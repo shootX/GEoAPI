@@ -41,3 +41,9 @@
 - [x] Picker skeletons, 120-second list cache, generation-matched photos, corner watermark, KA/EN value labels, deduped generations, sorted brands, collapsed API response, and the listed copy fixes.
 - [x] Pixel pass: home header, four demo selects (no year), testimonials, pricing and footer copy match `docs/mockups/home.html`. The photo stays in the card.
 - [x] `/dashboard` and `/account` render that cabinet. `CARAPI_CABINET_DEMO=1` fills the local screenshot with the mockup's project, usage, keys, and catalog cards.
+
+## 2026-10-20 — Auto-deploy
+
+- [x] `.github/workflows/deploy.yml` runs PHPUnit on push to `main`, then SSHes with `DEPLOY_HOST`, `DEPLOY_USER`, `DEPLOY_SSH_KEY`, and optional `DEPLOY_PORT`.
+- [x] The remote script deploys `/www/wwwroot/car.socialsave.cc` and runs `php artisan up` if a later command fails. Concurrency group `production-deploy` does not cancel an in-progress deploy. The workflow does not edit `.env`.
+- [ ] Owner: one-time setup in `docs/DEPLOY.md` (deploy key, `authorized_keys`, the four secrets, remote `shootX/GEoAPI`, `safe.directory`, owner `www`).

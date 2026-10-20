@@ -30,3 +30,7 @@ The first redesign only recolored the old layout. Home now follows `docs/mockups
 `/dashboard` and `/account` both render `App\Livewire\Account\Projects` with `public/assets/cabinet.css`. The `/dashboard` route is registered before Electrik's shell. When `CARAPI_CABINET_DEMO=1`, the cabinet shows the mockup sample (დემო პროექტი, 2 140 used, the 30-day bars, ვიჯეტი / სერვერი, and the six catalog cards) instead of the platform database. Leave that flag unset in production. PHPUnit forces it off.
 
 The blog link is omitted from the header and footer of pages that still use the public chrome while `blog_posts` has no visible row. The route stays. The legacy project desk at `/account/projects/{id}` was not rebuilt.
+
+## 2026-10-20 — Auto-deploy
+
+Push to `main` is `.github/workflows/deploy.yml`. PHPUnit runs first on the GitHub runner. The server step uses `appleboy/ssh-action` and the secrets `DEPLOY_HOST`, `DEPLOY_USER`, `DEPLOY_SSH_KEY`, and `DEPLOY_PORT` (22 when unset). Commands run in `/www/wwwroot/car.socialsave.cc`. The checkout owner is `www`. PHP-FPM stays `carapi`. The workflow never writes `.env`. One-time setup is `docs/DEPLOY.md`. The public remote is `https://github.com/shootX/GEoAPI.git`.
