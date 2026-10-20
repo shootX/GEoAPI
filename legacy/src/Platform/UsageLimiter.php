@@ -6,13 +6,32 @@ namespace Carapi\Platform;
 
 final class UsageLimiter
 {
-    public function __construct(private UsageStore $store)
-    {
-    }
+    public function __construct(private UsageStore $store) {}
 
     public static function fromEnv(): self
     {
+        if (self::memoryEnabled()) {
+            return new self(MemoryUsageStore::shared());
+        }
+
         return new self(new PostgresUsageStore(Connection::pdo()));
+    }
+
+    private static function memoryEnabled(): bool
+    {
+        if (! function_exists('app')) {
+            return false;
+        }
+        try {
+            if (! app()->environment('testing')) {
+                return false;
+            }
+        } catch (\Throwable) {
+            return false;
+        }
+        $flag = carapi_env('CARAPI_USAGE_MEMORY');
+
+        return is_string($flag) && in_array(strtolower(trim($flag)), ['1', 'true', 'on', 'yes'], true);
     }
 
     public static function now(): int
@@ -44,25 +63,48 @@ final class UsageLimiter
         return ['exceeded' => $hit['exceeded'], 'retry_after' => $hit['retry_after']];
     }
 
-    /** @return array{exceeded:bool,retry_after:int,missing:bool} */
+    /** @return array{exceeded:bool,retry_after:int,missing:bool,limit:int,count:int,reset_at:int} */
     public function hitProject(int $projectId, int $now): array
     {
-        if (!$this->store instanceof PostgresUsageStore) {
-            throw new UnavailableException();
-        }
-        $limit = $this->store->perMinute($projectId);
+        $limit = $this->perMinute($projectId);
         if ($limit === null) {
-            return ['exceeded' => true, 'retry_after' => 60, 'missing' => true];
+            return ['exceeded' => true, 'retry_after' => 60, 'missing' => true, 'limit' => 0, 'count' => 0, 'reset_at' => $now + 60];
         }
         $hit = $this->store->bumpWindow('project', (string) $projectId, $limit, $now);
+        $reset = $now - ((int) gmdate('s', $now)) + 60;
 
-        return ['exceeded' => $hit['exceeded'], 'retry_after' => $hit['retry_after'], 'missing' => false];
+        return [
+            'exceeded' => $hit['exceeded'],
+            'retry_after' => $hit['retry_after'],
+            'missing' => false,
+            'limit' => $limit,
+            'count' => $hit['count'],
+            'reset_at' => $reset,
+        ];
+    }
+
+    private function perMinute(int $projectId): ?int
+    {
+        if ($this->store instanceof PostgresUsageStore) {
+            return $this->store->perMinute($projectId);
+        }
+        if ($this->store instanceof MemoryUsageStore) {
+            return $this->store->perMinute;
+        }
+
+        throw new UnavailableException;
     }
 
     /** @return array{limit:int,used:int,remaining:int,exhausted:bool,reset_at:int}|null */
     public function previewMonth(int $projectId, int $now): ?array
     {
         return $this->store->previewMonth($projectId, $now);
+    }
+
+    /** @return array{limit:int,used:int,remaining:int,exhausted:bool,reset_at:int,enforced:bool}|null */
+    public function previewDay(int $projectId, int $now): ?array
+    {
+        return $this->store->previewDay($projectId, $now);
     }
 
     /** @return array{ok:bool,limit:int,used:int,remaining:int,reset_at:int} */

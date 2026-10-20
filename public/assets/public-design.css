@@ -662,6 +662,7 @@
 .notify { display: grid; gap: 8px; margin-top: auto; }
 .notify input { min-height: 44px; }
 .guide-layout { display: grid; grid-template-columns: 220px minmax(0, 1fr); gap: 28px; align-items: start; }
+.codebox .tabs { flex-wrap: wrap; }
 .guide-toc { position: sticky; top: 92px; display: grid; gap: 8px; padding: 14px; border: 1px solid #d7e7df; border-radius: 16px; background: #fff; }
 .guide-toc a { color: #285A48; text-decoration: none; font-size: 14px; font-weight: 600; }
 .guide-toc a:hover { color: #091413; }
