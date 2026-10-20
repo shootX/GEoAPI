@@ -268,7 +268,7 @@
             margin-bottom: 16px;
         }
 
-.mk .counts { display: flex; gap: 18px; color: var(--muted); font-size: 13px; }
+.mk .counts { display: flex; flex-wrap: wrap; gap: 18px; color: var(--muted); font-size: 13px; }
 
 .mk .counts b { display: block; color: var(--ink); font-size: 20px; font-variant-numeric: tabular-nums; }
 

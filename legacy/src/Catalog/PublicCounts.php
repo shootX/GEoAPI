@@ -8,7 +8,7 @@ final class PublicCounts
 {
     private const TTL = 120;
 
-    /** @return array{status:string, brands?:int, models?:int, generations?:int, generation_groups?:int, models_without_generations?:int} */
+    /** @return array{status:string, brands?:int, models?:int, generations?:int, generation_groups?:int, models_without_generations?:int, modifications?:int, photos?:int} */
     public static function read(): array
     {
         if (! Http::enabled()) {
@@ -22,7 +22,13 @@ final class PublicCounts
             $pdo = Connection::pdo();
             $coverage = (new CatalogRepository($pdo))->coverage();
             // coverage() groups a chassis into one generation. The public total is every row.
-            $generations = (int) $pdo->query('SELECT count(*) FROM public.generations')->fetchColumn();
+            $totals = $pdo->query(<<<'SQL'
+                SELECT
+                    (SELECT count(*) FROM public.generations) AS generations,
+                    (SELECT count(*) FROM public.model_photos WHERE image IS NOT NULL) AS photos
+            SQL)->fetch();
+            $generations = is_array($totals) ? (int) $totals['generations'] : 0;
+            $photos = is_array($totals) ? (int) $totals['photos'] : 0;
         } catch (UnavailableException|\PDOException) {
             return ['status' => 'unavailable'];
         }
@@ -36,6 +42,8 @@ final class PublicCounts
             'generations' => $generations,
             'generation_groups' => (int) $coverage['generations_count'],
             'models_without_generations' => (int) $coverage['models_without_generations_count'],
+            'modifications' => (int) $coverage['modifications_count'],
+            'photos' => $photos,
         ];
         self::store($counts);
 
@@ -59,16 +67,21 @@ final class PublicCounts
                 return null;
             }
         }
+        foreach (['modifications', 'photos'] as $optional) {
+            if (array_key_exists($optional, $decoded) && (! is_int($decoded[$optional]) || $decoded[$optional] < 0)) {
+                return null;
+            }
+        }
 
         return $decoded;
     }
 
-    /** @param array{status:string, brands:int, models:int, generations:int, generation_groups:int, models_without_generations:int} $counts */
+    /** @param array{status:string, brands:int, models:int, generations:int, generation_groups:int, models_without_generations:int, modifications:int, photos:int} $counts */
     private static function store(array $counts): void
     {
         $path = self::path();
         $dir = dirname($path);
-        if (! is_dir($dir)) {
+        if (! is_dir($dir) || (is_file($path) ? ! is_writable($path) : ! is_writable($dir))) {
             return;
         }
         file_put_contents($path, json_encode($counts), LOCK_EX);

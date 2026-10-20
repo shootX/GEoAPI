@@ -39,6 +39,8 @@ class PublicDesignTest extends TestCase
             'generations' => 22367,
             'generation_groups' => 10228,
             'models_without_generations' => 1,
+            'modifications' => 343640,
+            'photos' => 634,
         ]));
         $_ENV['CARAPI_CATALOG_ENABLED'] = '1';
         $_SERVER['CARAPI_CATALOG_ENABLED'] = '1';
@@ -52,6 +54,8 @@ class PublicDesignTest extends TestCase
                 ->assertSee('მზა არჩევანი')
                 ->assertDontSee('ამრჩევი')
                 ->assertSee('22 367', false)
+                ->assertSee('343 640', false)
+                ->assertSee('634', false)
                 ->assertDontSee('10 228', false);
         } finally {
             unset($_ENV['CARAPI_CATALOG_ENABLED'], $_SERVER['CARAPI_CATALOG_ENABLED']);

@@ -33,7 +33,7 @@
     <meta property="og:image" content="{{ $ogImage }}">
     <meta name="twitter:card" content="{{ $twitterCard }}">
     <meta name="twitter:title" content="{{ $title ?? 'CarAPI' }}">
-    <link rel="stylesheet" href="{{ asset('assets/public-design.css') }}?v=20261020v">
+    <link rel="stylesheet" href="{{ asset('assets/public-design.css') }}?v=20261021live">
     <x-electrik::brand-styles />
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <style>

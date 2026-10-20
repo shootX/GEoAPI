@@ -9,7 +9,7 @@
         'create' => 'Create a free account', 'docs' => 'Documentation',
         'key' => 'Key', 'car' => 'Car', 'gen' => 'Generation XV70', 'engine' => 'Engine 2.5',
         'try' => 'Try it here', 'flow' => 'Brand → model → generation → modification',
-        'brands' => 'brands', 'models' => 'models', 'generations' => 'generations',
+        'brands' => 'brands', 'models' => 'models', 'generations' => 'generations', 'modifications' => 'modifications', 'photos' => 'photos',
         'brand' => 'Brand', 'model' => 'Model', 'generation' => 'Generation', 'modification' => 'Modification',
         'featuresEyebrow' => 'Features', 'featuresTitle' => 'A catalog you build a screen on',
         'featuresLede' => 'The server API and the widget use one catalog. The secret key never reaches the browser.',
@@ -61,7 +61,7 @@
         'create' => 'უფასო ანგარიშის შექმნა', 'docs' => 'დოკუმენტაცია',
         'key' => 'გასაღები', 'car' => 'მანქანა', 'gen' => 'თაობა XV70', 'engine' => 'ძრავი 2.5',
         'try' => 'სცადეთ აქ', 'flow' => 'მარკა → მოდელი → თაობა → მოდიფიკაცია',
-        'brands' => 'მარკა', 'models' => 'მოდელი', 'generations' => 'თაობა',
+        'brands' => 'მარკა', 'models' => 'მოდელი', 'generations' => 'თაობა', 'modifications' => 'მოდიფიკაცია', 'photos' => 'ფოტო',
         'brand' => 'მარკა', 'model' => 'მოდელი', 'generation' => 'თაობა', 'modification' => 'მოდიფიკაცია',
         'featuresEyebrow' => 'შესაძლებლობები', 'featuresTitle' => 'კატალოგი, რომელზეც ეკრანს აწყობთ',
         'featuresLede' => 'სერვერული API და ვიჯეტი ერთ კატალოგს იყენებს. საიდუმლო გასაღები ბრაუზერში არ გადის.',
@@ -106,7 +106,6 @@
         'pickBrand' => 'აირჩიეთ მარკა', 'pickPrev' => 'ჯერ წინა საფეხური აირჩიეთ',
     ];
     $check = '<svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="#408A71" stroke-width="1.8"><circle cx="9" cy="9" r="7"/><path d="M5.5 9.2l2.2 2.2 4.8-5"/></svg>';
-    $carSvg = '<svg viewBox="0 0 160 72" fill="none" stroke="#285A48" stroke-width="2.2"><path d="M14 46h132l-10-18a8 8 0 0 0-7-4H34a8 8 0 0 0-7 4L14 46z"/><path d="M28 46v6M132 46v6"/><circle cx="42" cy="52" r="7" fill="#B0E4CC"/><circle cx="118" cy="52" r="7" fill="#B0E4CC"/><path d="M58 32h28l6 10H52l6-10z" stroke="#408A71"/></svg>';
 @endphp
 @component('components.layouts.public', [
     'title' => 'CarAPI — '.($en ? 'Vehicle data' : 'ავტომობილების მონაცემები'),
@@ -177,62 +176,21 @@
                             <p class="eyebrow">{{ $t['try'] }}</p>
                             <h2 id="demo-title" style="font-size:28px">{{ $t['flow'] }}</h2>
                         </div>
-                        <div class="counts">
-                            <div><b>314</b> {{ $t['brands'] }}</div>
-                            <div><b>4 710</b> {{ $t['models'] }}</div>
-                            <div><b>22 367</b> {{ $t['generations'] }}</div>
-                        </div>
-                    </div>
-                    <div class="picker">
-                        <label>{{ $t['brand'] }}
-                            <select id="brand">
-                                <option value="">{{ $t['brand'] }}</option>
-                                <option value="toyota" selected>Toyota</option>
-                                <option value="bmw">BMW</option>
-                                <option value="mercedes-benz">Mercedes-Benz</option>
-                            </select>
-                        </label>
-                        <label>{{ $t['model'] }}
-                            <select id="model">
-                                <option value="">{{ $t['model'] }}</option>
-                                <option value="camry" selected>Camry</option>
-                                <option value="corolla">Corolla</option>
-                            </select>
-                        </label>
-                        <label>{{ $t['generation'] }}
-                            <select id="generation">
-                                <option value="">{{ $t['generation'] }}</option>
-                                <option value="xv70" selected>XV70</option>
-                            </select>
-                        </label>
-                        <label>{{ $t['modification'] }}
-                            <select id="modification">
-                                <option value="">{{ $t['modification'] }}</option>
-                                <option value="2-5" selected>2.5</option>
-                                <option value="3-5">3.5</option>
-                            </select>
-                        </label>
-                    </div>
-                    <div class="result">
-                        <div class="photo-btn" id="photo-open">
-                            <img id="photo-img" alt="" hidden>
-                            <span class="photo-fallback" id="photo-fallback" aria-hidden="true">{!! $carSvg !!}</span>
-                            <span class="watermark">GEOAPI.GE</span>
-                        </div>
-                        <div class="result-body">
-                            <div class="result-copy">
-                                <h3 id="result-title">Toyota Camry</h3>
-                                <p id="result-meta">XV70 · 2017–2024 · 2.5</p>
-                                <p class="path" id="result-path">GET /api/v1/brands/toyota/models</p>
+                        @if ($catalogUp ?? false)
+                            <div class="counts">
+                                <div><b>{{ $brands }}</b> {{ $t['brands'] }}</div>
+                                <div><b>{{ $models }}</b> {{ $t['models'] }}</div>
+                                <div><b>{{ $generations }}</b> {{ $t['generations'] }}</div>
+                                @if (! empty($modifications))
+                                    <div><b>{{ $modifications }}</b> {{ $t['modifications'] }}</div>
+                                @endif
+                                @if (! empty($photos))
+                                    <div><b>{{ $photos }}</b> {{ $t['photos'] }}</div>
+                                @endif
                             </div>
-                            <pre id="result-json">{
-  "brand": "toyota",
-  "model": "camry",
-  "generation": "XV70",
-  "modification": "2.5"
-}</pre>
-                        </div>
+                        @endif
                     </div>
+                    @include('public.partials.vehicle-picker')
                 </section>
             </div>
         </div>
@@ -386,116 +344,6 @@
     </footer>
 </div>
 <script>
-    const catalog = {
-        toyota: { name: "Toyota", models: {
-            camry: { name: "Camry", generations: { xv70: { name: "XV70", years: "2017–2024", modifications: [{ id: "2-5", name: "2.5" }, { id: "3-5", name: "3.5" }] } } },
-            corolla: { name: "Corolla", generations: { e210: { name: "E210", years: "2018–2024", modifications: [{ id: "1-8", name: "1.8" }, { id: "2-0", name: "2.0 Hybrid" }] } } }
-        } },
-        bmw: { name: "BMW", models: {
-            "3-series": { name: "3 Series", generations: { g20: { name: "G20", years: "2019–2024", modifications: [{ id: "320i", name: "320i" }, { id: "330i", name: "330i" }] } } },
-            x5: { name: "X5", generations: { g05: { name: "G05", years: "2018–2024", modifications: [{ id: "30d", name: "30d" }, { id: "40i", name: "40i" }] } } }
-        } },
-        "mercedes-benz": { name: "Mercedes-Benz", models: {
-            "c-class": { name: "C-Class", generations: { w206: { name: "W206", years: "2021–2024", modifications: [{ id: "c200", name: "C 200" }, { id: "c300", name: "C 300" }] } } }
-        } }
-    };
-    const brand = document.getElementById("brand");
-    const model = document.getElementById("model");
-    const generation = document.getElementById("generation");
-    const modification = document.getElementById("modification");
-    const placeholders = { brand: @json($t['brand']), model: @json($t['model']), generation: @json($t['generation']), modification: @json($t['modification']) };
-    function fill(select, entries, placeholder) {
-        const current = select.value;
-        select.innerHTML = "";
-        const empty = document.createElement("option");
-        empty.value = "";
-        empty.textContent = placeholder;
-        select.appendChild(empty);
-        entries.forEach(function (entry) {
-            const option = document.createElement("option");
-            option.value = entry.id;
-            option.textContent = entry.name;
-            select.appendChild(option);
-        });
-        select.disabled = entries.length === 0;
-        if (current && entries.some(function (entry) { return entry.id === current; })) select.value = current;
-    }
-    function modelsOf(brandId) {
-        const row = catalog[brandId];
-        if (!row) return [];
-        return Object.keys(row.models).map(function (id) { return { id: id, name: row.models[id].name }; });
-    }
-    function generationsOf(brandId, modelId) {
-        const row = catalog[brandId] && catalog[brandId].models[modelId];
-        if (!row) return [];
-        return Object.keys(row.generations).map(function (id) { return { id: id, name: row.generations[id].name }; });
-    }
-    function modificationsOf(brandId, modelId, generationId) {
-        const row = catalog[brandId] && catalog[brandId].models[modelId] && catalog[brandId].models[modelId].generations[generationId];
-        return row ? row.modifications : [];
-    }
-    function paint() {
-        const brandId = brand.value;
-        const modelId = model.value;
-        const generationId = generation.value;
-        const modificationId = modification.value;
-        const brandRow = catalog[brandId];
-        const modelRow = brandRow && brandRow.models[modelId];
-        const generationRow = modelRow && modelRow.generations[generationId];
-        const modificationRow = (generationRow ? generationRow.modifications : []).find(function (item) { return item.id === modificationId; });
-        const title = [brandRow && brandRow.name, modelRow && modelRow.name].filter(Boolean).join(" ") || @json($t['pickBrand']);
-        const meta = [generationRow && generationRow.name, generationRow && generationRow.years, modificationRow && modificationRow.name].filter(Boolean).join(" · ") || @json($t['pickPrev']);
-        document.getElementById("result-title").textContent = title;
-        document.getElementById("result-meta").textContent = meta;
-        document.getElementById("result-path").textContent = brandId ? "GET /api/v1/brands/" + brandId + "/models" : "GET /api/v1/brands";
-        document.getElementById("result-json").textContent = JSON.stringify({
-            brand: brandId || null,
-            model: modelId || null,
-            generation: generationRow ? generationRow.name : null,
-            modification: modificationRow ? modificationRow.name : null
-        }, null, 2);
-        document.getElementById("photo-open").hidden = !modificationRow;
-        showPhoto(modificationRow ? "https://car.socialsave.cc/api/models/10/photo" : null);
-    }
-    let photoTried = false;
-    function showPhoto(url) {
-        const img = document.getElementById("photo-img");
-        const fallback = document.getElementById("photo-fallback");
-        if (!url) {
-            img.hidden = true;
-            fallback.hidden = false;
-            return;
-        }
-        if (photoTried) return;
-        photoTried = true;
-        img.onload = function () {
-            img.hidden = false;
-            fallback.hidden = true;
-        };
-        img.onerror = function () {
-            img.hidden = true;
-            fallback.hidden = false;
-        };
-        img.src = url;
-    }
-    function sync(from) {
-        if (from === "brand") {
-            fill(model, modelsOf(brand.value), placeholders.model);
-            fill(generation, [], placeholders.generation);
-            fill(modification, [], placeholders.modification);
-        } else if (from === "model") {
-            fill(generation, generationsOf(brand.value, model.value), placeholders.generation);
-            fill(modification, [], placeholders.modification);
-        } else if (from === "generation") {
-            fill(modification, modificationsOf(brand.value, model.value, generation.value), placeholders.modification);
-        }
-        paint();
-    }
-    brand.addEventListener("change", function () { sync("brand"); });
-    model.addEventListener("change", function () { sync("model"); });
-    generation.addEventListener("change", function () { sync("generation"); });
-    modification.addEventListener("change", paint);
-    showPhoto("https://car.socialsave.cc/api/models/10/photo");
     const menu = document.querySelector(".menu-toggle");
     const nav = document.getElementById("nav");
     menu.addEventListener("click", function () {
