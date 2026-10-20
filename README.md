@@ -1,6 +1,6 @@
 # carapi
 
-**A free, open-source alternative to imagin.studio that returns REAL car photographs — not 3D renders.**
+**A commercial alternative to imagin.studio that returns REAL car photographs — not 3D renders.**
 
 Give it a make and a model, get back an actual photo of that car, resolved from
 [Wikidata](https://www.wikidata.org) and served from [Wikimedia Commons](https://commons.wikimedia.org)
@@ -96,7 +96,8 @@ actual photo of the car instead of a render — and a **licence you must respect
 
 ## Attribution & licensing (important)
 
-The **code** in this repository is MIT. The **photos** are not: they come from
+The **code** in this repository is proprietary and commercial. No one else is
+granted the right to use it. The **photos** are not part of that code: they come from
 Wikimedia Commons under their own licences — mostly Creative Commons
 (CC BY / CC BY-SA) and public domain.
 
@@ -201,6 +202,6 @@ src/Cache/FilesystemCache.php local-directory cache (the default)
 
 ## License
 
-- Code: [MIT](LICENSE) © [Anovo.Ge](https://anovo.ge)
+- Code: proprietary, all rights reserved — [LICENSE](LICENSE) © [Anovo.Ge](https://anovo.ge)
 - Photos: © their respective authors, via Wikimedia Commons, under the licence
   stated in each response — attribution required where the licence says so.
