@@ -9,7 +9,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="robots" content="noindex, nofollow">
     <title>{{ $heading }} — GeoAPI ადმინი</title>
-    <link rel="icon" href="/assets/brand/favicon-32-lime.svg" type="image/svg+xml">
+    <link rel="icon" href="/favicon.ico" sizes="any">
+    <link rel="icon" href="/assets/brand/favicon-32.png" type="image/png" sizes="32x32">
+    <link rel="apple-touch-icon" href="/assets/brand/apple-touch-icon-180.png">
     <link rel="stylesheet" href="/assets/fonts/fonts.css?v=20261018">
     <link rel="stylesheet" href="/assets/admin.css?v=20261020r">
 </head>

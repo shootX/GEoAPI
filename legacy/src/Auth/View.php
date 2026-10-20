@@ -353,7 +353,7 @@ final class View
                 . '<form method="post" action="/logout"><input type="hidden" name="_csrf" value="'
                 . self::e(SessionAuth::csrf()) . '"><button class="btn" type="submit">გასვლა</button></form>';
 
-        return '<header><div class="bar"><a class="logo" href="/"><img src="/logo.png?v=3" alt="" width="48" height="48">car<span>api</span></a>'
+        return '<header><div class="bar"><a class="logo" href="/"><img src="/assets/brand/geoapi-lockup.png" alt="geoapi.ge" height="36"></a>'
             . '<nav>' . $right . '</nav></div></header>';
     }
 
@@ -433,7 +433,7 @@ final class View
   header{position:sticky;top:0;z-index:10;background:#fff;border-bottom:1px solid var(--line)}
   .bar{max-width:1120px;margin:0 auto;padding:16px 22px;display:flex;align-items:center;gap:18px}
   .logo{display:flex;align-items:center;gap:10px;font-family:Roboto,sans-serif;font-weight:700;font-size:22px;color:var(--ink);letter-spacing:-.02em}
-  .logo img{width:48px;height:48px;border-radius:12px;display:block}
+  .logo img{height:36px;width:auto;display:block}
   .logo span{color:var(--navy)}
   nav{display:flex;gap:16px;margin-left:auto;align-items:center}
   nav a{color:var(--ink);font-size:15px}

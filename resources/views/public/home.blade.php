@@ -115,7 +115,7 @@
 <div class="mk">
     <header class="site-header">
         <div class="wrap">
-            <a class="logo" href="#top"><span class="mark" aria-hidden="true"></span> GeoAPI</a>
+            <a class="logo" href="#top"><img src="{{ asset('assets/brand/geoapi-lockup.png') }}" alt="geoapi.ge" height="36"></a>
             <nav class="nav" id="nav" aria-label="{{ $en ? 'Main' : 'მთავარი' }}">
                 <a href="#features">{{ $t['nav1'] }}</a>
                 <a href="#how">{{ $t['nav2'] }}</a>
@@ -318,7 +318,7 @@
         <div class="wrap">
             <div class="footer-grid">
                 <div>
-                    <a class="logo" href="#top"><span class="mark"></span> GeoAPI</a>
+                    <a class="logo" href="#top"><img src="{{ asset('assets/brand/geoapi-lockup.png') }}" alt="geoapi.ge" height="36"></a>
                     <p style="margin-top:10px">{{ $t['foot'] }}</p>
                 </div>
                 <div>

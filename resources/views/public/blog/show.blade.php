@@ -2,7 +2,7 @@
     $en = $locale === 'en';
     $headline = $translation['meta_title'] !== '' ? $translation['meta_title'] : $translation['title'];
     $summary = $translation['meta_description'] !== '' ? $translation['meta_description'] : $translation['excerpt'];
-    $image = $post->coverUrl() ?: asset('assets/brand/favicon-32-lime.svg');
+    $image = $post->coverUrl() ?: asset('assets/brand/apple-touch-icon.png');
     $hreflang = [];
     foreach (['ka', 'en'] as $code) {
         if ($post->hasLocale($code)) {

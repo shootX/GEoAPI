@@ -15,8 +15,8 @@ final class SiteChrome
     public static function logo(string $href = '/'): string
     {
         return '<a href="' . $href . '" aria-label="GeoAPI მთავარი">'
-            . '<img class="lock lock-dark" src="/assets/brand/geoapi-lockup-dark.svg" alt="GeoAPI" height="36">'
-            . '<img class="lock lock-light" src="/assets/brand/geoapi-lockup-light.svg" alt="" height="36">'
+            . '<img class="lock lock-dark" src="/assets/brand/geoapi-lockup-dark.png" alt="geoapi.ge" height="36">'
+            . '<img class="lock lock-light" src="/assets/brand/geoapi-lockup.png" alt="" height="36">'
             . '</a>';
     }
 
@@ -73,7 +73,9 @@ final class SiteChrome
             . '<script>(function(){try{var t=localStorage.getItem("geoapi-theme")||localStorage.getItem("carapi-theme");if(t==="light")document.documentElement.dataset.theme="light"}catch(e){}})()</script>'
             . '<title>' . $pageTitle . '</title>'
             . '<meta name="description" content="' . htmlspecialchars($summary, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') . '">'
-            . '<link rel="icon" href="/assets/brand/favicon-32-lime.svg" type="image/svg+xml">'
+            . '<link rel="icon" href="/favicon.ico" sizes="any">'
+            . '<link rel="icon" href="/assets/brand/favicon-32.png" type="image/png" sizes="32x32">'
+            . '<link rel="apple-touch-icon" href="/assets/brand/apple-touch-icon-180.png">'
             . self::assets() . '</head><body>';
     }
 

@@ -12,7 +12,7 @@
 <div>
 <div class="app">
     <aside class="side" id="side">
-        <a class="logo" href="{{ url('/') }}"><span class="mark"></span> GeoAPI</a>
+        <a class="logo" href="{{ url('/') }}"><img src="{{ asset('assets/brand/geoapi-lockup.png') }}" alt="geoapi.ge" height="26"></a>
         <nav class="nav" aria-label="{{ $en ? 'Cabinet' : 'პანელი' }}">
             <button type="button" data-screen="overview" aria-current="page">{{ $en ? 'Overview' : 'მიმოხილვა' }}</button>
             <button type="button" data-screen="keys">{{ $en ? 'API keys' : 'API გასაღებები' }}</button>

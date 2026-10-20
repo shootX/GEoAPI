@@ -7,7 +7,7 @@
         $seo = $seo ?? [];
         $canonical = $seo['canonical'] ?? url()->current();
         $hreflang = $seo['hreflang'] ?? ['ka' => url('/ka'), 'en' => url('/en'), 'x-default' => url('/')];
-        $ogImage = $seo['image'] ?? asset('assets/brand/favicon-32-lime.svg');
+        $ogImage = $seo['image'] ?? asset('assets/brand/apple-touch-icon.png');
         $ogType = $seo['type'] ?? 'website';
         $twitterCard = $seo['card'] ?? 'summary';
     @endphp
@@ -18,7 +18,10 @@
     @if (!empty($robots))
         <meta name="robots" content="{{ $robots }}">
     @endif
-    <link rel="icon" href="{{ asset('assets/brand/favicon-32-lime.svg') }}" type="image/svg+xml">
+    <link rel="icon" href="{{ asset('favicon.ico') }}" sizes="any">
+    <link rel="icon" href="{{ asset('assets/brand/favicon-32.png') }}" type="image/png" sizes="32x32">
+    <link rel="icon" href="{{ asset('assets/brand/favicon-16.png') }}" type="image/png" sizes="16x16">
+    <link rel="apple-touch-icon" href="{{ asset('assets/brand/apple-touch-icon-180.png') }}">
     <link rel="canonical" href="{{ $canonical }}">
     @foreach ($hreflang as $lang => $href)
         <link rel="alternate" hreflang="{{ $lang }}" href="{{ $href }}">
@@ -33,7 +36,7 @@
     <meta property="og:image" content="{{ $ogImage }}">
     <meta name="twitter:card" content="{{ $twitterCard }}">
     <meta name="twitter:title" content="{{ $title ?? 'GeoAPI' }}">
-    <link rel="stylesheet" href="{{ asset('assets/public-design.css') }}?v=20261021live">
+    <link rel="stylesheet" href="{{ asset('assets/public-design.css') }}?v=20261021logo">
     <x-electrik::brand-styles />
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <style>
@@ -69,7 +72,7 @@
     <div class="flex min-h-screen flex-col">
         <header class="site-header {{ $homeNav ? 'is-overlay' : 'is-solid' }}">
             <div class="m-wrap">
-                <a class="m-logo" href="{{ url('/') }}"><span class="m-mark" aria-hidden="true"></span> GeoAPI</a>
+                <a class="m-logo" href="{{ url('/') }}"><img class="logo-full" src="{{ asset('assets/brand/geoapi-lockup.png') }}" alt="geoapi.ge" height="36"><img class="logo-mark" src="{{ asset('assets/brand/geoapi-mark-light.png') }}" alt="" height="32"></a>
                 <nav class="m-nav" aria-label="{{ __('Menu') }}">
                     @foreach ($nav as $item)
                         <a href="{{ $item['href'] }}">{{ $item['label'] }}</a>
@@ -112,7 +115,7 @@
             <div class="m-wrap">
                 <div class="footer-grid">
                     <div>
-                        <a class="m-logo" href="{{ url('/') }}"><span class="m-mark" aria-hidden="true"></span> GeoAPI</a>
+                        <a class="m-logo" href="{{ url('/') }}"><img src="{{ asset('assets/brand/geoapi-lockup.png') }}" alt="geoapi.ge" height="36"></a>
                         <p style="margin-top:10px">{{ __('Vehicle catalog API.') }}</p>
                     </div>
                     <div>
