@@ -4,6 +4,7 @@
     <p class="mt-3 text-base leading-7">{{ __('The free plan is the current limit. Pro is not on sale yet.') }}</p>
 </div>
 <div class="mt-8 grid gap-4 md:grid-cols-2">
+    <div class="plan-featured">
     <x-slate::card>
         <x-slate::card-header>
             <x-slate::card-title>Free</x-slate::card-title>
@@ -13,6 +14,7 @@
             <x-slate::button as="a" href="{{ route('register') }}" class="hero-cta">{{ __('Create a free account') }}</x-slate::button>
         </x-slate::card-content>
     </x-slate::card>
+    </div>
     <x-slate::card>
         <x-slate::card-header>
             <x-slate::card-title>Pro — {{ __('Soon') }}</x-slate::card-title>

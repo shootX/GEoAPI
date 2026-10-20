@@ -1,8 +1,8 @@
 .admin-app {
   margin: 0;
   min-height: 100vh;
-  background: #f4f7f8;
-  color: #1a2330;
+  background: #f4faf7;
+  color: #091413;
   font-family: "Noto Sans Georgian", Roboto, sans-serif;
   font-size: 15px;
   line-height: 1.4;
@@ -15,7 +15,7 @@
   left: 12px;
   top: -40px;
   background: #fff;
-  color: #12324a;
+  color: #091413;
   padding: 8px 12px;
 }
 
@@ -27,13 +27,13 @@
   gap: 20px;
   min-height: 64px;
   padding: 0 20px;
-  background: #12324a;
-  color: #f4f7f8;
+  background: #091413;
+  color: #f4faf7;
 }
 
 .admin-brand { margin: 0; font-size: 15px; letter-spacing: 0.08em; text-transform: uppercase; }
 
-.admin-brand span { color: #f0b429; }
+.admin-brand span { color: #B0E4CC; }
 
 .admin-bar h1 { margin: 0; font-size: 20px; font-weight: 600; }
 
@@ -41,9 +41,9 @@
   display: none;
   min-width: 44px;
   min-height: 44px;
-  border: 1px solid #8fb4c9;
+  border: 1px solid #408A71;
   background: transparent;
-  color: #f4f7f8;
+  color: #f4faf7;
   border-radius: 0;
 }
 
@@ -54,14 +54,14 @@
 .admin-who b { display: block; font-weight: 600; }
 
 .admin-who span,
-.admin-who a { color: #c5d5e0; font-size: 13px; }
+.admin-who a { color: #B0E4CC; font-size: 13px; }
 
 .admin-who a,
 .admin-who button {
   min-height: 44px;
   display: inline-flex;
   align-items: center;
-  color: #f4f7f8;
+  color: #f4faf7;
   text-decoration: underline;
   text-underline-offset: 3px;
 }
@@ -83,9 +83,9 @@
 }
 
 .admin-side {
-  background: #e7eef2;
-  color: #1a2330;
-  border-right: 1px solid #c5d3dc;
+  background: #e7f5ee;
+  color: #091413;
+  border-right: 1px solid #d7e7df;
   padding: 18px 12px 24px;
 }
 
@@ -105,15 +105,15 @@
 
 .admin-side a[aria-current="page"] {
   background: #fff;
-  border-left-color: #b86e00;
+  border-left-color: #408A71;
   font-weight: 600;
 }
 
-.admin-side span { color: #5c6e7c; }
+.admin-side span { color: #3d564c; }
 
 .admin-side small { font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase; }
 
-.admin-soon { margin: 24px 12px 0; color: #5c6e7c; font-size: 13px; }
+.admin-soon { margin: 24px 12px 0; color: #3d564c; font-size: 13px; }
 
 .admin-main { min-width: 0; padding: 24px 28px 40px; }
 
@@ -127,27 +127,27 @@
   font-weight: 700;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: #5c6e7c;
+  color: #3d564c;
 }
 
 .admin-cards {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 0;
-  border-top: 1px solid #c5d3dc;
-  border-left: 1px solid #c5d3dc;
+  border-top: 1px solid #d7e7df;
+  border-left: 1px solid #d7e7df;
   background: #fff;
 }
 
 .admin-card {
   min-width: 0;
   padding: 14px 16px 16px;
-  border-right: 1px solid #c5d3dc;
-  border-bottom: 1px solid #c5d3dc;
+  border-right: 1px solid #d7e7df;
+  border-bottom: 1px solid #d7e7df;
   border-radius: 0;
 }
 
-.admin-card p { margin: 0; color: #5c6e7c; font-size: 13px; }
+.admin-card p { margin: 0; color: #3d564c; font-size: 13px; }
 
 .admin-card strong {
   display: block;
@@ -168,7 +168,7 @@
   width: 100%;
   border-collapse: collapse;
   background: #fff;
-  border-top: 1px solid #c5d3dc;
+  border-top: 1px solid #d7e7df;
 }
 
 .admin-table th,
@@ -176,16 +176,16 @@
   padding: 10px 8px;
   text-align: left;
   vertical-align: top;
-  border-bottom: 1px solid #d5e0e6;
+  border-bottom: 1px solid #d7e7df;
   overflow-wrap: anywhere;
 }
 
-.admin-table th { font-size: 12px; color: #5c6e7c; font-weight: 700; }
+.admin-table th { font-size: 12px; color: #3d564c; font-weight: 700; }
 
 .admin-empty {
   margin: 0;
   padding: 14px 0;
-  color: #5c6e7c;
+  color: #3d564c;
 }
 
 .admin-filters {
@@ -202,18 +202,19 @@
   gap: 4px;
   flex: 1 1 160px;
   min-width: 0;
-  color: #5c6e7c;
+  color: #3d564c;
   font-size: 12px;
 }
 
 .admin-filters input,
 .admin-filters select,
+.admin-filters textarea,
 .admin-filters button {
   min-height: 44px;
-  border: 1px solid #c5d3dc;
+  border: 1px solid #d7e7df;
   border-radius: 0;
   background: #fff;
-  color: #1a2330;
+  color: #091413;
   font: inherit;
   width: 100%;
 }
@@ -222,17 +223,17 @@
   width: auto;
   min-width: 44px;
   padding: 0 16px;
-  background: #12324a;
-  color: #f4f7f8;
+  background: #091413;
+  color: #f4faf7;
   cursor: pointer;
 }
 
-.admin-meta { margin: 0 0 8px; color: #5c6e7c; }
+.admin-meta { margin: 0 0 8px; color: #3d564c; }
 
 .admin-pager { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; margin-top: 16px; }
 
 .admin-pager a,
-.admin-back { display: inline-flex; align-items: center; min-height: 44px; color: #12324a; }
+.admin-back { display: inline-flex; align-items: center; min-height: 44px; color: #091413; }
 
 .admin-back { margin-bottom: 12px; }
 
@@ -241,22 +242,22 @@
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 0;
   margin: 0;
-  border-top: 1px solid #c5d3dc;
-  border-left: 1px solid #c5d3dc;
+  border-top: 1px solid #d7e7df;
+  border-left: 1px solid #d7e7df;
   background: #fff;
 }
 
 .admin-system div {
   padding: 14px 16px;
-  border-right: 1px solid #c5d3dc;
-  border-bottom: 1px solid #c5d3dc;
+  border-right: 1px solid #d7e7df;
+  border-bottom: 1px solid #d7e7df;
 }
 
-.admin-system dt { color: #5c6e7c; font-size: 12px; letter-spacing: 0.04em; text-transform: uppercase; }
+.admin-system dt { color: #3d564c; font-size: 12px; letter-spacing: 0.04em; text-transform: uppercase; }
 
 .admin-system dd { margin: 6px 0 0; }
 
-.admin-app :focus-visible { outline: 2px solid #b86e00; outline-offset: 2px; }
+.admin-app :focus-visible { outline: 2px solid #408A71; outline-offset: 2px; }
 
 @media (max-width: 1279px) {
   .admin-cards,
@@ -286,9 +287,9 @@
   .admin-cards,
   .admin-system dl { grid-template-columns: 1fr; }
   .admin-table thead { display: none; }
-  .admin-table tr { display: block; padding: 8px 0; border-bottom: 1px solid #d5e0e6; }
+  .admin-table tr { display: block; padding: 8px 0; border-bottom: 1px solid #d7e7df; }
   .admin-table td { display: block; border-bottom: 0; padding: 2px 0; }
-  .admin-table td::before { content: attr(data-label); display: block; color: #5c6e7c; font-size: 12px; }
+  .admin-table td::before { content: attr(data-label); display: block; color: #3d564c; font-size: 12px; }
 }
 
 @media (max-width: 375px) {

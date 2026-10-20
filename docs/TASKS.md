@@ -19,3 +19,17 @@
 - [ ] Owner: set `APP_DEBUG=false` in production and configure SMTP, including installing PHPMailer if `CARAPI_MAIL_*` is used.
 - [ ] Owner: rotate any admin token that was pasted into the audit chat. It is not in this repository.
 - [ ] Logos and model photos are still empty until ingest supplies files. No import was added.
+
+## 2026-10-20 — Blog
+
+- [x] Public `/blog` list with pagination, category and tag filters, and `/blog/{slug}`.
+- [x] Georgian and English translations, RSS, sitemap entries, reading time, related posts, and per-post SEO.
+- [x] Admin panel at `/admin/blog` and Sanctum CRUD at `/api/admin/blog`.
+- [ ] Owner: run `php artisan migrate` and `php artisan storage:link` so covers are reachable. The panel needs a Laravel admin or operator session.
+
+## 2026-10-20 — Public redesign
+
+- [x] Apply the approved ink / pine / leaf / mint palette and Noto Sans Georgian to the public layout, home, pricing, guide, legal pages, blog, auth, coming-soon, and error pages.
+- [x] Keep the vehicle picker photo inside the demo card. Do not add a lightbox.
+- [x] Recolor the Electrik cabinet, the legacy project desk, and the admin stylesheet without changing their behavior.
+- [ ] Owner: if production sets `ELECTRIK_BRAND_PRIMARY` to the old orange, remove it so the default `#285A48` is used.

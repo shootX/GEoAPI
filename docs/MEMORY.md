@@ -18,3 +18,15 @@ Picker queries always filter by brand, model, generation, or modification id. Th
 - Admin catalog integers are cast in `WritableCatalog::present`. Public picker ids stay strings because the guide and the widget already consume strings.
 - Home `22 367` is production row count, not a constant in the view. Tests seed `legacy/cache/public-counts.json`.
 - No API keys, passwords, or `.env` secrets were found in the tree. `.env` is gitignored.
+
+## 2026-10-20 — Blog
+
+Posts live in `blog_posts.translations` as `{ka, en}` objects with `title`, `excerpt`, `body` (Markdown), `meta_title`, and `meta_description`. One slug is shared by both languages. Public URLs are `/ka/blog/{slug}` and `/en/blog/{slug}`; `/blog/{slug}` follows the session locale. `published` is visible immediately. `scheduled` is visible when `publish_at` is in the past. Drafts are 404 for visitors and `noindex` for an admin. Covers are stored on the `public` disk under `blog/covers/`. The panel reuses `/assets/admin.css` and expects a Laravel admin or operator session; a platform-only cookie does not open `/admin/blog`. The public pages reuse `components.layouts.public` and do not add a new stylesheet.
+
+## 2026-10-20 — Public redesign
+
+The live site follows the approved mockups: ink `#091413`, pine `#285A48`, leaf `#408A71`, mint `#B0E4CC`, wash `#f4faf7`. Noto Sans Georgian is the Georgian face and is already self-hosted at `/assets/fonts/noto-sans-georgian.woff2`; FiraGO stays for the other letters. `config/electrik.php` defaults the brand primary to `#285A48`.
+
+The home demo still includes `public/partials/vehicle-picker.blade.php` and `/assets/vehicle-picker.js`. Choosing a modification fills `#vp-card` in place. The image request stays `GET /api/models/{id}/photo`, and `DemoWatermark` still stamps `GEOAPI.GE`. The mockup lightbox was not copied into the live picker.
+
+Password reset and email verification use the public layout through `resources/views/vendor/electrik/components/layouts/guest.blade.php`. The project desk in `public/assets/site.css` and the admin panel in `public/assets/admin.css` only changed color.

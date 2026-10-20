@@ -63,7 +63,7 @@
     #vehicle-picker .vp-field.open [data-vp-trigger] svg { transform: rotate(180deg); }
     #vehicle-picker [data-vp-label] { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
     #vehicle-picker .is-empty { color: var(--slate-muted-foreground); font-weight: 400; }
-    #vehicle-picker [data-vp-pop] { position: absolute; left: -1px; right: -1px; top: calc(100% + 8px); z-index: 40; overflow: hidden; border: 1px solid var(--slate-input); border-radius: 0.75rem; background: var(--slate-card); box-shadow: 0 18px 44px rgba(27, 18, 36, 0.12); transform-origin: top center; animation: vp-open 0.18s ease; }
+    #vehicle-picker [data-vp-pop] { position: absolute; left: -1px; right: -1px; top: calc(100% + 8px); z-index: 40; overflow: hidden; border: 1px solid var(--slate-input); border-radius: 0.75rem; background: var(--slate-card); box-shadow: 0 18px 44px rgba(9, 20, 19, 0.12); transform-origin: top center; animation: vp-open 0.18s ease; }
     #vehicle-picker [data-vp-q] { width: 100%; padding: 0.75rem 1rem; border: 0; border-bottom: 1px solid var(--slate-border); background: transparent; color: inherit; font-size: 14px; outline: none; }
     #vehicle-picker [data-vp-hint] { margin: 0; padding: 0.6rem 1rem 0; font-size: 12px; color: var(--slate-muted-foreground); }
     #vehicle-picker [data-vp-list] { display: grid; grid-template-columns: repeat(auto-fill, minmax(14rem, 1fr)); max-height: 18rem; margin: 0; padding: 0.4rem; overflow: auto; list-style: none; }
@@ -73,14 +73,14 @@
     #vp-status { min-height: 1.25rem; margin: 0.6rem 0 0; font-size: 12px; color: var(--slate-muted-foreground); }
     #vp-card { margin-top: 0.85rem; overflow: hidden; border: 1px solid var(--slate-border); border-radius: 0.75rem; background: var(--slate-card); animation: vp-open 0.22s ease; }
     #vehicle-picker .vp-sheet { display: block; }
-    #vehicle-picker .vp-photo { position: relative; border-bottom: 1px solid var(--slate-border); background: #f4f4f5; -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; }
+    #vehicle-picker .vp-photo { position: relative; border-bottom: 1px solid var(--slate-border); background: #e7f5ee; -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; }
     #vp-flag { position: absolute; right: 0.55rem; bottom: 0.55rem; z-index: 2; display: grid; place-items: center; width: 2rem; height: 2rem; padding: 0; border: 0; border-radius: 999px; background: #d1264a; color: #fff; cursor: pointer; }
     #vp-flag svg { width: 1rem; height: 1rem; }
     #vp-flag:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
     #vp-flag:disabled { cursor: default; }
-    #vp-flag-note { position: absolute; left: 0.55rem; right: 3.2rem; bottom: 0.55rem; z-index: 2; margin: 0; padding: 0.45rem 0.6rem; border-radius: 0.5rem; background: rgba(27, 18, 36, 0.88); color: #fff; font-size: 13px; line-height: 1.35; }
-    #vp-empty { display: grid; place-items: center; width: 100%; min-height: 11rem; background: #f4f4f5; color: #52525b; font-size: 14px; }
-    #vp-img { display: block; width: 100%; height: auto; background: #f4f4f5; pointer-events: none; -webkit-user-drag: none; user-select: none; -webkit-touch-callout: none; }
+    #vp-flag-note { position: absolute; left: 0.55rem; right: 3.2rem; bottom: 0.55rem; z-index: 2; margin: 0; padding: 0.45rem 0.6rem; border-radius: 0.5rem; background: rgba(9, 20, 19, 0.88); color: #fff; font-size: 13px; line-height: 1.35; }
+    #vp-empty { display: grid; place-items: center; width: 100%; min-height: 11rem; background: #e7f5ee; color: #3d564c; font-size: 14px; }
+    #vp-img { display: block; width: 100%; height: auto; background: #e7f5ee; pointer-events: none; -webkit-user-drag: none; user-select: none; -webkit-touch-callout: none; }
     #vp-shield { position: absolute; inset: 0; z-index: 1; }
     #vehicle-picker .vp-body { padding: 1.1rem 1.25rem 1.2rem; }
     #vp-title { margin: 0; font-size: 1.05rem; font-weight: 600; letter-spacing: -0.01em; }
