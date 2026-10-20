@@ -644,7 +644,7 @@
 .api-fold summary { cursor: pointer; font-weight: 700; }
 .api-fold pre { margin-top: 12px; }
 @media (max-width: 980px) {
-    .m-nav, .site-header .m-cta { display: none; }
+    .m-nav { display: none; }
     .m-menu { display: inline-flex; margin-left: auto; }
     .site-footer .footer-grid, .plan-grid, .guide-layout { grid-template-columns: 1fr; }
     .guide-toc { position: static; }
