@@ -33,6 +33,7 @@
     <meta property="og:image" content="{{ $ogImage }}">
     <meta name="twitter:card" content="{{ $twitterCard }}">
     <meta name="twitter:title" content="{{ $title ?? 'CarAPI' }}">
+    <link rel="stylesheet" href="{{ asset('assets/public-design.css') }}?v=20261020s">
     <x-electrik::brand-styles />
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <style>
@@ -46,69 +47,94 @@
         article code { font-size: 0.85em; }
     </style>
 </head>
-<body class="site min-h-screen text-foreground antialiased">
+@php
+    $showBlog = \Illuminate\Support\Facades\Schema::hasTable('blog_posts')
+        && \App\Models\BlogPost::query()->visible()->exists();
+    $homeNav = ! empty($home ?? null);
+    $nav = [
+        ['href' => $homeNav ? '#features' : url('/').'#features', 'label' => __('Features')],
+        ['href' => $homeNav ? '#how' : url('/').'#how', 'label' => __('How it works')],
+        ['href' => $homeNav ? '#pricing' : route('pricing'), 'label' => __('Pricing')],
+        ['href' => url('/demo'), 'label' => __('Demo')],
+        ['href' => url('/guide'), 'label' => __('Documentation')],
+    ];
+    if ($showBlog) {
+        $nav[] = ['href' => url('/blog'), 'label' => __('Blog')];
+    }
+@endphp
+<body class="site min-h-screen text-foreground antialiased {{ $homeNav ? 'is-home' : '' }}">
     <div class="flex min-h-screen flex-col">
-        <header class="site-bar">
-            <div class="mx-auto flex h-16 max-w-6xl items-center gap-2 px-4 sm:px-6">
-                <a href="{{ url('/') }}" class="flex shrink-0 items-center gap-2 text-base font-extrabold tracking-tight text-white">
-                    <span class="site-mark size-5 rounded-md"></span>
-                    CarAPI
-                </a>
-                <div class="ml-auto flex items-center gap-2">
-                    <nav class="hidden items-center gap-4 text-sm min-[761px]:flex" aria-label="{{ __('Documentation') }}">
-                        <a href="{{ url('/guide') }}" class="site-link">{{ __('Documentation') }}</a>
-                        <a href="{{ route('pricing') }}" class="site-link">{{ __('Pricing') }}</a>
-                        <a href="{{ url('/blog') }}" class="site-link">{{ __('Blog') }}</a>
-                        @auth
-                            <a href="{{ url('/account') }}" class="site-link">{{ __('Cabinet') }}</a>
-                        @else
-                            <a href="{{ route('login') }}" class="site-link">{{ __('Sign in') }}</a>
-                        @endauth
-                    </nav>
-                    @include('components.locale-switch')
-                    @guest
-                        <x-slate::button as="a" href="{{ route('register') }}" class="header-cta hero-cta">{{ __('Create account') }}</x-slate::button>
-                    @endguest
-                    <button
-                        type="button"
-                        class="inline-flex size-11 items-center justify-center rounded-md border border-border min-[761px]:hidden"
-                        aria-expanded="false"
-                        aria-controls="site-menu"
-                        data-nav-toggle
-                        aria-label="{{ __('Menu') }}"
-                    >
-                        <svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true">
-                            <path d="M3 5h12M3 9h12M3 13h12"/>
-                        </svg>
-                    </button>
-                </div>
+        <header class="site-header {{ $homeNav ? 'is-overlay' : 'is-solid' }}">
+            <div class="m-wrap">
+                <a class="m-logo" href="{{ url('/') }}"><span class="m-mark" aria-hidden="true"></span> CarAPI</a>
+                <nav class="m-nav" aria-label="{{ __('Menu') }}">
+                    @foreach ($nav as $item)
+                        <a href="{{ $item['href'] }}">{{ $item['label'] }}</a>
+                    @endforeach
+                    @auth
+                        <a href="{{ url('/account') }}">{{ __('Cabinet') }}</a>
+                    @else
+                        <a href="{{ route('login') }}">{{ __('Sign in') }}</a>
+                    @endauth
+                </nav>
+                <nav class="m-lang" aria-label="{{ __('Language') }}">
+                    <a href="{{ route('locale.switch', 'ka') }}" @if (app()->getLocale() === 'ka') aria-current="true" @endif>KA</a>
+                    <span aria-hidden="true">/</span>
+                    <a href="{{ route('locale.switch', 'en') }}" @if (app()->getLocale() === 'en') aria-current="true" @endif>EN</a>
+                </nav>
+                @guest
+                    <a class="m-cta" href="{{ route('register') }}">{{ __('Free account') }}</a>
+                @endguest
+                <button type="button" class="m-menu" aria-expanded="false" aria-controls="site-menu" data-nav-toggle>{{ __('Menu') }}</button>
             </div>
-            <nav id="site-menu" hidden class="border-t px-4 py-2 min-[761px]:hidden">
-                <a href="{{ url('/guide') }}" class="block py-3 text-sm font-semibold">{{ __('Documentation') }}</a>
-                <a href="{{ route('pricing') }}" class="block py-3 text-sm font-semibold">{{ __('Pricing') }}</a>
-                <a href="{{ url('/blog') }}" class="block py-3 text-sm font-semibold">{{ __('Blog') }}</a>
+            <nav id="site-menu" hidden>
+                @foreach ($nav as $item)
+                    <a href="{{ $item['href'] }}">{{ $item['label'] }}</a>
+                @endforeach
                 @auth
-                    <a href="{{ url('/account') }}" class="block py-3 text-sm font-semibold">{{ __('Cabinet') }}</a>
+                    <a href="{{ url('/account') }}">{{ __('Cabinet') }}</a>
                 @else
-                    <a href="{{ route('login') }}" class="block py-3 text-sm font-semibold">{{ __('Sign in') }}</a>
-                    <a href="{{ route('register') }}" class="block py-3 text-sm font-semibold">{{ __('Create account') }}</a>
+                    <a href="{{ route('login') }}">{{ __('Sign in') }}</a>
+                    <a href="{{ route('register') }}">{{ __('Free account') }}</a>
                 @endauth
             </nav>
         </header>
         <main class="site-main mx-auto w-full min-w-0 max-w-6xl flex-1 px-4 py-12 sm:px-6 md:py-16 {{ !empty($bleed) ? 'is-bleed' : '' }}">
+            @if (session('coming_soon_saved'))
+                <p class="mb-6 rounded-2xl border border-[#d7e7df] bg-white px-4 py-3 text-sm">{{ __('Thanks. We will write when Pro opens.') }}</p>
+            @endif
             {{ $slot }}
         </main>
-        <footer class="site-foot">
-            <div class="mx-auto flex max-w-6xl flex-col gap-4 px-4 py-8 text-sm sm:flex-row sm:items-center sm:justify-between sm:px-6">
-                <p class="text-muted-foreground">© {{ date('Y') }} CarAPI</p>
-                <nav class="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:gap-x-5" aria-label="{{ __('Contact') }}">
-                    <a class="accent" href="{{ url('/guide') }}">{{ __('Documentation') }}</a>
-                    <a class="accent" href="{{ route('pricing') }}">{{ __('Pricing') }}</a>
-                    <a class="accent" href="{{ url('/privacy') }}">{{ __('Privacy') }}</a>
-                    <a class="accent" href="{{ url('/blog') }}">{{ __('Blog') }}</a>
-                    <a class="accent" href="{{ url('/terms') }}">{{ __('Terms') }}</a>
-                    <a class="accent" href="mailto:info@socialsave.cc">{{ __('Contact') }}</a>
-                </nav>
+        <footer class="site-footer">
+            <div class="m-wrap">
+                <div class="footer-grid">
+                    <div>
+                        <a class="m-logo" href="{{ url('/') }}"><span class="m-mark" aria-hidden="true"></span> CarAPI</a>
+                        <p style="margin-top:10px">{{ __('Vehicle catalog API. The source is drom.ru.') }}</p>
+                    </div>
+                    <div>
+                        <h3>{{ __('Product') }}</h3>
+                        <a href="{{ url('/') }}#features">{{ __('Features') }}</a>
+                        <a href="{{ url('/') }}#how">{{ __('How it works') }}</a>
+                        <a href="{{ route('pricing') }}">{{ __('Pricing') }}</a>
+                    </div>
+                    <div>
+                        <h3>{{ __('Documentation') }}</h3>
+                        <a href="{{ url('/demo') }}">{{ __('Demo') }}</a>
+                        <a href="{{ url('/guide') }}">{{ __('Documentation') }}</a>
+                        <a href="{{ url('/') }}#faq">{{ __('Questions') }}</a>
+                    </div>
+                    <div>
+                        <h3>{{ __('Contact') }}</h3>
+                        <a href="mailto:info@socialsave.cc">info@socialsave.cc</a>
+                        <a href="{{ url('/privacy') }}">{{ __('Privacy') }}</a>
+                        <a href="{{ url('/terms') }}">{{ __('Terms') }}</a>
+                        @if ($showBlog)
+                            <a href="{{ url('/blog') }}">{{ __('Blog') }}</a>
+                        @endif
+                    </div>
+                </div>
+                <p class="legal">© {{ date('Y') }} CarAPI</p>
             </div>
         </footer>
     </div>

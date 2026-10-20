@@ -4,19 +4,36 @@ declare(strict_types=1);
 
 namespace App\Livewire\Account;
 
+use Carapi\Platform\ApiKeys;
 use Carapi\Platform\Connection;
 use Carapi\Platform\ProjectRepository;
+use Carapi\Platform\UnavailableException;
+use Carapi\Platform\WidgetRepository;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Title;
 use Livewire\Component;
+use PDO;
+use PDOException;
 
-#[Layout('electrik::components.layouts.app')]
-#[Title('პროექტები')]
+#[Layout('components.layouts.cabinet')]
+#[Title('CarAPI')]
 final class Projects extends Component
 {
     public string $name = '';
 
     public string $website_url = '';
+
+    public string $key_name = '';
+
+    public string $key_kind = 'secret';
+
+    public ?int $projectId = null;
+
+    public function mount(): void
+    {
+        $snap = $this->snapshot();
+        $this->projectId = $snap['project']['id'] ?? null;
+    }
 
     public function create(): void
     {
@@ -36,15 +53,207 @@ final class Projects extends Component
             }
         }
         $id = (new ProjectRepository(Connection::pdo()))->insert($legacyId, $name, $website === '' ? null : $website);
+        $this->projectId = $id;
         $this->reset('name', 'website_url');
-        $this->redirect('/account/projects/'.$id);
+    }
+
+    public function selectProject(int $id): void
+    {
+        $owned = (new ProjectRepository(Connection::pdo()))->findOwned($this->legacyId(), $id);
+        if ($owned === null) {
+            return;
+        }
+        $this->projectId = $id;
+    }
+
+    public function createKey(): void
+    {
+        $this->validate([
+            'key_name' => ['required', 'string', 'min:2', 'max:80'],
+            'key_kind' => ['required', 'in:public,secret'],
+        ]);
+        if ($this->projectId === null) {
+            $this->addError('key_name', app()->getLocale() === 'en' ? 'Create a project first.' : 'ჯერ შექმენით პროექტი.');
+
+            return;
+        }
+        $userId = $this->legacyId();
+        $pdo = Connection::pdo();
+        if ($this->key_kind === 'public') {
+            $token = (new WidgetRepository($pdo))->rotate($userId, (int) $this->projectId);
+            if (! is_string($token) || $token === '') {
+                $this->addError('key_name', app()->getLocale() === 'en' ? 'The public key was not created.' : 'საჯარო გასაღები ვერ შეიქმნა.');
+
+                return;
+            }
+            session()->flash('revealed_key', $token);
+            $this->reset('key_name');
+
+            return;
+        }
+        if (auth()->user()?->email_verified_at === null) {
+            $this->addError('key_name', app()->getLocale() === 'en'
+                ? 'Confirm your email before creating a secret key.'
+                : 'საიდუმლო API გასაღების შესაქმნელად ჯერ დაადასტურეთ ელფოსტა.');
+
+            return;
+        }
+        if (class_exists(\App\Access\LegacyGate::class)) {
+            $denial = \App\Access\LegacyGate::issueKey($userId);
+            if ($denial !== null) {
+                $this->addError('key_name', (string) ($denial['body']['error']['message'] ?? ''));
+
+                return;
+            }
+        }
+        $issued = ApiKeys::issue();
+        $saved = (new ProjectRepository($pdo))->insertKey($userId, (int) $this->projectId, trim($this->key_name), $issued['selector'], $issued['hash'], null);
+        if (! $saved) {
+            $this->addError('key_name', app()->getLocale() === 'en' ? 'The key was not created.' : 'გასაღები ვერ შეიქმნა.');
+
+            return;
+        }
+        session()->flash('revealed_key', $issued['token']);
+        $this->reset('key_name');
+    }
+
+    public function revokeKey(int $keyId): void
+    {
+        if ($this->projectId === null) {
+            return;
+        }
+        (new ProjectRepository(Connection::pdo()))->revoke($this->legacyId(), (int) $this->projectId, $keyId);
     }
 
     public function render()
     {
-        $rows = (new ProjectRepository(Connection::pdo()))->forUser($this->legacyId());
+        return view('livewire.account.projects', $this->snapshot());
+    }
 
-        return view('livewire.account.projects', ['projects' => $rows]);
+    /** @return array<string, mixed> */
+    private function snapshot(): array
+    {
+        $emptyDays = [];
+        for ($i = 0; $i < 30; $i++) {
+            $emptyDays[] = ['day' => '', 'used' => 0];
+        }
+        $base = [
+            'unavailable' => false,
+            'projects' => [],
+            'project' => null,
+            'keys' => [],
+            'widget' => null,
+            'used' => 0,
+            'limit' => 10000,
+            'remaining' => 10000,
+            'perMinute' => 60,
+            'days' => $emptyDays,
+            'activeKeys' => 0,
+        ];
+        try {
+            $pdo = Connection::pdo();
+            $repo = new ProjectRepository($pdo);
+            $projects = $repo->forUser($this->legacyId());
+        } catch (UnavailableException|PDOException) {
+            $base['unavailable'] = true;
+
+            return $base;
+        }
+        $base['projects'] = $projects;
+        $project = null;
+        foreach ($projects as $row) {
+            if ($this->projectId !== null && (int) $row['id'] === (int) $this->projectId) {
+                $project = $row;
+                break;
+            }
+        }
+        if ($project === null && $projects !== []) {
+            $project = $projects[0];
+            $this->projectId = (int) $project['id'];
+        }
+        if ($project === null) {
+            return $base;
+        }
+        $base['project'] = $project;
+        $id = (int) $project['id'];
+        $usage = $this->usage($pdo, $id);
+        $base['used'] = $usage['used'];
+        $base['limit'] = $usage['limit'];
+        $base['remaining'] = max(0, $usage['limit'] - $usage['used']);
+        $base['perMinute'] = $usage['per_minute'];
+        $base['days'] = $this->days($pdo, $id);
+        $keys = $repo->keys($this->legacyId(), $id);
+        $base['keys'] = $keys;
+        $active = 0;
+        foreach ($keys as $key) {
+            if (($key['revoked_at'] ?? null) === null) {
+                $active++;
+            }
+        }
+        $widget = (new WidgetRepository($pdo))->findOwned($this->legacyId(), $id);
+        if (is_array($widget) && ($widget['public_key'] ?? '') !== '') {
+            $active++;
+        }
+        $base['widget'] = $widget;
+        $base['activeKeys'] = $active;
+
+        return $base;
+    }
+
+    /** @return array{used:int,limit:int,per_minute:int} */
+    private function usage(PDO $pdo, int $projectId): array
+    {
+        $stmt = $pdo->prepare(<<<'SQL'
+            SELECT COALESCE(l.monthly_quota, 10000) AS monthly_quota,
+                   COALESCE(l.per_minute, 60) AS per_minute,
+                   COALESCE(m.used_count, 0) AS used_count
+            FROM platform.projects p
+            LEFT JOIN platform.project_limits l ON l.project_id = p.id
+            LEFT JOIN platform.monthly_usage m ON m.project_id = p.id AND m.period = :period
+            WHERE p.id = :id AND p.user_id = :user_id
+        SQL);
+        $stmt->bindValue('period', gmdate('Y-m-01'));
+        $stmt->bindValue('id', $projectId, PDO::PARAM_INT);
+        $stmt->bindValue('user_id', $this->legacyId(), PDO::PARAM_INT);
+        $stmt->execute();
+        $row = $stmt->fetch();
+        if ($row === false) {
+            return ['used' => 0, 'limit' => 10000, 'per_minute' => 60];
+        }
+
+        return [
+            'used' => (int) $row['used_count'],
+            'limit' => (int) $row['monthly_quota'],
+            'per_minute' => (int) $row['per_minute'],
+        ];
+    }
+
+    /** @return list<array{day:string,used:int}> */
+    private function days(PDO $pdo, int $projectId): array
+    {
+        $today = gmmktime(0, 0, 0, (int) gmdate('n'), (int) gmdate('j'), (int) gmdate('Y'));
+        $start = $today - (29 * 86400);
+        $stmt = $pdo->prepare(<<<'SQL'
+            SELECT day::text AS day, sum(used_count) AS used
+            FROM platform.daily_usage
+            WHERE project_id = :id AND day >= :start AND day <= :end
+            GROUP BY day
+        SQL);
+        $stmt->bindValue('id', $projectId, PDO::PARAM_INT);
+        $stmt->bindValue('start', gmdate('Y-m-d', $start));
+        $stmt->bindValue('end', gmdate('Y-m-d', $today));
+        $stmt->execute();
+        $byDay = [];
+        foreach ($stmt->fetchAll() ?: [] as $row) {
+            $byDay[(string) $row['day']] = (int) $row['used'];
+        }
+        $days = [];
+        for ($i = 0; $i < 30; $i++) {
+            $day = gmdate('Y-m-d', $start + ($i * 86400));
+            $days[] = ['day' => $day, 'used' => $byDay[$day] ?? 0];
+        }
+
+        return $days;
     }
 
     private function legacyId(): int

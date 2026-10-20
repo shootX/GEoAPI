@@ -1,95 +1,370 @@
+@php
+    $en = app()->getLocale() === 'en';
+    $t = $en ? [
+        'eyebrow' => 'Catalog API · drom.ru',
+        'lede' => 'Get brands, models, generations, and modifications from your server, or place a ready picker on the site. The source is drom.ru.',
+        'try' => 'Try it here',
+        'flow' => 'Brand → model → generation → modification',
+        'brand' => 'brands',
+        'model' => 'models',
+        'generation' => 'generations',
+        'featuresEyebrow' => 'Features',
+        'featuresTitle' => 'A catalog you build a screen on',
+        'featuresLede' => 'The server API and the widget use one catalog. The secret key never reaches the browser.',
+        'f1t' => 'Read it from your server',
+        'f1p' => 'Build your own screen on top of brands, models, generations, and modifications.',
+        'f2t' => 'Drop a picker on your site',
+        'f2p' => 'Visitors choose a vehicle in the browser. The secret key never leaves your server.',
+        'f3t' => 'Stable identifiers',
+        'f3p' => 'slug and id, pages with page and per_page. The response is JSON.',
+        'f4t' => 'Start on the free plan',
+        'f4p' => '60 requests a minute and 10,000 successful requests a month, per project.',
+        'howEyebrow' => 'How it works',
+        'howTitle' => 'Three steps to the catalog',
+        'howLede' => 'An account, a key, and one chain: brand, model, generation, modification.',
+        'c1' => 'The server key stays on your server.',
+        'c2' => 'The widget uses the public key and passes the choice to your page.',
+        'c3' => 'Generation rows include market variants.',
+        's1t' => 'Project and key',
+        's1p' => 'A free account, a confirmed email, and one project.',
+        's2t' => 'Request',
+        's2p' => 'GET /api/v1/brands, then models, generations, and modifications.',
+        's3t' => 'Your screen or the widget',
+        's3p' => 'Your own interface, or a ready picker in the site form.',
+        'priceEyebrow' => 'Pricing',
+        'priceTitle' => 'Free now, Pro soon',
+        'priceLede' => 'Pro is not for sale yet. This page does not open a payment.',
+        'now' => 'Now',
+        'free' => 'Free',
+        'freeAmount' => '0 ₾',
+        'p1' => '60 requests a minute',
+        'p2' => '10,000 successful requests a month',
+        'p3' => 'Server API and widget',
+        'p4' => 'Limit per project',
+        'soon' => 'Soon',
+        'proAmount' => 'Price soon',
+        'q1' => 'The same catalog',
+        'q2' => 'A higher limit will be announced',
+        'q3' => 'Not for sale yet',
+        'q4' => 'The price will be announced separately',
+        'notify' => 'Notify me at launch',
+        'storiesEyebrow' => 'In teams',
+        'storiesTitle' => 'Where CarAPI fits',
+        'storiesLede' => 'These are examples of how a catalog is used. They are not quotes from real customers.',
+        'st1t' => 'A filter on a listing',
+        'st1p' => 'Four steps from brand to generation. A custom filter stands on that chain.',
+        'st1w' => 'Frontend',
+        'st1s' => 'Own screen',
+        'st2t' => 'A widget in a form',
+        'st2p' => 'The picker is on the site. The public key is in the browser. The secret stays on the server.',
+        'st2w' => 'Product',
+        'st2s' => 'Widget',
+        'st3t' => 'A familiar catalog',
+        'st3p' => 'The data comes from drom.ru, so brand and generation follow that structure.',
+        'st3w' => 'Catalog',
+        'st3s' => 'Data',
+        'faqEyebrow' => 'Questions',
+        'faqTitle' => 'Short answers',
+        'faq1q' => 'Where does the data come from?',
+        'faq1a' => 'The catalog source is drom.ru. A record can be incomplete. Not every model has a generation.',
+        'faq2q' => 'What is in the free plan?',
+        'faq2a' => '60 requests a minute and 10,000 successful requests in a calendar month, per project.',
+        'faq3q' => 'Where does the secret key stay?',
+        'faq3a' => 'On the server request. The widget uses the public key and does not send the session cookie.',
+        'faq4q' => 'Is Pro for sale?',
+        'faq4a' => 'No. Pro is coming later. This page does not open a payment.',
+        'faq5q' => 'Does the API return a photo?',
+        'faq5a' => 'The version 1 list endpoints do not return photo files. On the demo, a photo is shown only when it matches the chosen generation. Otherwise you see a placeholder.',
+        'contactEyebrow' => 'Contact',
+        'contactTitle' => 'Write to us',
+        'contactLede' => 'This form opens your email app. The server does not send the message. The address is info@socialsave.cc.',
+        'name' => 'Name',
+        'email' => 'Email',
+        'message' => 'Message',
+        'send' => 'Send',
+        'asideTitle' => 'Start with the catalog',
+        'asideP' => 'A free account. Pro is not for sale yet.',
+        'server' => 'The server is in Germany.',
+    ] : [
+        'eyebrow' => 'კატალოგის API · drom.ru',
+        'lede' => 'მიიღეთ მარკები, მოდელები, თაობები და მოდიფიკაციები თქვენი სერვერიდან, ან ჩასვით მზა არჩევანი საიტზე. მონაცემების წყაროა drom.ru.',
+        'try' => 'სცადეთ აქ',
+        'flow' => 'მარკა → მოდელი → თაობა → მოდიფიკაცია',
+        'brand' => 'მარკა',
+        'model' => 'მოდელი',
+        'generation' => 'თაობა',
+        'featuresEyebrow' => 'შესაძლებლობები',
+        'featuresTitle' => 'კატალოგი, რომელზეც ეკრანს აწყობთ',
+        'featuresLede' => 'სერვერული API და ვიჯეტი ერთ კატალოგს იყენებს. საიდუმლო გასაღები ბრაუზერში არ გადის.',
+        'f1t' => 'წაიკითხეთ თქვენი სერვერიდან',
+        'f1p' => 'ააწყვეთ საკუთარი ეკრანი მარკებზე, მოდელებზე, თაობებსა და მოდიფიკაციებზე.',
+        'f2t' => 'ჩასვით არჩევანი საიტზე',
+        'f2p' => 'სტუმარი ავტომობილს ბრაუზერში ირჩევს. საიდუმლო გასაღები სერვერს არ ტოვებს.',
+        'f3t' => 'სუფთა იდენტიფიკატორები',
+        'f3p' => 'slug და id, გვერდები page და per_page. პასუხი JSON-ია.',
+        'f4t' => 'დაიწყეთ უფასო გეგმით',
+        'f4p' => 'წუთში 60 მოთხოვნა და თვეში 10 000 წარმატებული მოთხოვნა, პროექტზე.',
+        'howEyebrow' => 'როგორ მუშაობს',
+        'howTitle' => 'სამი ნაბიჯი კატალოგამდე',
+        'howLede' => 'ანგარიში, გასაღები და ერთი ჯაჭვი: მარკა, მოდელი, თაობა, მოდიფიკაცია.',
+        'c1' => 'სერვერული გასაღები მხოლოდ თქვენს სერვერზე რჩება.',
+        'c2' => 'ვიჯეტი საჯარო გასაღებს იყენებს და არჩევანს თქვენს გვერდს გადასცემს.',
+        'c3' => 'თაობის ჩანაწერები ბაზრის ვარიანტებსაც ითვლის.',
+        's1t' => 'პროექტი და გასაღები',
+        's1p' => 'უფასო ანგარიში, დადასტურებული ელფოსტა და ერთი პროექტი.',
+        's2t' => 'მოთხოვნა',
+        's2p' => 'GET /api/v1/brands, შემდეგ მოდელები, თაობები და მოდიფიკაციები.',
+        's3t' => 'თქვენი ეკრანი ან ვიჯეტი',
+        's3p' => 'საკუთარი ინტერფეისი, ან მზა არჩევანი საიტის ფორმაში.',
+        'priceEyebrow' => 'ფასები',
+        'priceTitle' => 'უფასო ახლა, Pro მალე',
+        'priceLede' => 'Pro ჯერ არ იყიდება. გადახდა ამ გვერდზე არ იხსნება.',
+        'now' => 'ახლა',
+        'free' => 'უფასო',
+        'freeAmount' => '0 ₾',
+        'p1' => '60 მოთხოვნა წუთში',
+        'p2' => '10 000 წარმატებული მოთხოვნა თვეში',
+        'p3' => 'სერვერული API და ვიჯეტი',
+        'p4' => 'ლიმიტი პროექტზე',
+        'soon' => 'მალე',
+        'proAmount' => 'ფასი მალე',
+        'q1' => 'იგივე კატალოგი',
+        'q2' => 'გაზრდილი ლიმიტი გამოცხადდება',
+        'q3' => 'ჯერ არ იყიდება',
+        'q4' => 'ფასი ცალკე გამოცხადდება',
+        'notify' => 'შემატყობინე გაშვებისას',
+        'storiesEyebrow' => 'გუნდებში',
+        'storiesTitle' => 'სად ჯდება CarAPI',
+        'storiesLede' => 'ეს მაგალითებია, როგორ იყენებენ კატალოგს. რეალური მომხმარებლის ციტატა არ არის.',
+        'st1t' => 'ფილტრი განცხადებაზე',
+        'st1p' => 'მარკიდან თაობამდე ოთხი საფეხურია. საკუთარი ფილტრი ამ ჯაჭვზე დგას.',
+        'st1w' => 'ფრონტენდი',
+        'st1s' => 'საკუთარი ეკრანი',
+        'st2t' => 'ვიჯეტი ფორმაში',
+        'st2p' => 'არჩევანი საიტზე ჩანს. საჯარო გასაღები ბრაუზერშია, საიდუმლო სერვერზე რჩება.',
+        'st2w' => 'პროდუქტი',
+        'st2s' => 'ვიჯეტი',
+        'st3t' => 'ნაცნობი კატალოგი',
+        'st3p' => 'მონაცემები drom.ru-დან მოდის, ამიტომ მარკა და თაობა იმ სტრუქტურას მიჰყვება.',
+        'st3w' => 'კატალოგი',
+        'st3s' => 'მონაცემები',
+        'faqEyebrow' => 'კითხვები',
+        'faqTitle' => 'მოკლე პასუხები',
+        'faq1q' => 'საიდანაა მონაცემები?',
+        'faq1a' => 'კატალოგის წყაროა drom.ru. ჩანაწერი შეიძლება იყოს არასრული. ყველა მოდელს თაობა არ აქვს.',
+        'faq2q' => 'რა შედის უფასო გეგმაში?',
+        'faq2a' => 'წუთში 60 მოთხოვნა და კალენდარულ თვეში 10 000 წარმატებული მოთხოვნა, თითო პროექტზე.',
+        'faq3q' => 'სად რჩება საიდუმლო გასაღები?',
+        'faq3a' => 'სერვერულ მოთხოვნაზე. ვიჯეტი საჯარო გასაღებს იყენებს და სესიის cookie-ს არ აგზავნის.',
+        'faq4q' => 'Pro უკვე იყიდება?',
+        'faq4a' => 'არა. Pro მალე გამოჩნდება. ამ გვერდზე გადახდა არ იხსნება.',
+        'faq5q' => 'ფოტო აქვს API-ს?',
+        'faq5a' => 'სერვერული v1 სია ფოტოს ფაილს არ აბრუნებს. დემოზე ფოტო ჩანს მხოლოდ მაშინ, როცა ის არჩეულ თაობას ემთხვევა. სხვა შემთხვევაში ჩანს ადგილმჭერი.',
+        'contactEyebrow' => 'კონტაქტი',
+        'contactTitle' => 'მოგვწერეთ',
+        'contactLede' => 'ფორმა თქვენს ელფოსტის პროგრამას ხსნის. სერვერი წერილს არ აგზავნის. მისამართია info@socialsave.cc.',
+        'name' => 'სახელი',
+        'email' => 'ელფოსტა',
+        'message' => 'შეტყობინება',
+        'send' => 'გაგზავნა',
+        'asideTitle' => 'დაიწყეთ კატალოგით',
+        'asideP' => 'ანგარიში უფასოა, Pro კი ჯერ არ იყიდება.',
+        'server' => 'სერვერი გერმანიაშია.',
+    ];
+    $check = '<svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="#408A71" stroke-width="1.8"><circle cx="9" cy="9" r="7"/><path d="M5.5 9.2l2.2 2.2 4.8-5"/></svg>';
+@endphp
 @component('components.layouts.public', [
     'title' => 'CarAPI — '.__('Vehicle data'),
-    'description' => __('Get vehicle brands, models, and generations through the API, or add a ready vehicle picker to your website.'),
+    'description' => $t['lede'],
     'bleed' => true,
+    'home' => true,
 ])
-    <section class="home-hero">
-        <div class="mx-auto grid max-w-6xl items-start gap-10 lg:grid-cols-2">
-            <div class="max-w-xl">
-                <p class="text-sm font-semibold tracking-wide text-[#B0E4CC]">API v1</p>
-                <h1 class="hero-title mt-3 text-balance">
-                    <span class="lead">{{ __('Vehicle data') }}</span>
-                    <span class="phrase">{{ __('API or a ready widget') }}</span>
-                </h1>
-                <p class="home-lead mt-4 text-base leading-7">{{ __('Get vehicle brands, models, and generations through the API, or add a ready vehicle picker to your website.') }}</p>
-                <div class="mt-6 flex flex-wrap items-center gap-3">
-                    <x-slate::button as="a" href="{{ route('register') }}" class="hero-cta">{{ __('Create a free account') }}</x-slate::button>
-                    <x-slate::button as="a" href="{{ url('/guide') }}" variant="outline" class="hero-cta">{{ __('Documentation') }}</x-slate::button>
+<div class="mk">
+    <section class="hero">
+        <div class="wrap hero-grid">
+            <div>
+                <p class="eyebrow">{{ $t['eyebrow'] }}</p>
+                <h1>{{ __('Vehicle data') }}, {{ __('API or a ready widget') }}</h1>
+                <p>{{ $t['lede'] }}</p>
+                <div class="actions">
+                    <a class="btn btn-mint" href="{{ route('register') }}">{{ __('Create a free account') }}</a>
+                    <a class="btn btn-ghost" href="{{ url('/guide') }}">{{ __('Documentation') }}</a>
                 </div>
             </div>
-            <div class="codebox">
-                <div class="flex items-center justify-between px-3 py-2 text-xs text-[#8fb3a4]">
-                    <span>curl</span>
-                    <button type="button" class="font-semibold text-[#f4faf7]" data-copy-target="home-example" data-copied="{{ __('Copied') }}">{{ __('Copy') }}</button>
+            <div class="stage" aria-hidden="true">
+                <svg class="wires" viewBox="0 0 560 480" preserveAspectRatio="none">
+                    <path d="M70 190 C 120 190, 140 200, 160 230"/>
+                    <path d="M230 28 C 240 70, 230 90, 230 120"/>
+                    <path d="M500 70 C 430 90, 400 120, 390 150"/>
+                    <path d="M500 330 C 440 300, 410 260, 390 230"/>
+                    <path d="M300 450 C 300 390, 300 340, 290 300"/>
+                    <path d="M70 400 C 120 370, 140 330, 165 290"/>
+                </svg>
+                <article class="code-card">
+                    <div class="code-bar"><i class="dot"></i><i class="dot"></i><i class="dot"></i><span>GET /api/v1/brands/toyota/models</span></div>
+                    <pre>{
+  <span class="k">"data"</span>: [
+    { <span class="k">"slug"</span>: <span class="s">"camry"</span>, <span class="k">"name"</span>: <span class="s">"Camry"</span> },
+    { <span class="k">"slug"</span>: <span class="s">"corolla"</span>, <span class="k">"name"</span>: <span class="s">"Corolla"</span> }
+  ]
+}</pre>
+                </article>
+                <div class="chips">
+                    <div class="chip chip-key"><svg viewBox="0 0 24 24" fill="none" stroke="#285A48" stroke-width="1.7"><circle cx="8" cy="12" r="3"/><path d="M11 12h10l-2 2 2 2h-3"/></svg>{{ $en ? 'Key' : 'გასაღები' }}</div>
+                    <div class="chip chip-brand"><svg viewBox="0 0 24 24" fill="none" stroke="#285A48" stroke-width="1.7"><circle cx="12" cy="12" r="8"/><path d="M8 14c1.2-2 6.8-2 8 0"/><path d="M9 10h.01M15 10h.01"/></svg>Toyota</div>
+                    <div class="chip chip-car"><svg viewBox="0 0 24 24" fill="none" stroke="#285A48" stroke-width="1.7"><path d="M4 15h16l-1.2-4.2a2 2 0 0 0-1.9-1.3H7.1a2 2 0 0 0-1.9 1.3L4 15z"/><path d="M6 15v2M18 15v2"/><circle cx="7.5" cy="16.5" r="1"/><circle cx="16.5" cy="16.5" r="1"/></svg>{{ $en ? 'Car' : 'მანქანა' }}</div>
+                    <div class="chip chip-gen"><svg viewBox="0 0 24 24" fill="none" stroke="#285A48" stroke-width="1.7"><path d="M5 7h14M5 12h14M5 17h9"/></svg>{{ $en ? 'Generation XV70' : 'თაობა XV70' }}</div>
+                    <div class="chip chip-engine"><svg viewBox="0 0 24 24" fill="none" stroke="#285A48" stroke-width="1.7"><rect x="5" y="8" width="10" height="8" rx="1"/><path d="M15 10h3l1 2-1 2h-3M8 8V5M11 8V5"/></svg>{{ $en ? 'Engine 2.5' : 'ძრავი 2.5' }}</div>
+                    <div class="chip chip-json"><svg viewBox="0 0 24 24" fill="none" stroke="#285A48" stroke-width="1.7"><path d="M9 5c-2 0-3 1-3 3v2c0 1-1 2-2 2 1 0 2 1 2 2v2c0 2 1 3 3 3M15 5c2 0 3 1 3 3v2c0 1 1 2 2 2-1 0-2 1-2 2v2c0 2-1 3-3 3"/></svg>JSON</div>
                 </div>
-                <pre id="home-example">curl {{ rtrim(config('app.url'), '/') }}/api/v1/brands \
-  -H "Authorization: Bearer carapi_sk_…"</pre>
             </div>
         </div>
     </section>
-    <section class="home-demo" aria-label="{{ __('Vehicle picker') }}">
-        <div class="mx-auto max-w-6xl">
-            @include('public.partials.vehicle-picker')
-        </div>
-    </section>
-    <section class="home-band">
-        <div class="mx-auto grid max-w-6xl gap-4 md:grid-cols-3">
-            <x-slate::card>
-                <x-slate::card-header>
-                    <x-slate::card-title>{{ __('Read it from your server') }}</x-slate::card-title>
-                </x-slate::card-header>
-                <x-slate::card-content>
-                    <p class="text-sm leading-6 text-muted-foreground">{{ __('Build your own screen on top of brands, models, generations, and modifications.') }}</p>
-                </x-slate::card-content>
-            </x-slate::card>
-            <x-slate::card>
-                <x-slate::card-header>
-                    <x-slate::card-title>{{ __('Drop a picker on your site') }}</x-slate::card-title>
-                </x-slate::card-header>
-                <x-slate::card-content>
-                    <p class="text-sm leading-6 text-muted-foreground">{{ __('Visitors choose a vehicle in the browser. The secret key never leaves your server.') }}</p>
-                </x-slate::card-content>
-            </x-slate::card>
-            <x-slate::card>
-                <x-slate::card-header>
-                    <x-slate::card-title>{{ __('Start on the free plan') }}</x-slate::card-title>
-                </x-slate::card-header>
-                <x-slate::card-content>
-                    <p class="text-sm leading-6 text-muted-foreground">{{ __('60 requests per minute and 10,000 successful requests per calendar month, per project.') }}</p>
-                </x-slate::card-content>
-            </x-slate::card>
-        </div>
-    </section>
-    <section class="home-band border-t border-[#d7e7df]">
-        <div class="mx-auto max-w-6xl">
-            <h2 class="text-lg font-semibold">{{ __('Catalog') }}</h2>
-            @if ($brands)
-                <dl class="mt-4 grid grid-cols-3 gap-3">
+    <div class="demo-wrap">
+        <div class="wrap">
+            <section class="demo" aria-labelledby="demo-title">
+                <div class="demo-head">
                     <div>
-                        <dt class="text-sm text-muted-foreground">{{ __('brands') }}</dt>
-                        <dd class="mt-1 text-4xl font-semibold tabular-nums text-[#285A48]">{{ $brands }}</dd>
+                        <p class="eyebrow">{{ $t['try'] }}</p>
+                        <h2 id="demo-title" style="font-size:28px">{{ $t['flow'] }}</h2>
                     </div>
-                    <div>
-                        <dt class="text-sm text-muted-foreground">{{ __('models') }}</dt>
-                        <dd class="mt-1 text-4xl font-semibold tabular-nums text-[#285A48]">{{ $models }}</dd>
-                    </div>
-                    <div>
-                        <dt class="text-sm text-muted-foreground">{{ __('generations') }}</dt>
-                        <dd class="mt-1 text-4xl font-semibold tabular-nums text-[#285A48]">{{ $generations }}</dd>
-                    </div>
-                </dl>
-                <p class="mt-3 text-sm text-muted-foreground">{{ __('Generation rows, including market variants. This matches the admin generations total.') }}</p>
-                @if ($generationGroups && $generationGroups !== $generations)
-                    <p class="mt-1 text-sm text-muted-foreground">{{ __('Chassis groups') }}: {{ $generationGroups }}</p>
+                    @if ($brands)
+                        <div class="counts">
+                            <div><b>{{ $brands }}</b> {{ $t['brand'] }}</div>
+                            <div><b>{{ $models }}</b> {{ $t['model'] }}</div>
+                            <div><b>{{ $generations }}</b> {{ $t['generation'] }}</div>
+                        </div>
+                    @endif
+                </div>
+                @include('public.partials.vehicle-picker')
+                @if ($generationGroups)
+                    <p class="lede" style="margin-top:12px">{{ __('Chassis groups') }}: {{ $generationGroups }}</p>
                 @endif
-            @endif
-            <p class="mt-4 text-sm">
-                <span class="text-muted-foreground">{{ __('Uptime') }}</span>
-                {{ $catalogUp ? __('Operational') : __('Unavailable') }}
-                @if ($measuredAt)
-                    <span class="text-muted-foreground">· {{ __('Updated') }} {{ $measuredAt }}</span>
-                @endif
-            </p>
+            </section>
+        </div>
+    </div>
+    <section class="section" id="features">
+        <div class="wrap">
+            <div class="section-intro center">
+                <p class="eyebrow" style="justify-content:center">{{ $t['featuresEyebrow'] }}</p>
+                <h2>{{ $t['featuresTitle'] }}</h2>
+                <p class="lede">{{ $t['featuresLede'] }}</p>
+            </div>
+            <div class="features">
+                <article class="card"><div class="icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="#285A48" stroke-width="1.7"><rect x="4" y="4" width="16" height="12" rx="2"/><path d="M8 20h8M12 16v4"/></svg></div><h3>{{ $t['f1t'] }}</h3><p>{{ $t['f1p'] }}</p></article>
+                <article class="card"><div class="icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="#285A48" stroke-width="1.7"><path d="M5 7h14M5 12h9M5 17h6"/></svg></div><h3>{{ $t['f2t'] }}</h3><p>{{ $t['f2p'] }}</p></article>
+                <article class="card"><div class="icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="#285A48" stroke-width="1.7"><path d="M8 7h11M8 12h11M8 17h11"/><circle cx="4.5" cy="7" r="1"/><circle cx="4.5" cy="12" r="1"/><circle cx="4.5" cy="17" r="1"/></svg></div><h3>{{ $t['f3t'] }}</h3><p>{{ $t['f3p'] }}</p></article>
+                <article class="card"><div class="icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="#285A48" stroke-width="1.7"><circle cx="12" cy="12" r="8"/><path d="M12 8v5l3 2"/></svg></div><h3>{{ $t['f4t'] }}</h3><p>{{ $t['f4p'] }}</p></article>
+            </div>
         </div>
     </section>
+    <section class="section wash" id="how">
+        <div class="wrap split">
+            <div>
+                <p class="eyebrow">{{ $t['howEyebrow'] }}</p>
+                <h2>{{ $t['howTitle'] }}</h2>
+                <p class="lede" style="margin-top:10px">{{ $t['howLede'] }}</p>
+                <ul class="checks">
+                    <li>{!! $check !!} {{ $t['c1'] }}</li>
+                    <li>{!! $check !!} {{ $t['c2'] }}</li>
+                    <li>{!! $check !!} {{ $t['c3'] }} @if ($generations)<span style="white-space:nowrap">{{ $generations }}</span>.@endif</li>
+                </ul>
+            </div>
+            <div class="steps">
+                <article class="step"><div class="num">01</div><div><h3>{{ $t['s1t'] }}</h3><p>{{ $t['s1p'] }}</p></div></article>
+                <article class="step"><div class="num">02</div><div><h3>{{ $t['s2t'] }}</h3><p>{{ $t['s2p'] }}</p></div></article>
+                <article class="step"><div class="num">03</div><div><h3>{{ $t['s3t'] }}</h3><p>{{ $t['s3p'] }}</p></div></article>
+            </div>
+        </div>
+    </section>
+    <section class="section" id="pricing">
+        <div class="wrap">
+            <div class="section-intro center">
+                <p class="eyebrow" style="justify-content:center">{{ $t['priceEyebrow'] }}</p>
+                <h2>{{ $t['priceTitle'] }}</h2>
+                <p class="lede">{{ $t['priceLede'] }}</p>
+            </div>
+            <div class="prices">
+                <article class="price featured">
+                    <span class="tag">{{ $t['now'] }}</span>
+                    <h3>{{ $t['free'] }}</h3>
+                    <div class="amount">{{ $t['freeAmount'] }}</div>
+                    <ul>
+                        <li>{{ $t['p1'] }}</li>
+                        <li>{{ $t['p2'] }}</li>
+                        <li>{{ $t['p3'] }}</li>
+                        <li>{{ $t['p4'] }}</li>
+                    </ul>
+                    <a class="btn" href="{{ route('register') }}">{{ __('Create a free account') }}</a>
+                </article>
+                <article class="price">
+                    <span class="tag" style="background:#e7f6ef;color:#285A48">{{ $t['soon'] }}</span>
+                    <h3>Pro</h3>
+                    <div class="amount">{{ $t['proAmount'] }}</div>
+                    <ul>
+                        <li>{{ $t['q1'] }}</li>
+                        <li>{{ $t['q2'] }}</li>
+                        <li>{{ $t['q3'] }}</li>
+                        <li>{{ $t['q4'] }}</li>
+                    </ul>
+                    <form class="notify" method="post" action="{{ route('coming-soon.store') }}">
+                        @csrf
+                        <label>{{ $t['email'] }}<input type="email" name="email" required autocomplete="email"></label>
+                        <button class="btn btn-line" type="submit">{{ $t['notify'] }}</button>
+                    </form>
+                </article>
+            </div>
+        </div>
+    </section>
+    <section class="section wash" id="stories">
+        <div class="wrap">
+            <div class="section-intro center">
+                <p class="eyebrow" style="justify-content:center">{{ $t['storiesEyebrow'] }}</p>
+                <h2>{{ $t['storiesTitle'] }}</h2>
+                <p class="lede">{{ $t['storiesLede'] }}</p>
+            </div>
+            <div class="quotes">
+                <article class="quote"><h3>{{ $t['st1t'] }}</h3><p>{{ $t['st1p'] }}</p><div class="who"><div class="avatar">{{ mb_substr($t['st1w'], 0, 1) }}</div><div>{{ $t['st1w'] }}<br><small>{{ $t['st1s'] }}</small></div></div></article>
+                <article class="quote"><h3>{{ $t['st2t'] }}</h3><p>{{ $t['st2p'] }}</p><div class="who"><div class="avatar">{{ mb_substr($t['st2w'], 0, 1) }}</div><div>{{ $t['st2w'] }}<br><small>{{ $t['st2s'] }}</small></div></div></article>
+                <article class="quote"><h3>{{ $t['st3t'] }}</h3><p>{{ $t['st3p'] }}</p><div class="who"><div class="avatar">{{ mb_substr($t['st3w'], 0, 1) }}</div><div>{{ $t['st3w'] }}<br><small>{{ $t['st3s'] }}</small></div></div></article>
+            </div>
+        </div>
+    </section>
+    <section class="section" id="faq">
+        <div class="wrap">
+            <div class="section-intro center">
+                <p class="eyebrow" style="justify-content:center">{{ $t['faqEyebrow'] }}</p>
+                <h2>{{ $t['faqTitle'] }}</h2>
+            </div>
+            <div class="faq">
+                <details open><summary>{{ $t['faq1q'] }}</summary><p>{{ $t['faq1a'] }}</p></details>
+                <details><summary>{{ $t['faq2q'] }}</summary><p>{{ $t['faq2a'] }}</p></details>
+                <details><summary>{{ $t['faq3q'] }}</summary><p>{{ $t['faq3a'] }}</p></details>
+                <details><summary>{{ $t['faq4q'] }}</summary><p>{{ $t['faq4a'] }}</p></details>
+                <details><summary>{{ $t['faq5q'] }}</summary><p>{{ $t['faq5a'] }}</p></details>
+            </div>
+        </div>
+    </section>
+    <section class="section wash" id="contact">
+        <div class="wrap contact">
+            <div>
+                <p class="eyebrow">{{ $t['contactEyebrow'] }}</p>
+                <h2>{{ $t['contactTitle'] }}</h2>
+                <p class="lede" style="margin-top:10px">{{ $t['contactLede'] }}</p>
+                <form style="margin-top:18px" action="mailto:info@socialsave.cc" method="post" enctype="text/plain">
+                    <label>{{ $t['name'] }}<input name="name" autocomplete="name"></label>
+                    <label>{{ $t['email'] }}<input name="email" type="email" autocomplete="email"></label>
+                    <label>{{ $t['message'] }}<textarea name="body"></textarea></label>
+                    <button class="btn btn-pine" type="submit">{{ $t['send'] }}</button>
+                </form>
+            </div>
+            <aside class="aside">
+                <h2 style="font-size:32px">{{ $t['asideTitle'] }}</h2>
+                <p>@if ($brands){{ $brands }} {{ $t['brand'] }}, {{ $models }} {{ $t['model'] }}, <span style="white-space:nowrap">{{ $generations }}</span> {{ $t['generation'] }}. @endif{{ $t['asideP'] }}</p>
+                <p>{{ $en ? 'Email' : 'ელფოსტა' }}: <a href="mailto:info@socialsave.cc">info@socialsave.cc</a><br>{{ $t['server'] }}</p>
+                <a class="btn btn-mint" href="{{ route('register') }}">{{ __('Create a free account') }}</a>
+            </aside>
+        </div>
+    </section>
+</div>
 @endcomponent

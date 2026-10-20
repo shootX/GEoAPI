@@ -14,6 +14,11 @@ final class VehiclePickerRepository
     /** @return array{rows:list<array<string, mixed>>, total:int} */
     public function brands(int $limit, int $offset, string $term = ''): array
     {
+        $cacheKey = 'brands:'.$limit.':'.$offset.':'.$term;
+        $cached = $this->recall($cacheKey);
+        if ($cached !== null) {
+            return $cached;
+        }
         $where = '';
         if ($term !== '') {
             $where = 'WHERE name ILIKE :term OR slug ILIKE :term';
@@ -44,12 +49,17 @@ final class VehiclePickerRepository
             ];
         }
 
-        return ['rows' => $rows, 'total' => $total];
+        return $this->store($cacheKey, ['rows' => $rows, 'total' => $total]);
     }
 
     /** @return array{rows:list<array<string, mixed>>, total:int}|null */
     public function models(string $brandId, int $limit, int $offset): ?array
     {
+        $cacheKey = 'models:'.$brandId.':'.$limit.':'.$offset;
+        $cached = $this->recall($cacheKey);
+        if ($cached !== null) {
+            return $cached;
+        }
         if (! $this->exists('public.brands', $brandId)) {
             return null;
         }
@@ -75,12 +85,17 @@ final class VehiclePickerRepository
             ];
         }
 
-        return ['rows' => $rows, 'total' => (int) $totalStmt->fetchColumn()];
+        return $this->store($cacheKey, ['rows' => $rows, 'total' => (int) $totalStmt->fetchColumn()]);
     }
 
     /** @return array{rows:list<array<string, mixed>>, total:int}|null */
     public function years(string $modelId): ?array
     {
+        $cacheKey = 'years:'.$modelId;
+        $cached = $this->recall($cacheKey);
+        if ($cached !== null) {
+            return $cached;
+        }
         if (! $this->exists('public.models', $modelId)) {
             return null;
         }
@@ -108,12 +123,17 @@ final class VehiclePickerRepository
             $rows[] = ['id' => $year, 'name' => $year];
         }
 
-        return ['rows' => $rows, 'total' => count($rows)];
+        return $this->store($cacheKey, ['rows' => $rows, 'total' => count($rows)]);
     }
 
     /** @return array{rows:list<array<string, mixed>>, total:int}|null */
     public function generations(string $modelId, int $year, int $limit, int $offset): ?array
     {
+        $cacheKey = 'generations:'.$modelId.':'.$year.':'.$limit.':'.$offset;
+        $cached = $this->recall($cacheKey);
+        if ($cached !== null) {
+            return $cached;
+        }
         if (! $this->exists('public.models', $modelId)) {
             return null;
         }
@@ -183,7 +203,7 @@ final class VehiclePickerRepository
             ];
         }
 
-        return ['rows' => $rows, 'total' => (int) $totalStmt->fetchColumn()];
+        return $this->store($cacheKey, ['rows' => $rows, 'total' => (int) $totalStmt->fetchColumn()]);
     }
 
     /** @return array{rows:list<array<string, mixed>>, total:int}|null */
@@ -315,6 +335,7 @@ final class VehiclePickerRepository
             $types = self::pgArray($row['body_types']);
             $body = $types === [] ? null : implode(', ', $types);
         }
+        $matchesPhoto = $this->photoMatchesGeneration((string) $row['model_id'], $generationId);
 
         return [
             'id' => (string) $row['id'],
@@ -369,14 +390,18 @@ final class VehiclePickerRepository
             'rear_suspension' => self::specText($specs, 'rear_suspension'),
             'front_tires' => self::specText($specs, 'front_tires'),
             'rear_tires' => self::specText($specs, 'rear_tires'),
-            'has_photo' => $row['has_photo'] === true || $row['has_photo'] === 't' || $row['has_photo'] === '1' || $row['has_photo'] === 1,
+            'has_photo' => $matchesPhoto,
+            'photo_matches_generation' => $matchesPhoto,
             'equipment' => $this->equipment($id),
         ];
     }
 
     /** @return array{mime:string, bytes:string}|null */
-    public function photo(string $modelId): ?array
+    public function photo(string $modelId, ?string $generationId = null): ?array
     {
+        if (! $this->photoMatchesGeneration($modelId, $generationId)) {
+            return null;
+        }
         $stmt = $this->pdo->prepare(<<<'SQL'
             SELECT mime, image
             FROM public.model_photos
@@ -457,6 +482,61 @@ final class VehiclePickerRepository
             error_log('[catalog] query failed');
             throw new UnavailableException;
         }
+    }
+
+    private function photoMatchesGeneration(string $modelId, ?string $generationId): bool
+    {
+        if ($generationId === null || $generationId === '' || ! ctype_digit($generationId)) {
+            return false;
+        }
+        try {
+            $stmt = $this->pdo->prepare(<<<'SQL'
+                SELECT 1
+                FROM public.model_photos
+                WHERE model_id = :model
+                  AND verified = true
+                  AND image IS NOT NULL
+                  AND generation_id = :generation
+                LIMIT 1
+            SQL);
+            $stmt->bindValue('model', $modelId);
+            $stmt->bindValue('generation', $generationId);
+            $stmt->execute();
+
+            return $stmt->fetchColumn() !== false;
+        } catch (PDOException) {
+            return false;
+        }
+    }
+
+    private function cacheFile(string $key): string
+    {
+        return dirname(__DIR__, 2).'/cache/picker/'.hash('sha256', $key).'.json';
+    }
+
+    /** @return array<string, mixed>|null */
+    private function recall(string $key): ?array
+    {
+        $file = $this->cacheFile($key);
+        if (! is_file($file) || time() - (int) filemtime($file) > 120) {
+            return null;
+        }
+        $decoded = json_decode((string) file_get_contents($file), true);
+
+        return is_array($decoded) ? $decoded : null;
+    }
+
+    /** @param array<string, mixed> $value */
+    private function store(string $key, array $value): array
+    {
+        $file = $this->cacheFile($key);
+        $dir = dirname($file);
+        if (! is_dir($dir)) {
+            @mkdir($dir, 0775, true);
+        }
+        @file_put_contents($file, json_encode($value, JSON_UNESCAPED_UNICODE));
+
+        return $value;
     }
 
     private function bindLimit(\PDOStatement $stmt, int $limit, int $offset): void

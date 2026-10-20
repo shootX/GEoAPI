@@ -5,12 +5,12 @@
     <h1 class="text-3xl font-extrabold leading-tight">{{ __('Vehicle picker') }}</h1>
     <p class="mt-3 max-w-2xl text-base leading-7">{{ __('Choose a brand, model, year, generation, and modification.') }}</p>
     @include('public.partials.vehicle-picker')
-    <section id="vp-response" class="mt-8" hidden>
-        <h2 class="text-lg font-semibold">{{ __('Response') }}</h2>
+    <details id="vp-response" class="api-fold">
+        <summary>{{ __('View the API response') }}</summary>
         <div class="codebox mt-3">
             <pre id="vp-json"></pre>
         </div>
-    </section>
+    </details>
     <section class="mt-10">
         <div class="flex items-center justify-between gap-3">
             <h2 class="text-lg font-semibold">{{ __('Embed code') }}</h2>

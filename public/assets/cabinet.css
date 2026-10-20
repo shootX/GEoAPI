@@ -1,0 +1,95 @@
+.cab {
+    --ink: #091413;
+    --pine: #285A48;
+    --leaf: #408A71;
+    --mint: #B0E4CC;
+    --paper: #ffffff;
+    --wash: #f4faf7;
+    --line: #d7e7df;
+    --muted: #4d6159;
+    --shadow: 0 24px 60px rgba(9, 20, 19, 0.12);
+    margin: 0;
+    color: var(--ink);
+    background: var(--wash);
+    font-family: "Noto Sans Georgian", "FiraGO", sans-serif;
+    font-size: 16px;
+    line-height: 1.6;
+}
+.cab * { box-sizing: border-box; }
+.cab button, .cab input, .cab select { font: inherit; color: inherit; }
+.cab h1, .cab h2, .cab h3, .cab p { margin: 0; }
+.cab a { color: inherit; }
+.cab .app { display: grid; grid-template-columns: 248px 1fr; min-height: 100vh; }
+.cab .side { background: var(--ink); color: #fff; padding: 22px 16px; display: flex; flex-direction: column; gap: 18px; }
+.cab .logo { display: flex; align-items: center; gap: 10px; font-weight: 700; text-decoration: none; color: #fff; padding: 0 8px; }
+.cab .mark { width: 22px; height: 22px; border-radius: 7px; background: var(--mint); }
+.cab .nav { display: grid; gap: 6px; }
+.cab .nav button { text-align: left; background: transparent; color: rgba(255,255,255,0.82); border: 0; border-radius: 12px; min-height: 44px; padding: 0 12px; cursor: pointer; font-weight: 600; }
+.cab .nav button[aria-current="page"] { background: var(--pine); color: #fff; }
+.cab .main { min-width: 0; }
+.cab .top { display: flex; align-items: center; gap: 12px; min-height: 72px; padding: 0 24px; background: #fff; border-bottom: 1px solid var(--line); }
+.cab .menu { display: none; }
+.cab .top h1 { font-size: 20px; }
+.cab .who { margin-left: auto; color: var(--muted); font-size: 14px; }
+.cab .content { padding: 24px; display: grid; gap: 16px; }
+.cab .screen { display: none; gap: 16px; }
+.cab .screen.active { display: grid; }
+.cab .tiles { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+.cab .tile, .cab .panel, .cab .card, .cab .key, .cab .plan { background: #fff; border: 1px solid var(--line); border-radius: 18px; }
+.cab .tile { padding: 16px; }
+.cab .tile span, .cab .muted { color: var(--muted); font-size: 13px; }
+.cab .tile b { display: block; margin-top: 4px; font-size: 28px; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.cab .panel { padding: 18px; }
+.cab .panel h2 { font-size: 18px; margin-bottom: 12px; }
+.cab .quota { height: 12px; border-radius: 99px; background: #e7f3ed; overflow: hidden; }
+.cab .quota span { display: block; height: 100%; background: var(--leaf); }
+.cab .chart { width: 100%; height: 180px; }
+.cab .chart rect { fill: var(--leaf); }
+.cab .keys, .cab .plans { display: grid; gap: 12px; }
+.cab .key, .cab .plan { padding: 16px; display: grid; gap: 8px; }
+.cab .key-row, .cab .row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.cab .pill { border-radius: 999px; padding: 2px 8px; font-size: 12px; font-weight: 700; background: rgba(176,228,204,0.7); color: var(--ink); }
+.cab .pill.wait { background: #e7f3ed; color: var(--pine); }
+.cab .pill.off { background: #efe7e4; color: #6b3b32; }
+.cab code { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 13px; }
+.cab .btn { border: 1px solid var(--line); background: #fff; border-radius: 999px; min-height: 40px; padding: 0 14px; font-weight: 600; cursor: pointer; text-decoration: none; display: inline-flex; align-items: center; }
+.cab .btn.pine { background: var(--pine); color: #fff; border-color: var(--pine); }
+.cab .btn:disabled { opacity: 0.45; cursor: default; }
+.cab .plans { grid-template-columns: 1fr 1fr; align-items: stretch; }
+.cab .plan { height: 100%; }
+.cab .plan.now { background: var(--pine); color: #fff; }
+.cab .plan ul { margin: 0; padding-left: 18px; }
+.cab .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+.cab .card { overflow: hidden; cursor: pointer; padding: 0; text-align: left; width: 100%; }
+.cab .shot { position: relative; height: 150px; background: linear-gradient(180deg, #e7f6ef, #d5eee3); display: grid; place-items: center; }
+.cab .shot svg { width: 120px; height: 64px; }
+.cab .watermark { position: absolute; right: 10px; bottom: 8px; font-size: 11px; font-weight: 700; letter-spacing: 0.14em; color: rgba(9,20,19,0.42); }
+.cab .card .body { padding: 12px 14px 14px; }
+.cab .drawer-back { position: fixed; inset: 0; background: rgba(9,20,19,0.45); display: none; z-index: 20; }
+.cab .drawer-back.open { display: block; }
+.cab .drawer { position: fixed; top: 0; right: 0; height: 100%; width: min(460px, 100%); background: #fff; z-index: 21; transform: translateX(100%); transition: transform 0.2s ease; overflow: auto; box-shadow: var(--shadow); }
+.cab .drawer.open { transform: none; }
+.cab .drawer .shot { height: 220px; }
+.cab .drawer .pad { padding: 18px; display: grid; gap: 12px; }
+.cab .specs { display: grid; grid-template-columns: 1fr 1fr; gap: 8px 14px; }
+.cab .specs dt { color: var(--muted); font-size: 13px; }
+.cab .specs dd { margin: 0; font-weight: 600; }
+.cab pre { margin: 0; padding: 12px; background: var(--ink); color: #d7eee4; border-radius: 12px; overflow: auto; font-size: 12px; line-height: 1.5; }
+.cab .url { color: var(--pine); word-break: break-all; }
+.cab .banner { background: #fff; border: 1px solid var(--line); border-radius: 14px; padding: 12px 14px; color: var(--muted); }
+.cab .reveal { background: #10211c; color: #d7eee4; border-radius: 12px; padding: 12px; word-break: break-all; }
+.cab label { display: grid; gap: 6px; font-size: 13px; font-weight: 600; }
+.cab input, .cab select { min-height: 40px; border: 1px solid var(--line); border-radius: 12px; background: #fff; padding: 0 12px; }
+.cab .err { color: #8a2b2b; font-size: 13px; }
+@media (max-width: 980px) {
+    .cab .app { grid-template-columns: 1fr; }
+    .cab .side { position: fixed; inset: 0 auto 0 0; width: min(280px, 86vw); z-index: 30; transform: translateX(-105%); transition: transform 0.2s ease; }
+    .cab .side.open { transform: none; }
+    .cab .menu { display: inline-flex; }
+    .cab .tiles, .cab .plans, .cab .grid { grid-template-columns: 1fr 1fr; }
+}
+@media (max-width: 640px) {
+    .cab .content, .cab .top { padding-left: 14px; padding-right: 14px; }
+    .cab .tiles, .cab .plans, .cab .grid, .cab .specs { grid-template-columns: 1fr; }
+    .cab .top h1 { font-size: 17px; }
+}

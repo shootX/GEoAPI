@@ -25,8 +25,8 @@ Posts live in `blog_posts.translations` as `{ka, en}` objects with `title`, `exc
 
 ## 2026-10-20 — Public redesign
 
-The live site follows the approved mockups: ink `#091413`, pine `#285A48`, leaf `#408A71`, mint `#B0E4CC`, wash `#f4faf7`. Noto Sans Georgian is the Georgian face and is already self-hosted at `/assets/fonts/noto-sans-georgian.woff2`; FiraGO stays for the other letters. `config/electrik.php` defaults the brand primary to `#285A48`.
+The first redesign only recolored the old layout. The follow-up copies the mockup sections. Home styles are `public/assets/public-design.css` (scoped under `.mk`). The cabinet is `/account` with `public/assets/cabinet.css`. Noto Sans Georgian stays self-hosted. `config/electrik.php` still defaults the brand primary to `#285A48`.
 
-The home demo still includes `public/partials/vehicle-picker.blade.php` and `/assets/vehicle-picker.js`. Choosing a modification fills `#vp-card` in place. The image request stays `GET /api/models/{id}/photo`, and `DemoWatermark` still stamps `GEOAPI.GE`. The mockup lightbox was not copied into the live picker.
+The home demo still includes `public/partials/vehicle-picker.blade.php` and `/assets/vehicle-picker.js`. Choosing a modification fills `#vp-card` in place. A photo is requested only when `photo_matches_generation` is true (`model_photos.generation_id` equals the chosen generation). `DemoWatermark` draws one small semi-transparent `GEOAPI.GE` in the corner. The mockup lightbox was not copied. Picker list queries are cached for 120 seconds under `legacy/cache/picker`. Generation dropdown labels are deduped in the browser. Brand and model names are sorted there too, with a short popular-brand list first.
 
-Password reset and email verification use the public layout through `resources/views/vendor/electrik/components/layouts/guest.blade.php`. The project desk in `public/assets/site.css` and the admin panel in `public/assets/admin.css` only changed color.
+The blog link is omitted from the header and footer while `blog_posts` has no visible row. The route stays. Password reset and email verification still use the public layout. The legacy project desk and `admin.css` were not rebuilt.
