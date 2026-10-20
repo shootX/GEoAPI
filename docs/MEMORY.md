@@ -25,7 +25,7 @@ Posts live in `blog_posts.translations` as `{ka, en}` objects with `title`, `exc
 
 ## 2026-10-20 — Public redesign
 
-The first redesign only recolored the old layout. Home now follows `docs/mockups/home.html`: the mockup header and footer are inside `.mk`, and the demo is four selects (brand, model, generation, modification) with no year step. The photo stays inside the result card. There is no lightbox. `/demo` still uses `vehicle-picker.js`. Styles are `public/assets/public-design.css`. Noto Sans Georgian stays self-hosted.
+The first redesign only recolored the old layout. Home now follows `docs/mockups/home.html`: the mockup header and footer are inside `.mk`, and the demo is four selects (brand, model, generation, modification) with no year step. The photo stays inside the result card. There is no lightbox. `/demo` still uses `vehicle-picker.js`. Styles are `public/assets/public-design.css`. Noto Sans Georgian is self-hosted, including the Latin and Latin-ext subsets, so the mockup's Latin words use the same face.
 
 `/dashboard` and `/account` both render `App\Livewire\Account\Projects` with `public/assets/cabinet.css`. The `/dashboard` route is registered before Electrik's shell. When `CARAPI_CABINET_DEMO=1`, the cabinet shows the mockup sample (დემო პროექტი, 2 140 used, the 30-day bars, ვიჯეტი / სერვერი, and the six catalog cards) instead of the platform database. Leave that flag unset in production. PHPUnit forces it off.
 

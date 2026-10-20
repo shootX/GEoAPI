@@ -13,7 +13,7 @@
     margin: 0;
     color: var(--ink);
     background: var(--paper);
-    font-family: "Noto Sans Georgian", "FiraGO", sans-serif;
+    font-family: "Noto Sans Georgian", sans-serif;
     font-size: 16px;
     line-height: 1.65;
 }
@@ -75,6 +75,7 @@
             inset: 0 0 auto;
             z-index: 5;
             color: white;
+            background: transparent;
         }
 
 .mk .site-header .wrap {
@@ -440,6 +441,8 @@
 .mk .amount { font-size: 42px; font-weight: 700; line-height: 1; }
 
 .mk .price ul { margin: 0; padding: 0; list-style: none; display: grid; gap: 8px; }
+.mk .price li { margin: 0; }
+.mk article a { text-decoration: none; }
 
 .mk .price li { display: flex; gap: 8px; }
 
