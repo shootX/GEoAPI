@@ -28,7 +28,7 @@
         </header>
         <div class="content">
             @if ($unavailable)
-                <p class="banner">{{ __('Catalog is temporarily unavailable') }}</p>
+                <p class="banner">{{ $en ? 'The project database is temporarily unavailable.' : 'პროექტების ბაზა დროებით მიუწვდომელია.' }}</p>
             @endif
             <section class="screen active" id="overview">
                 <div class="tiles">
