@@ -9,6 +9,7 @@
                 <x-slate::input wire:model="name" type="text" label="სახელი და გვარი" autocomplete="name" required />
                 <x-slate::input wire:model="email" type="email" label="ელფოსტა" autocomplete="username" required :readonly="$inviteLockedEmail" />
                 <x-slate::input wire:model="password" type="password" label="პაროლი" autocomplete="new-password" required />
+                <p class="text-sm text-muted-foreground">{{ __('Password must be at least 15 characters.') }}</p>
                 <x-slate::input wire:model="password_confirmation" type="password" label="გაიმეორეთ პაროლი" autocomplete="new-password" required />
                 <label class="flex items-start gap-2 text-sm">
                     <input type="checkbox" wire:model="accept_terms" class="mt-1" value="1">

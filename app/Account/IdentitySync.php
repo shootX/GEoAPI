@@ -6,10 +6,22 @@ namespace App\Account;
 
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 
 final class IdentitySync
 {
     public static bool $fromLegacy = false;
+
+    public static function markLaravelVerified(int $legacyUserId): void
+    {
+        if (! Schema::hasTable('users') || ! Schema::hasColumn('users', 'legacy_platform_user_id')) {
+            return;
+        }
+        User::query()
+            ->where('legacy_platform_user_id', $legacyUserId)
+            ->whereNull('email_verified_at')
+            ->update(['email_verified_at' => now()]);
+    }
 
     public static function ensure(int $legacyUserId): void
     {
@@ -29,7 +41,7 @@ final class IdentitySync
         self::$fromLegacy = true;
         try {
             if ($user === null) {
-                $user = new User();
+                $user = new User;
             }
 
             $user->forceFill([

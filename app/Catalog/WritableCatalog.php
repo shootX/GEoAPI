@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Catalog;
 
 use Illuminate\Database\Connection;
+use Illuminate\Database\Query\Builder;
 use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
@@ -30,7 +31,7 @@ final class WritableCatalog
                 'source_url' => 'string',
                 'drom_firm_id' => 'int',
             ],
-            'required' => ['slug', 'name', 'source_url'],
+            'required' => ['slug', 'name'],
             'search' => ['slug', 'name'],
             'hidden' => [],
         ],
@@ -46,7 +47,7 @@ final class WritableCatalog
                 'body_types' => 'json',
                 'body_type' => 'string',
             ],
-            'required' => ['brand_id', 'slug', 'name', 'source_url'],
+            'required' => ['brand_id', 'slug', 'name'],
             'search' => ['slug', 'name'],
             'hidden' => [],
         ],
@@ -67,7 +68,7 @@ final class WritableCatalog
                 'photo_urls' => 'json',
                 'source_url' => 'string',
             ],
-            'required' => ['model_id', 'drom_generation_id', 'slug', 'source_url'],
+            'required' => ['model_id', 'drom_generation_id', 'slug'],
             'search' => ['slug', 'name', 'chassis_code'],
             'hidden' => [],
         ],
@@ -91,7 +92,7 @@ final class WritableCatalog
                 'doors' => 'int',
                 'source_url' => 'string',
             ],
-            'required' => ['model_id', 'drom_complectation_id', 'name', 'source_url'],
+            'required' => ['model_id', 'drom_complectation_id', 'name'],
             'search' => ['name', 'trim_level', 'chassis_code'],
             'hidden' => [],
         ],
@@ -151,7 +152,7 @@ final class WritableCatalog
     /**
      * @return array{data:list<array<string,mixed>>,meta:array{page:int,per_page:int,total:int}}
      */
-    public function paginate(string $table, int $page, int $perPage, string $term = '', ?string $parentColumn = null, ?int $parentId = null): array
+    public function paginate(string $table, int $page, int $perPage, string $term = '', ?string $parentColumn = null, ?int $parentId = null, array $filters = []): array
     {
         $def = $this->definition($table);
         $query = $this->db()->table($table);
@@ -159,6 +160,7 @@ final class WritableCatalog
             $this->assertColumn($def, $parentColumn);
             $query->where($parentColumn, $parentId);
         }
+        $this->applyFilters($query, $def, $filters);
         if ($term !== '') {
             $like = $this->db()->getDriverName() === 'pgsql' ? 'ilike' : 'like';
             $query->where(function ($inner) use ($def, $like, $term): void {
@@ -207,6 +209,9 @@ final class WritableCatalog
     {
         $def = $this->definition($table);
         $data = $this->validate($def, $input, false);
+        if (array_key_exists('source_url', $def['columns']) && (($data['source_url'] ?? null) === null)) {
+            $data['source_url'] = '';
+        }
         $binary = $this->pullBinary($data);
         try {
             if ($table === 'model_photos') {
@@ -373,17 +378,66 @@ final class WritableCatalog
     private function present(array $def, array $row): array
     {
         foreach ($def['columns'] as $column => $type) {
-            if ($type !== 'json' || ! array_key_exists($column, $row) || ! is_string($row[$column])) {
+            if (! array_key_exists($column, $row) || $row[$column] === null) {
                 continue;
             }
-            $decoded = json_decode($row[$column], true);
-            if (json_last_error() === JSON_ERROR_NONE) {
-                $row[$column] = $decoded;
+            if ($type === 'json' && is_string($row[$column])) {
+                $row[$column] = $this->decodeJsonish($row[$column]);
+            } elseif ($type === 'int' && is_numeric($row[$column])) {
+                $row[$column] = (int) $row[$column];
+            } elseif ($type === 'number' && is_numeric($row[$column])) {
+                $row[$column] = (float) $row[$column];
+            } elseif ($type === 'bool') {
+                $raw = $row[$column];
+                $row[$column] = $raw === true || $raw === 1 || $raw === '1' || $raw === 't' || $raw === 'true';
             }
+        }
+        if (isset($row[$def['key']]) && is_numeric($row[$def['key']])) {
+            $row[$def['key']] = (int) $row[$def['key']];
+        }
+        if ($def['key'] === 'model_id' && isset($row['model_id'])) {
+            $row['id'] = (int) $row['model_id'];
         }
         unset($row['image']);
 
         return $row;
+    }
+
+    private function decodeJsonish(string $value): mixed
+    {
+        $decoded = json_decode($value, true);
+        if (json_last_error() === JSON_ERROR_NONE) {
+            return $decoded;
+        }
+        if (preg_match('/^\{(.*)\}$/s', $value, $match) === 1) {
+            return $match[1] === '' ? [] : str_getcsv($match[1]);
+        }
+
+        return $value;
+    }
+
+    /**
+     * @param  Builder  $query
+     * @param  array{key:string,columns:array<string,string>,required:list<string>,search:list<string>,hidden:list<string>}  $def
+     * @param  array<string, mixed>  $filters
+     */
+    private function applyFilters($query, array $def, array $filters): void
+    {
+        foreach (['model_id', 'brand_id'] as $column) {
+            if (! isset($filters[$column]) || $filters[$column] === null || $filters[$column] === '') {
+                continue;
+            }
+            $value = (int) $filters[$column];
+            if (array_key_exists($column, $def['columns']) || $column === $def['key']) {
+                $query->where($column, $value);
+
+                continue;
+            }
+            if ($column === 'brand_id' && array_key_exists('model_id', $def['columns'])) {
+                $ids = $this->db()->table('models')->where('brand_id', $value)->pluck('id');
+                $query->whereIn('model_id', $ids->all());
+            }
+        }
     }
 
     /**

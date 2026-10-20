@@ -22,4 +22,37 @@
         </x-slate::card-content>
     </x-slate::card>
 </div>
+<div class="mt-8 overflow-x-auto">
+    <table class="w-full text-sm">
+        <thead>
+            <tr>
+                <th class="py-2 text-left"></th>
+                <th class="py-2 text-left">Free</th>
+                <th class="py-2 text-left">Pro</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr class="border-t border-border">
+                <th class="py-3 text-left font-medium">{{ __('Requests per minute') }}</th>
+                <td>60</td>
+                <td>{{ __('Soon') }}</td>
+            </tr>
+            <tr class="border-t border-border">
+                <th class="py-3 text-left font-medium">{{ __('Successful requests per month') }}</th>
+                <td>10 000</td>
+                <td>{{ __('Soon') }}</td>
+            </tr>
+            <tr class="border-t border-border">
+                <th class="py-3 text-left font-medium">{{ __('Server API') }}</th>
+                <td>{{ __('Included') }}</td>
+                <td>{{ __('Soon') }}</td>
+            </tr>
+            <tr class="border-t border-border">
+                <th class="py-3 text-left font-medium">{{ __('Widget') }}</th>
+                <td>{{ __('Included') }}</td>
+                <td>{{ __('Soon') }}</td>
+            </tr>
+        </tbody>
+    </table>
+</div>
 </div>

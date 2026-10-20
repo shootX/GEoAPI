@@ -23,7 +23,9 @@ final class EnsureInternalDocs
 
         $user = $request->user();
         if (! $user instanceof User || ! $this->allowed($user)) {
-            abort(404);
+            return response()->json([
+                'error' => ['code' => 'not_found', 'message' => 'Not found.'],
+            ], 404);
         }
 
         $response = $next($request);

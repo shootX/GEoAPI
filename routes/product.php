@@ -7,7 +7,9 @@ use App\Http\Controllers\ComingSoonSignupController;
 use App\Http\Controllers\LocaleController;
 use App\Http\Controllers\PaymentWebhookController;
 use App\Http\Controllers\PhotoReportController;
+use App\Http\Controllers\PublicOpenApiController;
 use App\Http\Controllers\PublicPageController;
+use App\Http\Controllers\SitemapController;
 use App\Livewire\Account\Errors;
 use App\Livewire\Account\Products;
 use App\Livewire\Account\Projects;
@@ -20,6 +22,8 @@ Route::middleware('web')->group(function (): void {
 
         return redirect('/');
     })->where('locale', 'ka|en');
+    Route::get('/sitemap.xml', SitemapController::class);
+    Route::get('/api/v1/openapi.json', PublicOpenApiController::class);
     Route::get('/', [PublicPageController::class, 'home']);
     Route::get('/demo', [PublicPageController::class, 'demo']);
     Route::get('/guide', [PublicPageController::class, 'guide']);

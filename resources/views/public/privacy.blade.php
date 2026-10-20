@@ -1,4 +1,10 @@
-@component('components.layouts.public', ['title' => 'კონფიდენციალურობის პოლიტიკა — CarAPI', 'description' => 'CarAPI-ის კონფიდენციალურობის პოლიტიკა'])
+@component('components.layouts.public', [
+    'title' => (app()->getLocale() === 'en' ? 'Privacy policy' : 'კონფიდენციალურობის პოლიტიკა').' — CarAPI',
+    'description' => app()->getLocale() === 'en' ? 'CarAPI privacy policy' : 'CarAPI-ის კონფიდენციალურობის პოლიტიკა',
+])
+@if (app()->getLocale() === 'en')
+    @include('public.partials.privacy-en')
+@else
 <article class="space-y-6 text-sm leading-6">
 
 <section class="panel">
@@ -71,4 +77,5 @@
 <p>კითხვებისთვის: info@socialsave.cc.</p>
 </section>
 </article>
+@endif
 @endcomponent

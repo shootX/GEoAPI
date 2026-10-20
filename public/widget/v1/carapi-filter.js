@@ -1,9 +1,17 @@
 (function () {
   var script = document.currentScript;
   var apiBase = script && script.src ? new URL(script.src).origin : '';
-  var LEVELS = ['brand', 'model', 'year', 'body'];
-  var LABELS = { brand: 'ბრენდი', model: 'მოდელი', year: 'გამოშვების წელი', body: 'ძარის ტიპი' };
-  var PLACEHOLDER = { brand: 'აირჩიეთ ბრენდი', model: 'აირჩიეთ მოდელი', year: 'აირჩიეთ წელი', body: 'აირჩიეთ ძარის ტიპი' };
+  var LEVELS = ['brand', 'model', 'year', 'body', 'generation'];
+  var english = (document.documentElement.lang || '').toLowerCase().indexOf('en') === 0;
+  var LABELS = english
+    ? { brand: 'Brand', model: 'Model', year: 'Year', body: 'Body', generation: 'Generation' }
+    : { brand: 'ბრენდი', model: 'მოდელი', year: 'გამოშვების წელი', body: 'ძარის ტიპი', generation: 'თაობა' };
+  var PLACEHOLDER = english
+    ? { brand: 'Choose a brand', model: 'Choose a model', year: 'Choose a year', body: 'Choose a body', generation: 'Choose a generation' }
+    : { brand: 'აირჩიეთ ბრენდი', model: 'აირჩიეთ მოდელი', year: 'აირჩიეთ წელი', body: 'აირჩიეთ ძარის ტიპი', generation: 'აირჩიეთ თაობა' };
+  var WAIT = english
+    ? { model: 'Choose a brand first', year: 'Choose a model first', body: 'Choose a model first', generation: 'Choose a model first' }
+    : { model: 'ჯერ აირჩიეთ ბრენდი', year: 'ჯერ აირჩიეთ მოდელი', body: 'ჯერ აირჩიეთ მოდელი', generation: 'ჯერ აირჩიეთ მოდელი' };
   var BODY_LABEL = {
     sedan: 'სედანი',
     hatchback: 'ჰეჩბეკი',
@@ -49,8 +57,8 @@
     constructor() {
       super();
       this.attachShadow({ mode: 'open' });
-      this.state = { brand: null, model: null, year: null, body: null };
-      this.names = { brand: null, model: null, year: null, body: null };
+      this.state = { brand: null, model: null, year: null, body: null, generation: null };
+      this.names = { brand: null, model: null, year: null, body: null, generation: null };
       this.seq = 0;
       this.shadowRoot.innerHTML = '<style>' +
         ':host{display:block;font:var(--carapi-font,16px/1.4 sans-serif);color:var(--carapi-ink,#141719)}' +
@@ -80,22 +88,26 @@
       this.model = this.shadowRoot.querySelector('[data-level="model"]');
       this.year = this.shadowRoot.querySelector('[data-level="year"]');
       this.body = this.shadowRoot.querySelector('[data-level="body"]');
+      this.generation = this.shadowRoot.querySelector('[data-level="generation"]');
       this.status = this.shadowRoot.querySelector('[data-status]');
       this.brand.addEventListener('change', () => { this.onBrand(); this.syncAll(); });
       this.model.addEventListener('change', () => { this.onModel(); this.syncAll(); });
       this.year.addEventListener('change', () => { this.onYear(); this.syncAll(); });
       this.body.addEventListener('change', () => { this.onBody(); this.syncAll(); });
+      this.generation.addEventListener('change', () => { this.onGeneration(); this.syncAll(); });
       this.combos = LEVELS.map((level) => this.combo(level));
     }
 
     connectedCallback() {
       this.resetSelect(this.brand, PLACEHOLDER.brand);
-      this.resetSelect(this.model, 'ჯერ აირჩიეთ ბრენდი');
-      this.resetSelect(this.year, 'ჯერ აირჩიეთ მოდელი');
-      this.resetSelect(this.body, 'ჯერ აირჩიეთ მოდელი');
+      this.resetSelect(this.model, WAIT.model);
+      this.resetSelect(this.year, WAIT.year);
+      this.resetSelect(this.body, WAIT.body);
+      this.resetSelect(this.generation, WAIT.generation);
       this.model.disabled = true;
       this.year.disabled = true;
       this.body.disabled = true;
+      this.generation.disabled = true;
       this.syncAll();
       this.load('brands', {}, this.brand, PLACEHOLDER.brand);
     }
@@ -182,14 +194,18 @@
       this.state.model = null;
       this.state.year = null;
       this.state.body = null;
+      this.state.generation = null;
       this.names.model = null;
       this.names.year = null;
       this.names.body = null;
+      this.names.generation = null;
       this.resetSelect(this.model, PLACEHOLDER.model);
-      this.resetSelect(this.year, 'ჯერ აირჩიეთ მოდელი');
-      this.resetSelect(this.body, 'ჯერ აირჩიეთ მოდელი');
+      this.resetSelect(this.year, WAIT.year);
+      this.resetSelect(this.body, WAIT.body);
+      this.resetSelect(this.generation, WAIT.generation);
       this.year.disabled = true;
       this.body.disabled = true;
+      this.generation.disabled = true;
       this.emit();
       if (!this.state.brand) {
         this.model.disabled = true;
@@ -226,11 +242,15 @@
       this.names.model = this.state.model ? option.dataset.name : null;
       this.state.year = null;
       this.state.body = null;
+      this.state.generation = null;
       this.names.year = null;
       this.names.body = null;
+      this.names.generation = null;
       this.resetSelect(this.year, PLACEHOLDER.year);
-      this.resetSelect(this.body, 'ჯერ აირჩიეთ მოდელი');
+      this.resetSelect(this.body, WAIT.body);
+      this.resetSelect(this.generation, WAIT.generation);
       this.body.disabled = true;
+      this.generation.disabled = true;
       this.emit();
       if (!this.state.model) {
         this.year.disabled = true;
@@ -251,8 +271,22 @@
       this.state.year = this.year.value || null;
       this.names.year = this.state.year ? option.dataset.name : null;
       this.state.body = null;
+      this.state.generation = null;
       this.names.body = null;
+      this.names.generation = null;
       this.fillBodies(option);
+      this.resetSelect(this.generation, this.state.model ? PLACEHOLDER.generation : WAIT.generation);
+      this.generation.disabled = true;
+      this.emit();
+      if (this.state.model) {
+        this.load('models/' + encodeURIComponent(this.state.model) + '/generations', {}, this.generation, PLACEHOLDER.generation);
+      }
+    }
+
+    onGeneration() {
+      var option = this.generation.selectedOptions[0];
+      this.state.generation = this.generation.value || null;
+      this.names.generation = this.state.generation ? option.dataset.name : null;
       this.emit();
     }
 
@@ -300,12 +334,13 @@
           model_id: this.state.model,
           year: this.state.year,
           body_type: this.state.body,
-          generation_id: null,
+          generation_id: this.state.generation,
           modification_id: null,
           brand_name: this.names.brand,
           model_name: this.names.model,
           year_name: this.names.year,
-          body_name: this.names.body
+          body_name: this.names.body,
+          generation_name: this.names.generation
         }
       }));
     }

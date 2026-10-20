@@ -115,10 +115,11 @@ if ($path === '/getimage') {
 
 function carapi_get_image(): void
 {
-    header('Access-Control-Allow-Origin: *');
-    header('Access-Control-Allow-Methods: GET, OPTIONS');
     header('Vary: Accept-Encoding');
-    header('X-Robots-Tag: noindex');
+    header('X-Robots-Tag: noindex, noimageindex');
+    header('X-Content-Type-Options: nosniff');
+    header('Cross-Origin-Resource-Policy: same-site');
+    header('Referrer-Policy: no-referrer');
 
     if (($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'OPTIONS') {
         http_response_code(204);
@@ -214,6 +215,14 @@ function carapi_get_image(): void
         }
         $bytes = $cache?->readImage($res['file']);
         if ($bytes !== null) {
+            $marked = \Carapi\Catalog\DemoWatermark::apply($bytes);
+            if ($marked !== null) {
+                header('Content-Type: ' . $marked['mime']);
+                header('Content-Length: ' . strlen($marked['bytes']));
+                header('Cache-Control: private, no-store');
+                echo $marked['bytes'];
+                return;
+            }
             header('Content-Type: ' . $res['mime']);
             header('Content-Length: ' . strlen($bytes));
             echo $bytes;
@@ -667,8 +676,8 @@ GET /api/v1/coverage
 
 ვიჯეტი იყენებს საჯარო API გასაღებს carapi_pk_. ის HTML-ში დასაშვებია.
 <script src="{$base}/widget/v1/carapi-filter.js"></script>
-<carapi-filter public-key="carapi_pk_example"></carapi-filter>
-ჩაანაცვლეთ carapi_pk_example თქვენი პროექტის საჯარო API გასაღებით.
+<carapi-filter public-key="demo"></carapi-filter>
+ამ საიტზე demo მხოლოდ ამ origin-ზე მუშაობს. პროექტის გასაღები არის carapi_pk_ და 32 თექვსმეტობითი სიმბოლო.
 ვიჯეტი მუშაობს მხოლოდ პროექტში ჩაწერილი origin-იდან, მაგალითად https://example.com.
 Origin არის პროტოკოლი, დომენი და საჭიროების შემთხვევაში პორტი. გვერდის ბილიკს არ შეიცავს.
 wildcard (*) და ცარიელი Origin არ მიიღება. http დასაშვებია მხოლოდ localhost-ისა და 127.0.0.1-ისთვის.
@@ -778,8 +787,9 @@ TXT;
     echo '<h2 id="widget" class="doc-sec">ვიჯეტის დამატება ვებსაიტზე</h2>';
     echo '<p>CarAPI-ის ვიჯეტის გამოყენებით შეგიძლიათ თქვენს ვებსაიტს დაამატოთ ავტომობილის არჩევის ინტერფეისი. ვიჯეტი იტვირთება JavaScript ფაილის საშუალებით და მუშაობისთვის იყენებს საჯარო API გასაღებს.</p>';
     echo '<div class="codeb"><div class="tb"><div class="tabs"><button type="button" class="on" data-tab="html">HTML</button></div><button type="button" class="copy" data-copy-block>' . $copy . 'კოდის კოპირება</button></div>';
-    echo '<pre class="json" data-tab-panel="html">' . $h("<script src=\"" . $base . "/widget/v1/carapi-filter.js\"></script>\n<carapi-filter public-key=\"carapi_pk_example\"></carapi-filter>") . '</pre></div>';
-    echo '<p>ჩაანაცვლეთ <code>carapi_pk_example</code> თქვენი პროექტის საჯარო API გასაღებით.</p>';
+    echo '<pre class="json" data-tab-panel="html">' . $h("<script src=\"" . $base . "/widget/v1/carapi-filter.js\"></script>\n<carapi-filter public-key=\"demo\"></carapi-filter>") . '</pre></div>';
+    echo '<p>ამ საიტზე <code>demo</code> მხოლოდ ამ origin-ზე მუშაობს. პროექტის გასაღები არის <code>carapi_pk_</code> და 32 თექვსმეტობითი სიმბოლო.</p>';
+    echo '<p>ვიჯეტი კატალოგს იღებს <code>POST</code> მოთხოვნებით: <code>/widget/v1/{publicKey}/brands</code>, <code>/widget/v1/{publicKey}/brands/{slug}/models</code>, <code>/widget/v1/{publicKey}/models/{id}/years</code> და <code>/widget/v1/{publicKey}/models/{id}/generations</code>. ეს სერვერული <code>GET /api/v1</code> მოთხოვნებისაგან დამოუკიდებელი გზაა.</p>';
     echo '<p>ვიჯეტი კატალოგს იღებს <code>POST</code> მოთხოვნებით: <code>/widget/v1/{publicKey}/brands</code>, <code>/widget/v1/{publicKey}/brands/{slug}/models</code> და <code>/widget/v1/{publicKey}/models/{id}/years</code>. ეს სერვერული <code>GET /api/v1</code> მოთხოვნებისაგან დამოუკიდებელი გზაა.</p>';
 
     echo '<h2 id="domains" class="doc-sec">საიტის მისამართის დამატება</h2>';

@@ -23,7 +23,9 @@ final class PublicPageController extends Controller
             'brands' => $ok ? number_format((int) $counts['brands'], 0, '.', ' ') : null,
             'models' => $ok ? number_format((int) $counts['models'], 0, '.', ' ') : null,
             'generations' => $ok ? number_format((int) $counts['generations'], 0, '.', ' ') : null,
+            'generationGroups' => $ok ? number_format((int) ($counts['generation_groups'] ?? 0), 0, '.', ' ') : null,
             'catalogUp' => $ok,
+            'measuredAt' => $ok ? now()->toDateString() : null,
         ]);
     }
 

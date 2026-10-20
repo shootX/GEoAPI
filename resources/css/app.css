@@ -152,6 +152,8 @@ html,
 .site {
     background: #fff;
     color: #171717;
+    font-size: 16px;
+    line-height: 1.6;
     --slate-background: #ffffff;
     --slate-foreground: #171717;
     --slate-card: #ffffff;
@@ -165,7 +167,7 @@ html,
     --slate-accent: #f4f4f5;
     --slate-accent-foreground: #171717;
     --slate-border: #e4e4e7;
-    --slate-input: #d4d4d8;
+    --slate-input: #71717a;
     --slate-ring: #c2410c;
     --color-primary: #ff7340;
     --color-primary-foreground: #1b1224;

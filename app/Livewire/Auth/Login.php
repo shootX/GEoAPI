@@ -7,12 +7,15 @@ namespace App\Livewire\Auth;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Title;
 
-#[Layout('electrik::components.layouts.guest')]
+#[Layout('components.layouts.public')]
 #[Title('შესვლა')]
 final class Login extends \Electrik\Livewire\Auth\Login
 {
     public function render()
     {
-        return view('livewire.auth.login');
+        return view('livewire.auth.login')->layoutData([
+            'title' => __('Sign in').' — CarAPI',
+            'description' => __('Welcome back. Enter your credentials to continue.'),
+        ]);
     }
 }

@@ -1,20 +1,20 @@
 <div id="vehicle-picker">
     <div class="vp-bar">
         @foreach ([
-            'brand' => 'მარკა',
-            'model' => 'მოდელი',
-            'year' => 'წელი',
-            'generation' => 'თაობა',
-            'modification' => 'მოდიფიკაცია',
+            'brand' => __('Brand'),
+            'model' => __('Model'),
+            'year' => __('Year'),
+            'generation' => __('Generation'),
+            'modification' => __('Modification'),
         ] as $step => $label)
             <div class="vp-field" data-step="{{ $step }}">
                 <label class="vp-name" for="vp-{{ $step }}-q">{{ $label }}</label>
                 <button type="button" data-vp-trigger disabled>
-                    <span data-vp-label class="is-empty">აირჩიეთ</span>
+                    <span data-vp-label class="is-empty">{{ $step === 'brand' ? __('Choose') : __('Choose a brand first') }}</span>
                     <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M4 6l4 4 4-4"/></svg>
                 </button>
                 <div data-vp-pop hidden>
-                    <input id="vp-{{ $step }}-q" data-vp-q type="search" placeholder="ძებნა" autocomplete="off" aria-label="{{ $label }}, ძებნა">
+                    <input id="vp-{{ $step }}-q" data-vp-q type="search" placeholder="{{ __('Search') }}" autocomplete="off" aria-label="{{ $label }}, {{ __('Search') }}">
                     <p data-vp-hint hidden></p>
                     <ul data-vp-list role="listbox"></ul>
                 </div>
@@ -112,4 +112,11 @@
         #vehicle-picker [data-vp-pop], #vp-card { animation: none; }
     }
 </style>
-<script src="/assets/vehicle-picker.js?v=20261020m"></script>
+<script type="application/json" id="vp-copy">{!! json_encode([
+    'chooseBrand' => __('Choose a brand'),
+    'chooseModel' => __('Choose a model'),
+    'chooseYear' => __('Choose a year'),
+    'chooseGeneration' => __('Choose a generation'),
+    'chooseModification' => __('Choose a modification'),
+], JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_AMP | JSON_HEX_QUOT) !!}</script>
+<script src="/assets/vehicle-picker.js?v=20261020n"></script>

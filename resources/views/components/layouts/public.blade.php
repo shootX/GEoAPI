@@ -7,6 +7,21 @@
     @if (!empty($description))
         <meta name="description" content="{{ $description }}">
     @endif
+    <link rel="icon" href="{{ asset('assets/brand/favicon-32-lime.svg') }}" type="image/svg+xml">
+    <link rel="canonical" href="{{ url()->current() }}">
+    <link rel="alternate" hreflang="ka" href="{{ url('/ka') }}">
+    <link rel="alternate" hreflang="en" href="{{ url('/en') }}">
+    <link rel="alternate" hreflang="x-default" href="{{ url('/') }}">
+    <meta property="og:title" content="{{ $title ?? 'CarAPI' }}">
+    @if (!empty($description))
+        <meta property="og:description" content="{{ $description }}">
+        <meta name="twitter:description" content="{{ $description }}">
+    @endif
+    <meta property="og:url" content="{{ url()->current() }}">
+    <meta property="og:type" content="website">
+    <meta property="og:image" content="{{ asset('assets/brand/favicon-32-lime.svg') }}">
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:title" content="{{ $title ?? 'CarAPI' }}">
     <x-electrik::brand-styles />
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <style>
@@ -23,7 +38,7 @@
 <body class="site min-h-screen bg-white text-foreground antialiased">
     <div class="flex min-h-screen flex-col">
         <header class="border-b border-border">
-            <div class="mx-auto flex h-16 max-w-5xl items-center gap-2 px-4 sm:px-6">
+            <div class="mx-auto flex h-16 max-w-6xl items-center gap-2 px-4 sm:px-6">
                 <a href="{{ url('/') }}" class="flex shrink-0 items-center gap-2 text-base font-extrabold tracking-tight">
                     <span class="size-5 rounded-md bg-primary"></span>
                     CarAPI
@@ -66,11 +81,11 @@
                 @endauth
             </nav>
         </header>
-        <main class="mx-auto w-full min-w-0 max-w-5xl flex-1 px-4 py-12 sm:px-6 md:py-16">
+        <main class="mx-auto w-full min-w-0 max-w-6xl flex-1 px-4 py-12 sm:px-6 md:py-24">
             {{ $slot }}
         </main>
         <footer class="border-t border-border">
-            <div class="mx-auto flex max-w-5xl flex-col gap-4 px-4 py-8 text-sm sm:flex-row sm:items-center sm:justify-between sm:px-6">
+            <div class="mx-auto flex max-w-6xl flex-col gap-4 px-4 py-8 text-sm sm:flex-row sm:items-center sm:justify-between sm:px-6">
                 <p class="text-muted-foreground">© {{ date('Y') }} CarAPI</p>
                 <nav class="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:gap-x-5" aria-label="{{ __('Contact') }}">
                     <a class="accent" href="{{ url('/guide') }}">{{ __('Documentation') }}</a>

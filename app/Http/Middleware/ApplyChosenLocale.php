@@ -13,8 +13,15 @@ final class ApplyChosenLocale
     public function handle(Request $request, Closure $next): Response
     {
         $choice = $request->session()->get('locale');
-
-        if (is_string($choice) && in_array($choice, ['ka', 'en'], true)) {
+        if (! is_string($choice) || ! in_array($choice, ['ka', 'en'], true)) {
+            $user = $request->user();
+            $choice = is_object($user) ? ($user->locale ?? null) : null;
+        }
+        if (! is_string($choice) || ! in_array($choice, ['ka', 'en'], true)) {
+            $choice = (string) config('carapi.locale');
+        }
+        // Electrik only knows en/es/fr/ar/hi and would replace ka with en.
+        if (in_array($choice, ['ka', 'en'], true)) {
             app()->setLocale($choice);
         }
 

@@ -15,10 +15,19 @@ final class SmtpMailer implements Mailer
         $user = self::env('CARAPI_MAIL_USERNAME');
         $password = carapi_env('CARAPI_MAIL_PASSWORD');
         $password = is_string($password) ? $password : '';
-        if ($host === '' || $from === '' || $user === '' || $password === '') {
-            throw new UnavailableException();
+        if ($host === '' || $from === '' || $user === '' || $password === '' || ! class_exists(PHPMailer::class)) {
+            throw new UnavailableException;
         }
 
+        try {
+            $this->deliver($host, $from, $user, $password, $to, $subject, $text);
+        } catch (\Throwable) {
+            throw new UnavailableException;
+        }
+    }
+
+    private function deliver(string $host, string $from, string $user, string $password, string $to, string $subject, string $text): void
+    {
         $mail = new PHPMailer(true);
         $mail->isSMTP();
         $mail->Host = $host;

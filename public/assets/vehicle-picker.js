@@ -11,12 +11,17 @@
   var flagNote = document.getElementById('vp-flag-note');
   var specs = document.getElementById('vp-specs');
   var order = ['brand', 'model', 'year', 'generation', 'modification'];
+  var copyNode = document.getElementById('vp-copy');
+  var copy = {};
+  if (copyNode) {
+    try { copy = JSON.parse(copyNode.textContent); } catch (e) { copy = {}; }
+  }
   var placeholders = {
-    brand: 'აირჩიეთ მარკა',
-    model: 'აირჩიეთ მოდელი',
-    year: 'აირჩიეთ წელი',
-    generation: 'აირჩიეთ თაობა',
-    modification: 'აირჩიეთ მოდიფიკაცია'
+    brand: copy.chooseBrand || 'აირჩიეთ მარკა',
+    model: copy.chooseModel || 'აირჩიეთ მოდელი',
+    year: copy.chooseYear || 'აირჩიეთ წელი',
+    generation: copy.chooseGeneration || 'აირჩიეთ თაობა',
+    modification: copy.chooseModification || 'აირჩიეთ მოდიფიკაცია'
   };
   var fields = {};
   var rows = {};

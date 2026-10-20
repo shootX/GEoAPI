@@ -18,12 +18,12 @@ final class Session
         }
 
         $path = carapi_env('CARAPI_PLATFORM_SESSION_PATH');
-        $path = is_string($path) && $path !== '' ? $path : dirname(__DIR__, 2) . '/data/sessions';
-        if (!is_dir($path) && !mkdir($path, 0700, true) && !is_dir($path)) {
-            throw new UnavailableException();
+        $path = is_string($path) && $path !== '' ? $path : dirname(__DIR__, 2).'/data/sessions';
+        if (! is_dir($path) && ! mkdir($path, 0700, true) && ! is_dir($path)) {
+            throw new UnavailableException;
         }
 
-        $secure = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off')
+        $secure = (! empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off')
             || (($_SERVER['HTTP_X_FORWARDED_PROTO'] ?? '') === 'https');
 
         session_save_path($path);
@@ -40,25 +40,44 @@ final class Session
         self::expire();
     }
 
+    /**
+     * PHP only accepts a 32-character hex session id. Laravel's encrypted
+     * cookie is longer and would make session_start() fail on the project page.
+     */
+    public static function acceptSessionId(mixed $raw, mixed $decrypted): ?string
+    {
+        if (self::validSessionId($raw)) {
+            return $raw;
+        }
+        if (self::validSessionId($decrypted)) {
+            return $decrypted;
+        }
+
+        return null;
+    }
+
     private static function restoreSessionId(): void
     {
         $raw = $_COOKIE['carapi_platform'] ?? null;
-        if (!is_string($raw) || preg_match('/^[A-Za-z0-9,-]{16,128}$/', $raw) === 1) {
-            return;
-        }
-        $sid = function_exists('request') ? request()->cookie('carapi_platform') : null;
-        if (is_string($sid) && preg_match('/^[a-f0-9]{32}$/', $sid) === 1) {
-            $_COOKIE['carapi_platform'] = $sid;
+        $decrypted = function_exists('request') ? request()->cookie('carapi_platform') : null;
+        $sid = self::acceptSessionId($raw, $decrypted);
+        if ($sid === null) {
+            unset($_COOKIE['carapi_platform']);
 
             return;
         }
-        unset($_COOKIE['carapi_platform']);
+        $_COOKIE['carapi_platform'] = $sid;
+    }
+
+    private static function validSessionId(mixed $sid): bool
+    {
+        return is_string($sid) && preg_match('/^[a-f0-9]{32}$/', $sid) === 1;
     }
 
     public static function csrf(): string
     {
         self::start();
-        if (empty($_SESSION['csrf']) || !is_string($_SESSION['csrf'])) {
+        if (empty($_SESSION['csrf']) || ! is_string($_SESSION['csrf'])) {
             $_SESSION['csrf'] = bin2hex(random_bytes(32));
         }
 
@@ -123,7 +142,7 @@ final class Session
     private static function expire(): void
     {
         $id = $_SESSION['user_id'] ?? null;
-        if (!is_numeric($id)) {
+        if (! is_numeric($id)) {
             return;
         }
         $now = time();

@@ -13,6 +13,7 @@ use App\Http\Controllers\Admin\PlanController;
 use App\Http\Controllers\Admin\ProductController;
 use App\Http\Controllers\Admin\SettingController;
 use App\Http\Middleware\ForceJson;
+use App\Http\Middleware\SecurityHeaders;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware(['web', 'internal-docs'])->group(function (): void {
@@ -20,7 +21,7 @@ Route::middleware(['web', 'internal-docs'])->group(function (): void {
     Route::get('/api/docs/openapi.json', [DocsController::class, 'spec'])->name('admin.docs.spec');
 });
 
-Route::middleware([ForceJson::class, 'auth:sanctum', 'admin', 'throttle:300,1'])->prefix('api/admin')->group(function (): void {
+Route::middleware([ForceJson::class, SecurityHeaders::class, 'auth:sanctum', 'admin', 'throttle:300,1'])->prefix('api/admin')->group(function (): void {
     Route::get('me', MeController::class)->name('admin.me');
 
     foreach ([

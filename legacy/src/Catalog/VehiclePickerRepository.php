@@ -9,20 +9,31 @@ use PDOException;
 
 final class VehiclePickerRepository
 {
-    public function __construct(private PDO $pdo)
-    {
-    }
+    public function __construct(private PDO $pdo) {}
 
     /** @return array{rows:list<array<string, mixed>>, total:int} */
-    public function brands(int $limit, int $offset): array
+    public function brands(int $limit, int $offset, string $term = ''): array
     {
-        $total = $this->count('SELECT count(*) FROM public.brands');
-        $stmt = $this->pdo->prepare(<<<'SQL'
+        $where = '';
+        if ($term !== '') {
+            $where = 'WHERE name ILIKE :term OR slug ILIKE :term';
+        }
+        $totalStmt = $this->pdo->prepare('SELECT count(*) FROM public.brands '.$where);
+        if ($term !== '') {
+            $totalStmt->bindValue('term', '%'.$term.'%');
+        }
+        $totalStmt->execute();
+        $total = (int) $totalStmt->fetchColumn();
+        $stmt = $this->pdo->prepare(<<<SQL
             SELECT id::text AS id, name
             FROM public.brands
+            $where
             ORDER BY name, id
             LIMIT :limit OFFSET :offset
         SQL);
+        if ($term !== '') {
+            $stmt->bindValue('term', '%'.$term.'%');
+        }
         $this->bindLimit($stmt, $limit, $offset);
         $stmt->execute();
         $rows = [];
@@ -39,7 +50,7 @@ final class VehiclePickerRepository
     /** @return array{rows:list<array<string, mixed>>, total:int}|null */
     public function models(string $brandId, int $limit, int $offset): ?array
     {
-        if (!$this->exists('public.brands', $brandId)) {
+        if (! $this->exists('public.brands', $brandId)) {
             return null;
         }
         $totalStmt = $this->pdo->prepare('SELECT count(*) FROM public.models WHERE brand_id = :id');
@@ -70,7 +81,7 @@ final class VehiclePickerRepository
     /** @return array{rows:list<array<string, mixed>>, total:int}|null */
     public function years(string $modelId): ?array
     {
-        if (!$this->exists('public.models', $modelId)) {
+        if (! $this->exists('public.models', $modelId)) {
             return null;
         }
         $stmt = $this->pdo->prepare(<<<'SQL'
@@ -103,7 +114,7 @@ final class VehiclePickerRepository
     /** @return array{rows:list<array<string, mixed>>, total:int}|null */
     public function generations(string $modelId, int $year, int $limit, int $offset): ?array
     {
-        if (!$this->exists('public.models', $modelId)) {
+        if (! $this->exists('public.models', $modelId)) {
             return null;
         }
         $filter = <<<'SQL'
@@ -113,19 +124,34 @@ final class VehiclePickerRepository
               AND g.year_start <= :year_from
               AND (g.year_end IS NULL OR g.year_end >= :year_to)
         SQL;
-        $totalStmt = $this->pdo->prepare('SELECT count(*) ' . $filter);
+        $group = <<<'SQL'
+            coalesce(nullif(btrim(g.chassis_code), ''), nullif(btrim(g.name), ''), g.id::text),
+            coalesce(g.year_start, 0),
+            coalesce(g.year_end, 0),
+            coalesce(nullif(btrim(g.market), ''), ''),
+            coalesce(nullif(btrim(g.steering_wheel), ''), ''),
+            coalesce(nullif(btrim(g.body_type), ''), '')
+        SQL;
+        $totalStmt = $this->pdo->prepare('SELECT count(*) FROM (SELECT 1 '.$filter.' GROUP BY '.$group.') grouped');
         $totalStmt->bindValue('id', $modelId);
         $totalStmt->bindValue('year_from', $year, PDO::PARAM_INT);
         $totalStmt->bindValue('year_to', $year, PDO::PARAM_INT);
         $totalStmt->execute();
         $stmt = $this->pdo->prepare(<<<SQL
-            SELECT g.id::text AS id,
-                   NULLIF(btrim(g.name), '') AS name,
-                   NULLIF(btrim(g.chassis_code), '') AS code,
-                   g.year_start,
-                   g.year_end
-            $filter
-            ORDER BY g.year_start, g.name NULLS LAST, g.id
+            SELECT id, name, code, year_start, year_end, market, steering
+            FROM (
+                SELECT DISTINCT ON ($group)
+                       g.id::text AS id,
+                       NULLIF(btrim(g.name), '') AS name,
+                       NULLIF(btrim(g.chassis_code), '') AS code,
+                       g.year_start,
+                       g.year_end,
+                       NULLIF(btrim(g.market), '') AS market,
+                       NULLIF(btrim(g.steering_wheel), '') AS steering
+                $filter
+                ORDER BY $group, g.id
+            ) deduped
+            ORDER BY year_start, name NULLS LAST, id
             LIMIT :limit OFFSET :offset
         SQL);
         $stmt->bindValue('id', $modelId);
@@ -145,10 +171,14 @@ final class VehiclePickerRepository
                 'code' => $code,
                 'year_start' => $start,
                 'year_end' => $end,
+                'market' => self::text($row['market']),
+                'steering' => self::text($row['steering']),
                 'label' => self::join([
                     $name ?? $code ?? (string) $row['id'],
                     $name !== null ? $code : null,
                     self::span($start, $end),
+                    self::text($row['market']),
+                    self::text($row['steering']),
                 ]),
             ];
         }
@@ -159,7 +189,7 @@ final class VehiclePickerRepository
     /** @return array{rows:list<array<string, mixed>>, total:int}|null */
     public function modifications(string $generationId, int $year, int $limit, int $offset): ?array
     {
-        if (!$this->exists('public.generations', $generationId)) {
+        if (! $this->exists('public.generations', $generationId)) {
             return null;
         }
         $filter = <<<'SQL'
@@ -168,7 +198,7 @@ final class VehiclePickerRepository
               AND (mod.year_start IS NULL OR mod.year_start <= :year_from)
               AND (mod.year_end IS NULL OR mod.year_end >= :year_to)
         SQL;
-        $totalStmt = $this->pdo->prepare('SELECT count(*) ' . $filter);
+        $totalStmt = $this->pdo->prepare('SELECT count(*) '.$filter);
         $totalStmt->bindValue('id', $generationId);
         $totalStmt->bindValue('year_from', $year, PDO::PARAM_INT);
         $totalStmt->bindValue('year_to', $year, PDO::PARAM_INT);
@@ -215,7 +245,7 @@ final class VehiclePickerRepository
                 'label' => self::join([
                     $name,
                     self::liters($volume),
-                    $power === null ? null : self::trimNumber($power) . ' hp',
+                    $power === null ? null : self::trimNumber($power).' hp',
                     $transmission,
                     $drive,
                 ]),
@@ -267,7 +297,7 @@ final class VehiclePickerRepository
         $stmt->bindValue('id', $id);
         $stmt->execute();
         $row = $stmt->fetch();
-        if (!is_array($row)) {
+        if (! is_array($row)) {
             return null;
         }
         $specs = self::jsonObject($row['specs']);
@@ -357,7 +387,7 @@ final class VehiclePickerRepository
         $stmt->bindValue('id', $modelId);
         $stmt->execute();
         $row = $stmt->fetch();
-        if (!is_array($row)) {
+        if (! is_array($row)) {
             return null;
         }
         $mime = self::text($row['mime']);
@@ -365,7 +395,7 @@ final class VehiclePickerRepository
         if ($mime === null || $bytes === null || $bytes === '') {
             return null;
         }
-        if (!in_array($mime, ['image/jpeg', 'image/png', 'image/webp', 'image/gif'], true)) {
+        if (! in_array($mime, ['image/jpeg', 'image/png', 'image/webp', 'image/gif'], true)) {
             return null;
         }
 
@@ -409,10 +439,10 @@ final class VehiclePickerRepository
 
     private function exists(string $table, string $id): bool
     {
-        if (!in_array($table, ['public.brands', 'public.models', 'public.generations'], true)) {
-            throw new UnavailableException();
+        if (! in_array($table, ['public.brands', 'public.models', 'public.generations'], true)) {
+            throw new UnavailableException;
         }
-        $stmt = $this->pdo->prepare('SELECT 1 FROM ' . $table . ' WHERE id = :id');
+        $stmt = $this->pdo->prepare('SELECT 1 FROM '.$table.' WHERE id = :id');
         $stmt->bindValue('id', $id);
         $stmt->execute();
 
@@ -425,7 +455,7 @@ final class VehiclePickerRepository
             return (int) $this->pdo->query($sql)->fetchColumn();
         } catch (PDOException) {
             error_log('[catalog] query failed');
-            throw new UnavailableException();
+            throw new UnavailableException;
         }
     }
 
@@ -483,7 +513,7 @@ final class VehiclePickerRepository
             return null;
         }
 
-        return number_format($cc / 1000, 1, '.', '') . ' L';
+        return number_format($cc / 1000, 1, '.', '').' L';
     }
 
     /** @param list<string|null> $parts */
@@ -508,10 +538,10 @@ final class VehiclePickerRepository
             return (string) $end;
         }
         if ($end === null) {
-            return $start . '–';
+            return $start.'–';
         }
 
-        return $start . '–' . $end;
+        return $start.'–'.$end;
     }
 
     /** @param array<string, mixed> $specs */
@@ -532,7 +562,7 @@ final class VehiclePickerRepository
         if (is_array($value)) {
             return $value;
         }
-        if (!is_string($value) || $value === '') {
+        if (! is_string($value) || $value === '') {
             return [];
         }
         $decoded = json_decode($value, true);
@@ -547,7 +577,7 @@ final class VehiclePickerRepository
 
             return is_string($bytes) ? $bytes : null;
         }
-        if (!is_string($value) || $value === '') {
+        if (! is_string($value) || $value === '') {
             return null;
         }
         if (str_starts_with($value, '\\x')) {
@@ -573,7 +603,7 @@ final class VehiclePickerRepository
 
             return $out;
         }
-        if (!is_string($value)) {
+        if (! is_string($value)) {
             return [];
         }
         $value = trim($value);
@@ -608,7 +638,7 @@ final class VehiclePickerRepository
 
     private static function year(mixed $value): ?int
     {
-        if ($value === null || $value === '' || !is_numeric($value)) {
+        if ($value === null || $value === '' || ! is_numeric($value)) {
             return null;
         }
 
@@ -617,7 +647,7 @@ final class VehiclePickerRepository
 
     private static function number(mixed $value): int|float|null
     {
-        if ($value === null || $value === '' || !is_numeric($value)) {
+        if ($value === null || $value === '' || ! is_numeric($value)) {
             return null;
         }
         $number = (float) $value;

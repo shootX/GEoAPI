@@ -27,14 +27,36 @@ class PublicDesignTest extends TestCase
 
     public function test_home_georgian_copy_uses_the_picker_word(): void
     {
-        $this->withSession(['locale' => 'ka'])
-            ->get('/')
-            ->assertOk()
-            ->assertSee('ავტომობილების მონაცემები')
-            ->assertSee('API ან მზა ვიჯეტი')
-            ->assertSee('მზა არჩევანი')
-            ->assertDontSee('ამრჩევი')
-            ->assertSee('22 367', false);
+        $dir = base_path('legacy/cache');
+        if (! is_dir($dir)) {
+            mkdir($dir, 0700, true);
+        }
+        $path = $dir.'/public-counts.json';
+        file_put_contents($path, json_encode([
+            'status' => 'ok',
+            'brands' => 314,
+            'models' => 4710,
+            'generations' => 22367,
+            'generation_groups' => 10228,
+            'models_without_generations' => 1,
+        ]));
+        $_ENV['CARAPI_CATALOG_ENABLED'] = '1';
+        $_SERVER['CARAPI_CATALOG_ENABLED'] = '1';
+
+        try {
+            $this->withSession(['locale' => 'ka'])
+                ->get('/')
+                ->assertOk()
+                ->assertSee('ავტომობილების მონაცემები')
+                ->assertSee('API ან მზა ვიჯეტი')
+                ->assertSee('მზა არჩევანი')
+                ->assertDontSee('ამრჩევი')
+                ->assertSee('22 367', false)
+                ->assertSee('10 228', false);
+        } finally {
+            unset($_ENV['CARAPI_CATALOG_ENABLED'], $_SERVER['CARAPI_CATALOG_ENABLED']);
+            @unlink($path);
+        }
     }
 
     public function test_demo_and_guide_render_the_public_sections(): void

@@ -16,15 +16,28 @@ final class CatalogController extends Controller
     public function index(Request $request, string|int|null $parentId = null): JsonResponse
     {
         [$page, $perPage] = $this->page($request);
+        $table = $this->table($request);
         $parentColumn = $this->optionalRouteString($request, 'parentColumn');
+        if ($table === 'modification_equipment' && $parentColumn === null) {
+            $filter = $request->validate([
+                'modification_id' => ['required', 'integer', 'min:1'],
+            ]);
+            $parentColumn = 'modification_id';
+            $parentId = (int) $filter['modification_id'];
+        }
+        $filters = $request->validate([
+            'model_id' => ['sometimes', 'integer', 'min:1'],
+            'brand_id' => ['sometimes', 'integer', 'min:1'],
+        ]);
 
         return response()->json($this->catalog->paginate(
-            $this->table($request),
+            $table,
             $page,
             $perPage,
             trim((string) $request->query('q', '')),
             $parentColumn,
             $parentId === null ? null : (int) $parentId,
+            $filters,
         ));
     }
 
