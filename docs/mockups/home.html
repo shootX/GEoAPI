@@ -231,12 +231,76 @@
         select:disabled { color: #8aa097; }
         .result {
             margin-top: 14px;
-            display: grid;
-            grid-template-columns: 1.2fr 0.8fr;
-            gap: 14px;
             border: 1px solid var(--line);
             border-radius: 16px;
             overflow: hidden;
+        }
+        .result-body { display: grid; grid-template-columns: 1.2fr 0.8fr; }
+        .photo-btn {
+            display: block;
+            width: 100%;
+            height: 190px;
+            padding: 0;
+            border: 0;
+            border-bottom: 1px solid var(--line);
+            background: linear-gradient(180deg, #e7f6ef 0%, #d5eee3 100%);
+            cursor: pointer;
+            position: relative;
+        }
+        .photo-btn[hidden] { display: none; }
+        .photo-btn img { width: 100%; height: 190px; object-fit: cover; }
+        .photo-fallback {
+            height: 190px;
+            display: grid;
+            place-items: center;
+        }
+        .photo-fallback svg { width: 120px; height: 64px; }
+        .watermark {
+            position: absolute;
+            right: 14px;
+            bottom: 10px;
+            color: rgba(9, 20, 19, 0.42);
+            font-size: 12px;
+            font-weight: 700;
+            letter-spacing: 0.16em;
+        }
+        .lightbox {
+            position: fixed;
+            inset: 0;
+            z-index: 30;
+            display: none;
+            place-items: center;
+            padding: 24px;
+            background: rgba(9, 20, 19, 0.62);
+        }
+        .lightbox.open { display: grid; }
+        .lightbox-card {
+            width: min(760px, 100%);
+            background: white;
+            border-radius: 24px;
+            overflow: hidden;
+            box-shadow: var(--shadow);
+        }
+        .lightbox-photo { position: relative; background: linear-gradient(180deg, #e7f6ef, #d5eee3); }
+        .lightbox-photo img, .lightbox-fallback { width: 100%; height: 320px; object-fit: cover; }
+        .lightbox-fallback { display: grid; place-items: center; }
+        .lightbox-fallback svg { width: 220px; height: 110px; }
+        .lightbox-body { padding: 20px 22px 24px; }
+        .lightbox-body dl { display: grid; grid-template-columns: 1fr 1fr; gap: 10px 18px; margin: 14px 0 0; }
+        .lightbox-body dt { color: var(--muted); font-size: 13px; }
+        .lightbox-body dd { margin: 0; font-weight: 600; }
+        .lightbox-close {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            border: 0;
+            background: white;
+            color: var(--ink);
+            border-radius: 999px;
+            min-height: 36px;
+            padding: 0 12px;
+            font-weight: 700;
+            cursor: pointer;
         }
         .result-copy { padding: 16px 18px; }
         .result-copy p { margin-top: 6px; color: var(--muted); }
@@ -389,7 +453,7 @@
         }
 
         @media (max-width: 980px) {
-            .hero-grid, .split, .contact, .footer-grid, .features, .quotes, .prices, .result, .picker { grid-template-columns: 1fr; }
+            .hero-grid, .split, .contact, .footer-grid, .features, .quotes, .prices, .result-body, .picker, .lightbox-body dl { grid-template-columns: 1fr; }
             .price.featured { transform: none; }
             .demo-head { flex-direction: column; align-items: start; }
             .counts { width: 100%; justify-content: space-between; }
@@ -525,12 +589,21 @@
                         </label>
                     </div>
                     <div class="result">
-                        <div class="result-copy">
-                            <h3 id="result-title">Toyota Camry</h3>
-                            <p id="result-meta">XV70 · 2017–2024 · 2.5</p>
-                            <p class="path" id="result-path">GET /api/v1/brands/toyota/models</p>
+                        <button class="photo-btn" id="photo-open" type="button" hidden>
+                            <img id="photo-img" alt="" hidden>
+                            <span class="photo-fallback" id="photo-fallback" aria-hidden="true">
+                                <svg viewBox="0 0 160 72" fill="none" stroke="#285A48" stroke-width="2.2"><path d="M14 46h132l-10-18a8 8 0 0 0-7-4H34a8 8 0 0 0-7 4L14 46z"/><path d="M28 46v6M132 46v6"/><circle cx="42" cy="52" r="7" fill="#B0E4CC"/><circle cx="118" cy="52" r="7" fill="#B0E4CC"/><path d="M58 32h28l6 10H52l6-10z" stroke="#408A71"/></svg>
+                            </span>
+                            <span class="watermark">GEOAPI.GE</span>
+                        </button>
+                        <div class="result-body">
+                            <div class="result-copy">
+                                <h3 id="result-title">Toyota Camry</h3>
+                                <p id="result-meta">XV70 · 2017–2024 · 2.5</p>
+                                <p class="path" id="result-path">GET /api/v1/brands/toyota/models</p>
+                            </div>
+                            <pre id="result-json"></pre>
                         </div>
-                        <pre id="result-json"></pre>
                     </div>
                 </section>
             </div>
@@ -703,6 +776,29 @@
                 </aside>
             </div>
         </section>
+        <div class="lightbox" id="lightbox" hidden>
+            <div class="lightbox-card" role="dialog" aria-modal="true" aria-labelledby="lightbox-title">
+                <div class="lightbox-photo">
+                    <img id="lightbox-img" alt="" hidden>
+                    <div class="lightbox-fallback" id="lightbox-fallback" aria-hidden="true">
+                        <svg viewBox="0 0 160 72" fill="none" stroke="#285A48" stroke-width="2.2"><path d="M14 46h132l-10-18a8 8 0 0 0-7-4H34a8 8 0 0 0-7 4L14 46z"/><path d="M28 46v6M132 46v6"/><circle cx="42" cy="52" r="7" fill="#B0E4CC"/><circle cx="118" cy="52" r="7" fill="#B0E4CC"/><path d="M58 32h28l6 10H52l6-10z" stroke="#408A71"/></svg>
+                    </div>
+                    <span class="watermark">GEOAPI.GE</span>
+                    <button class="lightbox-close" id="lightbox-close" type="button">დახურვა</button>
+                </div>
+                <div class="lightbox-body">
+                    <h2 id="lightbox-title" style="font-size:28px">Toyota Camry</h2>
+                    <dl>
+                        <div><dt>მარკა</dt><dd id="spec-brand">—</dd></div>
+                        <div><dt>მოდელი</dt><dd id="spec-model">—</dd></div>
+                        <div><dt>წლები</dt><dd id="spec-years">—</dd></div>
+                        <div><dt>ძარა</dt><dd id="spec-body">—</dd></div>
+                        <div><dt>ძრავი</dt><dd id="spec-engine">—</dd></div>
+                        <div><dt>სიმძლავრე</dt><dd id="spec-power">—</dd></div>
+                    </dl>
+                </div>
+            </div>
+        </div>
     </main>
 
     <footer class="footer">
@@ -739,21 +835,21 @@
             toyota: {
                 name: "Toyota",
                 models: {
-                    camry: { name: "Camry", generations: { xv70: { name: "XV70", years: "2017–2024", modifications: [{ id: "2-5", name: "2.5" }, { id: "3-5", name: "3.5" }] } } },
-                    corolla: { name: "Corolla", generations: { e210: { name: "E210", years: "2018–2024", modifications: [{ id: "1-8", name: "1.8" }, { id: "2-0", name: "2.0 Hybrid" }] } } }
+                    camry: { name: "Camry", generations: { xv70: { name: "XV70", years: "2017–2024", modifications: [{ id: "2-5", name: "2.5", body: "სედანი", engine: "2.5 ბენზინი", power: "203 ცხ.ძ." }, { id: "3-5", name: "3.5", body: "სედანი", engine: "3.5 ბენზინი", power: "301 ცხ.ძ." }] } } },
+                    corolla: { name: "Corolla", generations: { e210: { name: "E210", years: "2018–2024", modifications: [{ id: "1-8", name: "1.8", body: "სედანი", engine: "1.8 ბენზინი", power: "140 ცხ.ძ." }, { id: "2-0", name: "2.0 Hybrid", body: "სედანი", engine: "2.0 ჰიბრიდი", power: "184 ცხ.ძ." }] } } }
                 }
             },
             bmw: {
                 name: "BMW",
                 models: {
-                    "3-series": { name: "3 Series", generations: { g20: { name: "G20", years: "2019–2024", modifications: [{ id: "320i", name: "320i" }, { id: "330i", name: "330i" }] } } },
-                    x5: { name: "X5", generations: { g05: { name: "G05", years: "2018–2024", modifications: [{ id: "30d", name: "30d" }, { id: "40i", name: "40i" }] } } }
+                    "3-series": { name: "3 Series", generations: { g20: { name: "G20", years: "2019–2024", modifications: [{ id: "320i", name: "320i", body: "სედანი", engine: "2.0 ბენზინი", power: "184 ცხ.ძ." }, { id: "330i", name: "330i", body: "სედანი", engine: "2.0 ბენზინი", power: "258 ცხ.ძ." }] } } },
+                    x5: { name: "X5", generations: { g05: { name: "G05", years: "2018–2024", modifications: [{ id: "30d", name: "30d", body: "ჯიპი", engine: "3.0 დიზელი", power: "265 ცხ.ძ." }, { id: "40i", name: "40i", body: "ჯიპი", engine: "3.0 ბენზინი", power: "340 ცხ.ძ." }] } } }
                 }
             },
             "mercedes-benz": {
                 name: "Mercedes-Benz",
                 models: {
-                    "c-class": { name: "C-Class", generations: { w206: { name: "W206", years: "2021–2024", modifications: [{ id: "c200", name: "C 200" }, { id: "c300", name: "C 300" }] } } }
+                    "c-class": { name: "C-Class", generations: { w206: { name: "W206", years: "2021–2024", modifications: [{ id: "c200", name: "C 200", body: "სედანი", engine: "1.5 ბენზინი", power: "204 ცხ.ძ." }, { id: "c300", name: "C 300", body: "სედანი", engine: "2.0 ბენზინი", power: "258 ცხ.ძ." }] } } }
                 }
             }
         };
@@ -813,6 +909,45 @@
                 generation: generationRow ? generationRow.name : null,
                 modification: modificationRow ? modificationRow.name : null
             }, null, 2);
+            const photo = document.getElementById("photo-open");
+            photo.hidden = !modificationRow;
+            document.getElementById("lightbox-title").textContent = title;
+            document.getElementById("spec-brand").textContent = brandRow ? brandRow.name : "—";
+            document.getElementById("spec-model").textContent = modelRow ? modelRow.name : "—";
+            document.getElementById("spec-years").textContent = generationRow ? generationRow.years : "—";
+            document.getElementById("spec-body").textContent = modificationRow ? modificationRow.body : "—";
+            document.getElementById("spec-engine").textContent = modificationRow ? modificationRow.engine : "—";
+            document.getElementById("spec-power").textContent = modificationRow ? modificationRow.power : "—";
+            showPhoto(modificationRow ? "https://car.socialsave.cc/api/models/10/photo" : null);
+        }
+
+        let photoTried = false;
+        function showPhoto(url) {
+            const img = document.getElementById("photo-img");
+            const fallback = document.getElementById("photo-fallback");
+            const large = document.getElementById("lightbox-img");
+            const largeFallback = document.getElementById("lightbox-fallback");
+            if (!url) {
+                img.hidden = true;
+                large.hidden = true;
+                fallback.hidden = false;
+                largeFallback.hidden = false;
+                return;
+            }
+            if (photoTried) return;
+            photoTried = true;
+            img.onload = function () {
+                img.hidden = false;
+                fallback.hidden = true;
+                large.hidden = false;
+                largeFallback.hidden = true;
+                large.src = url;
+            };
+            img.onerror = function () {
+                img.hidden = true;
+                fallback.hidden = false;
+            };
+            img.src = url;
         }
 
         function sync(from) {
@@ -843,6 +978,25 @@
         sync("generation");
         modification.value = "2-5";
         paint();
+
+        const lightbox = document.getElementById("lightbox");
+        function openLightbox() {
+            lightbox.hidden = false;
+            lightbox.classList.add("open");
+            document.getElementById("lightbox-close").focus();
+        }
+        function closeLightbox() {
+            lightbox.classList.remove("open");
+            lightbox.hidden = true;
+        }
+        document.getElementById("photo-open").addEventListener("click", openLightbox);
+        document.getElementById("lightbox-close").addEventListener("click", closeLightbox);
+        lightbox.addEventListener("click", function (event) {
+            if (event.target === lightbox) closeLightbox();
+        });
+        document.addEventListener("keydown", function (event) {
+            if (event.key === "Escape") closeLightbox();
+        });
 
         const menu = document.querySelector(".menu-toggle");
         const nav = document.getElementById("nav");
