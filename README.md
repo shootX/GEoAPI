@@ -1,195 +1,59 @@
-# carapi
+<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
 
-**A commercial alternative to imagin.studio that returns REAL car photographs — not 3D renders.**
+<p align="center">
+<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
+<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
+<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
+<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
+</p>
 
-Give it a make and a model, get back an actual photo of that car, resolved from
-[Wikidata](https://www.wikidata.org) and served from [Wikimedia Commons](https://commons.wikimedia.org)
-with full licence + attribution metadata. No API key, no signup, CORS-enabled.
+## About Laravel
 
-```html
-<img src="/getImage?make=Toyota&model=Camry">
-```
+Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
 
-- **Author:** [Anovo.Ge](https://anovo.ge)
-- **Drop-in for imagin.studio** — accepts `make`, `modelFamily`, `modelYear`, `angle`, `customer`, … with the same `/getImage` path
-- **Great coverage where render APIs fail** — post-Soviet models (Lada Niva, ZAZ, GAZ Volga, UAZ, Moskvitch), Cyrillic make names (`ВАЗ`, `ЗАЗ`) included, via multilingual Wikidata search + transliteration and a vehicle-class filter that keeps out ships, products and galaxies
-- **Zero dependencies** — plain PHP 8.2+, no framework, no SDKs; Composer is optional (autoload only)
-- **Polite to Wikimedia** — every image is downloaded once (as an 800px thumbnail) and cached content-addressed; negative results are cached for 7 days
+- [Simple, fast routing engine](https://laravel.com/docs/routing).
+- [Powerful dependency injection container](https://laravel.com/docs/container).
+- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
+- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
+- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
+- [Robust background job processing](https://laravel.com/docs/queues).
+- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
 
-## Quick start
+Laravel is accessible, powerful, and provides tools required for large, robust applications.
 
-```bash
-php -S localhost:8080 -t public public/index.php
-```
+## Learning Laravel
 
-Then:
+Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework. You can also check out [Laravel Learn](https://laravel.com/learn), where you will be guided through building a modern Laravel application.
 
-```bash
-# The image itself (streams from local cache after first hit)
-curl -L "http://localhost:8080/getImage?make=Lada&model=Niva" -o niva.jpg
+If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
 
-# Metadata, licence and attribution
-curl "http://localhost:8080/getImage?make=Lada&model=Niva&format=json"
-```
+## Laravel Sponsors
 
-`http://localhost:8080/` serves a small self-documenting landing page.
+We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
 
-> **Set your User-Agent.** The Wikimedia [User-Agent policy](https://meta.wikimedia.org/wiki/User-Agent_policy)
-> asks API clients to identify themselves with contact info. Please run your instance with:
-> `CARAPI_USER_AGENT="MyProject/1.0 (https://my.site; me@my.site)"`
+### Premium Partners
 
-## Endpoint
+- **[Vehikl](https://vehikl.com)**
+- **[Tighten Co.](https://tighten.co)**
+- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
+- **[64 Robots](https://64robots.com)**
+- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
+- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
+- **[Redberry](https://redberry.international/laravel-development)**
+- **[Active Logic](https://activelogic.com)**
 
-`GET /getImage`
+## Contributing
 
-| Param | Required | Notes |
-|---|---|---|
-| `make` | yes | e.g. `Toyota`, `ВАЗ`, `ЗАЗ` — Cyrillic works |
-| `model` | yes | e.g. `Camry`, `Niva`. Alias: `modelFamily` (imagin-compatible) |
-| `year` | no | Narrows the Wikidata search. Alias: `modelYear` |
-| `format` | no | `json` for metadata; default returns the image |
-| `angle`, `customer`, `zoomType`, … | no | Accepted for imagin.studio compatibility and **ignored** — real photographs come with a fixed viewpoint, and no customer key is needed |
+Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
 
-### Responses
+## Code of Conduct
 
-**Default (image mode)** — the photo itself: streamed bytes with the local
-filesystem cache, or a `302` redirect when a CDN-backed cache is configured.
-Licence metadata always travels in headers:
+In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
 
-```
-X-Image-Source:      wikimedia
-X-Image-License:     CC BY-SA 3.0
-X-Image-Attribution: Lada Niva — © Sah68 (CC BY-SA 3.0), via Wikimedia Commons
-```
+## Security Vulnerabilities
 
-**`format=json`**:
-
-```json
-{
-  "found": true,
-  "make": "Lada", "model": "Niva", "year": null,
-  "image_url": "http://localhost:8080/getImage?make=Lada&model=Niva",
-  "source": "wikimedia",
-  "title": "Lada Niva",
-  "license": "CC BY-SA 3.0",
-  "author": "Sah68",
-  "attribution": "Lada Niva — © Sah68 (CC BY-SA 3.0), via Wikimedia Commons",
-  "reference": "Q1470103"
-}
-```
-
-**No photo found** — JSON mode returns `{"found": false}` with HTTP 404; image
-mode returns an inline SVG placeholder (with a 404 status), so plain `<img>`
-tags degrade gracefully.
-
-### Migrating from imagin.studio
-
-```diff
--https://cdn.imagin.studio/getImage?customer=xxxx&make=toyota&modelFamily=camry&angle=23
-+https://your-host/getImage?make=toyota&modelFamily=camry
-```
-
-Same path, same core params. `customer` is ignored (no key needed), `angle`/paint
-params are ignored (you get a real photograph). What changes for your users: an
-actual photo of the car instead of a render — and a **licence you must respect**
-(see below).
-
-## Attribution & licensing (important)
-
-The **code, materials, and information** in this repository are the exclusive
-property of the copyright holder. They were created with artificial intelligence
-and verified by the copyright holder. No one else is granted the right to use them.
-
-## How it works
-
-1. `wbsearchentities` on Wikidata for `"make model"` (multilingual: Cyrillic
-   queries also search `uk`/`ru` labels, plus a Latin transliteration fallback).
-2. Keep the first candidate that is a manufactured vehicle — it must have a
-   manufacturer (`P176`), an image (`P18`), and an instance-of (`P31`) class
-   that denotes a road vehicle (known ids like *automobile model*, or classes
-   whose English label matches car/truck/SUV/…).
-3. Fetch the Commons `imageinfo` for the photo: 800px thumbnail URL, author,
-   licence short-name.
-4. Download the thumbnail **once**, store it content-addressed
-   (`<md5-of-bytes>.<ext>`) in the cache with the query→photo mapping; misses
-   are cached for 7 days.
-
-## Configuration
-
-All optional, via environment variables:
-
-| Env var | Default | Purpose |
-|---|---|---|
-| `CARAPI_USER_AGENT` | `carapi/1.0 (+repo URL)` | User-Agent for Wikimedia API calls — **set this** with your project URL + contact email |
-| `CARAPI_CACHE_DIR` | `./cache` | Where images + metadata are stored (must be writable by the web server) |
-| `CARAPI_CACHE_URL` | *(unset)* | Public base URL under which you expose `<cache>/img/` (nginx alias, CDN, …). When set, image mode answers with a `302` to `<url>/<file>` instead of streaming bytes |
-
-### Swapping the cache for S3-compatible storage
-
-The cache is behind a small interface (`src/Cache/CacheInterface.php`):
-`getMeta`/`setMeta` for query metadata, `hasImage`/`putImage`/`readImage`/`imageUrl`
-for content-addressed blobs. The default `FilesystemCache` writes to a local
-directory. To serve from S3-compatible object storage behind a CDN (what the
-hosted demo does), implement the interface with your S3 client — `putImage()` →
-PutObject, `imageUrl()` → your public CDN URL (which switches the endpoint into
-302-redirect mode) — and swap the `new FilesystemCache(...)` line in
-`public/index.php`. Details in the interface docblock.
-
-## Deploying
-
-### PHP built-in server (dev)
-
-```bash
-php -S 0.0.0.0:8080 -t public public/index.php
-```
-
-### Docker Compose (php:8.3-apache)
-
-```yaml
-services:
-  carapi:
-    image: php:8.3-apache
-    ports:
-      - "8080:80"
-    volumes:
-      - ./:/var/www/carapi
-      - carapi-cache:/var/www/carapi/cache
-    environment:
-      CARAPI_USER_AGENT: "MyCarImages/1.0 (https://example.com; ops@example.com)"
-    command: >
-      bash -c "
-        sed -ri 's!/var/www/html!/var/www/carapi/public!g' /etc/apache2/sites-available/000-default.conf &&
-        printf '<Directory /var/www/carapi/public>\nAllowOverride All\nRequire all granted\n</Directory>\n' > /etc/apache2/conf-enabled/carapi.conf &&
-        a2enmod rewrite &&
-        chown -R www-data:www-data /var/www/carapi/cache &&
-        apache2-foreground"
-
-volumes:
-  carapi-cache:
-```
-
-`docker compose up`, then `http://localhost:8080/getImage?make=Toyota&model=Camry`.
-The bundled `public/.htaccess` routes everything to the front controller; for
-nginx use a standard `try_files $uri /index.php?$args;` location.
-
-### Production notes
-
-- Put a caching proxy/CDN in front — responses send `Cache-Control: public, max-age=86400`.
-- The first request for a new make/model does 2–4 Wikimedia API calls plus one
-  image download; everything after that is served from your cache.
-- Don't strip the attribution headers at your proxy.
-
-## Repository layout
-
-```
-public/index.php            front controller: /getImage + landing page (also a php -S router)
-public/.htaccess            Apache rewrite to the front controller
-src/DromResolver.php        make/model[/year] -> catalog photo used by /getImage
-src/Service.php             orchestration: cache lookup -> resolve -> download once -> store
-src/Cache/CacheInterface.php  storage contract (metadata + content-addressed blobs)
-src/Cache/FilesystemCache.php local-directory cache (the default)
-```
+If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
 
 ## License
 
-- Code, materials, and information: proprietary, all rights reserved — [LICENSE](LICENSE) © shootX. Created with artificial intelligence and verified by the copyright holder. No one else may use them.
+The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).

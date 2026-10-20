@@ -5,6 +5,8 @@
   var card = document.getElementById('vp-card');
   var photo = document.getElementById('vp-img');
   var empty = document.getElementById('vp-empty');
+  var frame = document.getElementById('vp-frame');
+  var shield = document.getElementById('vp-shield');
   var flag = document.getElementById('vp-flag');
   var flagNote = document.getElementById('vp-flag-note');
   var specs = document.getElementById('vp-specs');
@@ -70,12 +72,19 @@
     if (flagNote) flagNote.hidden = true;
   }
 
+  function setShield(on) {
+    if (shield) shield.hidden = !on;
+  }
+
   function hideCard() {
     card.hidden = true;
     photo.hidden = true;
     photo.removeAttribute('src');
     empty.hidden = false;
+    setShield(false);
     resetFlag();
+    var response = document.getElementById('vp-response');
+    if (response) response.hidden = true;
   }
 
   function close(step) {
@@ -116,7 +125,8 @@
     var field = fields[step];
     var query = field.query.value.trim().toLowerCase();
     var source = rows[step];
-    var filtering = query.length >= 3;
+    var need = step === 'model' ? 1 : 3;
+    var filtering = query.length >= need;
     shown = filtering
       ? source.filter(function (row) {
           return String(row.label || row.name || '').toLowerCase().indexOf(query) !== -1;
@@ -124,12 +134,12 @@
       : source.slice();
     var capped = shown.slice(0, 80);
     field.hint.hidden = false;
-    if (query.length > 0 && query.length < 3) {
+    if (query.length > 0 && query.length < need) {
       field.hint.textContent = 'ძებნა იწყება 3 ასოდან';
     } else if (filtering && !capped.length) {
       field.hint.textContent = 'ვერ მოიძებნა';
     } else if (!filtering && source.length > 80) {
-      field.hint.textContent = 'ნაჩვენებია 80 / ' + source.length + '. ძებნა იწყება 3 ასოდან';
+      field.hint.textContent = 'ნაჩვენებია 80 / ' + source.length + (need === 1 ? '' : '. ძებნა იწყება 3 ასოდან');
     } else {
       field.hint.hidden = true;
       field.hint.textContent = '';
@@ -175,11 +185,20 @@
     field.query.focus();
   }
 
+  function showJson(payload) {
+    var response = document.getElementById('vp-response');
+    var json = document.getElementById('vp-json');
+    if (!response || !json || !payload) return;
+    json.textContent = JSON.stringify(payload, null, 2);
+    response.hidden = false;
+  }
+
   function choose(step, row) {
     picked[step] = row;
     setLabel(step, row.label || row.name || String(row.id), true);
     close(step);
     resetFrom(step);
+    showJson({ data: row });
     var current = ++token;
     if (step === 'brand') return load('model', current);
     if (step === 'model') return load('year', current);
@@ -337,9 +356,11 @@
       photo.onerror = function () {
         photo.hidden = true;
         empty.hidden = false;
+        setShield(false);
         resetFlag();
       };
-      photo.src = '/api/models/' + encodeURIComponent(data.model.id) + '/photo';
+      setShield(true);
+      photo.src = '/api/models/' + encodeURIComponent(data.model.id) + '/photo?v=20261020j';
       if (flag) {
         flag.hidden = false;
         flag.disabled = false;
@@ -351,6 +372,7 @@
       photo.hidden = true;
       photo.removeAttribute('src');
       empty.hidden = false;
+      setShield(false);
       resetFlag();
     }
     card.hidden = false;
@@ -366,6 +388,12 @@
       .then(function (payload) {
         if (current !== token) return;
         showCard(payload.data || {});
+        var response = document.getElementById('vp-response');
+        var json = document.getElementById('vp-json');
+        if (response && json) {
+          json.textContent = JSON.stringify(payload, null, 2);
+          response.hidden = false;
+        }
         setStatus('');
       })
       .catch(function () {
@@ -398,6 +426,13 @@
       }
     });
   });
+
+  if (frame) {
+    frame.addEventListener('contextmenu', function (event) { event.preventDefault(); });
+    frame.addEventListener('dragstart', function (event) { event.preventDefault(); });
+  }
+  photo.draggable = false;
+  photo.addEventListener('dragstart', function (event) { event.preventDefault(); });
 
   document.addEventListener('click', function (event) {
     if (!root.contains(event.target)) closeAll();
