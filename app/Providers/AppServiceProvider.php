@@ -33,6 +33,9 @@ class AppServiceProvider extends ServiceProvider
         // app()->setLocale() also overwrites config('app.locale').
         config(['carapi.locale' => (string) config('app.locale')]);
 
+        // Registered before Electrik's /dashboard so the cabinet wins the match.
+        Route::middleware(['web', 'auth'])->get('/dashboard', Projects::class);
+
         $this->app->booted(function (): void {
             require base_path('routes/admin-api.php');
             require base_path('routes/product.php');

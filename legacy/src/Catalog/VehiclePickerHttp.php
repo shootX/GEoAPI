@@ -67,7 +67,8 @@ final class VehiclePickerHttp
 
                     return;
                 }
-                $photo = $repo->photo($route['id']);
+                $generation = $_GET['generation'] ?? null;
+                $photo = $repo->photo($route['id'], is_string($generation) ? $generation : null);
                 if ($photo === null) {
                     self::json(404, ['error' => ['code' => 'not_found', 'message' => 'No photo yet.']]);
 

@@ -25,8 +25,8 @@ Posts live in `blog_posts.translations` as `{ka, en}` objects with `title`, `exc
 
 ## 2026-10-20 — Public redesign
 
-The live site follows the approved mockups: ink `#091413`, pine `#285A48`, leaf `#408A71`, mint `#B0E4CC`, wash `#f4faf7`. Noto Sans Georgian is the Georgian face and is already self-hosted at `/assets/fonts/noto-sans-georgian.woff2`; FiraGO stays for the other letters. `config/electrik.php` defaults the brand primary to `#285A48`.
+The first redesign only recolored the old layout. Home now follows `docs/mockups/home.html`: the mockup header and footer are inside `.mk`, and the demo is four selects (brand, model, generation, modification) with no year step. The photo stays inside the result card. There is no lightbox. `/demo` still uses `vehicle-picker.js`. Styles are `public/assets/public-design.css`. Noto Sans Georgian is self-hosted, including the Latin and Latin-ext subsets, so the mockup's Latin words use the same face.
 
-The home demo still includes `public/partials/vehicle-picker.blade.php` and `/assets/vehicle-picker.js`. Choosing a modification fills `#vp-card` in place. The image request stays `GET /api/models/{id}/photo`, and `DemoWatermark` still stamps `GEOAPI.GE`. The mockup lightbox was not copied into the live picker.
+`/dashboard` and `/account` both render `App\Livewire\Account\Projects` with `public/assets/cabinet.css`. The `/dashboard` route is registered before Electrik's shell. When `CARAPI_CABINET_DEMO=1`, the cabinet shows the mockup sample (დემო პროექტი, 2 140 used, the 30-day bars, ვიჯეტი / სერვერი, and the six catalog cards) instead of the platform database. Leave that flag unset in production. PHPUnit forces it off.
 
-Password reset and email verification use the public layout through `resources/views/vendor/electrik/components/layouts/guest.blade.php`. The project desk in `public/assets/site.css` and the admin panel in `public/assets/admin.css` only changed color.
+The blog link is omitted from the header and footer of pages that still use the public chrome while `blog_posts` has no visible row. The route stays. The legacy project desk at `/account/projects/{id}` was not rebuilt.

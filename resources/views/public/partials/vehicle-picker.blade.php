@@ -25,13 +25,17 @@
     <div id="vp-card" hidden>
         <div class="vp-sheet">
             <div class="vp-photo" id="vp-frame">
-                <div id="vp-empty">ფოტო ჯერ არ არის</div>
+                <div id="vp-empty">
+                    <svg viewBox="0 0 160 72" fill="none" stroke="#285A48" stroke-width="2.2" aria-hidden="true"><path d="M14 46h132l-10-18a8 8 0 0 0-7-4H34a8 8 0 0 0-7 4L14 46z"/><path d="M28 46v6M132 46v6"/><circle cx="42" cy="52" r="7" fill="#B0E4CC"/><circle cx="118" cy="52" r="7" fill="#B0E4CC"/></svg>
+                    <span>{{ __('No photo yet') }}</span>
+                    <span class="vp-mark">GEOAPI.GE</span>
+                </div>
                 <img id="vp-img" alt="" hidden draggable="false">
                 <div id="vp-shield" hidden></div>
                 <button type="button" id="vp-flag" hidden aria-label="ფოტო არასწორია">
                     <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><circle cx="8" cy="8" r="6.25"/><path d="M8 4.6v4" stroke-linecap="round"/><circle cx="8" cy="11.15" r="0.7" fill="currentColor" stroke="none"/></svg>
                 </button>
-                <p id="vp-flag-note" hidden>შეტყობინება მიღებულია. ხარვეზი მალე გამოვასწორებთ. მადლობა.</p>
+                <p id="vp-flag-note" hidden></p>
             </div>
             <div class="vp-body">
                 <h2 id="vp-title">ავტომობილი</h2>
@@ -39,9 +43,9 @@
             </div>
         </div>
         <div id="vp-equipment">
-            <details><summary>სტანდარტული</summary><div data-eq="standard"></div></details>
-            <details><summary>დამატებითი</summary><div data-eq="optional"></div></details>
-            <details><summary>არ არის</summary><div data-eq="not_available"></div></details>
+            <details><summary>{{ __('Standard') }}</summary><div data-eq="standard"></div></details>
+            <details><summary>{{ __('Optional') }}</summary><div data-eq="optional"></div></details>
+            <details><summary>{{ __('Not included') }}</summary><div data-eq="not_available"></div></details>
         </div>
     </div>
 </div>
@@ -79,7 +83,12 @@
     #vp-flag:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
     #vp-flag:disabled { cursor: default; }
     #vp-flag-note { position: absolute; left: 0.55rem; right: 3.2rem; bottom: 0.55rem; z-index: 2; margin: 0; padding: 0.45rem 0.6rem; border-radius: 0.5rem; background: rgba(9, 20, 19, 0.88); color: #fff; font-size: 13px; line-height: 1.35; }
-    #vp-empty { display: grid; place-items: center; width: 100%; min-height: 11rem; background: #e7f5ee; color: #3d564c; font-size: 14px; }
+    #vp-empty { position: relative; display: grid; place-items: center; width: 100%; min-height: 190px; background: linear-gradient(180deg, #e7f6ef 0%, #d5eee3 100%); color: #3d564c; font-size: 14px; }
+    #vp-empty svg { width: 120px; height: 64px; }
+    #vp-empty .vp-mark { position: absolute; right: 14px; bottom: 10px; color: rgba(9, 20, 19, 0.42); font-size: 12px; font-weight: 700; letter-spacing: 0.16em; }
+    #vehicle-picker.is-busy [data-vp-trigger] { color: transparent; }
+    #vehicle-picker.is-busy .vp-field { background-image: linear-gradient(90deg, #e7f3ed 0%, #f7fbf9 50%, #e7f3ed 100%); background-size: 200% 100%; animation: vp-skel 1.1s ease infinite; }
+    @keyframes vp-skel { from { background-position: 100% 0; } to { background-position: -100% 0; } }
     #vp-img { display: block; width: 100%; height: auto; background: #e7f5ee; pointer-events: none; -webkit-user-drag: none; user-select: none; -webkit-touch-callout: none; }
     #vp-shield { position: absolute; inset: 0; z-index: 1; }
     #vehicle-picker .vp-body { padding: 1.1rem 1.25rem 1.2rem; }
@@ -112,11 +121,68 @@
         #vehicle-picker [data-vp-pop], #vp-card { animation: none; }
     }
 </style>
+@php
+    $specLocale = app()->getLocale() === 'en' ? 'en' : 'ka';
+    $specPairs = [
+        'sedan' => ['სედანი', 'Sedan'], 'სედანი' => ['სედანი', 'Sedan'],
+        'hatchback' => ['ჰეჩბეკი', 'Hatchback'], 'ჰეჩბეკი' => ['ჰეჩბეკი', 'Hatchback'],
+        'wagon' => ['უნივერსალი', 'Wagon'], 'უნივერსალი' => ['უნივერსალი', 'Wagon'], 'estate' => ['უნივერსალი', 'Wagon'],
+        'suv' => ['ჯიპი', 'SUV'], 'ჯიპი' => ['ჯიპი', 'SUV'], 'crossover' => ['კროსოვერი', 'Crossover'], 'კროსოვერი' => ['კროსოვერი', 'Crossover'],
+        'coupe' => ['კუპე', 'Coupe'], 'კუპე' => ['კუპე', 'Coupe'], 'convertible' => ['კაბრიოლეტი', 'Convertible'], 'კაბრიოლეტი' => ['კაბრიოლეტი', 'Convertible'],
+        'pickup' => ['პიკაპი', 'Pickup'], 'პიკაპი' => ['პიკაპი', 'Pickup'], 'van' => ['ფურგონი', 'Van'], 'ფურგონი' => ['ფურგონი', 'Van'],
+        'minivan' => ['მინივენი', 'Minivan'], 'მინივენი' => ['მინივენი', 'Minivan'], 'liftback' => ['ლიფტბეკი', 'Liftback'], 'ლიფტბეკი' => ['ლიფტბეკი', 'Liftback'],
+        'petrol' => ['ბენზინი', 'Petrol'], 'gasoline' => ['ბენზინი', 'Petrol'], 'ბენზინი' => ['ბენზინი', 'Petrol'],
+        'diesel' => ['დიზელი', 'Diesel'], 'დიზელი' => ['დიზელი', 'Diesel'], 'hybrid' => ['ჰიბრიდი', 'Hybrid'], 'ჰიბრიდი' => ['ჰიბრიდი', 'Hybrid'],
+        'electric' => ['ელექტრო', 'Electric'], 'ელექტრო' => ['ელექტრო', 'Electric'], 'lpg' => ['გაზი', 'LPG'], 'გაზი' => ['გაზი', 'LPG'],
+        'automatic' => ['ავტომატიკა', 'Automatic'], 'ავტომატიკა' => ['ავტომატიკა', 'Automatic'],
+        'manual' => ['მექანიკა', 'Manual'], 'მექანიკა' => ['მექანიკა', 'Manual'],
+        'robot' => ['რობოტი', 'Robot'], 'რობოტი' => ['რობოტი', 'Robot'], 'cvt' => ['ვარიატორი', 'CVT'], 'ვარიატორი' => ['ვარიატორი', 'CVT'],
+        'fwd' => ['წინა წამყვანი', 'FWD'], 'rwd' => ['უკანა წამყვანი', 'RWD'], 'awd' => ['სრული წამყვანი', 'AWD'], 'awd 4x4' => ['სრული წამყვანი', 'AWD'],
+        '4wd' => ['სრული წამყვანი', 'AWD'], '4x4' => ['სრული წამყვანი', 'AWD'],
+    ];
+    $specValues = [];
+    foreach ($specPairs as $key => $pair) {
+        $specValues[mb_strtolower($key)] = $specLocale === 'en' ? $pair[1] : $pair[0];
+    }
+@endphp
 <script type="application/json" id="vp-copy">{!! json_encode([
     'chooseBrand' => __('Choose a brand'),
     'chooseModel' => __('Choose a model'),
     'chooseYear' => __('Choose a year'),
     'chooseGeneration' => __('Choose a generation'),
     'chooseModification' => __('Choose a modification'),
+    'loading' => __('Loading'),
+    'unavailable' => __('Catalog is temporarily unavailable'),
+    'searchFrom' => $specLocale === 'en' ? 'Search starts at 3 letters' : 'ძებნა იწყება 3 ასოდან',
+    'notFound' => $specLocale === 'en' ? 'Nothing found' : 'ვერ მოიძებნა',
+    'shown' => $specLocale === 'en' ? 'Showing' : 'ნაჩვენებია',
+    'empty' => [
+        'model' => $specLocale === 'en' ? 'This brand has no models' : 'ამ მარკას მოდელი არ აქვს',
+        'year' => $specLocale === 'en' ? 'This model has no years' : 'ამ მოდელს წელი არ აქვს',
+        'generation' => $specLocale === 'en' ? 'This year has no generation' : 'ამ წელს თაობა არ აქვს',
+        'modification' => $specLocale === 'en' ? 'This generation has no modification' : 'ამ თაობას მოდიფიკაცია არ აქვს',
+        'brand' => $specLocale === 'en' ? 'No brand found' : 'მარკა ვერ მოიძებნა',
+    ],
+    'labels' => [
+        'brand' => __('Brand'), 'model' => __('Model'), 'generation' => __('Generation'), 'years' => $specLocale === 'en' ? 'Years' : 'წლები',
+        'body' => $specLocale === 'en' ? 'Body' : 'ძარა', 'engine' => $specLocale === 'en' ? 'Engine' : 'ძრავი',
+        'power' => $specLocale === 'en' ? 'Power' : 'სიმძლავრე', 'torque' => $specLocale === 'en' ? 'Torque' : 'ბრუნვა',
+        'fuel' => $specLocale === 'en' ? 'Fuel' : 'საწვავი', 'tank' => $specLocale === 'en' ? 'Tank' : 'ავზი',
+        'gearbox' => $specLocale === 'en' ? 'Gearbox' : 'კოლოფი', 'drive' => $specLocale === 'en' ? 'Drive' : 'წამყვანი',
+        'use' => $specLocale === 'en' ? 'Use' : 'ხარჯი', 'speed' => $specLocale === 'en' ? 'Speed' : 'სიჩქარე',
+        'size' => $specLocale === 'en' ? 'Size' : 'ზომები', 'clearance' => $specLocale === 'en' ? 'Clearance' : 'კლირენსი',
+        'weight' => $specLocale === 'en' ? 'Weight' : 'წონა', 'seats' => $specLocale === 'en' ? 'Seats' : 'ადგილები',
+        'trunk' => $specLocale === 'en' ? 'Trunk' : 'საბარგული', 'brakes' => $specLocale === 'en' ? 'Brakes' : 'მუხრუჭები',
+        'suspension' => $specLocale === 'en' ? 'Suspension' : 'საკიდარი', 'tires' => $specLocale === 'en' ? 'Tires' : 'საბურავები',
+        'vehicle' => $specLocale === 'en' ? 'Vehicle' : 'ავტომობილი',
+        'hp' => $specLocale === 'en' ? 'hp' : 'ცხ.ძ.', 'kw' => $specLocale === 'en' ? 'kW' : 'კვტ',
+        'front' => $specLocale === 'en' ? 'front' : 'წინ', 'rear' => $specLocale === 'en' ? 'rear' : 'უკან',
+        'city' => $specLocale === 'en' ? 'city' : 'ქალაქი', 'highway' => $specLocale === 'en' ? 'highway' : 'ტრასა', 'mixed' => $specLocale === 'en' ? 'mixed' : 'შერეული',
+        'none' => $specLocale === 'en' ? 'None' : 'არ არის', 'other' => $specLocale === 'en' ? 'Other' : 'სხვა',
+        'photoWrong' => __('Photo does not match'),
+        'reportOk' => $specLocale === 'en' ? 'Report received. We will fix it soon. Thank you.' : 'შეტყობინება მიღებულია. ხარვეზი მალე გამოვასწორებთ. მადლობა.',
+        'reportFail' => $specLocale === 'en' ? 'The report was not sent' : 'შეტყობინება ვერ გაიგზავნა',
+    ],
+    'values' => $specValues,
 ], JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_AMP | JSON_HEX_QUOT) !!}</script>
-<script src="/assets/vehicle-picker.js?v=20261020n"></script>
+<script src="/assets/vehicle-picker.js?v=20261020s"></script>

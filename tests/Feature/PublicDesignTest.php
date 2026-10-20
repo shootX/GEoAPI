@@ -52,7 +52,7 @@ class PublicDesignTest extends TestCase
                 ->assertSee('მზა არჩევანი')
                 ->assertDontSee('ამრჩევი')
                 ->assertSee('22 367', false)
-                ->assertSee('10 228', false);
+                ->assertDontSee('10 228', false);
         } finally {
             unset($_ENV['CARAPI_CATALOG_ENABLED'], $_SERVER['CARAPI_CATALOG_ENABLED']);
             @unlink($path);

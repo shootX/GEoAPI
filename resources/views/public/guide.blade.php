@@ -22,15 +22,25 @@
         ? 'CarAPI authorization, endpoints, widget, and error codes.'
         : 'CarAPI-ის ავტორიზაცია, მისამართები, ვიჯეტი და შეცდომის კოდები.',
 ])
+    <div class="guide-layout">
+    <aside class="guide-toc" aria-label="{{ __('On this page') }}">
+        <strong>{{ __('On this page') }}</strong>
+        @foreach ($sections as $index => [$title])
+            <a href="#guide-{{ $index }}">{{ $title }}</a>
+        @endforeach
+        <a href="#guide-widget">{{ __('Widget') }}</a>
+        <a href="#guide-errors">{{ $en ? 'Errors' : 'შეცდომები' }}</a>
+    </aside>
+    <div>
     <div class="max-w-3xl">
         <h1 class="text-3xl font-extrabold leading-tight">{{ __('Documentation') }}</h1>
         <p class="mt-3 text-sm leading-6 text-muted-foreground">{{ $en ? 'The secret key stays on your server. Send it as Authorization: Bearer carapi_sk_…' : 'საიდუმლო გასაღები carapi_sk_ მხოლოდ სერვერზე რჩება. სათაური: Authorization: Bearer.' }}</p>
         <p class="mt-2 text-sm text-muted-foreground">{{ __('The example is illustrative.') }}</p>
     </div>
-    @foreach ($sections as [$title, $text, $path, $response])
-        @include('public.partials.endpoint', ['title' => $title, 'text' => $text, 'path' => $path, 'response' => $response])
+    @foreach ($sections as $index => [$title, $text, $path, $response])
+        @include('public.partials.endpoint', ['title' => $title, 'text' => $text, 'path' => $path, 'response' => $response, 'anchor' => 'guide-'.$index])
     @endforeach
-    <section class="grid min-w-0 items-start gap-6 border-b border-border py-8 lg:grid-cols-2">
+    <section id="guide-widget" class="grid min-w-0 items-start gap-6 border-b border-border py-8 lg:grid-cols-2">
         <div class="min-w-0">
             <h2 class="text-lg font-semibold">{{ __('Widget') }}</h2>
             <p class="mt-3 text-sm leading-6">{{ $en ? 'The browser calls POST /widget/v1/{public-key}/brands and the same path for models, years, and generations. On this site the key demo works only for this origin. A project key looks like carapi_pk_ and 32 hex characters. The carapi:change event includes generation_id after a generation is chosen. modification_id stays null; use the server API for modifications.' : 'ბრაუზერი იძახებს POST /widget/v1/{საჯარო-გასაღები}/brands და იმავე გზას მოდელების, წლებისა და თაობებისთვის. ამ საიტზე demo გასაღები მხოლოდ ამ origin-ზე მუშაობს. პროექტის გასაღები არის carapi_pk_ და 32 თექვსმეტობითი სიმბოლო. carapi:change მოვლენაში generation_id ივსება თაობის არჩევის შემდეგ. modification_id რჩება null; მოდიფიკაციისთვის გამოიყენეთ სერვერული API.' }}</p>
@@ -43,7 +53,7 @@
 {{ '<carapi-filter public-key="demo"></carapi-filter>' }}</pre>
         </div>
     </section>
-    <section class="grid min-w-0 items-start gap-6 py-8 lg:grid-cols-2">
+    <section id="guide-errors" class="grid min-w-0 items-start gap-6 py-8 lg:grid-cols-2">
         <div class="min-w-0 text-sm leading-6">
             <h2 class="text-lg font-semibold">{{ $en ? 'Errors' : 'შეცდომები' }}</h2>
             <p class="mt-3">401 unauthorized — {{ $en ? 'the key is missing or no longer works.' : 'გასაღები არ არის ან ვეღარ გამოიყენება.' }}</p>
@@ -63,4 +73,6 @@
 }</pre>
         </div>
     </section>
+    </div>
+    </div>
 @endcomponent

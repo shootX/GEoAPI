@@ -33,3 +33,11 @@
 - [x] Keep the vehicle picker photo inside the demo card. Do not add a lightbox.
 - [x] Recolor the Electrik cabinet, the legacy project desk, and the admin stylesheet without changing their behavior.
 - [ ] Owner: if production sets `ELECTRIK_BRAND_PRIMARY` to the old orange, remove it so the default `#285A48` is used.
+
+## 2026-10-20 — Match the approved mockups
+
+- [x] Rebuild the home page to the mockup section order, including the hero illustration. The demo photo stays inside the card.
+- [x] Rebuild `/account` to the dashboard mockup and keep project, key, usage, and plan data on the existing platform tables.
+- [x] Picker skeletons, 120-second list cache, generation-matched photos, corner watermark, KA/EN value labels, deduped generations, sorted brands, collapsed API response, and the listed copy fixes.
+- [x] Pixel pass: home header, four demo selects (no year), testimonials, pricing and footer copy match `docs/mockups/home.html`. The photo stays in the card.
+- [x] `/dashboard` and `/account` render that cabinet. `CARAPI_CABINET_DEMO=1` fills the local screenshot with the mockup's project, usage, keys, and catalog cards.

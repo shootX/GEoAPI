@@ -1,4 +1,4 @@
-@props(['title', 'text', 'path', 'response'])
+@props(['title', 'text', 'path', 'response', 'anchor' => null])
 @php
     $url = rtrim((string) config('app.url'), '/').$path;
     $samples = [
@@ -7,7 +7,7 @@
         'PHP' => "\$ch = curl_init(".json_encode($url).");\ncurl_setopt_array(\$ch, [\n    CURLOPT_HTTPHEADER => ['Authorization: Bearer carapi_sk_…'],\n    CURLOPT_RETURNTRANSFER => true,\n]);\necho curl_exec(\$ch);",
     ];
 @endphp
-<section class="grid min-w-0 items-start gap-6 border-b border-border py-8 lg:grid-cols-2">
+<section @if ($anchor) id="{{ $anchor }}" @endif class="grid min-w-0 items-start gap-6 border-b border-border py-8 lg:grid-cols-2">
     <div class="min-w-0">
         <h2 class="text-lg font-semibold">{{ $title }}</h2>
         <p class="mt-2 font-mono text-sm text-muted-foreground">GET {{ $path }}</p>

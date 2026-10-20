@@ -49,6 +49,50 @@
     status.textContent = text || '';
   }
 
+  function setBusy(on) {
+    root.classList.toggle('is-busy', !!on);
+    if (on) setStatus(copy.loading || '');
+  }
+
+  function tr(value) {
+    if (value === null || value === undefined || value === '') return '';
+    var map = copy.values || {};
+    var key = String(value).trim().toLowerCase();
+    return Object.prototype.hasOwnProperty.call(map, key) ? map[key] : String(value);
+  }
+
+  var popular = ['toyota', 'bmw', 'mercedes-benz', 'mercedes', 'audi', 'volkswagen', 'honda', 'hyundai', 'kia', 'ford', 'nissan', 'lexus', 'mazda', 'porsche'];
+
+  function sortRows(list, popularFirst) {
+    return list.slice().sort(function (a, b) {
+      var an = String(a.name || a.label || '');
+      var bn = String(b.name || b.label || '');
+      if (popularFirst) {
+        var ai = popular.indexOf(an.toLowerCase());
+        var bi = popular.indexOf(bn.toLowerCase());
+        if (ai !== -1 || bi !== -1) {
+          if (ai === -1) return 1;
+          if (bi === -1) return -1;
+          return ai - bi;
+        }
+      }
+      var ad = /^\d/.test(an);
+      var bd = /^\d/.test(bn);
+      if (ad !== bd) return ad ? 1 : -1;
+      return an.localeCompare(bn, undefined, { numeric: true, sensitivity: 'base' });
+    });
+  }
+
+  function uniqueLabels(list) {
+    var seen = {};
+    return list.filter(function (row) {
+      var key = String(row.label || row.name || row.id);
+      if (seen[key]) return false;
+      seen[key] = true;
+      return true;
+    });
+  }
+
   function setLabel(step, text, chosen) {
     var field = fields[step];
     field.label.textContent = text;
@@ -140,11 +184,11 @@
     var capped = shown.slice(0, 80);
     field.hint.hidden = false;
     if (query.length > 0 && query.length < need) {
-      field.hint.textContent = 'ძებნა იწყება 3 ასოდან';
+      field.hint.textContent = copy.searchFrom || '';
     } else if (filtering && !capped.length) {
-      field.hint.textContent = 'ვერ მოიძებნა';
+      field.hint.textContent = copy.notFound || '';
     } else if (!filtering && source.length > 80) {
-      field.hint.textContent = 'ნაჩვენებია 80 / ' + source.length + (need === 1 ? '' : '. ძებნა იწყება 3 ასოდან');
+      field.hint.textContent = (copy.shown || '') + ' 80 / ' + source.length + (need === 1 ? '' : '. ' + (copy.searchFrom || ''));
     } else {
       field.hint.hidden = true;
       field.hint.textContent = '';
@@ -196,6 +240,7 @@
     if (!response || !json || !payload) return;
     json.textContent = JSON.stringify(payload, null, 2);
     response.hidden = false;
+    if (response.tagName === 'DETAILS') response.open = false;
   }
 
   function choose(step, row) {
@@ -220,7 +265,7 @@
   }
 
   function load(step, current) {
-    setStatus('იტვირთება');
+    setBusy(true);
     var path = '';
     if (step === 'model') path = '/api/picker/brands/' + encodeURIComponent(picked.brand.id) + '/models';
     if (step === 'year') path = '/api/picker/models/' + encodeURIComponent(picked.model.id) + '/years';
@@ -228,15 +273,16 @@
     if (step === 'modification') path = '/api/picker/generations/' + encodeURIComponent(picked.generation.id) + '/modifications?year=' + encodeURIComponent(picked.year.id);
     pages(path).then(function (list) {
       if (current !== token) return;
-      var empty = {
-        model: 'ამ მარკას მოდელი არ აქვს',
-        year: 'ამ მოდელს წელი არ აქვს',
-        generation: 'ამ წელს თაობა არ აქვს',
-        modification: 'ამ თაობას მოდიფიკაცია არ აქვს'
-      };
-      enable(step, list, empty[step]);
+      if (step === 'generation') list = uniqueLabels(list);
+      if (step === 'brand' || step === 'model') list = sortRows(list, step === 'brand');
+      var empty = copy.empty || {};
+      enable(step, list, empty[step] || '');
+      setBusy(false);
     }).catch(function () {
-      if (current === token) setStatus('კატალოგი დროებით მიუწვდომელია');
+      if (current === token) {
+        setBusy(false);
+        setStatus(copy.unavailable || '');
+      }
     });
   }
 
@@ -253,7 +299,8 @@
   }
 
   function liters(cc) {
-    return cc ? (Number(cc) / 1000).toFixed(1) + ' ლ' : '';
+    var unit = (copy.labels && copy.labels.engine) === 'Engine' ? ' L' : ' ლ';
+    return cc ? (Number(cc) / 1000).toFixed(1) + unit : '';
   }
 
   function years(start, end) {
@@ -264,9 +311,10 @@
   }
 
   function pair(front, rear, unit) {
+    var labels = copy.labels || {};
     var parts = [];
-    if (front != null && front !== '') parts.push('წინ ' + front + (unit || ''));
-    if (rear != null && rear !== '') parts.push('უკან ' + rear + (unit || ''));
+    if (front != null && front !== '') parts.push((labels.front || '') + ' ' + tr(front) + (unit || ''));
+    if (rear != null && rear !== '') parts.push((labels.rear || '') + ' ' + tr(rear) + (unit || ''));
     return parts.join(' · ');
   }
 
@@ -278,14 +326,14 @@
       if (!items.length) {
         var none = document.createElement('p');
         none.className = 'vp-muted';
-        none.textContent = 'არ არის';
+        none.textContent = (copy.labels && copy.labels.none) || '';
         host.appendChild(none);
         return;
       }
       var grouped = {};
       var names = [];
       items.forEach(function (item) {
-        var section = item.section || 'სხვა';
+        var section = item.section || ((copy.labels && copy.labels.other) || '');
         if (!grouped[section]) {
           grouped[section] = [];
           names.push(section);
@@ -316,45 +364,47 @@
   }
 
   function showCard(data) {
+    var labels = copy.labels || {};
     var brandName = data.brand ? data.brand.name : '';
     var modelName = data.model ? data.model.name : '';
     var generationName = data.generation ? [data.generation.name, data.generation.code].filter(Boolean).join(' · ') : '';
-    document.getElementById('vp-title').textContent = [brandName, modelName, generationName].filter(Boolean).join(' · ') || 'ავტომობილი';
+    document.getElementById('vp-title').textContent = [brandName, modelName, generationName].filter(Boolean).join(' · ') || labels.vehicle || '';
     specs.innerHTML = '';
-    var engine = [liters(data.engine && data.engine.volume_cc), data.engine && data.engine.type].filter(Boolean).join(' · ');
-    var power = data.power_hp != null ? data.power_hp + ' ცხ.ძ.' : '';
-    if (data.power_kw != null) power += (power ? ' (' + data.power_kw + ' კვტ)' : data.power_kw + ' კვტ');
+    var engine = [liters(data.engine && data.engine.volume_cc), tr(data.engine && data.engine.type)].filter(Boolean).join(' · ');
+    var power = data.power_hp != null ? data.power_hp + ' ' + (labels.hp || '') : '';
+    if (data.power_kw != null) power += (power ? ' (' + data.power_kw + ' ' + (labels.kw || '') + ')' : data.power_kw + ' ' + (labels.kw || ''));
     var use = data.consumption || {};
     var consumption = [];
-    if (use.city_l != null) consumption.push('ქალაქი ' + use.city_l);
-    if (use.highway_l != null) consumption.push('ტრასა ' + use.highway_l);
-    if (use.combined_l != null) consumption.push('შერეული ' + use.combined_l);
-    line('მარკა', brandName);
-    line('მოდელი', modelName);
-    line('თაობა', generationName);
-    line('წლები', years(data.year_start, data.year_end));
-    line('ძარა', data.body_type);
-    line('ძრავი', engine);
-    line('სიმძლავრე', power);
-    line('ბრუნვა', data.torque_nm == null ? '' : data.torque_nm + ' ნმ');
-    line('საწვავი', data.fuel);
-    line('ავზი', data.tank_l == null ? '' : data.tank_l + ' ლ');
-    line('კოლოფი', data.transmission);
-    line('წამყვანი', data.drive);
-    line('ხარჯი', consumption.length ? consumption.join(' · ') + ' ლ/100 კმ' : '');
-    line('სიჩქარე', data.max_speed_kmh == null ? '' : data.max_speed_kmh + ' კმ/სთ');
+    if (use.city_l != null) consumption.push((labels.city || '') + ' ' + use.city_l);
+    if (use.highway_l != null) consumption.push((labels.highway || '') + ' ' + use.highway_l);
+    if (use.combined_l != null) consumption.push((labels.mixed || '') + ' ' + use.combined_l);
+    line(labels.brand, brandName);
+    line(labels.model, modelName);
+    line(labels.generation, generationName);
+    line(labels.years, years(data.year_start, data.year_end));
+    line(labels.body, tr(data.body_type));
+    line(labels.engine, engine);
+    line(labels.power, power);
+    line(labels.torque, data.torque_nm == null ? '' : data.torque_nm + ' Nm');
+    line(labels.fuel, tr(data.fuel));
+    line(labels.tank, data.tank_l == null ? '' : data.tank_l + ' L');
+    line(labels.gearbox, tr(data.transmission));
+    line(labels.drive, tr(data.drive));
+    line(labels.use, consumption.length ? consumption.join(' · ') + ' L/100 km' : '');
+    line(labels.speed, data.max_speed_kmh == null ? '' : data.max_speed_kmh + ' km/h');
     var size = data.dimensions_mm || {};
     var dimensions = [size.length, size.width, size.height].filter(function (part) { return part != null; });
-    line('ზომები', dimensions.length ? dimensions.join(' × ') + ' მმ' : '');
-    line('კლირენსი', data.clearance_mm == null ? '' : data.clearance_mm + ' მმ');
-    line('წონა', data.weight_kg == null ? '' : data.weight_kg + ' კგ');
-    line('ადგილები', data.seats);
-    line('საბარგული', data.trunk_l == null ? '' : data.trunk_l + ' ლ');
-    line('მუხრუჭები', pair(data.front_brakes, data.rear_brakes));
-    line('საკიდარი', pair(data.front_suspension, data.rear_suspension));
-    line('საბურავები', pair(data.front_tires, data.rear_tires));
+    line(labels.size, dimensions.length ? dimensions.join(' × ') + ' mm' : '');
+    line(labels.clearance, data.clearance_mm == null ? '' : data.clearance_mm + ' mm');
+    line(labels.weight, data.weight_kg == null ? '' : data.weight_kg + ' kg');
+    line(labels.seats, data.seats);
+    line(labels.trunk, data.trunk_l == null ? '' : data.trunk_l + ' L');
+    line(labels.brakes, pair(data.front_brakes, data.rear_brakes));
+    line(labels.suspension, pair(data.front_suspension, data.rear_suspension));
+    line(labels.tires, pair(data.front_tires, data.rear_tires));
     showEquipment(data.equipment);
-    if (data.has_photo && data.model && data.model.id) {
+    var photoMatches = data.photo_matches_generation === true;
+    if (photoMatches && data.model && data.model.id && data.generation && data.generation.id) {
       empty.hidden = true;
       photo.hidden = false;
       photo.alt = brandName + ' ' + modelName;
@@ -365,11 +415,11 @@
         resetFlag();
       };
       setShield(true);
-      photo.src = '/api/models/' + encodeURIComponent(data.model.id) + '/photo?v=20261020j';
+      photo.src = '/api/models/' + encodeURIComponent(data.model.id) + '/photo?generation=' + encodeURIComponent(data.generation.id) + '&v=20261020s';
       if (flag) {
         flag.hidden = false;
         flag.disabled = false;
-        flag.setAttribute('aria-label', 'ფოტო არასწორია');
+        flag.setAttribute('aria-label', (copy.labels && copy.labels.photoWrong) || '');
         flag.dataset.model = String(data.model.id);
         if (flagNote) flagNote.hidden = true;
       }
@@ -384,7 +434,7 @@
   }
 
   function loadDetail(current) {
-    setStatus('იტვირთება');
+    setBusy(true);
     fetch('/api/picker/modifications/' + encodeURIComponent(picked.modification.id), { headers: { Accept: 'application/json' } })
       .then(function (response) {
         if (!response.ok) throw new Error('fail');
@@ -398,11 +448,16 @@
         if (response && json) {
           json.textContent = JSON.stringify(payload, null, 2);
           response.hidden = false;
+          if (response.tagName === 'DETAILS') response.open = false;
         }
+        setBusy(false);
         setStatus('');
       })
       .catch(function () {
-        if (current === token) setStatus('კატალოგი დროებით მიუწვდომელია');
+        if (current === token) {
+          setBusy(false);
+          setStatus(copy.unavailable || '');
+        }
       });
   }
 
@@ -453,19 +508,24 @@
         headers: { 'Accept': 'application/json' }
       }).then(function (response) {
         if (!response.ok) throw new Error('report');
-        if (flagNote) flagNote.hidden = false;
-        flag.setAttribute('aria-label', 'შეტყობინება მიღებულია');
+        if (flagNote) {
+          flagNote.textContent = (copy.labels && copy.labels.reportOk) || '';
+          flagNote.hidden = false;
+        }
+        flag.setAttribute('aria-label', (copy.labels && copy.labels.reportOk) || '');
       }).catch(function () {
         flag.disabled = false;
-        setStatus('შეტყობინება ვერ გაიგზავნა');
+        setStatus((copy.labels && copy.labels.reportFail) || '');
       });
     });
   }
 
-  setStatus('იტვირთება მარკები');
+  setBusy(true);
   pages('/api/picker/brands').then(function (list) {
-    enable('brand', list, 'მარკა ვერ მოიძებნა');
+    enable('brand', sortRows(list, true), (copy.empty && copy.empty.brand) || '');
+    setBusy(false);
   }).catch(function () {
-    setStatus('კატალოგი დროებით მიუწვდომელია');
+    setBusy(false);
+    setStatus(copy.unavailable || '');
   });
 })();

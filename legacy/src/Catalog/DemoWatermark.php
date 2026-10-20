@@ -23,26 +23,20 @@ final class DemoWatermark
         imagealphablending($image, true);
         $width = imagesx($image);
         $height = imagesy($image);
-        $size = max(22, (int) round($width * 0.042));
-        $shadow = imagecolorallocatealpha($image, 20, 16, 28, 78);
-        $ink = imagecolorallocatealpha($image, 255, 255, 255, 62);
+        $size = max(11, min(16, (int) round($width * 0.022)));
+        $shadow = imagecolorallocatealpha($image, 9, 20, 19, 100);
+        $ink = imagecolorallocatealpha($image, 255, 255, 255, 90);
         if ($shadow === false || $ink === false) {
             imagedestroy($image);
 
             return null;
         }
-        $box = imagettfbbox($size, -28, self::FONT, self::TEXT);
-        $stepX = (int) round(abs($box[2] - $box[0]) + $size * 1.6);
-        $stepY = (int) round(abs($box[1] - $box[5]) + $size * 2.2);
-        $row = 0;
-        for ($y = (int) round(-$height * 0.2); $y < $height + $stepY; $y += $stepY) {
-            $shift = ($row % 2) * (int) round($stepX / 2);
-            for ($x = (int) round(-$width * 0.35) + $shift; $x < $width + $stepX; $x += $stepX) {
-                imagettftext($image, $size, -28, $x + 2, $y + 2, $shadow, self::FONT, self::TEXT);
-                imagettftext($image, $size, -28, $x, $y, $ink, self::FONT, self::TEXT);
-            }
-            $row++;
-        }
+        $box = imagettfbbox($size, 0, self::FONT, self::TEXT);
+        $textWidth = (int) abs($box[2] - $box[0]);
+        $x = max(8, $width - $textWidth - max(10, (int) round($width * 0.03)));
+        $y = $height - max(10, (int) round($height * 0.045));
+        imagettftext($image, $size, 0, $x + 1, $y + 1, $shadow, self::FONT, self::TEXT);
+        imagettftext($image, $size, 0, $x, $y, $ink, self::FONT, self::TEXT);
         ob_start();
         $written = imagejpeg($image, null, 82);
         $marked = ob_get_clean();
