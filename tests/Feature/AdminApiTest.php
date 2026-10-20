@@ -127,6 +127,95 @@ final class AdminApiTest extends TestCase
             ->assertJsonPath('data.value.email', 'info@socialsave.cc');
     }
 
+    public function test_duplicate_page_slug_is_a_conflict(): void
+    {
+        $token = $this->adminToken();
+        $payload = [
+            'slug' => 'privacy',
+            'title' => 'კონფიდენციალურობა',
+            'body' => '<p>ტექსტი</p>',
+        ];
+
+        $this->withHeader('Authorization', 'Bearer '.$token)
+            ->postJson('/api/admin/pages', $payload)
+            ->assertCreated();
+
+        $this->withHeader('Authorization', 'Bearer '.$token)
+            ->postJson('/api/admin/pages', $payload)
+            ->assertStatus(409)
+            ->assertJsonPath('error.code', 'conflict')
+            ->assertDontSee('SQLSTATE', false);
+    }
+
+    public function test_brand_can_be_created_without_source_url(): void
+    {
+        $token = $this->adminToken();
+
+        $this->withHeader('Authorization', 'Bearer '.$token)
+            ->postJson('/api/admin/brands', [
+                'slug' => 'nosource',
+                'name' => 'No Source',
+            ])
+            ->assertCreated()
+            ->assertJsonPath('data.source_url', '')
+            ->assertJsonPath('data.id', 1);
+    }
+
+    public function test_equipment_list_requires_a_modification(): void
+    {
+        $token = $this->adminToken();
+
+        $this->withHeader('Authorization', 'Bearer '.$token)
+            ->getJson('/api/admin/equipment')
+            ->assertStatus(422)
+            ->assertJsonValidationErrors(['modification_id']);
+    }
+
+    public function test_generation_list_filters_by_model_id(): void
+    {
+        Schema::connection('catalog')->create('generations', function ($table): void {
+            $table->id();
+            $table->unsignedBigInteger('model_id')->nullable();
+            $table->unsignedBigInteger('drom_generation_id')->nullable();
+            $table->string('slug')->nullable();
+            $table->string('name')->nullable();
+            $table->string('chassis_code')->nullable();
+            $table->string('body_type')->nullable();
+            $table->integer('year_start')->nullable();
+            $table->integer('year_end')->nullable();
+            $table->string('period_text')->nullable();
+            $table->string('market')->nullable();
+            $table->string('steering_wheel')->nullable();
+            $table->text('photo_urls')->nullable();
+            $table->string('source_url')->nullable();
+        });
+        DB::connection('catalog')->table('generations')->insert([
+            ['model_id' => 7, 'slug' => 'camry-a', 'name' => 'A', 'source_url' => ''],
+            ['model_id' => 8, 'slug' => 'camry-b', 'name' => 'B', 'source_url' => ''],
+        ]);
+        $token = $this->adminToken();
+
+        $this->withHeader('Authorization', 'Bearer '.$token)
+            ->getJson('/api/admin/generations?model_id=7')
+            ->assertOk()
+            ->assertJsonPath('meta.total', 1)
+            ->assertJsonPath('data.0.model_id', 7)
+            ->assertJsonPath('data.0.id', 1);
+    }
+
+    public function test_secret_settings_are_rejected(): void
+    {
+        $token = $this->adminToken();
+
+        $this->withHeader('Authorization', 'Bearer '.$token)
+            ->postJson('/api/admin/settings', [
+                'key' => 'mail.password',
+                'value' => ['password' => 'nope'],
+            ])
+            ->assertStatus(422)
+            ->assertJsonPath('error.code', 'forbidden');
+    }
+
     private function adminToken(): string
     {
         $user = User::factory()->create([
