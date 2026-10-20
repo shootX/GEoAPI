@@ -3,5 +3,5 @@
 use Illuminate\Support\Facades\Route;
 
 Route::fallback(function () {
-    abort(404);
+    return response()->view('errors.404', [], 404);
 });

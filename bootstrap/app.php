@@ -5,6 +5,7 @@ use App\Http\Middleware\BridgeLegacySession;
 use App\Http\Middleware\ComingSoonGate;
 use App\Http\Middleware\EnsureAdmin;
 use App\Http\Middleware\EnsureInternalDocs;
+use App\Http\Middleware\SecurityHeaders;
 use Electrik\Http\Middleware\BindTeamFromAccessToken;
 use Electrik\Http\Middleware\SetLocale;
 use Illuminate\Foundation\Application;
@@ -19,7 +20,11 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware): void {
 
+        $middleware->encryptCookies(except: [
+            'carapi_platform',
+        ]);
         $middleware->web(append: [
+            SecurityHeaders::class,
             BridgeLegacySession::class,
             SetLocale::class,
             ApplyChosenLocale::class,
