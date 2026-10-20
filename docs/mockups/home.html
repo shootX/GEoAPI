@@ -1,0 +1,855 @@
+<!DOCTYPE html>
+<html lang="ka">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>CarAPI — ავტომობილების მონაცემები</title>
+    <meta name="description" content="CarAPI არის ავტომობილების კატალოგის API. მონაცემები drom.ru-დან მოდის.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Georgian:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --ink: #091413;
+            --pine: #285A48;
+            --leaf: #408A71;
+            --mint: #B0E4CC;
+            --paper: #ffffff;
+            --wash: #f4faf7;
+            --line: #d7e7df;
+            --muted: #4d6159;
+            --shadow: 0 24px 60px rgba(9, 20, 19, 0.12);
+            --radius: 18px;
+        }
+
+        * { box-sizing: border-box; }
+        html { scroll-behavior: smooth; }
+        body {
+            margin: 0;
+            color: var(--ink);
+            background: var(--paper);
+            font-family: "Noto Sans Georgian", sans-serif;
+            font-size: 16px;
+            line-height: 1.65;
+        }
+        a { color: inherit; }
+        img, svg { display: block; max-width: 100%; }
+        button, input, select, textarea { font: inherit; color: inherit; }
+        .wrap { width: min(1120px, calc(100% - 40px)); margin: 0 auto; }
+        .eyebrow {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            margin: 0 0 14px;
+            color: var(--leaf);
+            font-size: 13px;
+            font-weight: 600;
+        }
+        .eyebrow::before {
+            content: "";
+            width: 8px;
+            height: 8px;
+            border-radius: 99px;
+            background: var(--leaf);
+        }
+        h1, h2, h3, p { margin: 0; }
+        h1 { font-size: clamp(34px, 5vw, 58px); line-height: 1.18; font-weight: 700; letter-spacing: 0; }
+        h2 { font-size: clamp(28px, 3vw, 40px); line-height: 1.25; font-weight: 700; }
+        h3 { font-size: 18px; line-height: 1.4; font-weight: 700; }
+        .lede { color: var(--muted); max-width: 62ch; }
+        .center { text-align: center; }
+        .center .lede { margin-inline: auto; }
+
+        .site-header {
+            position: absolute;
+            inset: 0 0 auto;
+            z-index: 5;
+            color: white;
+        }
+        .site-header .wrap {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            min-height: 76px;
+        }
+        .logo {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 700;
+            text-decoration: none;
+        }
+        .mark {
+            width: 22px;
+            height: 22px;
+            border-radius: 7px;
+            background: var(--mint);
+        }
+        .nav { display: flex; gap: 22px; margin-left: auto; }
+        .nav a { color: rgba(255,255,255,0.86); text-decoration: none; font-size: 15px; font-weight: 500; }
+        .nav a:hover { color: white; }
+        .header-cta {
+            text-decoration: none;
+            background: var(--mint);
+            color: var(--ink);
+            border-radius: 999px;
+            padding: 10px 16px;
+            font-weight: 600;
+            font-size: 14px;
+        }
+        .menu-toggle { display: none; }
+
+        .hero {
+            position: relative;
+            color: white;
+            background:
+                radial-gradient(620px 280px at 78% 18%, rgba(176, 228, 204, 0.18), transparent 70%),
+                linear-gradient(180deg, #326b56 0%, var(--pine) 46%, #16352b 100%);
+            padding: 118px 0 128px;
+            overflow: hidden;
+        }
+        .hero-grid {
+            display: grid;
+            grid-template-columns: 1.05fr 0.95fr;
+            gap: 36px;
+            align-items: center;
+        }
+        .hero p { margin-top: 16px; color: rgba(255,255,255,0.82); max-width: 48ch; }
+        .hero .eyebrow { color: var(--mint); }
+        .hero .eyebrow::before { background: var(--mint); }
+        .actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 28px; }
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 48px;
+            padding: 0 18px;
+            border-radius: 999px;
+            text-decoration: none;
+            font-weight: 600;
+            border: 1px solid transparent;
+        }
+        .btn-mint { background: var(--mint); color: var(--ink); }
+        .btn-ghost { background: transparent; color: white; border-color: rgba(176, 228, 204, 0.7); }
+        .btn-pine { background: var(--pine); color: white; }
+        .btn-line { background: white; color: var(--pine); border-color: var(--line); }
+
+        .stage {
+            position: relative;
+            height: 480px;
+        }
+        .wires { position: absolute; inset: 0; width: 100%; height: 100%; }
+        .wires path {
+            fill: none;
+            stroke: rgba(176, 228, 204, 0.55);
+            stroke-width: 1.4;
+        }
+        .code-card, .chip {
+            position: absolute;
+            background: white;
+            color: var(--ink);
+            border-radius: 16px;
+            box-shadow: var(--shadow);
+        }
+        .code-card {
+            left: 27%;
+            top: 23%;
+            width: 46%;
+            z-index: 1;
+            overflow: hidden;
+        }
+        .code-bar {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 14px;
+            background: #10211c;
+            color: rgba(255,255,255,0.7);
+            font-size: 12px;
+        }
+        .dot { width: 8px; height: 8px; border-radius: 99px; background: var(--mint); }
+        .dot:nth-child(2) { background: var(--leaf); opacity: 0.7; }
+        .dot:nth-child(3) { background: white; opacity: 0.35; }
+        .code-bar span { margin-left: auto; }
+        pre {
+            margin: 0;
+            padding: 14px 16px 16px;
+            background: var(--ink);
+            color: #d7eee4;
+            font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+            font-size: 12px;
+            line-height: 1.55;
+            white-space: pre-wrap;
+        }
+        .k { color: var(--mint); }
+        .s { color: white; }
+        .chip {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 10px;
+            font-size: 13px;
+            font-weight: 600;
+        }
+        .chip svg { width: 22px; height: 22px; flex: none; }
+        .chip { z-index: 2; }
+        .chip-key { left: 0; top: 34%; }
+        .chip-brand { left: 28%; top: 0; }
+        .chip-car { right: 0; top: 8%; }
+        .chip-gen { right: 0; top: 64%; }
+        .chip-engine { left: 38%; bottom: 0; }
+        .chip-json { left: 0; bottom: 10%; }
+
+        .demo-wrap { position: relative; z-index: 2; margin-top: -78px; }
+        .demo {
+            background: white;
+            border: 1px solid var(--line);
+            border-radius: 24px;
+            box-shadow: var(--shadow);
+            padding: 22px;
+        }
+        .demo-head {
+            display: flex;
+            justify-content: space-between;
+            gap: 16px;
+            align-items: end;
+            margin-bottom: 16px;
+        }
+        .counts { display: flex; gap: 18px; color: var(--muted); font-size: 13px; }
+        .counts b { display: block; color: var(--ink); font-size: 20px; font-variant-numeric: tabular-nums; }
+        .picker { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+        label { display: grid; gap: 6px; font-size: 13px; font-weight: 600; }
+        select {
+            width: 100%;
+            min-height: 48px;
+            border: 1px solid var(--line);
+            border-radius: 12px;
+            background: var(--wash) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='none' stroke='%23285A48' stroke-width='1.8'%3E%3Cpath d='M4 6l4 4 4-4'/%3E%3C/svg%3E") right 12px center no-repeat;
+            padding: 0 36px 0 12px;
+            appearance: none;
+        }
+        select:disabled { color: #8aa097; }
+        .result {
+            margin-top: 14px;
+            display: grid;
+            grid-template-columns: 1.2fr 0.8fr;
+            gap: 14px;
+            border: 1px solid var(--line);
+            border-radius: 16px;
+            overflow: hidden;
+        }
+        .result-copy { padding: 16px 18px; }
+        .result-copy p { margin-top: 6px; color: var(--muted); }
+        .path {
+            margin-top: 10px;
+            font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+            font-size: 13px;
+            color: var(--pine);
+        }
+        .result pre { min-height: 100%; }
+
+        .section { padding: 88px 0; }
+        .section.wash { background: var(--wash); }
+        .section-intro { margin-bottom: 36px; }
+        .section-intro .lede { margin-top: 10px; }
+
+        .features { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
+        .card {
+            background: white;
+            border: 1px solid var(--line);
+            border-radius: var(--radius);
+            padding: 20px;
+        }
+        .icon {
+            width: 44px;
+            height: 44px;
+            border-radius: 14px;
+            display: grid;
+            place-items: center;
+            background: rgba(176, 228, 204, 0.55);
+            margin-bottom: 14px;
+        }
+        .icon svg { width: 22px; height: 22px; }
+        .card p { margin-top: 8px; color: var(--muted); font-size: 15px; }
+
+        .split { display: grid; grid-template-columns: 1.05fr 0.95fr; gap: 40px; align-items: center; }
+        .checks { list-style: none; margin: 22px 0 0; padding: 0; display: grid; gap: 12px; }
+        .checks li { display: flex; gap: 10px; align-items: flex-start; }
+        .checks svg { flex: none; margin-top: 3px; }
+        .steps { display: grid; gap: 14px; }
+        .step {
+            display: grid;
+            grid-template-columns: auto 1fr;
+            gap: 14px;
+            align-items: start;
+            background: white;
+            border: 1px solid var(--line);
+            border-radius: 16px;
+            padding: 16px;
+        }
+        .num {
+            width: 42px;
+            height: 42px;
+            border-radius: 12px;
+            display: grid;
+            place-items: center;
+            background: var(--pine);
+            color: white;
+            font-weight: 700;
+        }
+        .step p { color: var(--muted); margin-top: 4px; font-size: 14px; }
+
+        .prices { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; max-width: 860px; margin: 0 auto; }
+        .price {
+            background: white;
+            border: 1px solid var(--line);
+            border-radius: 24px;
+            padding: 28px;
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+        .price.featured {
+            background: var(--pine);
+            color: white;
+            border-color: var(--pine);
+            transform: translateY(-8px);
+        }
+        .price .tag {
+            align-self: flex-start;
+            background: rgba(176, 228, 204, 0.25);
+            color: var(--mint);
+            border-radius: 999px;
+            padding: 4px 10px;
+            font-size: 12px;
+            font-weight: 700;
+        }
+        .amount { font-size: 42px; font-weight: 700; line-height: 1; }
+        .price ul { margin: 0; padding: 0; list-style: none; display: grid; gap: 8px; }
+        .price li { display: flex; gap: 8px; }
+        .price .btn { margin-top: auto; }
+        .price.featured .btn { background: var(--mint); color: var(--ink); }
+
+        .quotes { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+        .quote { background: white; border: 1px solid var(--line); border-radius: 20px; padding: 22px; }
+        .quote p { margin-top: 12px; }
+        .who { display: flex; gap: 10px; align-items: center; margin-top: 18px; }
+        .avatar {
+            width: 40px; height: 40px; border-radius: 999px;
+            display: grid; place-items: center;
+            background: var(--mint); color: var(--ink); font-weight: 700;
+        }
+        .who small { color: var(--muted); }
+
+        .faq { max-width: 760px; margin: 0 auto; display: grid; gap: 10px; }
+        details {
+            background: white;
+            border: 1px solid var(--line);
+            border-radius: 14px;
+            padding: 14px 16px;
+        }
+        summary { cursor: pointer; font-weight: 700; }
+        details p { margin-top: 8px; color: var(--muted); }
+
+        .contact {
+            display: grid;
+            grid-template-columns: 0.9fr 1.1fr;
+            gap: 28px;
+            align-items: start;
+        }
+        form { display: grid; gap: 12px; }
+        input, textarea {
+            width: 100%;
+            border: 1px solid var(--line);
+            border-radius: 12px;
+            background: white;
+            padding: 12px 14px;
+        }
+        textarea { min-height: 120px; resize: vertical; }
+        .aside {
+            background: var(--ink);
+            color: white;
+            border-radius: 24px;
+            padding: 28px;
+        }
+        .aside p { margin-top: 10px; color: rgba(255,255,255,0.78); }
+        .aside a { color: var(--mint); }
+        .aside .btn { margin-top: 18px; }
+
+        .footer { background: var(--ink); color: rgba(255,255,255,0.78); padding: 48px 0 20px; }
+        .footer-grid { display: grid; grid-template-columns: 1.4fr repeat(3, 1fr); gap: 24px; }
+        .footer h3 { color: white; font-size: 15px; margin-bottom: 10px; }
+        .footer a { display: block; color: rgba(255,255,255,0.78); text-decoration: none; margin: 6px 0; }
+        .footer a:hover { color: var(--mint); }
+        .legal {
+            margin-top: 28px;
+            padding-top: 16px;
+            border-top: 1px solid rgba(176, 228, 204, 0.18);
+            font-size: 13px;
+        }
+
+        @media (max-width: 980px) {
+            .hero-grid, .split, .contact, .footer-grid, .features, .quotes, .prices, .result, .picker { grid-template-columns: 1fr; }
+            .price.featured { transform: none; }
+            .demo-head { flex-direction: column; align-items: start; }
+            .counts { width: 100%; justify-content: space-between; }
+            .stage { height: auto; display: grid; gap: 12px; }
+            .wires { display: none; }
+            .code-card, .chip { position: static; width: auto; }
+            .chips { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+            .nav { display: none; }
+            .header-cta { margin-left: auto; }
+            .menu-toggle { display: inline-flex; margin-left: 8px; background: transparent; color: white; border: 1px solid rgba(176,228,204,0.6); border-radius: 10px; min-height: 40px; padding: 0 10px; }
+            .nav.open {
+                display: grid;
+                position: absolute;
+                top: 76px;
+                left: 20px;
+                right: 20px;
+                background: #16352b;
+                border-radius: 16px;
+                padding: 12px;
+            }
+        }
+        @media (max-width: 640px) {
+            .wrap { width: min(1120px, calc(100% - 28px)); }
+            .hero { padding: 104px 0 96px; }
+            .section { padding: 64px 0; }
+            .counts b { font-size: 16px; }
+            .chips { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <header class="site-header">
+        <div class="wrap">
+            <a class="logo" href="#top"><span class="mark" aria-hidden="true"></span> CarAPI</a>
+            <nav class="nav" id="nav" aria-label="მთავარი">
+                <a href="#features">შესაძლებლობები</a>
+                <a href="#how">როგორ მუშაობს</a>
+                <a href="#pricing">ფასები</a>
+                <a href="#faq">კითხვები</a>
+                <a href="#contact">კონტაქტი</a>
+            </nav>
+            <a class="header-cta" href="#pricing">უფასო ანგარიში</a>
+            <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="nav">მენიუ</button>
+        </div>
+    </header>
+
+    <main id="top">
+        <section class="hero">
+            <div class="wrap hero-grid">
+                <div>
+                    <p class="eyebrow">კატალოგის API · drom.ru</p>
+                    <h1>ავტომობილების მონაცემები, API ან მზა ვიჯეტი</h1>
+                    <p>მიიღეთ მარკები, მოდელები, თაობები და მოდიფიკაციები თქვენი სერვერიდან, ან ჩასვით მზა არჩევანი საიტზე. მონაცემების წყაროა drom.ru.</p>
+                    <div class="actions">
+                        <a class="btn btn-mint" href="#pricing">უფასო ანგარიშის შექმნა</a>
+                        <a class="btn btn-ghost" href="#features">დოკუმენტაცია</a>
+                    </div>
+                </div>
+                <div class="stage" aria-hidden="true">
+                    <svg class="wires" viewBox="0 0 560 480" preserveAspectRatio="none">
+                        <path d="M70 190 C 120 190, 140 200, 160 230"/>
+                        <path d="M230 28 C 240 70, 230 90, 230 120"/>
+                        <path d="M500 70 C 430 90, 400 120, 390 150"/>
+                        <path d="M500 330 C 440 300, 410 260, 390 230"/>
+                        <path d="M300 450 C 300 390, 300 340, 290 300"/>
+                        <path d="M70 400 C 120 370, 140 330, 165 290"/>
+                    </svg>
+                    <article class="code-card">
+                        <div class="code-bar"><i class="dot"></i><i class="dot"></i><i class="dot"></i><span>GET /api/v1/brands/toyota/models</span></div>
+                        <pre>{
+  <span class="k">"data"</span>: [
+    { <span class="k">"slug"</span>: <span class="s">"camry"</span>, <span class="k">"name"</span>: <span class="s">"Camry"</span> },
+    { <span class="k">"slug"</span>: <span class="s">"corolla"</span>, <span class="k">"name"</span>: <span class="s">"Corolla"</span> }
+  ]
+}</pre>
+                    </article>
+                    <div class="chips">
+                        <div class="chip chip-key">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="#285A48" stroke-width="1.7"><circle cx="8" cy="12" r="3"/><path d="M11 12h10l-2 2 2 2h-3"/></svg>
+                            გასაღები
+                        </div>
+                        <div class="chip chip-brand">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="#285A48" stroke-width="1.7"><circle cx="12" cy="12" r="8"/><path d="M8 14c1.2-2 6.8-2 8 0"/><path d="M9 10h.01M15 10h.01"/></svg>
+                            Toyota
+                        </div>
+                        <div class="chip chip-car">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="#285A48" stroke-width="1.7"><path d="M4 15h16l-1.2-4.2a2 2 0 0 0-1.9-1.3H7.1a2 2 0 0 0-1.9 1.3L4 15z"/><path d="M6 15v2M18 15v2"/><circle cx="7.5" cy="16.5" r="1"/><circle cx="16.5" cy="16.5" r="1"/></svg>
+                            მანქანა
+                        </div>
+                        <div class="chip chip-gen">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="#285A48" stroke-width="1.7"><path d="M5 7h14M5 12h14M5 17h9"/></svg>
+                            თაობა XV70
+                        </div>
+                        <div class="chip chip-engine">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="#285A48" stroke-width="1.7"><rect x="5" y="8" width="10" height="8" rx="1"/><path d="M15 10h3l1 2-1 2h-3M8 8V5M11 8V5"/></svg>
+                            ძრავი 2.5
+                        </div>
+                        <div class="chip chip-json">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="#285A48" stroke-width="1.7"><path d="M9 5c-2 0-3 1-3 3v2c0 1-1 2-2 2 1 0 2 1 2 2v2c0 2 1 3 3 3M15 5c2 0 3 1 3 3v2c0 1 1 2 2 2-1 0-2 1-2 2v2c0 2-1 3-3 3"/></svg>
+                            JSON
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <div class="demo-wrap">
+            <div class="wrap">
+                <section class="demo" aria-labelledby="demo-title">
+                    <div class="demo-head">
+                        <div>
+                            <p class="eyebrow">სცადეთ აქ</p>
+                            <h2 id="demo-title" style="font-size:28px">მარკა → მოდელი → თაობა → მოდიფიკაცია</h2>
+                        </div>
+                        <div class="counts">
+                            <div><b>314</b> მარკა</div>
+                            <div><b>4 710</b> მოდელი</div>
+                            <div><b>22 367</b> თაობა</div>
+                        </div>
+                    </div>
+                    <div class="picker">
+                        <label>მარკა
+                            <select id="brand"></select>
+                        </label>
+                        <label>მოდელი
+                            <select id="model"></select>
+                        </label>
+                        <label>თაობა
+                            <select id="generation"></select>
+                        </label>
+                        <label>მოდიფიკაცია
+                            <select id="modification"></select>
+                        </label>
+                    </div>
+                    <div class="result">
+                        <div class="result-copy">
+                            <h3 id="result-title">Toyota Camry</h3>
+                            <p id="result-meta">XV70 · 2017–2024 · 2.5</p>
+                            <p class="path" id="result-path">GET /api/v1/brands/toyota/models</p>
+                        </div>
+                        <pre id="result-json"></pre>
+                    </div>
+                </section>
+            </div>
+        </div>
+
+        <section class="section" id="features">
+            <div class="wrap">
+                <div class="section-intro center">
+                    <p class="eyebrow" style="justify-content:center">შესაძლებლობები</p>
+                    <h2>კატალოგი, რომელზეც ეკრანს აწყობთ</h2>
+                    <p class="lede">სერვერული API და ვიჯეტი ერთ კატალოგს იყენებს. საიდუმლო გასაღები ბრაუზერში არ გადის.</p>
+                </div>
+                <div class="features">
+                    <article class="card">
+                        <div class="icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="#285A48" stroke-width="1.7"><rect x="4" y="4" width="16" height="12" rx="2"/><path d="M8 20h8M12 16v4"/></svg></div>
+                        <h3>წაიკითხეთ თქვენი სერვერიდან</h3>
+                        <p>ააწყვეთ საკუთარი ეკრანი მარკებზე, მოდელებზე, თაობებსა და მოდიფიკაციებზე.</p>
+                    </article>
+                    <article class="card">
+                        <div class="icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="#285A48" stroke-width="1.7"><path d="M5 7h14M5 12h9M5 17h6"/></svg></div>
+                        <h3>ჩასვით არჩევანი საიტზე</h3>
+                        <p>სტუმარი ავტომობილს ბრაუზერში ირჩევს. საიდუმლო გასაღები სერვერს არ ტოვებს.</p>
+                    </article>
+                    <article class="card">
+                        <div class="icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="#285A48" stroke-width="1.7"><path d="M8 7h11M8 12h11M8 17h11"/><circle cx="4.5" cy="7" r="1"/><circle cx="4.5" cy="12" r="1"/><circle cx="4.5" cy="17" r="1"/></svg></div>
+                        <h3>სუფთა იდენტიფიკატორები</h3>
+                        <p>slug და id, გვერდები <b>page</b> და <b>per_page</b>. პასუხი JSON-ია.</p>
+                    </article>
+                    <article class="card">
+                        <div class="icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="#285A48" stroke-width="1.7"><circle cx="12" cy="12" r="8"/><path d="M12 8v5l3 2"/></svg></div>
+                        <h3>დაიწყეთ უფასო გეგმით</h3>
+                        <p>წუთში 60 მოთხოვნა და თვეში 10 000 წარმატებული მოთხოვნა, პროექტზე.</p>
+                    </article>
+                </div>
+            </div>
+        </section>
+
+        <section class="section wash" id="how">
+            <div class="wrap split">
+                <div>
+                    <p class="eyebrow">როგორ მუშაობს</p>
+                    <h2>სამი ნაბიჯი კატალოგამდე</h2>
+                    <p class="lede" style="margin-top:10px">ანგარიში, გასაღები და ერთი ჯაჭვი: მარკა, მოდელი, თაობა, მოდიფიკაცია.</p>
+                    <ul class="checks">
+                        <li><svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="#408A71" stroke-width="1.8"><circle cx="9" cy="9" r="7"/><path d="M5.5 9.2l2.2 2.2 4.8-5"/></svg> სერვერული გასაღები მხოლოდ თქვენს სერვერზე რჩება.</li>
+                        <li><svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="#408A71" stroke-width="1.8"><circle cx="9" cy="9" r="7"/><path d="M5.5 9.2l2.2 2.2 4.8-5"/></svg> ვიჯეტი საჯარო გასაღებს იყენებს და არჩევანს თქვენს გვერდს გადასცემს.</li>
+                        <li><svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="#408A71" stroke-width="1.8"><circle cx="9" cy="9" r="7"/><path d="M5.5 9.2l2.2 2.2 4.8-5"/></svg> თაობის ჩანაწერები ბაზრის ვარიანტებსაც ითვლის. ჯამი 22 367-ია.</li>
+                    </ul>
+                </div>
+                <div class="steps">
+                    <article class="step"><div class="num">01</div><div><h3>პროექტი და გასაღები</h3><p>უფასო ანგარიში, დადასტურებული ელფოსტა და ერთი პროექტი.</p></div></article>
+                    <article class="step"><div class="num">02</div><div><h3>მოთხოვნა</h3><p>GET /api/v1/brands, შემდეგ მოდელები, თაობები და მოდიფიკაციები.</p></div></article>
+                    <article class="step"><div class="num">03</div><div><h3>თქვენი ეკრანი ან ვიჯეტი</h3><p>საკუთარი ინტერფეისი, ან მზა არჩევანი საიტის ფორმაში.</p></div></article>
+                </div>
+            </div>
+        </section>
+
+        <section class="section" id="pricing">
+            <div class="wrap">
+                <div class="section-intro center">
+                    <p class="eyebrow" style="justify-content:center">ფასები</p>
+                    <h2>უფასო ახლა, Pro მალე</h2>
+                    <p class="lede">Pro ჯერ არ იყიდება. გადახდა ამ გვერდზე არ იხსნება.</p>
+                </div>
+                <div class="prices">
+                    <article class="price featured">
+                        <span class="tag">ახლა</span>
+                        <h3>უფასო</h3>
+                        <div class="amount">0 ₾</div>
+                        <ul>
+                            <li>60 მოთხოვნა წუთში</li>
+                            <li>10 000 წარმატებული მოთხოვნა თვეში</li>
+                            <li>სერვერული API და ვიჯეტი</li>
+                            <li>ლიმიტი პროექტზე</li>
+                        </ul>
+                        <a class="btn" href="#contact">უფასო ანგარიშის შექმნა</a>
+                    </article>
+                    <article class="price">
+                        <span class="tag" style="background:#e7f6ef;color:#285A48">მალე</span>
+                        <h3>Pro</h3>
+                        <div class="amount">ფასი მალე</div>
+                        <ul>
+                            <li>იგივე კატალოგი</li>
+                            <li>გაზრდილი ლიმიტი გამოცხადდება</li>
+                            <li>ჯერ არ იყიდება</li>
+                            <li>ფასი ცალკე გამოცხადდება</li>
+                        </ul>
+                        <a class="btn btn-line" href="#contact">შეგატყობინებთ</a>
+                    </article>
+                </div>
+            </div>
+        </section>
+
+        <section class="section wash" id="stories">
+            <div class="wrap">
+                <div class="section-intro center">
+                    <p class="eyebrow" style="justify-content:center">გუნდებში</p>
+                    <h2>სად ჯდება CarAPI</h2>
+                    <p class="lede">ეს მაგალითებია, როგორ იყენებენ კატალოგს. რეალური მომხმარებლის ციტატა არ არის.</p>
+                </div>
+                <div class="quotes">
+                    <article class="quote">
+                        <h3>ფილტრი განცხადებაზე</h3>
+                        <p>მარკიდან თაობამდე ოთხი საფეხურია. საკუთარი ფილტრი ამ ჯაჭვზე დგას.</p>
+                        <div class="who"><div class="avatar">ფ</div><div>ფრონტენდი<br><small>საკუთარი ეკრანი</small></div></div>
+                    </article>
+                    <article class="quote">
+                        <h3>ვიჯეტი ფორმაში</h3>
+                        <p>არჩევანი საიტზე ჩანს. საჯარო გასაღები ბრაუზერშია, საიდუმლო სერვერზე რჩება.</p>
+                        <div class="who"><div class="avatar">პ</div><div>პროდუქტი<br><small>ვიჯეტი</small></div></div>
+                    </article>
+                    <article class="quote">
+                        <h3>ნაცნობი კატალოგი</h3>
+                        <p>მონაცემები drom.ru-დან მოდის, ამიტომ მარკა და თაობა იმ სტრუქტურას მიჰყვება.</p>
+                        <div class="who"><div class="avatar">კ</div><div>კატალოგი<br><small>მონაცემები</small></div></div>
+                    </article>
+                </div>
+            </div>
+        </section>
+
+        <section class="section" id="faq">
+            <div class="wrap">
+                <div class="section-intro center">
+                    <p class="eyebrow" style="justify-content:center">კითხვები</p>
+                    <h2>მოკლე პასუხები</h2>
+                </div>
+                <div class="faq">
+                    <details open>
+                        <summary>საიდანაა მონაცემები?</summary>
+                        <p>კატალოგის წყაროა drom.ru. ჩანაწერი შეიძლება იყოს არასრული. ყველა მოდელს თაობა არ აქვს.</p>
+                    </details>
+                    <details>
+                        <summary>რა შედის უფასო გეგმაში?</summary>
+                        <p>წუთში 60 მოთხოვნა და კალენდარულ თვეში 10 000 წარმატებული მოთხოვნა, თითო პროექტზე.</p>
+                    </details>
+                    <details>
+                        <summary>სად რჩება საიდუმლო გასაღები?</summary>
+                        <p>სერვერულ მოთხოვნაზე. ვიჯეტი საჯარო გასაღებს იყენებს და სესიის cookie-ს არ აგზავნის.</p>
+                    </details>
+                    <details>
+                        <summary>Pro უკვე იყიდება?</summary>
+                        <p>არა. Pro მალე გამოჩნდება. ამ გვერდზე გადახდა არ იხსნება.</p>
+                    </details>
+                    <details>
+                        <summary>ფოტო აქვს API-ს?</summary>
+                        <p>მიმდინარე სერვერულ API-ს ფოტო არ აქვს. მოდიფიკაციების სია და დეტალი არის.</p>
+                    </details>
+                </div>
+            </div>
+        </section>
+
+        <section class="section wash" id="contact">
+            <div class="wrap contact">
+                <div>
+                    <p class="eyebrow">კონტაქტი</p>
+                    <h2>მოგვწერეთ</h2>
+                    <p class="lede" style="margin-top:10px">ფორმა ამ მოკაპში წერილს არ აგზავნის. ცოცხალი მისამართია info@socialsave.cc.</p>
+                    <form style="margin-top:18px" action="#" onsubmit="return false">
+                        <label>სახელი<input name="name" autocomplete="name"></label>
+                        <label>ელფოსტა<input name="email" type="email" autocomplete="email"></label>
+                        <label>შეტყობინება<textarea name="message"></textarea></label>
+                        <button class="btn btn-pine" type="submit">გაგზავნა</button>
+                    </form>
+                </div>
+                <aside class="aside">
+                    <h2 style="font-size:32px">დაიწყეთ კატალოგით</h2>
+                    <p>314 მარკა, 4 710 მოდელი, 22 367 თაობა. ანგარიში უფასოა, Pro კი ჯერ არ იყიდება.</p>
+                    <p>ელფოსტა: <a href="mailto:info@socialsave.cc">info@socialsave.cc</a><br>სერვერი გერმანიაშია.</p>
+                    <a class="btn btn-mint" href="#pricing">უფასო ანგარიშის შექმნა</a>
+                </aside>
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <div class="wrap">
+            <div class="footer-grid">
+                <div>
+                    <a class="logo" href="#top"><span class="mark"></span> CarAPI</a>
+                    <p style="margin-top:10px">ავტომობილების კატალოგის API. მონაცემები drom.ru-დან.</p>
+                </div>
+                <div>
+                    <h3>პროდუქტი</h3>
+                    <a href="#features">შესაძლებლობები</a>
+                    <a href="#how">როგორ მუშაობს</a>
+                    <a href="#pricing">ფასები</a>
+                </div>
+                <div>
+                    <h3>დოკუმენტაცია</h3>
+                    <a href="#demo-title">ამომრჩევი</a>
+                    <a href="#faq">კითხვები</a>
+                    <a href="#features">მისამართები</a>
+                </div>
+                <div>
+                    <h3>კონტაქტი</h3>
+                    <a href="mailto:info@socialsave.cc">info@socialsave.cc</a>
+                    <a href="#contact">მოგვწერეთ</a>
+                </div>
+            </div>
+            <p class="legal">მოკაპი. ცოცხალი საიტის განლაგება ამ ფაილით არ იცვლება.</p>
+        </div>
+    </footer>
+
+    <script>
+        const catalog = {
+            toyota: {
+                name: "Toyota",
+                models: {
+                    camry: { name: "Camry", generations: { xv70: { name: "XV70", years: "2017–2024", modifications: [{ id: "2-5", name: "2.5" }, { id: "3-5", name: "3.5" }] } } },
+                    corolla: { name: "Corolla", generations: { e210: { name: "E210", years: "2018–2024", modifications: [{ id: "1-8", name: "1.8" }, { id: "2-0", name: "2.0 Hybrid" }] } } }
+                }
+            },
+            bmw: {
+                name: "BMW",
+                models: {
+                    "3-series": { name: "3 Series", generations: { g20: { name: "G20", years: "2019–2024", modifications: [{ id: "320i", name: "320i" }, { id: "330i", name: "330i" }] } } },
+                    x5: { name: "X5", generations: { g05: { name: "G05", years: "2018–2024", modifications: [{ id: "30d", name: "30d" }, { id: "40i", name: "40i" }] } } }
+                }
+            },
+            "mercedes-benz": {
+                name: "Mercedes-Benz",
+                models: {
+                    "c-class": { name: "C-Class", generations: { w206: { name: "W206", years: "2021–2024", modifications: [{ id: "c200", name: "C 200" }, { id: "c300", name: "C 300" }] } } }
+                }
+            }
+        };
+        const brand = document.getElementById("brand");
+        const model = document.getElementById("model");
+        const generation = document.getElementById("generation");
+        const modification = document.getElementById("modification");
+
+        function fill(select, entries, placeholder) {
+            select.innerHTML = "";
+            const empty = document.createElement("option");
+            empty.value = "";
+            empty.textContent = placeholder;
+            select.appendChild(empty);
+            entries.forEach(function (entry) {
+                const option = document.createElement("option");
+                option.value = entry.id;
+                option.textContent = entry.name;
+                select.appendChild(option);
+            });
+            select.disabled = entries.length === 0;
+        }
+
+        function modelsOf(brandId) {
+            const row = catalog[brandId];
+            if (!row) return [];
+            return Object.keys(row.models).map(function (id) { return { id: id, name: row.models[id].name }; });
+        }
+        function generationsOf(brandId, modelId) {
+            const row = catalog[brandId] && catalog[brandId].models[modelId];
+            if (!row) return [];
+            return Object.keys(row.generations).map(function (id) { return { id: id, name: row.generations[id].name }; });
+        }
+        function modificationsOf(brandId, modelId, generationId) {
+            const row = catalog[brandId] && catalog[brandId].models[modelId] && catalog[brandId].models[modelId].generations[generationId];
+            return row ? row.modifications : [];
+        }
+
+        function paint() {
+            const brandId = brand.value;
+            const modelId = model.value;
+            const generationId = generation.value;
+            const modificationId = modification.value;
+            const brandRow = catalog[brandId];
+            const modelRow = brandRow && brandRow.models[modelId];
+            const generationRow = modelRow && modelRow.generations[generationId];
+            const modificationRow = (generationRow ? generationRow.modifications : []).find(function (item) { return item.id === modificationId; });
+            const title = [brandRow && brandRow.name, modelRow && modelRow.name].filter(Boolean).join(" ") || "აირჩიეთ მარკა";
+            const meta = [generationRow && generationRow.name, generationRow && generationRow.years, modificationRow && modificationRow.name].filter(Boolean).join(" · ") || "ჯერ წინა საფეხური აირჩიეთ";
+            document.getElementById("result-title").textContent = title;
+            document.getElementById("result-meta").textContent = meta;
+            const path = brandId ? "GET /api/v1/brands/" + brandId + "/models" : "GET /api/v1/brands";
+            document.getElementById("result-path").textContent = path;
+            document.getElementById("result-json").textContent = JSON.stringify({
+                brand: brandId || null,
+                model: modelId || null,
+                generation: generationRow ? generationRow.name : null,
+                modification: modificationRow ? modificationRow.name : null
+            }, null, 2);
+        }
+
+        function sync(from) {
+            if (from === "brand") {
+                fill(model, modelsOf(brand.value), "მოდელი");
+                fill(generation, [], "თაობა");
+                fill(modification, [], "მოდიფიკაცია");
+            } else if (from === "model") {
+                fill(generation, generationsOf(brand.value, model.value), "თაობა");
+                fill(modification, [], "მოდიფიკაცია");
+            } else if (from === "generation") {
+                fill(modification, modificationsOf(brand.value, model.value, generation.value), "მოდიფიკაცია");
+            }
+            paint();
+        }
+
+        brand.addEventListener("change", function () { sync("brand"); });
+        model.addEventListener("change", function () { sync("model"); });
+        generation.addEventListener("change", function () { sync("generation"); });
+        modification.addEventListener("change", paint);
+
+        fill(brand, Object.keys(catalog).map(function (id) { return { id: id, name: catalog[id].name }; }), "მარკა");
+        brand.value = "toyota";
+        sync("brand");
+        model.value = "camry";
+        sync("model");
+        generation.value = "xv70";
+        sync("generation");
+        modification.value = "2-5";
+        paint();
+
+        const menu = document.querySelector(".menu-toggle");
+        const nav = document.getElementById("nav");
+        menu.addEventListener("click", function () {
+            const open = nav.classList.toggle("open");
+            menu.setAttribute("aria-expanded", open ? "true" : "false");
+        });
+    </script>
+</body>
+</html>
