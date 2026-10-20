@@ -7,6 +7,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\QueryException;
 use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -48,7 +49,11 @@ abstract class CrudController extends Controller
     public function store(Request $request): JsonResponse
     {
         $data = $request->validate($this->rules(false));
-        $row = $this->model()::query()->create($this->prepare($data, $request));
+        try {
+            $row = $this->model()::query()->create($this->prepare($data, $request));
+        } catch (QueryException $e) {
+            $this->conflict($e);
+        }
 
         return response()->json(['data' => $row], 201);
     }
@@ -64,7 +69,11 @@ abstract class CrudController extends Controller
         $partial = $request->isMethod('PATCH');
         $data = $request->validate($this->rules($partial));
         $row->fill($this->prepare($data, $request));
-        $row->save();
+        try {
+            $row->save();
+        } catch (QueryException $e) {
+            $this->conflict($e);
+        }
 
         return response()->json(['data' => $row->fresh()]);
     }
@@ -88,6 +97,18 @@ abstract class CrudController extends Controller
     protected function newQuery(): Builder
     {
         return $this->model()::query();
+    }
+
+    private function conflict(QueryException $e): never
+    {
+        $state = (string) $e->getCode();
+        if ($state === '23505' || $state === '23000' || str_contains(strtolower($e->getMessage()), 'unique')) {
+            throw new HttpResponseException(response()->json([
+                'error' => ['code' => 'conflict', 'message' => 'ჩანაწერი ეწინააღმდეგება უნიკალურ ველს.'],
+            ], 409));
+        }
+
+        throw $e;
     }
 
     protected function find(int $id): Model

@@ -37,7 +37,7 @@ final class OpenApi
             'info' => [
                 'title' => 'CarAPI Admin',
                 'version' => '1.0.0',
-                'description' => 'ადმინის API. ავტორიზაცია: Authorization: Bearer {token}. ტოკენს სჭირდება abilities: ["*"] და მომხმარებლის როლი admin.',
+                'description' => 'ადმინის API. ავტორიზაცია: Authorization: Bearer {token}. ტოკენს სჭირდება abilities: ["*"] და მომხმარებლის როლი admin. pages-ის გამოქვეყნებული slug ცვლის ჩაშენებულ საჯარო გვერდს. ცარიელი სია ნიშნავს, რომ ჩანს კოდის გვერდი. model-photos-ის გზის id არის model_id. equipment-ის სიას სჭირდება modification_id. generations იღებს model_id და brand_id ფილტრს.',
             ],
             'servers' => [
                 ['url' => rtrim((string) config('app.url'), '/')],
@@ -47,6 +47,46 @@ final class OpenApi
                     'bearerAuth' => [
                         'type' => 'http',
                         'scheme' => 'bearer',
+                    ],
+                ],
+                'schemas' => [
+                    'Error' => [
+                        'type' => 'object',
+                        'properties' => [
+                            'error' => [
+                                'type' => 'object',
+                                'properties' => [
+                                    'code' => ['type' => 'string', 'example' => 'conflict'],
+                                    'message' => ['type' => 'string'],
+                                ],
+                            ],
+                        ],
+                    ],
+                    'Page' => [
+                        'type' => 'object',
+                        'required' => ['slug', 'title', 'body'],
+                        'properties' => [
+                            'id' => ['type' => 'integer'],
+                            'slug' => ['type' => 'string', 'example' => 'privacy'],
+                            'locale' => ['type' => 'string', 'example' => 'ka'],
+                            'title' => ['type' => 'string'],
+                            'body' => ['type' => 'string'],
+                            'status' => ['type' => 'string', 'enum' => ['draft', 'published']],
+                        ],
+                    ],
+                    'CatalogList' => [
+                        'type' => 'object',
+                        'properties' => [
+                            'data' => ['type' => 'array', 'items' => ['type' => 'object']],
+                            'meta' => [
+                                'type' => 'object',
+                                'properties' => [
+                                    'page' => ['type' => 'integer'],
+                                    'per_page' => ['type' => 'integer'],
+                                    'total' => ['type' => 'integer'],
+                                ],
+                            ],
+                        ],
                     ],
                 ],
             ],
@@ -96,6 +136,7 @@ final class OpenApi
                 '401' => ['description' => 'ტოკენი არ არის ან არასწორია'],
                 '403' => ['description' => 'ადმინის როლი ან უფლება * არ არის'],
                 '404' => ['description' => 'ჩანაწერი ვერ მოიძებნა'],
+                '409' => ['description' => 'უნიკალური ველი დუბლირებულია', 'content' => ['application/json' => ['schema' => ['$ref' => '#/components/schemas/Error']]]],
                 '422' => ['description' => 'ვალიდაციის შეცდომა'],
             ],
         ];
@@ -109,6 +150,7 @@ final class OpenApi
                     'name' => $name,
                     'in' => 'path',
                     'required' => true,
+                    'description' => str_contains($uri, 'model-photos') ? 'model_photos.model_id' : null,
                     'schema' => ['type' => str_contains($name, 'key') ? 'string' : 'integer'],
                 ];
             }
@@ -117,6 +159,13 @@ final class OpenApi
             $parameters[] = ['name' => 'page', 'in' => 'query', 'schema' => ['type' => 'integer']];
             $parameters[] = ['name' => 'per_page', 'in' => 'query', 'schema' => ['type' => 'integer']];
             $parameters[] = ['name' => 'q', 'in' => 'query', 'schema' => ['type' => 'string']];
+            if (preg_match('#/(generations|models|cars)$#', $uri) === 1) {
+                $parameters[] = ['name' => 'model_id', 'in' => 'query', 'schema' => ['type' => 'integer']];
+                $parameters[] = ['name' => 'brand_id', 'in' => 'query', 'schema' => ['type' => 'integer']];
+            }
+            if (str_ends_with($uri, '/equipment')) {
+                $parameters[] = ['name' => 'modification_id', 'in' => 'query', 'required' => true, 'schema' => ['type' => 'integer']];
+            }
         }
         if ($parameters !== []) {
             $operation['parameters'] = $parameters;
@@ -126,7 +175,9 @@ final class OpenApi
                 'required' => $method !== 'PATCH',
                 'content' => [
                     'application/json' => [
-                        'schema' => ['type' => 'object'],
+                        'schema' => str_contains($uri, '/pages')
+                            ? ['$ref' => '#/components/schemas/Page']
+                            : ['type' => 'object'],
                     ],
                 ],
             ];
