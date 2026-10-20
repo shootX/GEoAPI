@@ -12,7 +12,10 @@ interface UsageStore
     /** @return array{limit:int,used:int,remaining:int,exhausted:bool,reset_at:int}|null */
     public function previewMonth(int $projectId, int $now): ?array;
 
-    /** @return array{ok:bool,limit:int,used:int,remaining:int,reset_at:int} */
+    /** @return array{limit:int,used:int,remaining:int,exhausted:bool,reset_at:int,enforced:bool}|null */
+    public function previewDay(int $projectId, int $now): ?array;
+
+    /** @return array{ok:bool,reason?:string,limit:int,used:int,remaining:int,reset_at:int} */
     public function commitSuccess(int $projectId, string $route, int $now): array;
 
     /** @return array{limit:int,used:int,remaining:int,reset_at:string,per_minute:int,days:list<array{day:string,used:int}>,routes:list<array{route:string,used:int}>}|null */

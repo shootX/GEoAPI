@@ -8,9 +8,7 @@ use PDO;
 
 final class ProjectRepository
 {
-    public function __construct(private PDO $pdo)
-    {
-    }
+    public function __construct(private PDO $pdo) {}
 
     /** @return list<array<string, mixed>> */
     public function forUser(int $userId): array
@@ -51,7 +49,7 @@ final class ProjectRepository
         $stmt->execute();
         $id = (int) $stmt->fetchColumn();
         $limits = $this->pdo->prepare(
-            'INSERT INTO platform.project_limits (project_id, per_minute, monthly_quota) VALUES (:id, 60, 10000)'
+            $this->limitsInsert()
         );
         $limits->bindValue('id', $id, PDO::PARAM_INT);
         $limits->execute();
@@ -138,5 +136,21 @@ final class ProjectRepository
         $stmt->execute();
 
         return $stmt->rowCount() > 0;
+    }
+
+    private function limitsInsert(): string
+    {
+        $stmt = $this->pdo->query(<<<'SQL'
+            SELECT 1
+            FROM information_schema.columns
+            WHERE table_schema = 'platform'
+              AND table_name = 'project_limits'
+              AND column_name = 'per_day'
+        SQL);
+        if ($stmt !== false && $stmt->fetchColumn() !== false) {
+            return 'INSERT INTO platform.project_limits (project_id, per_minute, monthly_quota, per_day) VALUES (:id, 60, 10000, 2000)';
+        }
+
+        return 'INSERT INTO platform.project_limits (project_id, per_minute, monthly_quota) VALUES (:id, 60, 10000)';
     }
 }

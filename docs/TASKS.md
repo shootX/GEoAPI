@@ -47,6 +47,16 @@
 - [x] `DemoWatermark` again tiles a large diagonal `GEOAPI.GE` across the whole image. Demo, widget, and `/getimage` responses are marked in the file, not with a CSS overlay.
 - [x] The mark stays semi-transparent so the car remains visible. A download of the JPEG still contains the tiles.
 
+## 2026-10-20 — Public API v1 parity
+
+- [x] List responses keep `data` and `meta` and add `collection` (`count`, `total`, `pages`, `next`, `prev`, `first`, `last`). `limit` defaults to 100 and stops at 1000. `per_page` is the alias when `limit` is absent. `sort` and `direction` are whitelisted.
+- [x] Filters: `year_from`, `year_to`, `body`, `fuel`, `drive`, `transmission`, `brand_id`, `model_id`, and `q`. `GET /api/v1/modifications` searches across the chain. Invalid values return 422.
+- [x] Flat resources from stored columns only: `/api/v1/engines`, `/api/v1/bodies`, `/api/v1/fuel`, `/api/v1/colors`.
+- [x] Free plan quotas: 60 per UTC minute, 2 000 successful requests per UTC day, 10 000 per UTC month. Success responses send `X-RateLimit-*` and the existing `X-Quota-*` headers. 429 is JSON with `Retry-After`.
+- [x] Resources include `modified` (`updated_at`). `modified_after` filters newer rows.
+- [x] `/api/v1/docs` renders Redoc from `/api/v1/openapi.json`. `/api/v1/postman.json` is the collection. `/guide` has cURL, JavaScript, Node, Python, and PHP samples.
+- [ ] Owner: from `/www/wwwroot/car.socialsave.cc`, run `php artisan migrate --force` as the catalog table owner (`CARAPI_CATALOG_ADMIN_USER`) with `CARAPI_PLATFORM_*` set. Do not use `carapi_catalog_reader` for that command. No new PHP-FPM variable is required. Until `platform.project_limits.per_day` exists, the daily cap is not enforced.
+
 ## 2026-10-20 — Auto-deploy
 
 - [x] `.github/workflows/deploy.yml` runs PHPUnit on push to `main`, then SSHes with `DEPLOY_HOST`, `DEPLOY_USER`, `DEPLOY_SSH_KEY`, and optional `DEPLOY_PORT`.

@@ -63,11 +63,14 @@ slug ზუსტად ემთხვევა `brands.slug`-ს. `id` და�
 ```json
 {
   "data": [],
-  "meta": { "page": 1, "per_page": 50, "total": 0 }
+  "meta": { "page": 1, "per_page": 100, "total": 0 },
+  "collection": { "count": 0, "total": 0, "pages": 0, "next": null, "prev": null, "first": null, "last": null }
 }
 ```
 
-`page` ნაგულისხმევი 1, მაქსიმუმ 1000000. `per_page` ნაგულისხმევი 50, მაქსიმუმ 100. დალაგება: `name`, შემდეგ `id`.
+`page` ნაგულისხმევი 1, მაქსიმუმ 1000000. `limit` ნაგულისხმევი 100, მაქსიმუმ 1000. `per_page` იგივე ზომაა, როცა `limit` არ არის მოცემული; ორივეს გაგზავნისას მოქმედებს `limit`. `meta.per_page` ამ ზომას იღებს. `sort` და `direction` (`asc` ან `desc`) მხოლოდ თეთრ სიაზე მუშაობს. `q` სახელში ეძებს. `modified` არის `updated_at`. `modified_after` UTC დროა.
+
+დამატებითი მისამართები, მხოლოდ შენახულ ველებზე: `GET /api/v1/modifications` (ჯაჭვზე ძებნა), `GET /api/v1/engines`, `GET /api/v1/bodies`, `GET /api/v1/fuel`, `GET /api/v1/colors`. ფილტრები: `year_from`, `year_to`, `body`, `fuel`, `drive`, `transmission`, `brand_id`, `model_id`. წლები კვლავ `year_start` / `year_end` სვეტებია. ცნობარი: `/api/v1/docs`. Postman: `/api/v1/postman.json`.
 
 ბრენდი: `id`, `slug`, `name`, `synonyms`, `is_lcv_or_commercial`, `logo_url_light`, `logo_url_dark`. ცარიელი ლოგო არის `null`. სტატიკური SVG არ ერთვის. `synonyms` არარსებობისას `[]`.
 

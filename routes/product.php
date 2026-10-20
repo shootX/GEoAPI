@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use App\Http\Controllers\Admin\BlogPanelController;
 use App\Http\Controllers\Admin\DisableComingSoonController;
+use App\Http\Controllers\Api\V1\CatalogController;
 use App\Http\Controllers\BlogController;
 use App\Http\Controllers\BlogFeedController;
 use App\Http\Controllers\ComingSoonSignupController;
@@ -12,6 +13,7 @@ use App\Http\Controllers\PaymentWebhookController;
 use App\Http\Controllers\PhotoReportController;
 use App\Http\Controllers\PublicOpenApiController;
 use App\Http\Controllers\PublicPageController;
+use App\Http\Controllers\PublicPostmanController;
 use App\Http\Controllers\SitemapController;
 use App\Livewire\Account\Errors;
 use App\Livewire\Account\Products;
@@ -45,6 +47,9 @@ Route::middleware('web')->group(function (): void {
         Route::delete('/admin/blog/tags/{id}', [BlogPanelController::class, 'destroyTag'])->whereNumber('id');
     });
     Route::get('/api/v1/openapi.json', PublicOpenApiController::class);
+    Route::get('/api/v1/postman.json', PublicPostmanController::class);
+    Route::get('/api/v1/docs', [PublicPageController::class, 'reference']);
+    Route::any('/api/v1/{path?}', CatalogController::class)->where('path', '.*');
     Route::get('/', [PublicPageController::class, 'home']);
     Route::get('/demo', [PublicPageController::class, 'demo']);
     Route::get('/guide', [PublicPageController::class, 'guide']);

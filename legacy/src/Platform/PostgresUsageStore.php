@@ -5,12 +5,13 @@ declare(strict_types=1);
 namespace Carapi\Platform;
 
 use PDO;
+use PDOException;
 
 final class PostgresUsageStore implements UsageStore
 {
-    public function __construct(private PDO $pdo)
-    {
-    }
+    private ?bool $perDayColumn = null;
+
+    public function __construct(private PDO $pdo) {}
 
     public function bumpWindow(string $scope, string $subject, int $limit, int $now): array
     {
@@ -49,11 +50,40 @@ final class PostgresUsageStore implements UsageStore
         return $this->monthView($limits['monthly_quota'], $used, $now);
     }
 
+    public function previewDay(int $projectId, int $now): ?array
+    {
+        $limits = $this->limits($projectId);
+        if ($limits === null) {
+            return null;
+        }
+        if ($limits['per_day'] === null) {
+            return [
+                'limit' => 0,
+                'used' => 0,
+                'remaining' => 0,
+                'exhausted' => false,
+                'reset_at' => $this->nextDay($now),
+                'enforced' => false,
+            ];
+        }
+        $used = $this->dayUsed($projectId, $now);
+        $view = [
+            'limit' => $limits['per_day'],
+            'used' => $used,
+            'remaining' => max(0, $limits['per_day'] - $used),
+            'exhausted' => $used >= $limits['per_day'],
+            'reset_at' => $this->nextDay($now),
+            'enforced' => true,
+        ];
+
+        return $view;
+    }
+
     public function commitSuccess(int $projectId, string $route, int $now): array
     {
         $limits = $this->limits($projectId);
         if ($limits === null) {
-            throw new UnavailableException();
+            throw new UnavailableException;
         }
         $period = gmdate('Y-m-01', $now);
         $day = gmdate('Y-m-d', $now);
@@ -71,7 +101,7 @@ final class PostgresUsageStore implements UsageStore
         if ($used === false) {
             $this->pdo->rollBack();
 
-            return ['ok' => false, 'limit' => $limits['monthly_quota'], 'used' => $limits['monthly_quota'], 'remaining' => 0, 'reset_at' => $this->nextMonth($now)];
+            return ['ok' => false, 'reason' => 'month', 'limit' => $limits['monthly_quota'], 'used' => $limits['monthly_quota'], 'remaining' => 0, 'reset_at' => $this->nextMonth($now)];
         }
         $daily = $this->pdo->prepare(<<<'SQL'
             INSERT INTO platform.daily_usage (project_id, day, route, used_count)
@@ -80,6 +110,14 @@ final class PostgresUsageStore implements UsageStore
             DO UPDATE SET used_count = platform.daily_usage.used_count + 1
         SQL);
         $daily->execute(['id' => $projectId, 'day' => $day, 'route' => $route]);
+        if ($limits['per_day'] !== null) {
+            $dayUsed = $this->dayUsed($projectId, $now);
+            if ($dayUsed > $limits['per_day']) {
+                $this->pdo->rollBack();
+
+                return ['ok' => false, 'reason' => 'day', 'limit' => $limits['per_day'], 'used' => $limits['per_day'], 'remaining' => 0, 'reset_at' => $this->nextDay($now)];
+            }
+        }
         $this->pdo->commit();
         $used = (int) $used;
 
@@ -147,6 +185,7 @@ final class PostgresUsageStore implements UsageStore
             'remaining' => $view['remaining'],
             'reset_at' => gmdate('Y-m-d\TH:i:s\Z', $view['reset_at']),
             'per_minute' => $limits['per_minute'],
+            'per_day' => $limits['per_day'],
             'days' => $days,
             'routes' => $routes,
         ];
@@ -159,9 +198,33 @@ final class PostgresUsageStore implements UsageStore
         return $limits['per_minute'] ?? null;
     }
 
-    /** @return array{per_minute:int,monthly_quota:int}|null */
+    /** @return array{per_minute:int,monthly_quota:int,per_day:?int}|null */
     private function limits(int $projectId): ?array
     {
+        if ($this->perDayColumn !== false) {
+            try {
+                $stmt = $this->pdo->prepare(
+                    'SELECT per_minute, monthly_quota, per_day FROM platform.project_limits WHERE project_id = :id'
+                );
+                $stmt->execute(['id' => $projectId]);
+                $row = $stmt->fetch();
+                $this->perDayColumn = true;
+                if ($row === false) {
+                    return null;
+                }
+
+                return [
+                    'per_minute' => (int) $row['per_minute'],
+                    'monthly_quota' => (int) $row['monthly_quota'],
+                    'per_day' => (int) $row['per_day'],
+                ];
+            } catch (PDOException $e) {
+                if ($this->perDayColumn === true || ($e->getCode() !== '42703' && ! str_contains($e->getMessage(), 'per_day'))) {
+                    throw $e;
+                }
+                $this->perDayColumn = false;
+            }
+        }
         $stmt = $this->pdo->prepare(
             'SELECT per_minute, monthly_quota FROM platform.project_limits WHERE project_id = :id'
         );
@@ -171,7 +234,21 @@ final class PostgresUsageStore implements UsageStore
             return null;
         }
 
-        return ['per_minute' => (int) $row['per_minute'], 'monthly_quota' => (int) $row['monthly_quota']];
+        return [
+            'per_minute' => (int) $row['per_minute'],
+            'monthly_quota' => (int) $row['monthly_quota'],
+            'per_day' => null,
+        ];
+    }
+
+    private function dayUsed(int $projectId, int $now): int
+    {
+        $stmt = $this->pdo->prepare(
+            'SELECT COALESCE(sum(used_count), 0) FROM platform.daily_usage WHERE project_id = :id AND day = :day'
+        );
+        $stmt->execute(['id' => $projectId, 'day' => gmdate('Y-m-d', $now)]);
+
+        return (int) $stmt->fetchColumn();
     }
 
     /** @return array{limit:int,used:int,remaining:int,exhausted:bool,reset_at:int} */
@@ -189,5 +266,10 @@ final class PostgresUsageStore implements UsageStore
     private function nextMonth(int $now): int
     {
         return (int) gmmktime(0, 0, 0, (int) gmdate('n', $now) + 1, 1, (int) gmdate('Y', $now));
+    }
+
+    private function nextDay(int $now): int
+    {
+        return (int) gmmktime(0, 0, 0, (int) gmdate('n', $now), (int) gmdate('j', $now) + 1, (int) gmdate('Y', $now));
     }
 }
