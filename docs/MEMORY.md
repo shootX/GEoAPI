@@ -25,8 +25,8 @@ Posts live in `blog_posts.translations` as `{ka, en}` objects with `title`, `exc
 
 ## 2026-10-20 — Public redesign
 
-The first redesign only recolored the old layout. The follow-up copies the mockup sections. Home styles are `public/assets/public-design.css` (scoped under `.mk`). The cabinet is `/account` with `public/assets/cabinet.css`. Noto Sans Georgian stays self-hosted. `config/electrik.php` still defaults the brand primary to `#285A48`.
+The first redesign only recolored the old layout. Home now follows `docs/mockups/home.html`: the mockup header and footer are inside `.mk`, and the demo is four selects (brand, model, generation, modification) with no year step. The photo stays inside the result card. There is no lightbox. `/demo` still uses `vehicle-picker.js`. Styles are `public/assets/public-design.css`. Noto Sans Georgian stays self-hosted.
 
-The home demo still includes `public/partials/vehicle-picker.blade.php` and `/assets/vehicle-picker.js`. Choosing a modification fills `#vp-card` in place. A photo is requested only when `photo_matches_generation` is true (`model_photos.generation_id` equals the chosen generation). `DemoWatermark` draws one small semi-transparent `GEOAPI.GE` in the corner. The mockup lightbox was not copied. Picker list queries are cached for 120 seconds under `legacy/cache/picker`. Generation dropdown labels are deduped in the browser. Brand and model names are sorted there too, with a short popular-brand list first.
+`/dashboard` and `/account` both render `App\Livewire\Account\Projects` with `public/assets/cabinet.css`. The `/dashboard` route is registered before Electrik's shell. When `CARAPI_CABINET_DEMO=1`, the cabinet shows the mockup sample (დემო პროექტი, 2 140 used, the 30-day bars, ვიჯეტი / სერვერი, and the six catalog cards) instead of the platform database. Leave that flag unset in production. PHPUnit forces it off.
 
-The blog link is omitted from the header and footer while `blog_posts` has no visible row. The route stays. Password reset and email verification still use the public layout. The legacy project desk and `admin.css` were not rebuilt.
+The blog link is omitted from the header and footer of pages that still use the public chrome while `blog_posts` has no visible row. The route stays. The legacy project desk at `/account/projects/{id}` was not rebuilt.

@@ -1,3 +1,22 @@
+.mk {
+    --ink: #091413;
+    --pine: #285A48;
+    --leaf: #408A71;
+    --mint: #B0E4CC;
+    --paper: #ffffff;
+    --wash: #f4faf7;
+    --line: #d7e7df;
+    --muted: #4d6159;
+    --shadow: 0 24px 60px rgba(9, 20, 19, 0.12);
+    --radius: 18px;
+    position: relative;
+    margin: 0;
+    color: var(--ink);
+    background: var(--paper);
+    font-family: "Noto Sans Georgian", "FiraGO", sans-serif;
+    font-size: 16px;
+    line-height: 1.65;
+}
 .mk * { box-sizing: border-box; }
 
 .mk html { scroll-behavior: smooth; }
@@ -250,7 +269,7 @@
 
 .mk .counts { display: flex; gap: 18px; color: var(--muted); font-size: 13px; }
 
-.mk .counts b { display: block; white-space: nowrap; color: var(--ink); font-size: 20px; font-variant-numeric: tabular-nums; }
+.mk .counts b { display: block; color: var(--ink); font-size: 20px; font-variant-numeric: tabular-nums; }
 
 .mk .picker { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
 
@@ -511,8 +530,11 @@
 .mk .price.featured { transform: none; }
 .mk .demo-head { flex-direction: column; align-items: start; }
 .mk .counts { width: 100%; justify-content: space-between; }
-.mk .counts b { white-space: nowrap; }
 .mk .stage { height: auto; display: grid; gap: 12px; }
+.mk .nav { display: none; }
+.mk .header-cta { margin-left: auto; }
+.mk .menu-toggle { display: inline-flex; margin-left: 8px; background: transparent; color: white; border: 1px solid rgba(176,228,204,0.6); border-radius: 10px; min-height: 40px; padding: 0 10px; }
+.mk .nav.open { display: grid; position: absolute; top: 76px; left: 20px; right: 20px; background: #16352b; border-radius: 16px; padding: 12px; }
 .mk .wires { display: none; }
 .mk .code-card, .mk .chip { position: static; width: auto; }
 .mk .chips { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
@@ -521,7 +543,7 @@
 .mk .wrap { width: min(1120px, calc(100% - 28px)); }
 .mk .hero { padding: 104px 0 96px; }
 .mk .section { padding: 64px 0; }
-.mk .counts b { font-size: 16px; white-space: nowrap; }
+.mk .counts b { font-size: 16px; }
 .mk .chips { grid-template-columns: 1fr; }
 }
 

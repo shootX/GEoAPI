@@ -39,5 +39,6 @@
         <env name="CARAPI_CATALOG_ADMIN_DATABASE" value=":memory:"/>
         <env name="CARAPI_CATALOG_ADMIN_USER" value=""/>
         <env name="CARAPI_CATALOG_ADMIN_PASSWORD" value=""/>
+        <env name="CARAPI_CABINET_DEMO" value="false"/>
     </php>
 </phpunit>

@@ -33,7 +33,7 @@
     <meta property="og:image" content="{{ $ogImage }}">
     <meta name="twitter:card" content="{{ $twitterCard }}">
     <meta name="twitter:title" content="{{ $title ?? 'CarAPI' }}">
-    <link rel="stylesheet" href="{{ asset('assets/public-design.css') }}?v=20261020s">
+    <link rel="stylesheet" href="{{ asset('assets/public-design.css') }}?v=20261020t">
     <x-electrik::brand-styles />
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <style>
@@ -63,6 +63,9 @@
     }
 @endphp
 <body class="site min-h-screen text-foreground antialiased {{ $homeNav ? 'is-home' : '' }}">
+    @if ($homeNav)
+        {{ $slot }}
+    @else
     <div class="flex min-h-screen flex-col">
         <header class="site-header {{ $homeNav ? 'is-overlay' : 'is-solid' }}">
             <div class="m-wrap">
@@ -138,6 +141,7 @@
             </div>
         </footer>
     </div>
+    @endif
     <script>
         (function () {
             var toggle = document.querySelector('[data-nav-toggle]');

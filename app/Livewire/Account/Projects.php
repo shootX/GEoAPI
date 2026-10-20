@@ -139,6 +139,7 @@ final class Projects extends Component
         }
         $base = [
             'unavailable' => false,
+            'demo' => false,
             'projects' => [],
             'project' => null,
             'keys' => [],
@@ -149,7 +150,11 @@ final class Projects extends Component
             'perMinute' => 60,
             'days' => $emptyDays,
             'activeKeys' => 0,
+            'cars' => [],
         ];
+        if (filter_var(env('CARAPI_CABINET_DEMO', false), FILTER_VALIDATE_BOOL)) {
+            return $this->demoSnapshot($base);
+        }
         try {
             $pdo = Connection::pdo();
             $repo = new ProjectRepository($pdo);
@@ -254,6 +259,45 @@ final class Projects extends Component
         }
 
         return $days;
+    }
+
+    /** @param array<string, mixed> $base
+     *  @return array<string, mixed>
+     */
+    private function demoSnapshot(array $base): array
+    {
+        $values = [42, 38, 55, 61, 48, 22, 18, 70, 66, 80, 74, 59, 40, 28, 90, 84, 77, 69, 51, 33, 26, 96, 88, 73, 64, 58, 41, 30, 86, 79];
+        $days = [];
+        foreach ($values as $used) {
+            $days[] = ['day' => '', 'used' => $used];
+        }
+        $base['demo'] = true;
+        $base['project'] = ['id' => 1, 'name' => 'დემო პროექტი'];
+        $base['projects'] = [$base['project']];
+        $base['used'] = 2140;
+        $base['limit'] = 10000;
+        $base['remaining'] = 7860;
+        $base['perMinute'] = 60;
+        $base['days'] = $days;
+        $base['activeKeys'] = 2;
+        $base['widget'] = ['public_key' => 'carapi_pk_demo4f2a9c10'];
+        $base['keys'] = [[
+            'id' => 1,
+            'name' => 'სერვერი',
+            'key_selector' => 'demo91ab77e4',
+            'revoked_at' => null,
+            'demo_value' => 'carapi_sk_demo91ab77e4',
+        ]];
+        $base['cars'] = [
+            ['brand' => 'Toyota', 'model' => 'Camry', 'years' => '2017–2024', 'body' => 'სედანი', 'engine' => '2.5 ბენზინი', 'power' => '203 ცხ.ძ.', 'slug' => 'toyota', 'id' => '100'],
+            ['brand' => 'Toyota', 'model' => 'Corolla', 'years' => '2018–2024', 'body' => 'სედანი', 'engine' => '1.8 ბენზინი', 'power' => '140 ცხ.ძ.', 'slug' => 'toyota', 'id' => '110'],
+            ['brand' => 'BMW', 'model' => '3 Series', 'years' => '2019–2024', 'body' => 'სედანი', 'engine' => '2.0 ბენზინი', 'power' => '184 ცხ.ძ.', 'slug' => 'bmw', 'id' => '200'],
+            ['brand' => 'BMW', 'model' => 'X5', 'years' => '2018–2024', 'body' => 'ჯიპი', 'engine' => '3.0 ბენზინი', 'power' => '340 ცხ.ძ.', 'slug' => 'bmw', 'id' => '210'],
+            ['brand' => 'Mercedes-Benz', 'model' => 'C-Class', 'years' => '2021–2024', 'body' => 'სედანი', 'engine' => '1.5 ბენზინი', 'power' => '204 ცხ.ძ.', 'slug' => 'mercedes-benz', 'id' => '300'],
+            ['brand' => 'Hyundai', 'model' => 'Tucson', 'years' => '2020–2024', 'body' => 'ჯიპი', 'engine' => '2.0 ბენზინი', 'power' => '156 ცხ.ძ.', 'slug' => 'hyundai', 'id' => '400'],
+        ];
+
+        return $base;
     }
 
     private function legacyId(): int

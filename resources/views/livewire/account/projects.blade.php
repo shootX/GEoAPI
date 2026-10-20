@@ -6,8 +6,8 @@
         $max = max($max, (int) $day['used']);
     }
     $quota = $limit > 0 ? min(100, round(($used / $limit) * 100, 1)) : 0;
-    $who = trim((string) (auth()->user()->name ?? auth()->user()->email ?? ''));
     $plan = $en ? 'Free' : 'უფასო';
+    $who = (string) ($project['name'] ?? ($en ? 'Project' : 'პროექტი'));
 @endphp
 <div>
 <div class="app">
@@ -40,7 +40,7 @@
                 <section class="panel">
                     <h2>{{ $en ? 'Monthly quota' : 'თვიური კვოტა' }}</h2>
                     <div class="quota" aria-label="{{ $fmt($used) }} / {{ $fmt($limit) }}"><span style="width: {{ $quota }}%"></span></div>
-                    <p class="muted" style="margin-top:8px">{{ $fmt($used) }} / {{ $fmt($limit) }}. {{ $en ? 'Free plan, per project.' : 'უფასო გეგმა, პროექტზე.' }}</p>
+                    <p class="muted" style="margin-top:8px">{{ $en ? $fmt($used).' successful requests of '.$fmt($limit).'. Free plan, per project.' : $fmt($used).' წარმატებული მოთხოვნა '.$fmt($limit).'-დან. უფასო გეგმა, პროექტზე.' }}</p>
                 </section>
                 <section class="panel">
                     <h2>{{ $en ? 'Requests in the last 30 days' : 'მოთხოვნები ბოლო 30 დღეში' }}</h2>
@@ -50,26 +50,6 @@
                             <rect x="{{ 12 + $index * 19 }}" y="{{ 165 - $h }}" width="14" height="{{ $h }}" rx="3"></rect>
                         @endforeach
                     </svg>
-                </section>
-                <section class="panel">
-                    <h2>{{ $en ? 'Project' : 'პროექტი' }}</h2>
-                    @if ($projects !== [])
-                        <div class="row" style="margin-bottom:12px">
-                            @foreach ($projects as $row)
-                                <button type="button" class="btn {{ (int) $row['id'] === (int) ($project['id'] ?? 0) ? 'pine' : '' }}" wire:click="selectProject({{ (int) $row['id'] }})">{{ $row['name'] }}</button>
-                            @endforeach
-                            @if ($project)
-                                <a class="btn" href="{{ url('/account/projects/'.$project['id']) }}">{{ $en ? 'Open desk' : 'სრული გვერდი' }}</a>
-                            @endif
-                        </div>
-                    @endif
-                    <form wire:submit="create" class="row">
-                        <label>{{ $en ? 'Name' : 'სახელი' }}<input wire:model="name" required maxlength="120"></label>
-                        <label>{{ $en ? 'Website' : 'საიტი' }}<input wire:model="website_url" placeholder="https://example.com"></label>
-                        <button class="btn pine" type="submit">{{ $en ? 'Create' : 'შექმნა' }}</button>
-                    </form>
-                    @error('name') <p class="err">{{ $message }}</p> @enderror
-                    @error('website_url') <p class="err">{{ $message }}</p> @enderror
                 </section>
             </section>
 
@@ -93,20 +73,30 @@
                         <article class="key">
                             <div class="key-row"><strong>{{ $en ? 'Widget' : 'ვიჯეტი' }}</strong><span class="pill">{{ $en ? 'Public' : 'საჯარო' }}</span><span class="pill">{{ $en ? 'Active' : 'აქტიური' }}</span></div>
                             <code>{{ $widget['public_key'] }}</code>
+                            <div class="key-row"><button class="btn copy" type="button" data-copy="{{ $widget['public_key'] }}">{{ $en ? 'Copy' : 'კოპირება' }}</button><button class="btn" type="button">{{ $en ? 'Revoke' : 'გაუქმება' }}</button></div>
                         </article>
                     @endif
                     @foreach ($keys as $key)
-                        @php $off = ($key['revoked_at'] ?? null) !== null; @endphp
+                        @php
+                            $off = ($key['revoked_at'] ?? null) !== null;
+                            $secret = (string) ($key['demo_value'] ?? ('carapi_sk_'.($key['key_selector'] ?? '')));
+                            $masked = mb_substr($secret, 0, 12).'••••••••';
+                        @endphp
                         <article class="key">
                             <div class="key-row">
                                 <strong>{{ $key['name'] }}</strong>
                                 <span class="pill">{{ $en ? 'Secret' : 'საიდუმლო' }}</span>
                                 <span class="pill {{ $off ? 'off' : '' }}">{{ $off ? ($en ? 'Revoked' : 'გაუქმებული') : ($en ? 'Active' : 'აქტიური') }}</span>
                             </div>
-                            <code>carapi_sk_{{ substr((string) $key['key_selector'], 0, 8) }}••••</code>
+                            <code>{{ $masked }}</code>
                             @unless ($off)
                                 <div class="key-row">
-                                    <button class="btn" type="button" wire:click="revokeKey({{ (int) $key['id'] }})">{{ $en ? 'Revoke' : 'გაუქმება' }}</button>
+                                    <button class="btn copy" type="button" data-copy="{{ $secret }}">{{ $en ? 'Copy' : 'კოპირება' }}</button>
+                                    @if (empty($demo))
+                                        <button class="btn" type="button" wire:click="revokeKey({{ (int) $key['id'] }})">{{ $en ? 'Revoke' : 'გაუქმება' }}</button>
+                                    @else
+                                        <button class="btn" type="button">{{ $en ? 'Revoke' : 'გაუქმება' }}</button>
+                                    @endif
                                 </div>
                             @endunless
                         </article>
@@ -135,17 +125,19 @@
                             <li>{{ $en ? 'A higher limit will be announced' : 'გაზრდილი ლიმიტი გამოცხადდება' }}</li>
                             <li>{{ $en ? 'Not for sale yet' : 'ჯერ არ იყიდება' }}</li>
                         </ul>
-                        <form method="post" action="{{ route('coming-soon.store') }}">
-                            @csrf
-                            <label>{{ __('Email') }}<input type="email" name="email" required value="{{ auth()->user()->email }}"></label>
-                            <button class="btn" type="submit" style="margin-top:8px">{{ __('Notify me at launch') }}</button>
-                        </form>
                     </article>
                 </div>
             </section>
 
             <section class="screen" id="catalog">
-                <div class="grid" id="catalog-grid"></div>
+                <div class="grid" id="catalog-grid">
+                    @foreach ($cars as $car)
+                        <button class="card" type="button" data-car="{{ json_encode($car, JSON_UNESCAPED_UNICODE) }}">
+                            <div class="shot"><svg viewBox="0 0 160 72" fill="none" stroke="#285A48" stroke-width="2.2"><path d="M14 46h132l-10-18a8 8 0 0 0-7-4H34a8 8 0 0 0-7 4L14 46z"/><path d="M28 46v6M132 46v6"/><circle cx="42" cy="52" r="7" fill="#B0E4CC"/><circle cx="118" cy="52" r="7" fill="#B0E4CC"/></svg><span class="watermark">GEOAPI.GE</span></div>
+                            <div class="body"><strong>{{ $car['brand'] }} {{ $car['model'] }}</strong><p class="muted">{{ $car['years'] }} · {{ $car['body'] }}</p></div>
+                        </button>
+                    @endforeach
+                </div>
                 <p class="muted" id="catalog-note" hidden></p>
             </section>
         </div>
@@ -182,6 +174,13 @@
             const open = side.classList.toggle('open');
             menu.setAttribute('aria-expanded', open ? 'true' : 'false');
         });
+        document.querySelectorAll('.copy').forEach(function (button) {
+            button.addEventListener('click', function () {
+                const value = button.getAttribute('data-copy') || '';
+                if (navigator.clipboard) navigator.clipboard.writeText(value);
+                button.textContent = @json($en ? 'Copied' : 'დაკოპირდა');
+            });
+        });
         const car = '<svg viewBox="0 0 160 72" fill="none" stroke="#285A48" stroke-width="2.2"><path d="M14 46h132l-10-18a8 8 0 0 0-7-4H34a8 8 0 0 0-7 4L14 46z"/><path d="M28 46v6M132 46v6"/><circle cx="42" cy="52" r="7" fill="#B0E4CC"/><circle cx="118" cy="52" r="7" fill="#B0E4CC"/></svg><span class="watermark">GEOAPI.GE</span>';
         const grid = document.getElementById('catalog-grid');
         const note = document.getElementById('catalog-note');
@@ -197,7 +196,14 @@
         function openDrawer(item) {
             document.getElementById('drawer-shot').innerHTML = car;
             document.getElementById('drawer-title').textContent = item.brand + ' ' + item.model;
-            const specs = [['{{ $en ? 'Brand' : 'მარკა' }}', item.brand], ['{{ $en ? 'Model' : 'მოდელი' }}', item.model]];
+            const specs = [
+                ['{{ $en ? 'Brand' : 'მარკა' }}', item.brand],
+                ['{{ $en ? 'Model' : 'მოდელი' }}', item.model],
+                ['{{ $en ? 'Years' : 'წლები' }}', item.years || ''],
+                ['{{ $en ? 'Body' : 'ძარა' }}', item.body || ''],
+                ['{{ $en ? 'Engine' : 'ძრავი' }}', item.engine || ''],
+                ['{{ $en ? 'Power' : 'სიმძლავრე' }}', item.power || '']
+            ].filter(function (pair) { return pair[1] !== ''; });
             const list = document.getElementById('drawer-specs');
             list.innerHTML = '';
             specs.forEach(function (pair) {
@@ -207,13 +213,25 @@
                 wrap.querySelector('dd').textContent = pair[1];
                 list.appendChild(wrap);
             });
-            const url = 'GET /api/picker/brands/' + item.brandId + '/models';
+            const slug = item.slug || item.brandId;
+            const url = slug ? 'GET /api/v1/brands/' + slug + '/models' : '';
             document.getElementById('drawer-url').textContent = url;
-            document.getElementById('drawer-json').textContent = JSON.stringify({ data: [{ id: item.modelId, name: item.model }] }, null, 2);
+            const modelId = item.id || item.modelId;
+            const modelSlug = String(item.model || '').toLowerCase().replace(/\s+/g, '-');
+            document.getElementById('drawer-json').textContent = JSON.stringify({
+                data: [{ id: String(modelId), slug: modelSlug, name: item.model }],
+                meta: { page: 1, per_page: 50, total: 1 }
+            }, null, 2);
             drawer.classList.add('open');
             back.classList.add('open');
             drawer.setAttribute('aria-hidden', 'false');
         }
+        grid.querySelectorAll('[data-car]').forEach(function (button) {
+            button.addEventListener('click', function () {
+                openDrawer(JSON.parse(button.getAttribute('data-car')));
+            });
+        });
+        if (grid.children.length) return;
         fetch('/api/picker/brands?page=1&per_page=8', { headers: { Accept: 'application/json' } })
             .then(function (response) { if (!response.ok) throw new Error('fail'); return response.json(); })
             .then(function (payload) {
