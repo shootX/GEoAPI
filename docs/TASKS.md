@@ -56,3 +56,9 @@
 - [x] Resources include `modified` (`updated_at`). `modified_after` filters newer rows.
 - [x] `/api/v1/docs` renders Redoc from `/api/v1/openapi.json`. `/api/v1/postman.json` is the collection. `/guide` has cURL, JavaScript, Node, Python, and PHP samples.
 - [ ] Owner: from `/www/wwwroot/car.socialsave.cc`, run `php artisan migrate --force` as the catalog table owner (`CARAPI_CATALOG_ADMIN_USER`) with `CARAPI_PLATFORM_*` set. Do not use `carapi_catalog_reader` for that command. No new PHP-FPM variable is required. Until `platform.project_limits.per_day` exists, the daily cap is not enforced.
+
+## 2026-10-20 — Auto-deploy
+
+- [x] `.github/workflows/deploy.yml` runs PHPUnit on push to `main`, then SSHes with `DEPLOY_HOST`, `DEPLOY_USER`, `DEPLOY_SSH_KEY`, and optional `DEPLOY_PORT`.
+- [x] The remote script deploys `/www/wwwroot/car.socialsave.cc` and runs `php artisan up` if a later command fails. Concurrency group `production-deploy` does not cancel an in-progress deploy. The workflow does not edit `.env`.
+- [ ] Owner: one-time setup in `docs/DEPLOY.md` (deploy key, `authorized_keys`, the four secrets, remote `shootX/GEoAPI`, `safe.directory`, owner `www`).
