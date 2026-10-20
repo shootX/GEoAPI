@@ -18,7 +18,7 @@ production-ის სამივე დროშა ჩართულია. S
 | `CARAPI_MAIL_FROM_ADDRESS` | გამგზავნის მისამართი |
 | `CARAPI_MAIL_FROM_NAME` | გამგზავნის სახელი |
 
-SMTP იყენებს PHPMailer 6.12-ს, TLS სერტიფიკატის შემოწმებით, timeout 10 წამი, debug გამორთული. არასრული კონფიგურაცია fake transport-ზე არ გადადის.
+SMTP არის `src/Platform/SmtpMailer.php`-ში, PHPMailer-ის გარეშე. TLS სერტიფიკატი მოწმდება, timeout 10 წამია, საუბარი პასუხში არ იბეჭდება. არასრული კონფიგურაცია fake transport-ზე არ გადადის.
 
 2026-09-26: `mail.socialsave.cc` ამავე სერვერის `161.97.78.24`-ია. 587 პორტს ემსახურება Postfix (`submission`). aaPanel-ის ფოსტის მოდული ამ Postfix-ს აყენებს. ადრე STARTTLS თვითხელმოწერილ `vmi3595454.contaboserver.net` სერტიფიკატს იძლეოდა. ახლა Postfix იყენებს უკვე არსებულ Let's Encrypt სერტიფიკატს: გამცემი YR1, CN `*.socialsave.cc`, SAN `*.socialsave.cc` და `socialsave.cc`, მოქმედია 2026-12-22-მდე. სრული ჯაჭვი SMTP სერვისზეა მიბმული. OpenSSL `-verify_return_error` ამ სახელზე წარმატებულია, უცხო სახელზე კი hostname mismatch-ით ეცემა. PHP-ის საცავითაც, `verify_peer` და `verify_peer_name` ჩართული, STARTTLS გადის. სერტიფიკატის შემოწმება არ გამორთულა. AUTH და წერილი არ გაშვებულა.
 

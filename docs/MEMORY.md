@@ -1,5 +1,13 @@
 # Memory
 
+## 2026-10-20 — QA audit, critical
+
+The live host is Laravel Electrik (`/opt/carapi-electrik`), not this repository. Electrik's `APP_DEBUG` still prints stack traces until that server sets `APP_DEBUG=false`. This repo only controls its own front controller and the legacy `Session` / `SmtpMailer` files Electrik includes.
+
+`.env.example` had a non-empty `CARAPI_MAIL_PASSWORD`. It is cleared in git. The mailbox password should be rotated because the old value remains in git history. The real value belongs only in `/www/server/carapi/mail.env`.
+
+Verification mail failure no longer aborts registration. The account page asks the user to resend. Secret keys still require a verified email.
+
 ## 2026-10-20 — Vehicle picker
 
 The catalog tables do not use `year_from` / `year_to` or a 55-column spec table. Years are `year_start` and `year_end`. Generation code is `chassis_code`. Specs live in `modification_specs.specs` (jsonb). Equipment columns are `category`, `name`, `status` (`included`, `option`, `not_available`), and `value`. `model_photos` is one row per model (`model_id` primary key) with `image bytea`, `mime`, and `verified`.

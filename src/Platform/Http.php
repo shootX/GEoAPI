@@ -76,7 +76,29 @@ final class Http
                 '/reset-password' => self::reset($method),
                 default => self::notFound(),
             };
-        } catch (UnavailableException | PDOException) {
+        } catch (PDOException $e) {
+            error_log('[platform] request failed');
+            if (\Carapi\Http\Failure::uniqueViolation($e)) {
+                if (self::wantsJson()) {
+                    self::json(409, ['ok' => false, 'error' => 'conflict']);
+
+                    return;
+                }
+                http_response_code(409);
+                header('Content-Type: text/html; charset=utf-8');
+                echo \Carapi\SiteChrome::start('კონფლიქტი');
+                echo '<main id="content" class="wrap"><p>ეს მნიშვნელობა უკვე გამოყენებულია.</p></main>';
+                echo \Carapi\SiteChrome::end();
+
+                return;
+            }
+            if (self::wantsJson()) {
+                self::json(503, ['ok' => false, 'error' => 'unavailable']);
+
+                return;
+            }
+            View::unavailable();
+        } catch (UnavailableException) {
             error_log('[platform] request failed');
             if (self::wantsJson()) {
                 self::json(503, ['ok' => false, 'error' => 'unavailable']);
@@ -197,14 +219,19 @@ final class Http
 
             return;
         }
+        $mailFailed = false;
         try {
             $token = (new Tokens(Connection::pdo()))->issue((int) $result['id'], 'verify_email', UserRepository::email((string) $input['email']));
             Mail::make()->send(UserRepository::email((string) $input['email']), 'ელფოსტის დადასტურება', Mail::appUrl() . '/email/verify?token=' . $token);
         } catch (\Throwable $e) {
             error_log('[platform] verification mail failed ' . $e::class);
+            $mailFailed = true;
         }
         $created = (new UserRepository(Connection::pdo()))->findActive((int) $result['id']);
         Session::login((int) $result['id'], (int) ($created['auth_version'] ?? 1));
+        if ($mailFailed) {
+            $_SESSION['verify_mail_failed'] = 1;
+        }
         if (self::wantsJson()) {
             $row = $users->findActive((int) $result['id']);
             self::json(201, ['ok' => true, 'user' => $row === null ? [] : self::publicUser($row)]);
@@ -253,7 +280,12 @@ final class Http
 
             return;
         }
-        View::account($user, $projects->forUser((int) $user['id']), [], []);
+        $errors = [];
+        if (!empty($_SESSION['verify_mail_failed'])) {
+            unset($_SESSION['verify_mail_failed']);
+            $errors['form'] = 'ანგარიში შეიქმნა, მაგრამ დადასტურების წერილი ვერ გაიგზავნა. სცადეთ ხელახლა გაგზავნა.';
+        }
+        View::account($user, $projects->forUser((int) $user['id']), $errors, []);
     }
 
     private static function admin(string $method): void
@@ -808,8 +840,8 @@ final class Http
         try {
             $token = (new Tokens(Connection::pdo()))->issue((int) $user['id'], 'verify_email', (string) $user['email']);
                 Mail::make()->send((string) $user['email'], 'ელფოსტის დადასტურება', "დაადასტურეთ CarAPI ანგარიშის ელფოსტა ამ ბმულით. ბმული 24 საათი მოქმედებს.\n" . Mail::appUrl() . '/email/verify?token=' . $token);
-        } catch (UnavailableException) {
-            error_log('[platform] verification mail failed');
+        } catch (\Throwable $e) {
+            error_log('[platform] verification mail failed ' . $e::class);
             View::account($user, (new ProjectRepository(Connection::pdo()))->forUser((int) $user['id']), ['form' => 'დადასტურების წერილი ვერ გაიგზავნა. სცადეთ მოგვიანებით.'], []);
 
             return;
@@ -879,8 +911,8 @@ final class Http
             try {
                 $token = $tokens->issue((int) $row['id'], 'reset_password', (string) $row['email']);
                 Mail::make()->send((string) $row['email'], 'პაროლის აღდგენა', "პაროლის აღდგენის ბმული 30 წუთი მოქმედებს. თუ აღდგენა თქვენ არ მოგითხოვიათ, ამ წერილს არ უპასუხოთ.\n" . Mail::appUrl() . '/reset-password?token=' . $token);
-            } catch (UnavailableException) {
-                error_log('[platform] reset mail failed');
+            } catch (\Throwable $e) {
+                error_log('[platform] reset mail failed ' . $e::class);
             }
         }
         View::forgot(['form' => $message], true);

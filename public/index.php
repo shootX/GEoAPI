@@ -43,6 +43,8 @@ if (is_file($composer)) {
     });
 }
 
+\Carapi\Http\Failure::install();
+
 $uriPath = parse_url($_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH) ?: '/';
 $apiPath = rtrim($uriPath, '/') ?: '/';
 if (str_starts_with(strtolower($apiPath), '/widget/v1/') && !str_ends_with(strtolower($apiPath), '.js')) {

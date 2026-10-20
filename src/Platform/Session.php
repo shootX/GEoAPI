@@ -22,7 +22,12 @@ final class Session
             || (($_SERVER['HTTP_X_FORWARDED_PROTO'] ?? '') === 'https');
 
         session_save_path($path);
+        $configured = session_name();
+        foreach (['carapi_platform', 'carapi-session', 'PHPSESSID', is_string($configured) ? $configured : ''] as $cookieName) {
+            self::dropIllegalCookie($cookieName);
+        }
         session_name('carapi_platform');
+        self::dropIllegalCookie('carapi_platform');
         session_set_cookie_params([
             'lifetime' => 0,
             'path' => '/',
@@ -30,8 +35,52 @@ final class Session
             'httponly' => true,
             'samesite' => 'Lax',
         ]);
-        session_start();
+        if (!self::startNative()) {
+            unset($_COOKIE['carapi_platform']);
+            session_id(bin2hex(random_bytes(16)));
+            if (!self::startNative()) {
+                throw new UnavailableException();
+            }
+        }
         self::expire();
+    }
+
+    /**
+     * Laravel's encrypted session cookie is longer than a PHP session id.
+     * Reading it as carapi_platform makes session_start fail inside Electrik.
+     */
+    private static function dropIllegalCookie(string $name): void
+    {
+        if ($name === '' || !array_key_exists($name, $_COOKIE)) {
+            return;
+        }
+        $value = $_COOKIE[$name];
+        if (!is_string($value) || preg_match('/^[a-zA-Z0-9,-]{1,128}$/', $value) !== 1) {
+            unset($_COOKIE[$name]);
+        }
+    }
+
+    private static function startNative(): bool
+    {
+        $previous = set_error_handler(static function (int $severity, string $message, string $file, int $line) use (&$previous): bool {
+            if (str_contains($message, 'Session ID')) {
+                return true;
+            }
+            if ($previous !== null) {
+                return (bool) $previous($severity, $message, $file, $line);
+            }
+
+            return false;
+        });
+        try {
+            return session_start();
+        } finally {
+            if ($previous !== null) {
+                set_error_handler($previous);
+            } else {
+                restore_error_handler();
+            }
+        }
     }
 
     public static function csrf(): string
