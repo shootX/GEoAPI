@@ -1,0 +1,4 @@
+# Front controller for Apache (requires mod_rewrite + AllowOverride All).
+RewriteEngine On
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteRule ^ index.php [QSA,L]

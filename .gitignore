@@ -1,0 +1,7 @@
+/vendor/
+/cache/
+/data/
+composer.lock
+.env
+.DS_Store
+/tests/browser/node_modules/

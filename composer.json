@@ -1,0 +1,27 @@
+{
+    "name": "anovo/carapi",
+    "description": "Free, open car-image API returning real Wikimedia Commons photographs by make/model — an imagin.studio-compatible drop-in, no renders, no API keys",
+    "type": "project",
+    "license": "MIT",
+    "homepage": "https://anovo.ge",
+    "authors": [
+        {
+            "name": "Anovo.Ge",
+            "homepage": "https://anovo.ge"
+        }
+    ],
+    "require": {
+        "php": ">=8.2",
+        "ext-mbstring": "*",
+        "ext-json": "*",
+        "phpmailer/phpmailer": "^6.9"
+    },
+    "autoload": {
+        "psr-4": {
+            "Carapi\\": "src/"
+        }
+    },
+    "scripts": {
+        "serve": "php -S localhost:8080 -t public public/index.php"
+    }
+}

@@ -1,0 +1,79 @@
+@font-face {
+  font-family: "FiraGO";
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("firago-400.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "FiraGO";
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url("firago-500.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "FiraGO";
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url("firago-600.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "FiraGO";
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url("firago-700.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "FiraGO";
+  font-style: normal;
+  font-weight: 800;
+  font-display: swap;
+  src: url("firago-800.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "Fira Sans";
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("firago-400.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "Fira Sans";
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url("firago-500.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "Fira Sans";
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url("firago-600.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "Fira Sans";
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url("firago-700.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "Fira Sans";
+  font-style: normal;
+  font-weight: 800;
+  font-display: swap;
+  src: url("firago-800.woff2") format("woff2");
+}
