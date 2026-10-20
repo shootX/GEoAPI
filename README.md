@@ -96,19 +96,9 @@ actual photo of the car instead of a render — and a **licence you must respect
 
 ## Attribution & licensing (important)
 
-The **code** in this repository is proprietary and commercial. No one else is
-granted the right to use it. The **photos** are not part of that code: they come from
-Wikimedia Commons under their own licences — mostly Creative Commons
-(CC BY / CC BY-SA) and public domain.
-
-- Every successful response carries `author`, `license` and a ready-made,
-  human-readable `attribution` string (in JSON and in the `X-Image-Attribution`
-  header — preserved even on redirects).
-- **If the licence is CC BY or CC BY-SA, you must display the attribution**
-  wherever you show the image (a caption or a credits page is fine).
-- Public-domain images (`Public domain`, `CC0`) need no credit.
-- The `reference` field is the Wikidata entity id (e.g. `Q1470103`) if you want
-  to link back or fetch more.
+The **code, materials, and information** in this repository are the exclusive
+property of the copyright holder. They were created with artificial intelligence
+and verified by the copyright holder. No one else is granted the right to use them.
 
 ## How it works
 
@@ -202,6 +192,4 @@ src/Cache/FilesystemCache.php local-directory cache (the default)
 
 ## License
 
-- Code: proprietary, all rights reserved — [LICENSE](LICENSE) © [Anovo.Ge](https://anovo.ge)
-- Photos: © their respective authors, via Wikimedia Commons, under the licence
-  stated in each response — attribution required where the licence says so.
+- Code, materials, and information: proprietary, all rights reserved — [LICENSE](LICENSE) © shootX. Created with artificial intelligence and verified by the copyright holder. No one else may use them.

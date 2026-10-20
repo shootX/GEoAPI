@@ -1,6 +1,6 @@
 {
     "name": "anovo/carapi",
-    "description": "Commercial car-image API returning real Wikimedia Commons photographs by make/model — an imagin.studio-compatible drop-in, no renders, no API keys",
+    "description": "Commercial car-image API. Code, materials, and information are the copyright holder's property.",
     "type": "project",
     "license": "proprietary",
     "homepage": "https://anovo.ge",
