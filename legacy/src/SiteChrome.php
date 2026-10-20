@@ -9,7 +9,7 @@ final class SiteChrome
     public static function assets(): string
     {
         return '<link rel="stylesheet" href="/assets/fonts/fonts.css?v=20261018">'
-            . '<link rel="stylesheet" href="/assets/site.css?v=20261018i">';
+            . '<link rel="stylesheet" href="/assets/site.css?v=20261020r">';
     }
 
     public static function logo(string $href = '/'): string

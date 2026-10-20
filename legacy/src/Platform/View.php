@@ -1001,7 +1001,7 @@ JS;
             . '<title>' . self::e($heading) . ' — CarAPI ადმინი</title>'
             . '<link rel="icon" href="/assets/brand/favicon-32-lime.svg" type="image/svg+xml">'
             . '<link rel="stylesheet" href="/assets/fonts/fonts.css?v=20261018">'
-            . '<link rel="stylesheet" href="/assets/admin.css?v=20261018c"></head><body class="admin-app">';
+            . '<link rel="stylesheet" href="/assets/admin.css?v=20261020r"></head><body class="admin-app">';
         echo '<a class="admin-skip" href="#admin-content">შინაარსზე გადასვლა</a>';
         echo '<header class="admin-bar"><button class="admin-menu" type="button" aria-expanded="false" aria-controls="admin-nav">მენიუ</button>'
             . '<p class="admin-brand">CarAPI <span>ადმინი</span></p><h1>' . self::e($heading) . '</h1>'

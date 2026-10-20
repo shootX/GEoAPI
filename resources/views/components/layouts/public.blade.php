@@ -36,31 +36,33 @@
     <x-electrik::brand-styles />
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <style>
-        article section { border: 1px solid var(--border); border-radius: 0.75rem; padding: 1.25rem; }
-        article h1 { font-size: 1.875rem; font-weight: 600; letter-spacing: -0.02em; }
+        article section { border: 1px solid var(--slate-border, #d7e7df); border-radius: 0.75rem; padding: 1.25rem; background: #fff; }
+        article h1 { font-size: 1.875rem; font-weight: 800; letter-spacing: -0.02em; color: #091413; }
         article h2 { margin-top: 1rem; font-size: 1.05rem; font-weight: 600; }
-        article p, article li { margin-top: 0.75rem; color: var(--muted-foreground); }
+        article p, article li { margin-top: 0.75rem; color: var(--slate-muted-foreground, #3d564c); }
         article a { text-decoration: underline; text-underline-offset: 4px; }
         article table { width: 100%; margin-top: 0.75rem; border-collapse: collapse; }
         article th, article td { padding: 0.45rem 0.75rem 0.45rem 0; text-align: left; vertical-align: top; }
         article code { font-size: 0.85em; }
     </style>
 </head>
-<body class="site min-h-screen bg-white text-foreground antialiased">
+<body class="site min-h-screen text-foreground antialiased">
     <div class="flex min-h-screen flex-col">
-        <header class="border-b border-border">
+        <header class="site-bar">
             <div class="mx-auto flex h-16 max-w-6xl items-center gap-2 px-4 sm:px-6">
-                <a href="{{ url('/') }}" class="flex shrink-0 items-center gap-2 text-base font-extrabold tracking-tight">
-                    <span class="size-5 rounded-md bg-primary"></span>
+                <a href="{{ url('/') }}" class="flex shrink-0 items-center gap-2 text-base font-extrabold tracking-tight text-white">
+                    <span class="site-mark size-5 rounded-md"></span>
                     CarAPI
                 </a>
                 <div class="ml-auto flex items-center gap-2">
-                    <nav class="hidden items-center gap-3 text-sm min-[761px]:flex" aria-label="{{ __('Documentation') }}">
-                        <a href="{{ url('/guide') }}" class="font-semibold text-muted-foreground hover:text-foreground">{{ __('Documentation') }}</a>
+                    <nav class="hidden items-center gap-4 text-sm min-[761px]:flex" aria-label="{{ __('Documentation') }}">
+                        <a href="{{ url('/guide') }}" class="site-link">{{ __('Documentation') }}</a>
+                        <a href="{{ route('pricing') }}" class="site-link">{{ __('Pricing') }}</a>
+                        <a href="{{ url('/blog') }}" class="site-link">{{ __('Blog') }}</a>
                         @auth
-                            <a href="{{ url('/account') }}" class="font-semibold text-muted-foreground hover:text-foreground">{{ __('Cabinet') }}</a>
+                            <a href="{{ url('/account') }}" class="site-link">{{ __('Cabinet') }}</a>
                         @else
-                            <a href="{{ route('login') }}" class="font-semibold text-muted-foreground hover:text-foreground">{{ __('Sign in') }}</a>
+                            <a href="{{ route('login') }}" class="site-link">{{ __('Sign in') }}</a>
                         @endauth
                     </nav>
                     @include('components.locale-switch')
@@ -81,9 +83,10 @@
                     </button>
                 </div>
             </div>
-            <nav id="site-menu" hidden class="border-t border-border px-4 py-2 min-[761px]:hidden">
+            <nav id="site-menu" hidden class="border-t px-4 py-2 min-[761px]:hidden">
                 <a href="{{ url('/guide') }}" class="block py-3 text-sm font-semibold">{{ __('Documentation') }}</a>
                 <a href="{{ route('pricing') }}" class="block py-3 text-sm font-semibold">{{ __('Pricing') }}</a>
+                <a href="{{ url('/blog') }}" class="block py-3 text-sm font-semibold">{{ __('Blog') }}</a>
                 @auth
                     <a href="{{ url('/account') }}" class="block py-3 text-sm font-semibold">{{ __('Cabinet') }}</a>
                 @else
@@ -92,10 +95,10 @@
                 @endauth
             </nav>
         </header>
-        <main class="mx-auto w-full min-w-0 max-w-6xl flex-1 px-4 py-12 sm:px-6 md:py-24">
+        <main class="site-main mx-auto w-full min-w-0 max-w-6xl flex-1 px-4 py-12 sm:px-6 md:py-16 {{ !empty($bleed) ? 'is-bleed' : '' }}">
             {{ $slot }}
         </main>
-        <footer class="border-t border-border">
+        <footer class="site-foot">
             <div class="mx-auto flex max-w-6xl flex-col gap-4 px-4 py-8 text-sm sm:flex-row sm:items-center sm:justify-between sm:px-6">
                 <p class="text-muted-foreground">© {{ date('Y') }} CarAPI</p>
                 <nav class="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:gap-x-5" aria-label="{{ __('Contact') }}">

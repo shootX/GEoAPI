@@ -528,6 +528,8 @@
     "Page not found": "გვერდი ვერ მოიძებნა",
     "That address does not exist.": "ეს მისამართი არ არსებობს.",
     "Back to the home page": "მთავარზე დაბრუნება",
+    "Forbidden": "წვდომა აკრძალულია",
+    "You do not have access to that page.": "ამ გვერდზე წვდომა არ გაქვთ.",
     "Password must be at least 15 characters.": "პაროლი მინიმუმ 15 სიმბოლოა.",
     "Show password": "პაროლის ჩვენება",
     "We have emailed your password reset link.": "პაროლის აღდგენის ბმული ელფოსტაზე გაიგზავნა.",

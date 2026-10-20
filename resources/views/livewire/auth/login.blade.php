@@ -1,4 +1,4 @@
-<div>
+<div class="mx-auto w-full max-w-md">
     <x-slate::card>
         <x-slate::card-header>
             <x-slate::card-title>{{ __('Sign in') }}</x-slate::card-title>

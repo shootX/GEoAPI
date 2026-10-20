@@ -11,7 +11,7 @@
     <title>{{ $heading }} — CarAPI ადმინი</title>
     <link rel="icon" href="/assets/brand/favicon-32-lime.svg" type="image/svg+xml">
     <link rel="stylesheet" href="/assets/fonts/fonts.css?v=20261018">
-    <link rel="stylesheet" href="/assets/admin.css?v=20261018c">
+    <link rel="stylesheet" href="/assets/admin.css?v=20261020r">
 </head>
 <body class="admin-app">
     <a class="admin-skip" href="#admin-content">შინაარსზე გადასვლა</a>

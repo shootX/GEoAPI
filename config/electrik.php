@@ -22,7 +22,7 @@ return [
     'branding' => [
         'logo_url' => env('ELECTRIK_LOGO_URL'),
         'logo_dark_url' => env('ELECTRIK_LOGO_DARK_URL'),
-        'primary' => env('ELECTRIK_BRAND_PRIMARY'),
+        'primary' => env('ELECTRIK_BRAND_PRIMARY', '#285A48'),
         'show_powered_by' => filter_var(env('ELECTRIK_SHOW_POWERED_BY', true), FILTER_VALIDATE_BOOL),
     ],
 
