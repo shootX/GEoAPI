@@ -37,7 +37,7 @@ final class OpenApi
             'info' => [
                 'title' => 'CarAPI Admin',
                 'version' => '1.0.0',
-                'description' => 'ადმინის API. ავტორიზაცია: Authorization: Bearer {token}. ტოკენს სჭირდება abilities: ["*"] და მომხმარებლის როლი admin. pages-ის გამოქვეყნებული slug ცვლის ჩაშენებულ საჯარო გვერდს. ცარიელი სია ნიშნავს, რომ ჩანს კოდის გვერდი. model-photos-ის გზის id არის model_id. equipment-ის სიას სჭირდება modification_id. generations იღებს model_id და brand_id ფილტრს.',
+                'description' => 'ადმინის API. ავტორიზაცია: Authorization: Bearer {token}. ტოკენს სჭირდება abilities: ["*"] და მომხმარებლის როლი admin. pages-ის გამოქვეყნებული slug ცვლის ჩაშენებულ საჯარო გვერდს. ცარიელი სია ნიშნავს, რომ ჩანს კოდის გვერდი. model-photos-ის გზის id არის model_id. equipment-ის სიას სჭირდება modification_id. generations იღებს model_id და brand_id ფილტრს. ბლოგი: /api/admin/blog/posts, /categories, /tags. სტატუსი draft, published ან scheduled. scheduled-ს სჭირდება publish_at. სლაგი ცარიელი რომ იყოს, სათაურიდან ივსება. ყდა: POST /api/admin/blog/posts/{id}/cover.',
             ],
             'servers' => [
                 ['url' => rtrim((string) config('app.url'), '/')],
@@ -72,6 +72,48 @@ final class OpenApi
                             'title' => ['type' => 'string'],
                             'body' => ['type' => 'string'],
                             'status' => ['type' => 'string', 'enum' => ['draft', 'published']],
+                        ],
+                    ],
+                    'BlogPost' => [
+                        'type' => 'object',
+                        'properties' => [
+                            'slug' => ['type' => 'string', 'example' => 'api-keys'],
+                            'status' => ['type' => 'string', 'enum' => ['draft', 'published', 'scheduled']],
+                            'publish_at' => ['type' => 'string', 'format' => 'date-time', 'nullable' => true],
+                            'cover_alt' => ['type' => 'string'],
+                            'category_ids' => ['type' => 'array', 'items' => ['type' => 'integer']],
+                            'tag_ids' => ['type' => 'array', 'items' => ['type' => 'integer']],
+                            'translations' => [
+                                'type' => 'object',
+                                'properties' => [
+                                    'ka' => ['$ref' => '#/components/schemas/BlogTranslation'],
+                                    'en' => ['$ref' => '#/components/schemas/BlogTranslation'],
+                                ],
+                            ],
+                        ],
+                    ],
+                    'BlogTranslation' => [
+                        'type' => 'object',
+                        'required' => ['title', 'body'],
+                        'properties' => [
+                            'title' => ['type' => 'string'],
+                            'excerpt' => ['type' => 'string'],
+                            'body' => ['type' => 'string', 'description' => 'Markdown'],
+                            'meta_title' => ['type' => 'string', 'maxLength' => 70],
+                            'meta_description' => ['type' => 'string', 'maxLength' => 200],
+                        ],
+                    ],
+                    'BlogTaxonomy' => [
+                        'type' => 'object',
+                        'properties' => [
+                            'slug' => ['type' => 'string'],
+                            'name' => [
+                                'type' => 'object',
+                                'properties' => [
+                                    'ka' => ['type' => 'string'],
+                                    'en' => ['type' => 'string'],
+                                ],
+                            ],
                         ],
                     ],
                     'CatalogList' => [
@@ -163,6 +205,9 @@ final class OpenApi
                 $parameters[] = ['name' => 'model_id', 'in' => 'query', 'schema' => ['type' => 'integer']];
                 $parameters[] = ['name' => 'brand_id', 'in' => 'query', 'schema' => ['type' => 'integer']];
             }
+            if (str_ends_with($uri, '/blog/posts')) {
+                $parameters[] = ['name' => 'status', 'in' => 'query', 'schema' => ['type' => 'string', 'enum' => ['draft', 'published', 'scheduled']]];
+            }
             if (str_ends_with($uri, '/equipment')) {
                 $parameters[] = ['name' => 'modification_id', 'in' => 'query', 'required' => true, 'schema' => ['type' => 'integer']];
             }
@@ -171,13 +216,20 @@ final class OpenApi
             $operation['parameters'] = $parameters;
         }
         if (in_array($method, ['POST', 'PUT', 'PATCH'], true)) {
+            $schema = ['type' => 'object'];
+            if (str_contains($uri, '/pages')) {
+                $schema = ['$ref' => '#/components/schemas/Page'];
+            } elseif (str_contains($uri, '/blog/posts') && ! str_contains($uri, '/cover')) {
+                $schema = ['$ref' => '#/components/schemas/BlogPost'];
+            } elseif (str_contains($uri, '/blog/categories') || str_contains($uri, '/blog/tags')) {
+                $schema = ['$ref' => '#/components/schemas/BlogTaxonomy'];
+            }
+            $contentType = str_contains($uri, '/cover') ? 'multipart/form-data' : 'application/json';
             $operation['requestBody'] = [
                 'required' => $method !== 'PATCH',
                 'content' => [
-                    'application/json' => [
-                        'schema' => str_contains($uri, '/pages')
-                            ? ['$ref' => '#/components/schemas/Page']
-                            : ['type' => 'object'],
+                    $contentType => [
+                        'schema' => $schema,
                     ],
                 ],
             ];

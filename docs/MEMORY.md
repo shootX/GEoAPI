@@ -18,3 +18,7 @@ Picker queries always filter by brand, model, generation, or modification id. Th
 - Admin catalog integers are cast in `WritableCatalog::present`. Public picker ids stay strings because the guide and the widget already consume strings.
 - Home `22 367` is production row count, not a constant in the view. Tests seed `legacy/cache/public-counts.json`.
 - No API keys, passwords, or `.env` secrets were found in the tree. `.env` is gitignored.
+
+## 2026-10-20 — Blog
+
+Posts live in `blog_posts.translations` as `{ka, en}` objects with `title`, `excerpt`, `body` (Markdown), `meta_title`, and `meta_description`. One slug is shared by both languages. Public URLs are `/ka/blog/{slug}` and `/en/blog/{slug}`; `/blog/{slug}` follows the session locale. `published` is visible immediately. `scheduled` is visible when `publish_at` is in the past. Drafts are 404 for visitors and `noindex` for an admin. Covers are stored on the `public` disk under `blog/covers/`. The panel reuses `/assets/admin.css` and expects a Laravel admin or operator session; a platform-only cookie does not open `/admin/blog`. The public pages reuse `components.layouts.public` and do not add a new stylesheet.

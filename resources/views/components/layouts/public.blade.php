@@ -3,24 +3,35 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    @php
+        $seo = $seo ?? [];
+        $canonical = $seo['canonical'] ?? url()->current();
+        $hreflang = $seo['hreflang'] ?? ['ka' => url('/ka'), 'en' => url('/en'), 'x-default' => url('/')];
+        $ogImage = $seo['image'] ?? asset('assets/brand/favicon-32-lime.svg');
+        $ogType = $seo['type'] ?? 'website';
+        $twitterCard = $seo['card'] ?? 'summary';
+    @endphp
     <title>{{ $title ?? 'CarAPI' }}</title>
     @if (!empty($description))
         <meta name="description" content="{{ $description }}">
     @endif
+    @if (!empty($robots))
+        <meta name="robots" content="{{ $robots }}">
+    @endif
     <link rel="icon" href="{{ asset('assets/brand/favicon-32-lime.svg') }}" type="image/svg+xml">
-    <link rel="canonical" href="{{ url()->current() }}">
-    <link rel="alternate" hreflang="ka" href="{{ url('/ka') }}">
-    <link rel="alternate" hreflang="en" href="{{ url('/en') }}">
-    <link rel="alternate" hreflang="x-default" href="{{ url('/') }}">
+    <link rel="canonical" href="{{ $canonical }}">
+    @foreach ($hreflang as $lang => $href)
+        <link rel="alternate" hreflang="{{ $lang }}" href="{{ $href }}">
+    @endforeach
     <meta property="og:title" content="{{ $title ?? 'CarAPI' }}">
     @if (!empty($description))
         <meta property="og:description" content="{{ $description }}">
         <meta name="twitter:description" content="{{ $description }}">
     @endif
-    <meta property="og:url" content="{{ url()->current() }}">
-    <meta property="og:type" content="website">
-    <meta property="og:image" content="{{ asset('assets/brand/favicon-32-lime.svg') }}">
-    <meta name="twitter:card" content="summary">
+    <meta property="og:url" content="{{ $canonical }}">
+    <meta property="og:type" content="{{ $ogType }}">
+    <meta property="og:image" content="{{ $ogImage }}">
+    <meta name="twitter:card" content="{{ $twitterCard }}">
     <meta name="twitter:title" content="{{ $title ?? 'CarAPI' }}">
     <x-electrik::brand-styles />
     @vite(['resources/css/app.css', 'resources/js/app.js'])
@@ -91,6 +102,7 @@
                     <a class="accent" href="{{ url('/guide') }}">{{ __('Documentation') }}</a>
                     <a class="accent" href="{{ route('pricing') }}">{{ __('Pricing') }}</a>
                     <a class="accent" href="{{ url('/privacy') }}">{{ __('Privacy') }}</a>
+                    <a class="accent" href="{{ url('/blog') }}">{{ __('Blog') }}</a>
                     <a class="accent" href="{{ url('/terms') }}">{{ __('Terms') }}</a>
                     <a class="accent" href="mailto:info@socialsave.cc">{{ __('Contact') }}</a>
                 </nav>

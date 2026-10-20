@@ -208,6 +208,7 @@
 
 .admin-filters input,
 .admin-filters select,
+.admin-filters textarea,
 .admin-filters button {
   min-height: 44px;
   border: 1px solid #c5d3dc;

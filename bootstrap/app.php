@@ -4,6 +4,7 @@ use App\Http\Middleware\ApplyChosenLocale;
 use App\Http\Middleware\BridgeLegacySession;
 use App\Http\Middleware\ComingSoonGate;
 use App\Http\Middleware\EnsureAdmin;
+use App\Http\Middleware\EnsureAdminPanel;
 use App\Http\Middleware\EnsureInternalDocs;
 use App\Http\Middleware\SecurityHeaders;
 use Electrik\Http\Middleware\BindTeamFromAccessToken;
@@ -50,6 +51,7 @@ return Application::configure(basePath: dirname(__DIR__))
         ]);
         $middleware->alias([
             'admin' => EnsureAdmin::class,
+            'admin-panel' => EnsureAdminPanel::class,
             'internal-docs' => EnsureInternalDocs::class,
         ]);
     })

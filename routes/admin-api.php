@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use App\Http\Controllers\Admin\AnnouncementController;
+use App\Http\Controllers\Admin\BlogApiController;
 use App\Http\Controllers\Admin\CatalogController;
 use App\Http\Controllers\Admin\ContentController;
 use App\Http\Controllers\Admin\DocsController;
@@ -23,6 +24,22 @@ Route::middleware(['web', 'internal-docs'])->group(function (): void {
 
 Route::middleware([ForceJson::class, SecurityHeaders::class, 'auth:sanctum', 'admin', 'throttle:300,1'])->prefix('api/admin')->group(function (): void {
     Route::get('me', MeController::class)->name('admin.me');
+
+    Route::get('blog/posts', [BlogApiController::class, 'posts'])->name('admin.blog.posts.index');
+    Route::post('blog/posts', [BlogApiController::class, 'storePost'])->name('admin.blog.posts.store');
+    Route::get('blog/posts/{id}', [BlogApiController::class, 'showPost'])->whereNumber('id')->name('admin.blog.posts.show');
+    Route::match(['put', 'patch'], 'blog/posts/{id}', [BlogApiController::class, 'updatePost'])->whereNumber('id')->name('admin.blog.posts.update');
+    Route::delete('blog/posts/{id}', [BlogApiController::class, 'destroyPost'])->whereNumber('id')->name('admin.blog.posts.destroy');
+    Route::post('blog/posts/{id}/cover', [BlogApiController::class, 'storeCover'])->whereNumber('id')->name('admin.blog.posts.cover');
+    Route::delete('blog/posts/{id}/cover', [BlogApiController::class, 'destroyCover'])->whereNumber('id')->name('admin.blog.posts.cover.destroy');
+    Route::get('blog/categories', [BlogApiController::class, 'categories'])->name('admin.blog.categories.index');
+    Route::post('blog/categories', [BlogApiController::class, 'storeCategory'])->name('admin.blog.categories.store');
+    Route::match(['put', 'patch'], 'blog/categories/{id}', [BlogApiController::class, 'updateCategory'])->whereNumber('id')->name('admin.blog.categories.update');
+    Route::delete('blog/categories/{id}', [BlogApiController::class, 'destroyCategory'])->whereNumber('id')->name('admin.blog.categories.destroy');
+    Route::get('blog/tags', [BlogApiController::class, 'tags'])->name('admin.blog.tags.index');
+    Route::post('blog/tags', [BlogApiController::class, 'storeTag'])->name('admin.blog.tags.store');
+    Route::match(['put', 'patch'], 'blog/tags/{id}', [BlogApiController::class, 'updateTag'])->whereNumber('id')->name('admin.blog.tags.update');
+    Route::delete('blog/tags/{id}', [BlogApiController::class, 'destroyTag'])->whereNumber('id')->name('admin.blog.tags.destroy');
 
     foreach ([
         'pages' => PageController::class,
