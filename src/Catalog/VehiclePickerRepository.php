@@ -14,15 +14,38 @@ final class VehiclePickerRepository
     }
 
     /** @return array{rows:list<array<string, mixed>>, total:int} */
-    public function brands(int $limit, int $offset): array
+    public function brands(int $limit, int $offset, string $q = ''): array
     {
-        $total = $this->count('SELECT count(*) FROM public.brands');
-        $stmt = $this->pdo->prepare(<<<'SQL'
+        $where = '';
+        if ($q !== '') {
+            $where = <<<'SQL'
+                WHERE name ILIKE :q_name ESCAPE '\\'
+                   OR EXISTS (
+                        SELECT 1
+                        FROM jsonb_array_elements_text(
+                            CASE WHEN jsonb_typeof(synonyms) = 'array' THEN synonyms ELSE '[]'::jsonb END
+                        ) AS syn(value)
+                        WHERE syn.value ILIKE :q_syn ESCAPE '\\'
+                   )
+            SQL;
+        }
+        $totalStmt = $this->pdo->prepare('SELECT count(*) FROM public.brands ' . $where);
+        $stmt = $this->pdo->prepare(<<<SQL
             SELECT id::text AS id, name
             FROM public.brands
+            $where
             ORDER BY name, id
             LIMIT :limit OFFSET :offset
         SQL);
+        if ($q !== '') {
+            $like = '%' . str_replace(['\\', '%', '_'], ['\\\\', '\\%', '\\_'], $q) . '%';
+            $totalStmt->bindValue('q_name', $like);
+            $totalStmt->bindValue('q_syn', $like);
+            $stmt->bindValue('q_name', $like);
+            $stmt->bindValue('q_syn', $like);
+        }
+        $totalStmt->execute();
+        $total = (int) $totalStmt->fetchColumn();
         $this->bindLimit($stmt, $limit, $offset);
         $stmt->execute();
         $rows = [];
@@ -34,6 +57,24 @@ final class VehiclePickerRepository
         }
 
         return ['rows' => $rows, 'total' => $total];
+    }
+
+    /** @param list<array<string, mixed>> $rows @return list<array<string, mixed>> */
+    public static function disambiguate(array $rows): array
+    {
+        $counts = [];
+        foreach ($rows as $row) {
+            $label = (string) ($row['label'] ?? '');
+            $counts[$label] = ($counts[$label] ?? 0) + 1;
+        }
+        foreach ($rows as $i => $row) {
+            $label = (string) ($row['label'] ?? '');
+            if (($counts[$label] ?? 0) > 1) {
+                $rows[$i]['label'] = self::join([$label, (string) ($row['id'] ?? '')]);
+            }
+        }
+
+        return $rows;
     }
 
     /** @return array{rows:list<array<string, mixed>>, total:int}|null */
@@ -106,26 +147,44 @@ final class VehiclePickerRepository
         if (!$this->exists('public.models', $modelId)) {
             return null;
         }
-        $filter = <<<'SQL'
+        $matched = <<<'SQL'
             FROM public.generations g
             WHERE g.model_id = :id
               AND g.year_start IS NOT NULL
               AND g.year_start <= :year_from
               AND (g.year_end IS NULL OR g.year_end >= :year_to)
         SQL;
-        $totalStmt = $this->pdo->prepare('SELECT count(*) ' . $filter);
+        $groupKey = <<<'SQL'
+            CASE
+                WHEN nullif(btrim(g.chassis_code), '') IS NOT NULL
+                THEN 'c:' || upper(btrim(g.chassis_code))
+                ELSE 'n:' || lower(btrim(coalesce(g.name, '')))
+            END
+        SQL;
+        $totalStmt = $this->pdo->prepare('SELECT count(*) FROM (SELECT 1 ' . $matched . ' GROUP BY ' . $groupKey . ') grouped');
         $totalStmt->bindValue('id', $modelId);
         $totalStmt->bindValue('year_from', $year, PDO::PARAM_INT);
         $totalStmt->bindValue('year_to', $year, PDO::PARAM_INT);
         $totalStmt->execute();
         $stmt = $this->pdo->prepare(<<<SQL
-            SELECT g.id::text AS id,
-                   NULLIF(btrim(g.name), '') AS name,
-                   NULLIF(btrim(g.chassis_code), '') AS code,
-                   g.year_start,
-                   g.year_end
-            $filter
-            ORDER BY g.year_start, g.name NULLS LAST, g.id
+            SELECT min(g.id)::text AS id,
+                   (array_agg(NULLIF(btrim(g.name), '') ORDER BY g.id) FILTER (WHERE nullif(btrim(g.name), '') IS NOT NULL))[1] AS name,
+                   (array_agg(NULLIF(btrim(g.chassis_code), '') ORDER BY g.id) FILTER (WHERE nullif(btrim(g.chassis_code), '') IS NOT NULL))[1] AS code,
+                   min(g.year_start) AS year_start,
+                   CASE WHEN bool_or(g.year_end IS NULL) THEN NULL ELSE max(g.year_end) END AS year_end,
+                   CASE
+                       WHEN count(DISTINCT NULLIF(btrim(g.market), '')) = 1
+                       THEN min(NULLIF(btrim(g.market), ''))
+                       ELSE NULL
+                   END AS market,
+                   CASE
+                       WHEN count(DISTINCT NULLIF(btrim(g.steering_wheel), '')) = 1
+                       THEN min(NULLIF(btrim(g.steering_wheel), ''))
+                       ELSE NULL
+                   END AS steering
+            $matched
+            GROUP BY $groupKey
+            ORDER BY min(g.year_start), min(g.name) NULLS LAST, min(g.id)
             LIMIT :limit OFFSET :offset
         SQL);
         $stmt->bindValue('id', $modelId);
@@ -145,15 +204,19 @@ final class VehiclePickerRepository
                 'code' => $code,
                 'year_start' => $start,
                 'year_end' => $end,
+                'market' => self::text($row['market']),
+                'steering' => self::text($row['steering']),
                 'label' => self::join([
                     $name ?? $code ?? (string) $row['id'],
                     $name !== null ? $code : null,
                     self::span($start, $end),
+                    self::text($row['market']),
+                    self::text($row['steering']),
                 ]),
             ];
         }
 
-        return ['rows' => $rows, 'total' => (int) $totalStmt->fetchColumn()];
+        return ['rows' => self::disambiguate($rows), 'total' => (int) $totalStmt->fetchColumn()];
     }
 
     /** @return array{rows:list<array<string, mixed>>, total:int}|null */
@@ -164,7 +227,22 @@ final class VehiclePickerRepository
         }
         $filter = <<<'SQL'
             FROM public.modifications mod
-            WHERE mod.generation_id = :id
+            WHERE mod.generation_id IN (
+                SELECT g.id
+                FROM public.generations g
+                JOIN public.generations requested ON requested.id = :id
+                WHERE g.model_id = requested.model_id
+                  AND CASE
+                        WHEN nullif(btrim(g.chassis_code), '') IS NOT NULL
+                        THEN 'c:' || upper(btrim(g.chassis_code))
+                        ELSE 'n:' || lower(btrim(coalesce(g.name, '')))
+                      END
+                    = CASE
+                        WHEN nullif(btrim(requested.chassis_code), '') IS NOT NULL
+                        THEN 'c:' || upper(btrim(requested.chassis_code))
+                        ELSE 'n:' || lower(btrim(coalesce(requested.name, '')))
+                      END
+            )
               AND (mod.year_start IS NULL OR mod.year_start <= :year_from)
               AND (mod.year_end IS NULL OR mod.year_end >= :year_to)
         SQL;

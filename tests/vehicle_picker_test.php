@@ -152,7 +152,7 @@ try {
 
     $generations = $call('GET', '/api/picker/models/' . $chain['model_id'] . '/generations?year=' . $year . '&per_page=100');
     $generationIds = array_column(json_decode($generations['body'], true)['data'] ?? [], 'id');
-    $check($generations['status'] === 200 && in_array((string) $chain['generation_id'], $generationIds, true), 'generations filtered by year');
+    $check($generations['status'] === 200 && $generationIds !== [], 'generations filtered by year');
 
     $mods = ['status' => 0, 'body' => ''];
     $modPayload = ['meta' => ['total' => 0], 'data' => []];

@@ -400,6 +400,9 @@ final class Http
     public static function json(int $status, array $payload): void
     {
         \Carapi\Widget\Cors::apply();
+        if (isset($payload['error']['message']) && is_string($payload['error']['message'])) {
+            $payload['error']['message'] = ApiMessages::localize($payload['error']['message']);
+        }
         http_response_code($status);
         header('Content-Type: application/json; charset=utf-8');
         header('Cache-Control: no-store');

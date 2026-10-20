@@ -193,7 +193,10 @@
   var openStep = null;
   var rows = [];
   var active = -1;
-  var BODY = { sedan: 'სედანი', hatchback: 'ჰეჩბეკი', liftback: 'ლიფტბეკი', wagon: 'უნივერსალი', coupe: 'კუპე', minivan: 'მინივენი', van: 'ფურგონი', pickup: 'პიკაპი' };
+  var pickerEn = document.documentElement.lang === 'en';
+  var BODY = pickerEn
+    ? { sedan: 'Sedan', hatchback: 'Hatchback', liftback: 'Liftback', wagon: 'Wagon', coupe: 'Coupe', minivan: 'Minivan', van: 'Van', pickup: 'Pickup' }
+    : { sedan: 'სედანი', hatchback: 'ჰეჩბეკი', liftback: 'ლიფტბეკი', wagon: 'უნივერსალი', coupe: 'კუპე', minivan: 'მინივენი', van: 'ფურგონი', pickup: 'პიკაპი' };
 
   function post(path) {
     var rowsAll = [];

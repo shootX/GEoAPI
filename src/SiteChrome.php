@@ -24,9 +24,10 @@ final class SiteChrome
     {
         $open = \Carapi\Platform\Http::enabled();
         $account = $open ? \Carapi\Platform\Http::accountLink() : null;
+        $en = \Carapi\Site\Locale::current() === 'en';
         $links = [
-            'demo' => ['/#demo', 'დემო'],
-            'guide' => ['/guide', 'დოკუმენტაცია'],
+            'demo' => ['/#demo', $en ? 'Demo' : 'დემო'],
+            'guide' => ['/guide', $en ? 'Docs' : 'დოკუმენტაცია'],
         ];
         $nav = '';
         foreach ($links as $key => [$href, $label]) {
@@ -44,7 +45,7 @@ final class SiteChrome
         return '<a class="skip" href="#content">შინაარსზე გადასვლა</a>'
             . '<header class="wrap nav" id="site-header">' . self::logo()
             . '<nav class="links" id="site-nav">' . $nav . '</nav>'
-            . '<div class="act">' . self::themeButton() . $actions
+            . '<div class="act">' . self::localeLink() . self::themeButton() . $actions
             . '<button class="burger" type="button" aria-expanded="false" aria-controls="site-nav" aria-label="მენიუ">'
             . self::icon('menu') . '</button></div></header>';
     }
@@ -58,7 +59,7 @@ final class SiteChrome
 
         return '<footer class="site-foot"><div class="wrap row">'
             . '<span>© ' . date('Y') . ' შპს „ინოვა ლაბ“ · <a href="mailto:info@socialsave.cc">info@socialsave.cc</a></span>'
-            . '<div class="links"><a href="/guide">დოკუმენტაცია</a>' . $account
+            . '<div class="links"><a href="/guide">' . (\Carapi\Site\Locale::current() === 'en' ? 'Docs' : 'დოკუმენტაცია') . '</a><a href="/pricing">' . (\Carapi\Site\Locale::current() === 'en' ? 'Pricing' : 'ფასები') . '</a>' . $account
             . '<a href="/terms">გამოყენების წესები</a><a href="/privacy">კონფიდენციალურობა</a></div>'
             . '</div></footer><script src="/assets/site.js?v=20261018f"></script>';
     }
@@ -68,14 +69,50 @@ final class SiteChrome
         $safe = htmlspecialchars($title, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
         $pageTitle = $exactTitle ? $safe : $safe . ' — carapi';
         $summary = $description ?? 'CarAPI დეველოპერებს სთავაზობს ავტომობილების ბრენდების, მოდელებისა და თაობების მონაცემებს REST API-ის საშუალებით და ავტომობილის არჩევის მზა ვიჯეტს ვებსაიტებისთვის.';
-        $language = preg_match('/^[a-z]{2}$/', $lang) === 1 ? $lang : 'ka';
+        $language = $lang === 'en' ? 'en' : \Carapi\Site\Locale::current();
+
+        $summarySafe = htmlspecialchars($summary, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
+        $canonical = self::canonical();
+        $english = htmlspecialchars($canonical . (str_contains($canonical, '?') ? '&' : '?') . 'lang=en', ENT_QUOTES);
+        $canonicalSafe = htmlspecialchars($canonical, ENT_QUOTES);
 
         return '<!doctype html><html lang="' . $language . '"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">'
             . '<script>(function(){try{if(localStorage.getItem("carapi-theme")==="light")document.documentElement.dataset.theme="light"}catch(e){}})()</script>'
             . '<title>' . $pageTitle . '</title>'
-            . '<meta name="description" content="' . htmlspecialchars($summary, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') . '">'
+            . '<meta name="description" content="' . $summarySafe . '">'
+            . '<link rel="canonical" href="' . $canonicalSafe . '">'
+            . '<link rel="alternate" hreflang="ka" href="' . $canonicalSafe . '">'
+            . '<link rel="alternate" hreflang="en" href="' . $english . '">'
+            . '<link rel="alternate" hreflang="x-default" href="' . $canonicalSafe . '">'
+            . '<meta property="og:title" content="' . $pageTitle . '">'
+            . '<meta property="og:description" content="' . $summarySafe . '">'
+            . '<meta property="og:url" content="' . $canonicalSafe . '">'
+            . '<meta property="og:type" content="website">'
+            . '<meta name="twitter:card" content="summary">'
             . '<link rel="icon" href="/assets/brand/favicon-32-lime.svg" type="image/svg+xml">'
             . self::assets() . $head . '</head><body>';
+    }
+
+    public static function localeLink(): string
+    {
+        if (\Carapi\Site\Locale::current() === 'en') {
+            return '<a href="/locale/ka">ქართული</a>';
+        }
+
+        return '<a href="/locale/en">English</a>';
+    }
+
+    private static function canonical(): string
+    {
+        $configured = getenv('CARAPI_APP_URL');
+        $base = is_string($configured) && str_starts_with($configured, 'https://')
+            ? rtrim($configured, '/')
+            : (((!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') || (($_SERVER['HTTP_X_FORWARDED_PROTO'] ?? '') === 'https')) ? 'https' : 'http')
+                . '://' . (is_string($_SERVER['HTTP_HOST'] ?? null) ? $_SERVER['HTTP_HOST'] : 'localhost');
+        $path = parse_url((string) ($_SERVER['REQUEST_URI'] ?? '/'), PHP_URL_PATH);
+        $path = is_string($path) && str_starts_with($path, '/') ? $path : '/';
+
+        return $base . $path;
     }
 
     public static function end(): string

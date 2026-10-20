@@ -1,5 +1,15 @@
 # Memory
 
+## 2026-10-20 — QA audit, high and medium
+
+`generations_count` is grouped by model and chassis code (or name). The home page says so. Picker duplicates of the same chassis collapse to the minimum id; a sibling id still lists that group's modifications for the chosen year.
+
+The embeddable widget still ends at body type, so `generation_id` and `modification_id` stay null. `/demo` is the full picker. The guide example key is `demo`, not `carapi_pk_example`.
+
+`/pricing` repeats 60 per minute and 10 000 per month. No paid amount was added.
+
+Catalog JSON errors stay Georgian when `Accept-Language` is `ka` or absent. `en` and `ru` get English. There is no `/api/admin` in this repo, so its CORS header was not changed. Guide, privacy, and terms bodies stay the Georgian text in this code. The hosted CMS copies are outside this repository.
+
 ## 2026-10-20 — QA audit, critical
 
 The live host is Laravel Electrik (`/opt/carapi-electrik`), not this repository. Electrik's `APP_DEBUG` still prints stack traces until that server sets `APP_DEBUG=false`. This repo only controls its own front controller and the legacy `Session` / `SmtpMailer` files Electrik includes.

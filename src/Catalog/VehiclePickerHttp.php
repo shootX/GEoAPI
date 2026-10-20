@@ -108,7 +108,12 @@ final class VehiclePickerHttp
     private static function result(VehiclePickerRepository $repo, array $route, ?array $page): ?array
     {
         if ($route['kind'] === 'brands') {
-            return $repo->brands($page['per_page'], $page['offset']);
+            $q = self::searchQuery();
+            if ($q === null) {
+                return null;
+            }
+
+            return $repo->brands($page['per_page'], $page['offset'], $q);
         }
         if ($route['kind'] === 'models') {
             $result = $repo->models($route['id'], $page['per_page'], $page['offset']);
@@ -217,6 +222,30 @@ final class VehiclePickerHttp
         self::json(422, ['error' => ['code' => 'invalid_parameter', 'message' => $message]]);
 
         return ['kind' => 'invalid'];
+    }
+
+    private static function searchQuery(): ?string
+    {
+        $value = $_GET['q'] ?? null;
+        if ($value === null || $value === '') {
+            return '';
+        }
+        if (!is_string($value)) {
+            self::json(422, ['error' => ['code' => 'invalid_parameter', 'message' => 'q must be text of at most 80 characters.']]);
+
+            return null;
+        }
+        $value = trim($value);
+        if ($value === '') {
+            return '';
+        }
+        if (mb_strlen($value) > 80) {
+            self::json(422, ['error' => ['code' => 'invalid_parameter', 'message' => 'q must be text of at most 80 characters.']]);
+
+            return null;
+        }
+
+        return $value;
     }
 
     private static function year(): ?int

@@ -44,6 +44,7 @@ if (is_file($composer)) {
 }
 
 \Carapi\Http\Failure::install();
+\Carapi\Http\SecurityHeaders::send();
 
 $uriPath = parse_url($_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH) ?: '/';
 $apiPath = rtrim($uriPath, '/') ?: '/';
@@ -74,6 +75,39 @@ $path = strtolower(rtrim($uriPath, '/'));
 
 if (\Carapi\Platform\Http::enabled() && \Carapi\Platform\Http::handles($path)) {
     \Carapi\Platform\Http::dispatch($path);
+    return;
+}
+
+if ($path === '/en' || $path === '/ka') {
+    header('Location: /locale' . $path, true, 302);
+    header('Cache-Control: no-store');
+    return;
+}
+
+if ($path === '/locale/en' || $path === '/locale/ka') {
+    \Carapi\Site\Locale::remember(substr($path, 8));
+    header('Location: ' . \Carapi\Site\Locale::safeReturn(), true, 302);
+    header('Cache-Control: no-store');
+    return;
+}
+
+if ($path === '/robots.txt') {
+    carapi_robots();
+    return;
+}
+
+if ($path === '/sitemap.xml') {
+    carapi_sitemap();
+    return;
+}
+
+if ($path === '/pricing') {
+    carapi_pricing();
+    return;
+}
+
+if ($path === '/api/docs' || $path === '/api/docs/openapi.json') {
+    carapi_api_docs($path);
     return;
 }
 
@@ -115,6 +149,104 @@ if ($path === '/getimage') {
     echo \Carapi\SiteChrome::end();
 }
 return;
+
+function carapi_public_cache(): void
+{
+    header('Vary: Cookie');
+    if (!empty($_COOKIE['carapi_platform']) || (($_COOKIE['carapi_locale'] ?? '') === 'en')) {
+        header('Cache-Control: private, max-age=60');
+
+        return;
+    }
+    header('Cache-Control: public, max-age=120');
+}
+
+function carapi_robots(): void
+{
+    header('Content-Type: text/plain; charset=utf-8');
+    carapi_public_cache();
+    $base = htmlspecialchars(carapi_canonical_base(), ENT_QUOTES);
+    echo "User-agent: *\nDisallow:\n\nSitemap: {$base}/sitemap.xml\n";
+}
+
+function carapi_sitemap(): void
+{
+    header('Content-Type: application/xml; charset=utf-8');
+    carapi_public_cache();
+    $base = htmlspecialchars(carapi_canonical_base(), ENT_QUOTES);
+    echo '<?xml version="1.0" encoding="UTF-8"?>';
+    echo '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">';
+    foreach (['/', '/guide', '/demo', '/pricing', '/privacy', '/terms', '/login', '/register'] as $path) {
+        echo '<url><loc>' . $base . ($path === '/' ? '/' : $path) . '</loc></url>';
+    }
+    echo '</urlset>';
+}
+
+function carapi_canonical_base(): string
+{
+    $configured = getenv('CARAPI_APP_URL');
+    if (is_string($configured) && str_starts_with($configured, 'https://')) {
+        return rtrim($configured, '/');
+    }
+
+    return carapi_self_base();
+}
+
+function carapi_api_docs(string $path): void
+{
+    if ($path === '/api/docs/openapi.json') {
+        header('Content-Type: application/json; charset=utf-8');
+        carapi_public_cache();
+        echo json_encode(\Carapi\Catalog\PublicOpenApi::document(), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+
+        return;
+    }
+    header('Content-Type: text/html; charset=utf-8');
+    carapi_public_cache();
+    $en = \Carapi\Site\Locale::current() === 'en';
+    echo \Carapi\SiteChrome::start(
+        $en ? 'API reference' : 'API დოკუმენტაცია',
+        $en
+            ? 'Public OpenAPI for GET /api/v1 and the widget POST endpoints. Server keys use Authorization: Bearer. The embeddable widget uses POST /widget/v1/{public-key}.'
+            : 'საჯარო OpenAPI GET /api/v1-ისთვის და ვიჯეტის POST მისამართებისთვის. სერვერული გასაღები არის Authorization: Bearer. ვიჯეტი იყენებს POST /widget/v1/{public-key}-ს.'
+    );
+    echo \Carapi\SiteChrome::header('guide');
+    echo '<main id="content" class="wrap legal"><h1>' . ($en ? 'API reference' : 'API დოკუმენტაცია') . '</h1>';
+    echo '<p><a href="/api/docs/openapi.json">openapi.json</a> · <a href="/guide">' . ($en ? 'Guide' : 'გზამკვლევი') . '</a> · <a href="/demo">demo</a></p>';
+    echo '<p>' . ($en
+        ? 'The embeddable widget calls POST /widget/v1/demo/... from this site, or POST /widget/v1/{carapi_pk_...}/... from an allowed origin. It selects brand, model, year, and body. generation_id and modification_id stay null. The full picker is /demo.'
+        : 'ჩასმული ვიჯეტი ამ საიტიდან იძახებს POST /widget/v1/demo/...-ს, სხვა საიტიდან კი POST /widget/v1/{carapi_pk_...}/...-ს დაშვებული origin-ით. ის ირჩევს ბრენდს, მოდელს, წელს და ძარას. generation_id და modification_id რჩება null. სრული ამორჩევა არის /demo.') . '</p>';
+    echo '</main>';
+    echo \Carapi\SiteChrome::footer();
+    echo \Carapi\SiteChrome::end();
+}
+
+function carapi_pricing(): void
+{
+    header('Content-Type: text/html; charset=utf-8');
+    carapi_public_cache();
+    $en = \Carapi\Site\Locale::current() === 'en';
+    echo \Carapi\SiteChrome::start(
+        $en ? 'Pricing' : 'ფასები',
+        $en
+            ? 'CarAPI currently publishes one free project limit: 60 requests per minute and 10 000 successful requests per calendar month. Paid prices are not published.'
+            : 'CarAPI ამ ეტაპზე აქვეყნებს ერთ უფასო ლიმიტს პროექტზე: წუთში 60 მოთხოვნა და კალენდარულ თვეში 10 000 წარმატებული მოთხოვნა. ფასიანი ტარიფი გამოქვეყნებული არ არის.'
+    );
+    echo \Carapi\SiteChrome::header();
+    echo '<main id="content" class="wrap legal"><h1>' . ($en ? 'Pricing' : 'ფასები') . '</h1>';
+    if ($en) {
+        echo '<p>Each project can make 60 requests per minute and 10 000 successful requests per calendar month. This is the free limit already used by the API. It is not a paid plan.</p>';
+        echo '<p>Paid prices are not published. Nothing on this page is a Stripe price.</p>';
+        echo '<p><a class="btn btn-l" href="/register">Create a free account</a></p>';
+    } else {
+        echo '<p>თითო პროექტზე: წუთში 60 მოთხოვნა და კალენდარულ თვეში 10 000 წარმატებული მოთხოვნა. ეს არის ის უფასო ლიმიტი, რომელსაც API უკვე იყენებს. ეს ფასიანი გეგმა არ არის.</p>';
+        echo '<p>ფასიანი ტარიფი გამოქვეყნებული არ არის. ამ გვერდზე Stripe-ის ფასი არ წერია.</p>';
+        echo '<p><a class="btn btn-l" href="/register">უფასო ანგარიშის შექმნა</a></p>';
+    }
+    echo '</main>';
+    echo \Carapi\SiteChrome::footer();
+    echo \Carapi\SiteChrome::end();
+}
 
 function carapi_get_image(): void
 {
@@ -411,8 +543,8 @@ function carapi_closed(): void
 function carapi_terms(): void
 {
     header('Content-Type: text/html; charset=utf-8');
-    header('Cache-Control: no-cache');
-    echo \Carapi\SiteChrome::start('გამოყენების წესები');
+    carapi_public_cache();
+    echo \Carapi\SiteChrome::start('გამოყენების წესები', 'CarAPI-ის გამოყენების წესები: ანგარიში, გასაღებები და პროექტის ლიმიტი.');
     echo \Carapi\SiteChrome::header();
     echo '<main id="content" class="wrap legal">';
     echo <<<'HTML'
@@ -443,8 +575,8 @@ HTML;
 function carapi_privacy(): void
 {
     header('Content-Type: text/html; charset=utf-8');
-    header('Cache-Control: no-cache');
-    echo \Carapi\SiteChrome::start('კონფიდენციალურობის პოლიტიკა');
+    carapi_public_cache();
+    echo \Carapi\SiteChrome::start('კონფიდენციალურობის პოლიტიკა', 'როგორ ამუშავებს შპს „ინოვა ლაბ“ CarAPI-ის ანგარიშის, სესიის და ვიჯეტის მონაცემებს.');
     echo \Carapi\SiteChrome::header();
     echo '<main id="content" class="wrap legal">';
     echo <<<'HTML'
@@ -537,7 +669,7 @@ function carapi_logo(string $name): string
 function carapi_guide(): void
 {
     header('Content-Type: text/html; charset=utf-8');
-    header('Cache-Control: no-cache');
+    carapi_public_cache();
     $open = \Carapi\Platform\Http::enabled();
     $status = $open ? '' : '<p id="closed" class="err">საჯარო გაშვება ჯერ არ დაწყებულა. ქვემოთ მოცემული აღწერა საჯარო წვდომის გახსნამდე მხოლოდ ცნობისთვისაა.</p>';
     $base = carapi_self_base();
@@ -670,15 +802,16 @@ GET /api/v1/coverage
 
 ვიჯეტი იყენებს საჯარო API გასაღებს carapi_pk_. ის HTML-ში დასაშვებია.
 <script src="{$base}/widget/v1/carapi-filter.js"></script>
-<carapi-filter public-key="carapi_pk_example"></carapi-filter>
-ჩაანაცვლეთ carapi_pk_example თქვენი პროექტის საჯარო API გასაღებით.
+<carapi-filter public-key="YOUR_PUBLIC_KEY"></carapi-filter>
+საკუთარ საიტზე ჩაწერეთ პროექტის carapi_pk_ გასაღები. ამ საიტის დემო არის public-key="demo" და იძახებს POST /widget/v1/demo/brands.
+ვიჯეტის რეალური მოთხოვნებია POST /widget/v1/{public-key}/brands, /brands/{slug}/models და /models/{id}/years. ეს GET /api/v1 არ არის.
 ვიჯეტი მუშაობს მხოლოდ პროექტში ჩაწერილი origin-იდან, მაგალითად https://example.com.
 Origin არის პროტოკოლი, დომენი და საჭიროების შემთხვევაში პორტი. გვერდის ბილიკს არ შეიცავს.
 wildcard (*) და ცარიელი Origin არ მიიღება. http დასაშვებია მხოლოდ localhost-ისა და 127.0.0.1-ისთვის.
 
 carapi:change
 detail.brand_id, detail.model_id, detail.year და detail.body_type არის სტრიქონი ან null.
-detail.generation_id და detail.modification_id ამ ვერსიაში ყოველთვის null-ია. მოდიფიკაციის არჩევა მხარდაჭერილი არ არის.
+ჩასმული ვიჯეტი სრულ კატალოგს არ ირჩევს: detail.generation_id და detail.modification_id ყოველთვის null-ია. სრული თაობა და მოდიფიკაცია არის /demo-ზე.
 დამატებით შეიძლება იყოს brand_name, model_name, year_name და body_name.
 ვიჯეტი თქვენი საიტის განცხადებებს ავტომატურად არ ფილტრავს. არჩევანის დაკავშირება თქვენს მონაცემებთან თქვენს აპლიკაციაში უნდა მოხდეს.
 
@@ -689,9 +822,12 @@ TXT;
     $cursorFile = "---\ndescription: CarAPI ვიჯეტი და სერვერული კატალოგი\nalwaysApply: true\n---\n\nეს ფაილი Cursor-ის წესია და ამ პროექტში მოქმედებს.\n\n" . trim($facts);
     $claudeFile = "ეს ფაილი Claude Code კითხულობს პროექტის ინსტრუქციად, როცა CLAUDE.md პროექტის ფესვშია.\n\n" . trim($facts);
     $codexFile = "ეს ფაილი Codex კითხულობს AGENTS.md ინსტრუქციად. Cursor-ის .mdc ფაილს ავტომატურად არ კითხულობს.\n\n" . trim($facts);
+    $guideEn = \Carapi\Site\Locale::current() === 'en';
     echo \Carapi\SiteChrome::start(
-        'CarAPI-ის დოკუმენტაცია',
-        'გაეცანით CarAPI-ის ინტეგრაციის ინსტრუქციებს, ავტორიზაციას, API მეთოდებს, ვიჯეტის გამოყენებასა და მონაცემების მიღების მაგალითებს.',
+        $guideEn ? 'CarAPI documentation' : 'CarAPI-ის დოკუმენტაცია',
+        $guideEn
+            ? 'How to call GET /api/v1 with a secret key, and how the widget calls POST /widget/v1/{public-key}. The widget does not select a generation.'
+            : 'გაეცანით CarAPI-ის ინტეგრაციის ინსტრუქციებს, ავტორიზაციას, API მეთოდებს, ვიჯეტის გამოყენებასა და მონაცემების მიღების მაგალითებს.',
         true
     );
     echo \Carapi\SiteChrome::header('guide');
@@ -781,8 +917,8 @@ TXT;
     echo '<h2 id="widget" class="doc-sec">ვიჯეტის დამატება ვებსაიტზე</h2>';
     echo '<p>CarAPI-ის ვიჯეტის გამოყენებით შეგიძლიათ თქვენს ვებსაიტს დაამატოთ ავტომობილის არჩევის ინტერფეისი. ვიჯეტი იტვირთება JavaScript ფაილის საშუალებით და მუშაობისთვის იყენებს საჯარო API გასაღებს.</p>';
     echo '<div class="codeb"><div class="tb"><div class="tabs"><button type="button" class="on" data-tab="html">HTML</button></div><button type="button" class="copy" data-copy-block>' . $copy . 'კოდის კოპირება</button></div>';
-    echo '<pre class="json" data-tab-panel="html">' . $h("<script src=\"" . $base . "/widget/v1/carapi-filter.js\"></script>\n<carapi-filter public-key=\"carapi_pk_example\"></carapi-filter>") . '</pre></div>';
-    echo '<p>ჩაანაცვლეთ <code>carapi_pk_example</code> თქვენი პროექტის საჯარო API გასაღებით.</p>';
+    echo '<pre class="json" data-tab-panel="html">' . $h("<script src=\"" . $base . "/widget/v1/carapi-filter.js\"></script>\n<carapi-filter public-key=\"demo\"></carapi-filter>") . '</pre></div>';
+    echo '<p>მაგალითის <code>demo</code> მუშაობს მხოლოდ ამ საიტის Origin-ით. საკუთარ საიტზე ჩაწერეთ პროექტის <code>carapi_pk_</code> გასაღები და ის Origin, რომელიც პროექტშია შენახული.</p>';
     echo '<p>ვიჯეტი კატალოგს იღებს <code>POST</code> მოთხოვნებით: <code>/widget/v1/{publicKey}/brands</code>, <code>/widget/v1/{publicKey}/brands/{slug}/models</code> და <code>/widget/v1/{publicKey}/models/{id}/years</code>. ეს სერვერული <code>GET /api/v1</code> მოთხოვნებისაგან დამოუკიდებელი გზაა.</p>';
 
     echo '<h2 id="domains" class="doc-sec">საიტის მისამართის დამატება</h2>';
@@ -836,50 +972,72 @@ function carapi_landing(): void
 {
     $counts = carapi_counts_view();
     $open = \Carapi\Platform\Http::enabled();
+    $en = \Carapi\Site\Locale::current() === 'en';
     $primary = $open
-        ? '<a class="btn btn-l" href="/register">უფასო ანგარიშის შექმნა</a>'
+        ? '<a class="btn btn-l" href="/register">' . ($en ? 'Create a free account' : 'უფასო ანგარიშის შექმნა') . '</a>'
         : '<span class="btn btn-g">მალე გაიხსნება</span>';
     $months = [1 => 'იან', 2 => 'თებ', 3 => 'მარ', 4 => 'აპრ', 5 => 'მაი', 6 => 'ივნ', 7 => 'ივლ', 8 => 'აგვ', 9 => 'სექ', 10 => 'ოქტ', 11 => 'ნოე', 12 => 'დეკ'];
     $when = $months[(int) date('n')] . '. ' . date('Y');
     $base = htmlspecialchars(carapi_self_base(), ENT_QUOTES);
-    $heroNote = 'ყველა ავტომობილის მოდელისთვის თაობის მონაცემები ხელმისაწვდომი არ არის. მიმდინარე ვერსია არ შეიცავს ავტომობილების ფოტოებს. მოდიფიკაციების სია და დეტალი სერვერულ API-შია.';
+    $heroNote = $en
+        ? 'Not every model has generation data. This version does not include vehicle photos. Modification lists and details are on the server API. The generation count is one group per model and chassis code, or per name when the chassis is empty. Duplicate rows of the same generation are not counted again. The embeddable widget stops at body type; /demo selects generation and modification.'
+        : 'ყველა ავტომობილის მოდელისთვის თაობის მონაცემები ხელმისაწვდომი არ არის. მიმდინარე ვერსია არ შეიცავს ავტომობილების ფოტოებს. მოდიფიკაციების სია და დეტალი სერვერულ API-შია. თაობების რიცხვი არის ჯგუფი: მოდელი და შასის კოდი, ან სახელი, თუ შასი ცარიელია. ერთი თაობის დუბლი თავიდან არ ითვლება. ჩასმული ვიჯეტი ძარაზე ჩერდება; /demo ირჩევს თაობას და მოდიფიკაციას.';
     $countsId = '';
     if ($counts['status'] === 'ok') {
-        $heroNote = '<b>' . $counts['brands'] . '</b> ბრენდი · <b>' . $counts['models'] . '</b> მოდელი · <b>'
-            . $counts['generations'] . '</b> თაობა. ' . $heroNote;
+        $heroNote = $en
+            ? '<b>' . $counts['brands'] . '</b> brands · <b>' . $counts['models'] . '</b> models · <b>' . $counts['generations'] . '</b> generations. ' . $heroNote
+            : '<b>' . $counts['brands'] . '</b> ბრენდი · <b>' . $counts['models'] . '</b> მოდელი · <b>' . $counts['generations'] . '</b> თაობა. ' . $heroNote;
         $countsId = ' id="counts"';
     }
     $chev = \Carapi\SiteChrome::icon('chev');
     $copy = \Carapi\SiteChrome::icon('copy');
     $install = '&lt;script src="' . $base . '/widget/v1/carapi-filter.js"&gt;&lt;/script&gt;';
+    carapi_public_cache();
     echo \Carapi\SiteChrome::start(
-        'CarAPI — ავტომობილების კატალოგი, API და მზა ვიჯეტი',
-        'CarAPI დეველოპერებს სთავაზობს ავტომობილების ბრენდების, მოდელებისა და თაობების მონაცემებს REST API-ის საშუალებით და ავტომობილის არჩევის მზა ვიჯეტს ვებსაიტებისთვის.',
+        $en ? 'CarAPI — car catalog, API, and widget' : 'CarAPI — ავტომობილების კატალოგი, API და მზა ვიჯეტი',
+        $en
+            ? 'CarAPI gives developers vehicle brands, models, and generations over a REST API, plus a widget that selects brand, model, year, and body.'
+            : 'CarAPI დეველოპერებს სთავაზობს ავტომობილების ბრენდების, მოდელებისა და თაობების მონაცემებს REST API-ის საშუალებით და ავტომობილის არჩევის მზა ვიჯეტს ვებსაიტებისთვის.',
         true
     );
     echo \Carapi\SiteChrome::header();
+    $h1 = $en ? 'Vehicle data for your site — <span>API or a ready widget</span>' : 'ავტომობილების მონაცემები თქვენი საიტისთვის — <span>API ან მზა ვიჯეტი</span>';
+    $lead = $en ? 'Get brands, models, and generations through the API, or add a widget that selects a brand, model, year, and body.' : 'მიიღეთ ავტომობილების ბრენდების, მოდელებისა და თაობების მონაცემები API-ის საშუალებით, ან დაამატეთ თქვენს ვებსაიტს ავტომობილის არჩევის მზა ვიჯეტი.';
+    $docsLabel = $en ? 'Read the docs' : 'დოკუმენტაციის ნახვა';
+    $pickTitle = $en ? 'See how selection works' : 'ნახეთ, როგორ მუშაობს ავტომობილის არჩევა';
+    $pickLead = $en ? 'Choose a brand, model, year, and body type.' : 'აირჩიეთ ბრენდი, მოდელი, გამოშვების წელი და ძარის ტიპი, რათა ნახოთ, როგორ მუშაობს ავტომობილის არჩევის კომპონენტი.';
+    $brandSmall = $en ? 'Brand' : 'ბრენდი';
+    $brandPh = $en ? 'Select a brand' : 'აირჩიეთ ბრენდი';
+    $modelSmall = $en ? 'Model' : 'მოდელი';
+    $modelPh = $en ? 'Select a model' : 'აირჩიეთ მოდელი';
+    $yearSmall = $en ? 'Year' : 'გამოშვების წელი';
+    $yearPh = $en ? 'Select a year' : 'აირჩიეთ წელი';
+    $bodySmall = $en ? 'Body' : 'ძარის ტიპი';
+    $bodyPh = $en ? 'Select a body' : 'აირჩიეთ ძარის ტიპი';
+    $searchPh = $en ? 'Search' : 'ძიება';
+    $searchLabel = $en ? 'Search the list' : 'სიაში ძიება';
     echo <<<HTML
 <main id="content">
 <section class="hero">
 <div class="wrap grid">
 <div class="date"><b class="mono">carapi</b><span class="mono">API v1</span><span class="ka">{$when}</span></div>
 <div>
-<h1>ავტომობილების მონაცემები თქვენი საიტისთვის — <span>API ან მზა ვიჯეტი</span></h1>
-<div class="meta"><p>მიიღეთ ავტომობილების ბრენდების, მოდელებისა და თაობების მონაცემები API-ის საშუალებით, ან დაამატეთ თქვენს ვებსაიტს ავტომობილის არჩევის მზა ვიჯეტი.</p>
-<div class="ctas">{$primary}<a class="btn btn-g" href="/guide">დოკუმენტაციის ნახვა</a></div></div>
+<h1>{$h1}</h1>
+<div class="meta"><p>{$lead}</p>
+<div class="ctas">{$primary}<a class="btn btn-g" href="/guide">{$docsLabel}</a></div></div>
 </div>
 <div class="cmd" id="demo">
 {$counts['note']}
-<p class="hero-note"><b>ნახეთ, როგორ მუშაობს ავტომობილის არჩევა</b><br>აირჩიეთ ბრენდი, მოდელი, გამოშვების წელი და ძარის ტიპი, რათა ნახოთ, როგორ მუშაობს ავტომობილის არჩევის კომპონენტი.</p>
+<p class="hero-note"><b>{$pickTitle}</b><br>{$pickLead}</p>
 <div class="cl">
 <span class="pr">GET /api/v1/brands</span>
-<button class="st" type="button" data-step="brand"><small>ბრენდი</small><b class="ph">აირჩიეთ ბრენდი</b>{$chev}</button>
-<button class="st" type="button" data-step="model"><small>მოდელი</small><b class="ph">აირჩიეთ მოდელი</b>{$chev}</button>
-<button class="st" type="button" data-step="year"><small>გამოშვების წელი</small><b class="ph">აირჩიეთ წელი</b>{$chev}</button>
-<button class="st" type="button" data-step="body"><small>ძარის ტიპი</small><b class="ph">აირჩიეთ ძარის ტიპი</b>{$chev}</button>
+<button class="st" type="button" data-step="brand"><small>{$brandSmall}</small><b class="ph">{$brandPh}</b>{$chev}</button>
+<button class="st" type="button" data-step="model"><small>{$modelSmall}</small><b class="ph">{$modelPh}</b>{$chev}</button>
+<button class="st" type="button" data-step="year"><small>{$yearSmall}</small><b class="ph">{$yearPh}</b>{$chev}</button>
+<button class="st" type="button" data-step="body"><small>{$bodySmall}</small><b class="ph">{$bodyPh}</b>{$chev}</button>
 </div>
 <div class="picker" id="demo-picker" hidden>
-<input id="demo-q" type="search" placeholder="ძიება" aria-label="სიაში ძიება" autocomplete="off">
+<input id="demo-q" type="search" placeholder="{$searchPh}" aria-label="{$searchLabel}" autocomplete="off">
 <ul id="demo-list"></ul>
 </div>
 <div class="res">

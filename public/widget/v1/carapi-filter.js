@@ -2,9 +2,23 @@
   var script = document.currentScript;
   var apiBase = script && script.src ? new URL(script.src).origin : '';
   var LEVELS = ['brand', 'model', 'year', 'body'];
-  var LABELS = { brand: 'ბრენდი', model: 'მოდელი', year: 'გამოშვების წელი', body: 'ძარის ტიპი' };
-  var PLACEHOLDER = { brand: 'აირჩიეთ ბრენდი', model: 'აირჩიეთ მოდელი', year: 'აირჩიეთ წელი', body: 'აირჩიეთ ძარის ტიპი' };
-  var BODY_LABEL = {
+  var en = document.documentElement.lang === 'en';
+  var LABELS = en
+    ? { brand: 'Brand', model: 'Model', year: 'Year', body: 'Body' }
+    : { brand: 'ბრენდი', model: 'მოდელი', year: 'გამოშვების წელი', body: 'ძარის ტიპი' };
+  var PLACEHOLDER = en
+    ? { brand: 'Select a brand', model: 'Select a model', year: 'Select a year', body: 'Select a body' }
+    : { brand: 'აირჩიეთ ბრენდი', model: 'აირჩიეთ მოდელი', year: 'აირჩიეთ წელი', body: 'აირჩიეთ ძარის ტიპი' };
+  var BODY_LABEL = en ? {
+    sedan: 'Sedan',
+    hatchback: 'Hatchback',
+    liftback: 'Liftback',
+    wagon: 'Wagon',
+    coupe: 'Coupe',
+    minivan: 'Minivan',
+    van: 'Van',
+    pickup: 'Pickup'
+  } : {
     sedan: 'სედანი',
     hatchback: 'ჰეჩბეკი',
     liftback: 'ლიფტბეკი',

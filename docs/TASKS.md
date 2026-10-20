@@ -1,5 +1,17 @@
 # Tasks
 
+## 2026-10-20 — QA audit, high and medium
+
+- [x] Locale cookie, `/locale/{ka|en}`, `/en` and `/ka` redirects, English title, nav, and home picker.
+- [x] Home generation count explains the grouped definition.
+- [x] `/pricing` shows the existing free limit only.
+- [x] Public `/api/docs` and OpenAPI without a stack trace. Guide example uses `demo` and the widget POST path.
+- [x] Picker generations collapse the same chassis and keep market or steering in the label.
+- [x] `q` filters picker brands.
+- [x] Sitemap, robots, canonical, hreflang, Open Graph.
+- [x] Security headers on PHP responses.
+- [x] Catalog error text follows `Accept-Language` (Georgian for `ka`, English otherwise).
+
 ## 2026-10-20 — QA audit, critical
 
 - [x] Stop uncaught errors from returning exception class, path, SQL, or trace. Unique violation is HTTP 409.

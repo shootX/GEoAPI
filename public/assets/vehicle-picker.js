@@ -9,7 +9,14 @@
   var flagNote = document.getElementById('vp-flag-note');
   var specs = document.getElementById('vp-specs');
   var order = ['brand', 'model', 'year', 'generation', 'modification'];
-  var placeholders = {
+  var en = document.documentElement.lang === 'en';
+  var placeholders = en ? {
+    brand: 'Select a brand',
+    model: 'Select a model',
+    year: 'Select a year',
+    generation: 'Select a generation',
+    modification: 'Select a modification'
+  } : {
     brand: 'აირჩიეთ მარკა',
     model: 'აირჩიეთ მოდელი',
     year: 'აირჩიეთ წელი',
