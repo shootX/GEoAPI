@@ -1,2 +1,4 @@
 User-agent: *
 Disallow:
+
+Sitemap: https://car.socialsave.cc/sitemap.xml

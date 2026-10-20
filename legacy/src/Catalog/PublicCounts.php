@@ -8,7 +8,7 @@ final class PublicCounts
 {
     private const TTL = 120;
 
-    /** @return array{status:string, brands?:int, models?:int, generations?:int, models_without_generations?:int} */
+    /** @return array{status:string, brands?:int, models?:int, generations?:int, generation_groups?:int, models_without_generations?:int} */
     public static function read(): array
     {
         if (! Http::enabled()) {
@@ -34,6 +34,7 @@ final class PublicCounts
             'brands' => (int) $coverage['brands_count'],
             'models' => (int) $coverage['models_count'],
             'generations' => $generations,
+            'generation_groups' => (int) $coverage['generations_count'],
             'models_without_generations' => (int) $coverage['models_without_generations_count'],
         ];
         self::store($counts);
@@ -41,7 +42,7 @@ final class PublicCounts
         return $counts;
     }
 
-    /** @return array{status:string, brands:int, models:int, generations:int, models_without_generations:int}|null */
+    /** @return array{status:string, brands:int, models:int, generations:int, generation_groups:int, models_without_generations:int}|null */
     private static function cached(): ?array
     {
         $path = self::path();
@@ -52,7 +53,7 @@ final class PublicCounts
         if (! is_array($decoded) || ($decoded['status'] ?? '') !== 'ok') {
             return null;
         }
-        foreach (['brands', 'models', 'generations', 'models_without_generations'] as $key) {
+        foreach (['brands', 'models', 'generations', 'generation_groups', 'models_without_generations'] as $key) {
             $min = $key === 'models_without_generations' ? 0 : 1;
             if (! isset($decoded[$key]) || ! is_int($decoded[$key]) || $decoded[$key] < $min) {
                 return null;
@@ -62,7 +63,7 @@ final class PublicCounts
         return $decoded;
     }
 
-    /** @param array{status:string, brands:int, models:int, generations:int, models_without_generations:int} $counts */
+    /** @param array{status:string, brands:int, models:int, generations:int, generation_groups:int, models_without_generations:int} $counts */
     private static function store(array $counts): void
     {
         $path = self::path();

@@ -33,14 +33,14 @@
     <section class="grid min-w-0 items-start gap-6 border-b border-border py-8 lg:grid-cols-2">
         <div class="min-w-0">
             <h2 class="text-lg font-semibold">{{ __('Widget') }}</h2>
-            <p class="mt-3 text-sm leading-6">{{ $en ? 'A public carapi_pk_ key and an allowed origin. The event is carapi:change. generation_id and modification_id are null in this version.' : 'საჯარო გასაღები carapi_pk_ და დაშვებული origin. მოვლენა carapi:change. generation_id და modification_id ამ ვერსიაში null-ია.' }}</p>
+            <p class="mt-3 text-sm leading-6">{{ $en ? 'The browser calls POST /widget/v1/{public-key}/brands and the same path for models, years, and generations. On this site the key demo works only for this origin. A project key looks like carapi_pk_ and 32 hex characters. The carapi:change event includes generation_id after a generation is chosen. modification_id stays null; use the server API for modifications.' : 'ბრაუზერი იძახებს POST /widget/v1/{საჯარო-გასაღები}/brands და იმავე გზას მოდელების, წლებისა და თაობებისთვის. ამ საიტზე demo გასაღები მხოლოდ ამ origin-ზე მუშაობს. პროექტის გასაღები არის carapi_pk_ და 32 თექვსმეტობითი სიმბოლო. carapi:change მოვლენაში generation_id ივსება თაობის არჩევის შემდეგ. modification_id რჩება null; მოდიფიკაციისთვის გამოიყენეთ სერვერული API.' }}</p>
         </div>
         <div class="codebox min-w-0">
             <div class="flex justify-end px-3 py-2">
                 <button type="button" class="text-xs font-semibold" data-copy-target="guide-embed" data-copied="{{ __('Copied') }}">{{ __('Copy') }}</button>
             </div>
             <pre id="guide-embed">{{ '<script src="'.rtrim((string) config('app.url'), '/').'/widget/v1/carapi-filter.js"></script>' }}
-{{ '<carapi-filter public-key="carapi_pk_example"></carapi-filter>' }}</pre>
+{{ '<carapi-filter public-key="demo"></carapi-filter>' }}</pre>
         </div>
     </section>
     <section class="grid min-w-0 items-start gap-6 py-8 lg:grid-cols-2">

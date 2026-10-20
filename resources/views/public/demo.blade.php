@@ -18,7 +18,7 @@
         </div>
         <div class="codebox mt-3">
             <pre id="vp-embed">{{ '<script src="'.rtrim((string) config('app.url'), '/').'/widget/v1/carapi-filter.js"></script>' }}
-{{ '<carapi-filter public-key="carapi_pk_example"></carapi-filter>' }}</pre>
+{{ '<carapi-filter public-key="demo"></carapi-filter>' }}</pre>
         </div>
     </section>
 @endcomponent

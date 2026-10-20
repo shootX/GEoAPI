@@ -35,7 +35,7 @@ final class VehiclePickerHttp
 
             return;
         }
-        if ($route['kind'] !== 'photo' && !self::sameOrigin()) {
+        if ($route['kind'] !== 'photo' && ! self::sameOrigin()) {
             self::json(403, ['error' => ['code' => 'forbidden', 'message' => 'Request is not allowed.']]);
 
             return;
@@ -46,7 +46,7 @@ final class VehiclePickerHttp
 
             return;
         }
-        if (!$allowed) {
+        if (! $allowed) {
             header('Retry-After: 60');
             self::json(429, ['error' => ['code' => 'rate_limited', 'message' => 'Too many requests.']]);
 
@@ -62,7 +62,7 @@ final class VehiclePickerHttp
         try {
             $repo = new VehiclePickerRepository(Connection::pdo());
             if ($route['kind'] === 'photo') {
-                if (!self::embeddedImage()) {
+                if (! self::embeddedImage()) {
                     self::json(403, ['error' => ['code' => 'forbidden', 'message' => 'Request is not allowed.']]);
 
                     return;
@@ -79,8 +79,8 @@ final class VehiclePickerHttp
 
                     return;
                 }
-                header('Content-Type: ' . $marked['mime']);
-                header('Content-Length: ' . strlen($marked['bytes']));
+                header('Content-Type: '.$marked['mime']);
+                header('Content-Length: '.strlen($marked['bytes']));
                 header('Content-Disposition: inline');
                 header('X-Content-Type-Options: nosniff');
                 header('X-Robots-Tag: noindex, noimageindex, noarchive');
@@ -93,7 +93,7 @@ final class VehiclePickerHttp
                 return;
             }
             $result = self::result($repo, $route, $page);
-        } catch (UnavailableException | PDOException) {
+        } catch (UnavailableException|PDOException) {
             self::json(503, ['error' => ['code' => 'unavailable', 'message' => 'Catalog is temporarily unavailable.']]);
 
             return;
@@ -117,14 +117,19 @@ final class VehiclePickerHttp
     }
 
     /**
-     * @param array{kind:string,id?:string,year?:int} $route
-     * @param array{page:int,per_page:int,offset:int}|null $page
+     * @param  array{kind:string,id?:string,year?:int}  $route
+     * @param  array{page:int,per_page:int,offset:int}|null  $page
      * @return array<string, mixed>|null
      */
     private static function result(VehiclePickerRepository $repo, array $route, ?array $page): ?array
     {
         if ($route['kind'] === 'brands') {
-            return $repo->brands($page['per_page'], $page['offset']);
+            $term = self::term();
+            if ($term === null) {
+                return null;
+            }
+
+            return $repo->brands($page['per_page'], $page['offset'], $term);
         }
         if ($route['kind'] === 'models') {
             $result = $repo->models($route['id'], $page['per_page'], $page['offset']);
@@ -235,10 +240,25 @@ final class VehiclePickerHttp
         return ['kind' => 'invalid'];
     }
 
+    private static function term(): ?string
+    {
+        $value = $_GET['q'] ?? null;
+        if ($value === null || $value === '') {
+            return '';
+        }
+        if (! is_string($value) || strlen($value) > 80) {
+            self::json(422, ['error' => ['code' => 'invalid_parameter', 'message' => 'q must be a string of at most 80 characters.']]);
+
+            return null;
+        }
+
+        return trim($value);
+    }
+
     private static function year(): ?int
     {
         $value = $_GET['year'] ?? null;
-        if (!is_string($value) || preg_match('/^(18[8-9][0-9]|19[0-9]{2}|20[0-9]{2}|2100)$/', $value) !== 1) {
+        if (! is_string($value) || preg_match('/^(18[8-9][0-9]|19[0-9]{2}|20[0-9]{2}|2100)$/', $value) !== 1) {
             self::json(422, ['error' => ['code' => 'invalid_parameter', 'message' => 'Year must be a four-digit year from 1880 to 2100.']]);
 
             return null;
@@ -267,7 +287,7 @@ final class VehiclePickerHttp
         if ($value === null) {
             return $default;
         }
-        if (!is_string($value) || preg_match('/^[1-9][0-9]*$/', $value) !== 1) {
+        if (! is_string($value) || preg_match('/^[1-9][0-9]*$/', $value) !== 1) {
             self::json(422, ['error' => ['code' => 'invalid_parameter', 'message' => self::pageError($name)]]);
 
             return null;
@@ -304,11 +324,11 @@ final class VehiclePickerHttp
             return true;
         }
         $host = $_SERVER['HTTP_HOST'] ?? '';
-        if (!is_string($host) || preg_match('/^[A-Za-z0-9.-]+(?::[0-9]{1,5})?$/', $host) !== 1) {
+        if (! is_string($host) || preg_match('/^[A-Za-z0-9.-]+(?::[0-9]{1,5})?$/', $host) !== 1) {
             return false;
         }
         $https = isset($_SERVER['HTTPS']) && is_string($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== '' && strtolower($_SERVER['HTTPS']) !== 'off';
-        $expected = ($https ? 'https://' : 'http://') . strtolower($host);
+        $expected = ($https ? 'https://' : 'http://').strtolower($host);
         $origin = $_SERVER['HTTP_ORIGIN'] ?? '';
 
         return is_string($origin) && strtolower($origin) === $expected;
@@ -323,16 +343,16 @@ final class VehiclePickerHttp
 
     private static function allowIp(string $ip): ?bool
     {
-        $dir = dirname(__DIR__, 2) . '/cache/demo-limit';
-        if (!is_dir($dir) && !mkdir($dir, 0775, true) && !is_dir($dir)) {
+        $dir = dirname(__DIR__, 2).'/cache/demo-limit';
+        if (! is_dir($dir) && ! mkdir($dir, 0775, true) && ! is_dir($dir)) {
             return null;
         }
-        $handle = fopen($dir . '/' . hash('sha256', $ip), 'c+');
+        $handle = fopen($dir.'/'.hash('sha256', $ip), 'c+');
         if ($handle === false) {
             return null;
         }
         try {
-            if (!flock($handle, LOCK_EX)) {
+            if (! flock($handle, LOCK_EX)) {
                 return null;
             }
             $raw = stream_get_contents($handle);

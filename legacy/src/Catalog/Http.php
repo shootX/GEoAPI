@@ -4,21 +4,23 @@ declare(strict_types=1);
 
 namespace Carapi\Catalog;
 
+use App\Access\LegacyGate;
 use Carapi\Platform\UnavailableException as PlatformUnavailable;
 use Carapi\Platform\UsageLimiter;
+use Carapi\Widget\Cors;
 use PDOException;
 
 final class Http
 {
     public static function dispatch(string $path): void
     {
-        if (!self::enabled()) {
+        if (! self::enabled()) {
             self::json(404, ['error' => ['code' => 'not_found', 'message' => 'მითითებული მისამართით მონაცემები ვერ მოიძებნა.']]);
 
             return;
         }
 
-        if (self::modificationDetailPath($path) && !self::modificationDetailsEnabled()) {
+        if (self::modificationDetailPath($path) && ! self::modificationDetailsEnabled()) {
             self::json(404, ['error' => ['code' => 'not_found', 'message' => 'მითითებული მისამართით მონაცემები ვერ მოიძებნა.']]);
 
             return;
@@ -28,7 +30,7 @@ final class Http
             $limiter = UsageLimiter::fromEnv();
             $now = UsageLimiter::now();
             $ipHit = $limiter->hitIp(UsageLimiter::clientIp(), $now);
-        } catch (UnavailableException | PlatformUnavailable | PDOException) {
+        } catch (UnavailableException|PlatformUnavailable|PDOException) {
             self::json(503, ['error' => ['code' => 'unavailable', 'message' => 'სერვისი დროებით მიუწვდომელია. სცადეთ მოთხოვნის ხელახლა გაგზავნა მოგვიანებით.']]);
 
             return;
@@ -57,8 +59,8 @@ final class Http
             return;
         }
 
-        if (class_exists(\App\Access\LegacyGate::class)) {
-            $denial = \App\Access\LegacyGate::catalog($access['project_id']);
+        if (class_exists(LegacyGate::class)) {
+            $denial = LegacyGate::catalog($access['project_id']);
             if ($denial !== null) {
                 self::json($denial['status'], $denial['body']);
 
@@ -68,7 +70,7 @@ final class Http
 
         try {
             $projectHit = $limiter->hitProject($access['project_id'], $now);
-        } catch (UnavailableException | PlatformUnavailable | PDOException) {
+        } catch (UnavailableException|PlatformUnavailable|PDOException) {
             self::json(503, ['error' => ['code' => 'unavailable', 'message' => 'სერვისი დროებით მიუწვდომელია. სცადეთ მოთხოვნის ხელახლა გაგზავნა მოგვიანებით.']]);
 
             return;
@@ -139,7 +141,7 @@ final class Http
             if ($route['kind'] === 'brands') {
                 $result = $repo->brands($page['per_page'], $page['offset']);
             } elseif ($route['kind'] === 'models') {
-                if (!$repo->brandExists($route['slug'])) {
+                if (! $repo->brandExists($route['slug'])) {
                     Access::touch($access['key_id']);
                     self::json(404, ['error' => ['code' => 'not_found', 'message' => 'მითითებული ბრენდი ვერ მოიძებნა.']]);
 
@@ -155,7 +157,7 @@ final class Http
                     return;
                 }
             } else {
-                if (!$repo->modelExists($route['id'])) {
+                if (! $repo->modelExists($route['id'])) {
                     Access::touch($access['key_id']);
                     self::json(404, ['error' => ['code' => 'not_found', 'message' => 'მითითებული მოდელი ვერ მოიძებნა.']]);
 
@@ -220,14 +222,14 @@ final class Http
             if ($kind === 'widget:brands') {
                 $result = $repo->brands($page['per_page'], $page['offset']);
             } elseif ($kind === 'widget:models') {
-                if (!$repo->brandExists((string) $slug)) {
+                if (! $repo->brandExists((string) $slug)) {
                     self::json(404, ['error' => ['code' => 'not_found', 'message' => 'მითითებული ბრენდი ვერ მოიძებნა.']]);
 
                     return;
                 }
                 $result = $repo->models((string) $slug, $page['per_page'], $page['offset']);
             } elseif ($kind === 'widget:years') {
-                if (!$repo->modelExists((string) $id)) {
+                if (! $repo->modelExists((string) $id)) {
                     self::json(404, ['error' => ['code' => 'not_found', 'message' => 'მითითებული მოდელი ვერ მოიძებნა.']]);
 
                     return;
@@ -238,7 +240,7 @@ final class Http
                     'total' => $choices['total'],
                 ];
             } else {
-                if (!$repo->modelExists((string) $id)) {
+                if (! $repo->modelExists((string) $id)) {
                     self::json(404, ['error' => ['code' => 'not_found', 'message' => 'მითითებული მოდელი ვერ მოიძებნა.']]);
 
                     return;
@@ -249,7 +251,7 @@ final class Http
                 'data' => $result['rows'],
                 'meta' => ['page' => $page['page'], 'per_page' => $page['per_page'], 'total' => $result['total']],
             ], $now);
-        } catch (UnavailableException | PlatformUnavailable | PDOException) {
+        } catch (UnavailableException|PlatformUnavailable|PDOException) {
             self::json(503, ['error' => ['code' => 'unavailable', 'message' => 'სერვისი დროებით მიუწვდომელია. სცადეთ მოთხოვნის ხელახლა გაგზავნა მოგვიანებით.']]);
         }
     }
@@ -262,25 +264,25 @@ final class Http
             if ($access['key_id'] > 0) {
                 Access::touch($access['key_id']);
             }
-        } catch (UnavailableException | PlatformUnavailable | PDOException) {
+        } catch (UnavailableException|PlatformUnavailable|PDOException) {
             self::json(503, ['error' => ['code' => 'unavailable', 'message' => 'სერვისი დროებით მიუწვდომელია. სცადეთ მოთხოვნის ხელახლა გაგზავნა მოგვიანებით.']]);
 
             return;
         }
-        if (!$saved['ok']) {
+        if (! $saved['ok']) {
             self::limited('MONTHLY_QUOTA_EXCEEDED', max(1, $saved['reset_at'] - $now));
 
             return;
         }
-        header('X-Quota-Limit: ' . $saved['limit']);
-        header('X-Quota-Remaining: ' . $saved['remaining']);
-        header('X-Quota-Reset: ' . $saved['reset_at']);
+        header('X-Quota-Limit: '.$saved['limit']);
+        header('X-Quota-Remaining: '.$saved['remaining']);
+        header('X-Quota-Reset: '.$saved['reset_at']);
         self::json(200, $payload);
     }
 
     private static function limited(string $code, int $retryAfter): void
     {
-        header('Retry-After: ' . max(1, $retryAfter));
+        header('Retry-After: '.max(1, $retryAfter));
         self::json(429, ['error' => ['code' => $code, 'message' => 'მოთხოვნების ლიმიტი მიღწეულია.']]);
     }
 
@@ -324,10 +326,10 @@ final class Http
             return ['kind' => 'models', 'slug' => $match[1]];
         }
         if (preg_match('#^/api/v1/modifications/([^/]+)$#', $path, $match) === 1) {
-            if (!self::modificationDetailsEnabled()) {
+            if (! self::modificationDetailsEnabled()) {
                 return null;
             }
-            if (!preg_match('/^[1-9][0-9]{0,18}$/', $match[1])) {
+            if (! preg_match('/^[1-9][0-9]{0,18}$/', $match[1])) {
                 self::json(422, ['error' => ['code' => 'invalid_parameter', 'message' => 'მოდიფიკაციის id არასწორია. გამოიყენეთ დადებითი მთელი რიცხვი, რომელიც API-ის პასუხშია.']]);
 
                 return ['kind' => 'invalid'];
@@ -336,10 +338,10 @@ final class Http
             return ['kind' => 'modification', 'id' => $match[1]];
         }
         if (preg_match('#^/api/v1/generations/([^/]+)/modifications$#', $path, $match) === 1) {
-            if (!self::modificationsEnabled()) {
+            if (! self::modificationsEnabled()) {
                 return null;
             }
-            if (!preg_match('/^[1-9][0-9]{0,18}$/', $match[1])) {
+            if (! preg_match('/^[1-9][0-9]{0,18}$/', $match[1])) {
                 self::json(422, ['error' => ['code' => 'invalid_parameter', 'message' => 'თაობის id არასწორია. გამოიყენეთ დადებითი მთელი რიცხვი, რომელიც API-ის პასუხშია.']]);
 
                 return ['kind' => 'invalid'];
@@ -348,7 +350,7 @@ final class Http
             return ['kind' => 'modifications', 'id' => $match[1]];
         }
         if (preg_match('#^/api/v1/models/([^/]+)/generations$#', $path, $match) === 1) {
-            if (!preg_match('/^[1-9][0-9]{0,18}$/', $match[1])) {
+            if (! preg_match('/^[1-9][0-9]{0,18}$/', $match[1])) {
                 self::json(422, ['error' => ['code' => 'invalid_parameter', 'message' => 'მოდელის id არასწორია. გამოიყენეთ დადებითი მთელი რიცხვი, რომელიც API-ის პასუხშია.']]);
 
                 return ['kind' => 'invalid'];
@@ -384,7 +386,7 @@ final class Http
         if ($value === null) {
             return $default;
         }
-        if (is_array($value) || !is_string($value) || !preg_match('/^[1-9][0-9]*$/', $value)) {
+        if (is_array($value) || ! is_string($value) || ! preg_match('/^[1-9][0-9]*$/', $value)) {
             $hint = $name === 'per_page'
                 ? 'პარამეტრი per_page არასწორია. მიუთითეთ მთელი რიცხვი 1-დან 100-მდე.'
                 : 'პარამეტრი page არასწორია. მიუთითეთ დადებითი მთელი რიცხვი, არაუმეტეს 1000000.';
@@ -408,10 +410,54 @@ final class Http
     /** @param array<string, mixed> $payload */
     public static function json(int $status, array $payload): void
     {
-        \Carapi\Widget\Cors::apply();
+        if (isset($payload['error']) && is_array($payload['error']) && ! self::prefersGeorgian()) {
+            $message = (string) ($payload['error']['message'] ?? '');
+            if ($message !== '' && preg_match('/\p{Georgian}/u', $message) === 1) {
+                $payload['error']['message'] = self::englishMessage((string) ($payload['error']['code'] ?? ''), $message);
+            }
+        }
+        Cors::apply();
         http_response_code($status);
         header('Content-Type: application/json; charset=utf-8');
         header('Cache-Control: no-store');
         echo json_encode($payload, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+    }
+
+    private static function prefersGeorgian(): bool
+    {
+        $header = $_SERVER['HTTP_ACCEPT_LANGUAGE'] ?? '';
+        if (! is_string($header) || trim($header) === '') {
+            return true;
+        }
+        $first = strtolower(trim(explode(';', explode(',', $header)[0])[0]));
+
+        return $first === '' || str_starts_with($first, 'ka');
+    }
+
+    private static function englishMessage(string $code, string $message): string
+    {
+        $known = [
+            'მითითებული მისამართით მონაცემები ვერ მოიძებნა.' => 'Nothing was found at this address.',
+            'სერვისი დროებით მიუწვდომელია. სცადეთ მოთხოვნის ხელახლა გაგზავნა მოგვიანებით.' => 'The service is temporarily unavailable. Try the request again later.',
+            'ეს HTTP მეთოდი დაუშვებელია. გამოიყენეთ GET.' => 'This HTTP method is not allowed. Use GET.',
+            'ეს HTTP მეთოდი დაუშვებელია. გამოიყენეთ POST.' => 'This HTTP method is not allowed. Use POST.',
+            'მოთხოვნების ლიმიტი მიღწეულია.' => 'The request limit was reached.',
+            'მოთხოვნა არ არის დაშვებული. შეამოწმეთ საჯარო API გასაღები, დაშვებული origin და პროექტის მდგომარეობა.' => 'The request is not allowed. Check the public key, the allowed origin, and the project.',
+            'მოთხოვნა არ არის დაშვებული.' => 'The request is not allowed.',
+        ];
+        if (isset($known[$message])) {
+            return $known[$message];
+        }
+
+        return match ($code) {
+            'unauthorized' => 'The API key is missing or no longer works.',
+            'forbidden' => 'The request is not allowed.',
+            'not_found' => 'The requested record was not found.',
+            'invalid_parameter' => 'A parameter is invalid.',
+            'unavailable' => 'The service is temporarily unavailable.',
+            'RATE_LIMIT_EXCEEDED' => 'The request limit was reached.',
+            'MONTHLY_QUOTA_EXCEEDED' => 'The monthly quota was reached.',
+            default => 'The request could not be completed.',
+        };
     }
 }

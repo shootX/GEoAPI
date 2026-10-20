@@ -1,4 +1,10 @@
-@component('components.layouts.public', ['title' => 'გამოყენების წესები — CarAPI', 'description' => 'CarAPI-ის გამოყენების წესები'])
+@component('components.layouts.public', [
+    'title' => (app()->getLocale() === 'en' ? 'Terms of use' : 'გამოყენების წესები').' — CarAPI',
+    'description' => app()->getLocale() === 'en' ? 'CarAPI terms of use' : 'CarAPI-ის გამოყენების წესები',
+])
+@if (app()->getLocale() === 'en')
+    @include('public.partials.terms-en')
+@else
 <article class="space-y-6 text-sm leading-6">
 
 <section class="panel">
@@ -20,4 +26,5 @@
 <p>წესების მოქმედი ტექსტი ამ გვერდზეა. მხარდაჭერა: info@socialsave.cc. პერსონალურ მონაცემებზე იხილეთ <a href="/privacy">კონფიდენციალურობის პოლიტიკა</a>.</p>
 </section>
 </article>
+@endif
 @endcomponent

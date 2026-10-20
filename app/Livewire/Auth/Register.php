@@ -13,7 +13,7 @@ use Illuminate\Validation\ValidationException;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Title;
 
-#[Layout('electrik::components.layouts.guest')]
+#[Layout('components.layouts.public')]
 #[Title('ანგარიშის შექმნა')]
 final class Register extends \Electrik\Livewire\Auth\Register
 {
@@ -67,6 +67,9 @@ final class Register extends \Electrik\Livewire\Auth\Register
 
     public function render()
     {
-        return view('livewire.auth.register');
+        return view('livewire.auth.register')->layoutData([
+            'title' => __('Create account').' — CarAPI',
+            'description' => __('Password must be at least 15 characters.'),
+        ]);
     }
 }
