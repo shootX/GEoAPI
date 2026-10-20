@@ -12,7 +12,7 @@
         <h2>Free</h2>
         <div class="amount">0 ₾</div>
         <ul>
-            <li>{{ __('60 requests per minute and 10,000 successful requests per calendar month, per project.') }}</li>
+            <li>{{ __('60 requests per minute, 2,000 per day, and 10,000 successful requests per calendar month, per project.') }}</li>
             <li>{{ __('Server API') }}</li>
             <li>{{ __('Widget') }}</li>
         </ul>
@@ -49,6 +49,11 @@
             <tr class="border-t border-border">
                 <th class="py-3 text-left font-medium">{{ __('Requests per minute') }}</th>
                 <td>60</td>
+                <td>{{ __('Soon') }}</td>
+            </tr>
+            <tr class="border-t border-border">
+                <th class="py-3 text-left font-medium">{{ __('Requests per day') }}</th>
+                <td>2 000</td>
                 <td>{{ __('Soon') }}</td>
             </tr>
             <tr class="border-t border-border">

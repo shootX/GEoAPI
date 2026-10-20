@@ -30,3 +30,11 @@ The first redesign only recolored the old layout. Home now follows `docs/mockups
 `/dashboard` and `/account` both render `App\Livewire\Account\Projects` with `public/assets/cabinet.css`. The `/dashboard` route is registered before Electrik's shell. When `CARAPI_CABINET_DEMO=1`, the cabinet shows the mockup sample (დემო პროექტი, 2 140 used, the 30-day bars, ვიჯეტი / სერვერი, and the six catalog cards) instead of the platform database. Leave that flag unset in production. PHPUnit forces it off.
 
 The blog link is omitted from the header and footer of pages that still use the public chrome while `blog_posts` has no visible row. The route stays. The legacy project desk at `/account/projects/{id}` was not rebuilt.
+
+## 2026-10-20 — Public API v1
+
+The public catalog is `App\Catalog\CatalogApi` on `ANY /api/v1/{path?}`. `/api/v1/openapi.json`, `/api/v1/postman.json`, and `/api/v1/docs` are registered first, so they are not caught by that route. The widget still uses `Http::readForProject()` and its own `per_page` (default 50, max 100).
+
+`meta.page`, `meta.per_page`, and `meta.total` stay. `collection` is added. `per_page` applies only when `limit` is missing. The default page size for `/api/v1` is 100, maximum 1000. Years are still `year_start` and `year_end`; `year_from` / `year_to` are query filters for overlap, not columns. There is no engines, bodies, or colors table. `/engines` and `/fuel` read `modifications` plus `modification_specs.specs` (`fuel_type`, `fuel_city_l`, `fuel_highway_l`, `fuel_combined_l`, `power_hp`). `/bodies` is the distinct `body_type` values. `/colors` is `model_photos.color` and does not return the image. `modified` is `updated_at` once the owner migration adds that column.
+
+Free limits remain 60/minute and 10 000/month. The new daily cap is 2 000 successful requests per UTC day, stored as `platform.project_limits.per_day` (default 2000). If that column is missing, the daily check is skipped so an undeployed migration does not turn the API into 503. `X-Quota-*` stays the monthly quota. `X-RateLimit-*` is the minute window on success, and the limit that was hit on 429. New projects insert `per_day` when the column exists. `APP_DEBUG` and mail settings were not changed.

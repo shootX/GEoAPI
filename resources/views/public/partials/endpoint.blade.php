@@ -4,6 +4,8 @@
     $samples = [
         'curl' => "curl ". $url ." \\\n  -H \"Authorization: Bearer carapi_sk_…\"",
         'JavaScript' => "const response = await fetch(".json_encode($url).", {\n  headers: { Authorization: 'Bearer carapi_sk_…' },\n});\nconst data = await response.json();",
+        'Node' => "const response = await fetch(".json_encode($url).", {\n  headers: { Authorization: 'Bearer carapi_sk_…' },\n});\nconsole.log(await response.json());",
+        'Python' => "import urllib.request\nrequest = urllib.request.Request(".json_encode($url).", headers={'Authorization': 'Bearer carapi_sk_…'})\nprint(urllib.request.urlopen(request).read().decode())",
         'PHP' => "\$ch = curl_init(".json_encode($url).");\ncurl_setopt_array(\$ch, [\n    CURLOPT_HTTPHEADER => ['Authorization: Bearer carapi_sk_…'],\n    CURLOPT_RETURNTRANSFER => true,\n]);\necho curl_exec(\$ch);",
     ];
 @endphp

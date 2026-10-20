@@ -39,6 +39,11 @@ final class PublicPageController extends Controller
         return view('public.guide');
     }
 
+    public function reference(): View
+    {
+        return view('public.api-docs');
+    }
+
     public function privacy(): View
     {
         return $this->page('privacy', 'public.privacy');
