@@ -8,6 +8,8 @@ Picker queries always filter by brand, model, generation, or modification id. Th
 
 `GET /api/models/{id}/photo` returns the bytea with its mime type only when `verified = true`. The picker JSON routes are same-origin and share the demo IP limit (`cache/demo-limit`, 120/minute). The photo route is GET without an origin check so an `<img>` can load it, but only when the browser says the destination is an image and the fetch is same-origin. The response is watermarked or it is not sent.
 
+`DemoWatermark` burns `GEOAPI.GE` into the JPEG. The text is large, rotated -28 degrees, and repeated on a staggered grid that covers the frame, including past the edges. Ink is white at GD alpha 62 and the shadow is darker at alpha 78, so the car stays visible. The same function marks the demo and widget photo route and `/getimage`. PR #6 had reduced this to one small corner label; that corner is not the protection. The CSS `GEOAPI.GE` on the home and cabinet illustrations is only the mockup placeholder, not the photo file.
+
 `carapi_catalog_reader` previously could not read `modification_specs`, `modification_equipment`, or `model_photos`. `SELECT` on those three tables was granted on 2026-10-20. No write privilege was added.
 
 ## 2026-10-20 — Audit fixes
