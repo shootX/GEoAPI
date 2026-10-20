@@ -863,6 +863,9 @@ final class Http
 
             return;
         }
+        if (isset($result['user_id']) && class_exists(\App\Account\IdentitySync::class)) {
+            \App\Account\IdentitySync::markLaravelVerified((int) $result['user_id']);
+        }
         View::notice('ელფოსტა დადასტურდა', 'ელფოსტა დადასტურდა. შედით ანგარიშში. API გასაღები ავტომატურად არ იქმნება — პროექტს კაბინეტში დაამატებთ.');
     }
 

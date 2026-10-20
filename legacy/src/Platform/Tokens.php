@@ -8,9 +8,7 @@ use PDO;
 
 final class Tokens
 {
-    public function __construct(private PDO $pdo)
-    {
-    }
+    public function __construct(private PDO $pdo) {}
 
     public function issue(int $userId, string $purpose, string $email): string
     {
@@ -52,7 +50,7 @@ final class Tokens
     public function limited(string $email, string $ip, string $purpose): ?int
     {
         $this->pdo->beginTransaction();
-        $this->pdo->prepare('SELECT pg_advisory_xact_lock(hashtext(:key))')->execute(['key' => $purpose . '|' . $email . '|' . $ip]);
+        $this->pdo->prepare('SELECT pg_advisory_xact_lock(hashtext(:key))')->execute(['key' => $purpose.'|'.$email.'|'.$ip]);
         $this->note($email, 'email', $purpose);
         $emailMinute = $this->count('email', $email, $purpose, '1 minute');
         if ($emailMinute > 1) {
@@ -118,7 +116,7 @@ final class Tokens
         )->execute(['user_id' => $row['user_id'], 'purpose' => $purpose]);
         $this->pdo->commit();
 
-        return ['ok' => true, 'reason' => 'ok'];
+        return ['ok' => true, 'reason' => 'ok', 'user_id' => (int) $row['user_id']];
     }
 
     private function note(string $subject, string $kind, string $purpose): void
@@ -132,7 +130,7 @@ final class Tokens
     private function count(string $kind, string $subject, string $purpose, string $window): int
     {
         $stmt = $this->pdo->prepare(
-            "SELECT count(*) FROM platform.mail_limits WHERE kind = :kind AND subject = :subject AND purpose = :purpose AND created_at > now() - :window::interval"
+            'SELECT count(*) FROM platform.mail_limits WHERE kind = :kind AND subject = :subject AND purpose = :purpose AND created_at > now() - :window::interval'
         );
         $stmt->execute(['kind' => $kind, 'subject' => $subject, 'purpose' => $purpose, 'window' => $window]);
 

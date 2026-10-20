@@ -14,8 +14,10 @@ use Carapi\Platform\UserRepository;
 use Illuminate\Auth\Events\Login;
 use Illuminate\Auth\Events\Logout;
 use Illuminate\Auth\Events\Registered;
+use Illuminate\Auth\Events\Verified;
 use Illuminate\Support\Facades\Cookie;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 
 final class ProvisionPlatformUser
 {
@@ -46,6 +48,8 @@ final class ProvisionPlatformUser
             Mail::make()->send(UserRepository::email($user->email), 'ელფოსტის დადასტურება', Mail::appUrl().'/email/verify?token='.$token);
         } catch (UnavailableException) {
             // ფოსტა ამ გარემოში გამორთულია. ანგარიში მაინც იქმნება.
+        } catch (\Throwable $e) {
+            report($e);
         }
     }
 
@@ -70,6 +74,24 @@ final class ProvisionPlatformUser
         Cookie::queue(Cookie::forget('carapi_platform'));
     }
 
+    public function verified(Verified $event): void
+    {
+        $user = $event->user;
+        if (! $user instanceof User || $user->legacy_platform_user_id === null) {
+            return;
+        }
+        if (! Schema::hasTable('platform.users')) {
+            return;
+        }
+        DB::table('platform.users')
+            ->where('id', $user->legacy_platform_user_id)
+            ->whereNull('email_verified_at')
+            ->update([
+                'email_verified_at' => now(),
+                'updated_at' => now(),
+            ]);
+    }
+
     private function writeLegacySession(int $legacyId, int $version): void
     {
         $dir = carapi_env('CARAPI_PLATFORM_SESSION_PATH');
@@ -81,6 +103,6 @@ final class ProvisionPlatformUser
         $now = time();
         $payload = 'user_id|i:'.$legacyId.';auth_version|i:'.$version.';issued_at|i:'.$now.';last_seen|i:'.$now.';csrf|s:64:"'.bin2hex(random_bytes(32)).'";';
         file_put_contents($dir.'/sess_'.$sid, $payload, LOCK_EX);
-        Cookie::queue(cookie('carapi_platform', $sid, 0, '/', null, true, true, false, 'lax'));
+        Cookie::queue(cookie('carapi_platform', $sid, 0, '/', null, true, true, true, 'lax'));
     }
 }
