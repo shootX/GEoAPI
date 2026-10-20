@@ -21,8 +21,8 @@
       if (next) root.dataset.theme = next;
       else delete root.dataset.theme;
       try {
-        if (next) localStorage.setItem('carapi-theme', next);
-        else localStorage.removeItem('carapi-theme');
+        if (next) localStorage.setItem('geoapi-theme', next);
+        else localStorage.removeItem('geoapi-theme');
       } catch (e) {}
     });
   });

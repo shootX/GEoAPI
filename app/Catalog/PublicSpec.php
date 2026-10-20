@@ -16,7 +16,7 @@ final class PublicSpec
             'info' => [
                 'title' => 'GeoAPI',
                 'version' => '1.1.0',
-                'description' => 'Public catalog API. Send Authorization: Bearer carapi_sk_… from your server. List responses keep data and meta, and add collection. limit defaults to 100 and cannot exceed 1000. per_page is an alias used only when limit is absent.',
+                'description' => 'Public catalog API. Send Authorization: Bearer geoapi_sk_… from your server. List responses keep data and meta, and add collection. limit defaults to 100 and cannot exceed 1000. per_page is an alias used only when limit is absent.',
             ],
             'servers' => [['url' => $url]],
             'components' => [

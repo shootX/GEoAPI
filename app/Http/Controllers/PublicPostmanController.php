@@ -25,7 +25,7 @@ final class PublicPostmanController extends Controller
             ],
             'variable' => [
                 ['key' => 'baseUrl', 'value' => rtrim((string) config('app.url'), '/')],
-                ['key' => 'token', 'value' => 'carapi_sk_…'],
+                ['key' => 'token', 'value' => 'geoapi_sk_…'],
             ],
             'item' => PublicSpec::requests(),
         ]);

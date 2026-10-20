@@ -280,13 +280,13 @@ final class Projects extends Component
         $base['perMinute'] = 60;
         $base['days'] = $days;
         $base['activeKeys'] = 2;
-        $base['widget'] = ['public_key' => 'carapi_pk_demo4f2a9c10'];
+        $base['widget'] = ['public_key' => 'geoapi_pk_demo4f2a9c10'];
         $base['keys'] = [[
             'id' => 1,
             'name' => 'სერვერი',
             'key_selector' => 'demo91ab77e4',
             'revoked_at' => null,
-            'demo_value' => 'carapi_sk_demo91ab77e4',
+            'demo_value' => 'geoapi_sk_demo91ab77e4',
         ]];
         $base['cars'] = [
             ['brand' => 'Toyota', 'model' => 'Camry', 'years' => '2017–2024', 'body' => 'სედანი', 'engine' => '2.5 ბენზინი', 'power' => '203 ცხ.ძ.', 'slug' => 'toyota', 'id' => '100'],

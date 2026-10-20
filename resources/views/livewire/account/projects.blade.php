@@ -79,7 +79,7 @@
                     @foreach ($keys as $key)
                         @php
                             $off = ($key['revoked_at'] ?? null) !== null;
-                            $secret = (string) ($key['demo_value'] ?? ('carapi_sk_'.($key['key_selector'] ?? '')));
+                            $secret = (string) ($key['demo_value'] ?? ('geoapi_sk_'.($key['key_selector'] ?? '')));
                             $masked = mb_substr($secret, 0, 12).'••••••••';
                         @endphp
                         <article class="key">

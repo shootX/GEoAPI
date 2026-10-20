@@ -242,7 +242,7 @@ final class AdminProjects
         $head = substr($selector, 0, 4);
         $tail = strlen($selector) > 4 ? substr($selector, -4) : '';
 
-        return 'carapi_sk_' . $head . '…' . $tail;
+        return 'geoapi_sk_' . $head . '…' . $tail;
     }
 
     private function text(mixed $value): string

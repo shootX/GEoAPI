@@ -16,7 +16,7 @@ final class BridgeLegacySession
     public function handle(Request $request, Closure $next): Response
     {
         if (! Auth::check()) {
-            $sid = $request->cookie('carapi_platform');
+            $sid = $request->cookie('geoapi_platform');
             $legacyId = is_string($sid) ? $this->legacyUserId($sid) : null;
             if ($legacyId !== null) {
                 $platform = DB::table('platform.users')->where('id', $legacyId)->first(['status', 'auth_version']);

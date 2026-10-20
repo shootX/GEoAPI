@@ -13,7 +13,7 @@
 - პროქსი `/www/server/php/carapi/peer-proxy.py` აკავშირებს მხოლოდ იმ პროცესს, რომლის executable არის `/www/server/nginx/sbin/nginx` და მშობელი მიმდინარე nginx master-ია
 - სესიები: `/www/wwwroot/geoapi.ge/data/sessions`
 - საიდუმლო წყარო: `/www/server/carapi/*.env`, public/-ისა და Git-ის გარეთ
-- runtime იღებს `carapi_catalog_reader` და `carapi_platform_app` ანგარიშებს. მიგრაციის ადმინისტრატორი პულში არ არის
+- runtime იღებს `carapi_catalog_reader` და `geoapi_platform_app` ანგარიშებს. მიგრაციის ადმინისტრატორი პულში არ არის
 - `clear_env = yes`. ცვლადები პულში აშკარადაა ჩამოთვლილი
 
 nginx და სხვა საიტების PHP კვლავ `www` მომხმარებელია. მხოლოდ socket-ის ჯგუფის შეცვლა საკმარისი არ იქნებოდა, რადგან `www`-ს პროცესი socket-ს გახსნიდა. ამიტომ FPM socket `www`-სთვის დახურულია, ხოლო პროქსი nginx-ის გარდა ყველას კეტავს. სხვა საიტების მომხმარებლები არ შეცვლილა.
@@ -76,4 +76,4 @@ systemctl disable --now carapi-fpm-proxy.service carapi-php-fpm.service
 
 სამი დროშა production-ში 1-ია. fake transport production-ში არ გამოიყენება.
 
-SMTP, 2026-09-26: კონფიგურაცია მიერთებულია (`CARAPI_MAIL_TRANSPORT=smtp`, `mail.socialsave.cc:587`, `tls`, `info@socialsave.cc`, `CARAPI_APP_URL=https://geoapi.ge`). პაროლი მხოლოდ `/www/server/carapi/mail.env`-ში და FPM-ის გარემოშია. `clear_env=yes` შენარჩუნებულია. Postfix-ის 587 პორტი Let's Encrypt-ის `*.socialsave.cc` სერტიფიკატს იძლევა, ვადა 2026-12-22. AUTH TLS-ის შემდეგ გავიდა. სატესტო წერილი `sh.chkhvirkia@gmail.com`-ზე გაიგზავნა, Gmail-მა `250` დააბრუნა და მომხმარებელმა ამ ერთი წერილის მიღება დაადასტურა. ეს მომავალი მიწოდების გარანტია არ არის. `php bin/check-carapi-deploy.php` აბრუნებს `ok`.
+SMTP, 2026-09-26: კონფიგურაცია მიერთებულია (`CARAPI_MAIL_TRANSPORT=smtp`, `mail.socialsave.cc:587`, `tls`, `hello@geoapi.ge`, `CARAPI_APP_URL=https://geoapi.ge`). პაროლი მხოლოდ `/www/server/carapi/mail.env`-ში და FPM-ის გარემოშია. `clear_env=yes` შენარჩუნებულია. Postfix-ის 587 პორტი Let's Encrypt-ის `*.socialsave.cc` სერტიფიკატს იძლევა, ვადა 2026-12-22. AUTH TLS-ის შემდეგ გავიდა. სატესტო წერილი `sh.chkhvirkia@gmail.com`-ზე გაიგზავნა, Gmail-მა `250` დააბრუნა და მომხმარებელმა ამ ერთი წერილის მიღება დაადასტურა. ეს მომავალი მიწოდების გარანტია არ არის. `php bin/check-carapi-deploy.php` აბრუნებს `ok`.

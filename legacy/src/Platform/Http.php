@@ -606,9 +606,9 @@ final class Http
         header('Cache-Control: no-store');
         $key = htmlspecialchars((string) $widget['public_key'], ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
         echo '<!doctype html><html lang="ka"><head><meta charset="utf-8"><title>ვიჯეტის წინასწარი ნახვა</title></head><body>';
-        echo '<script src="/widget/v1/carapi-filter.js"></script>';
-        echo '<carapi-filter public-key="' . $key . '"></carapi-filter>';
-        echo '<pre id="out"></pre><script>document.querySelector("carapi-filter").addEventListener("carapi:change",function(e){document.getElementById("out").textContent=JSON.stringify(e.detail);});</script>';
+        echo '<script src="/widget/v1/geoapi-filter.js"></script>';
+        echo '<geoapi-filter public-key="' . $key . '"></geoapi-filter>';
+        echo '<pre id="out"></pre><script>document.querySelector("geoapi-filter").addEventListener("geoapi:change",function(e){document.getElementById("out").textContent=JSON.stringify(e.detail);});</script>';
         echo '</body></html>';
     }
 
@@ -950,7 +950,7 @@ final class Http
         try {
             $sentTo = self::emailForResetToken((string) ($input['token'] ?? ''));
             if ($sentTo !== null) {
-                Mail::make()->send($sentTo, 'პაროლი შეიცვალა', 'თქვენი GeoAPI ანგარიშის პაროლი შეიცვალა. თუ ეს ცვლილება თქვენ არ განგიხორციელებიათ, დაგვიკავშირდით: info@socialsave.cc.');
+                Mail::make()->send($sentTo, 'პაროლი შეიცვალა', 'თქვენი GeoAPI ანგარიშის პაროლი შეიცვალა. თუ ეს ცვლილება თქვენ არ განგიხორციელებიათ, დაგვიკავშირდით: hello@geoapi.ge.');
             }
         } catch (UnavailableException) {
             error_log('[platform] reset notice failed');

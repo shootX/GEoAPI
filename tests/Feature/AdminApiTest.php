@@ -121,10 +121,10 @@ final class AdminApiTest extends TestCase
         $this->withHeader('Authorization', 'Bearer '.$token)
             ->postJson('/api/admin/settings', [
                 'key' => 'site.contact_email',
-                'value' => ['email' => 'info@socialsave.cc'],
+                'value' => ['email' => 'hello@geoapi.ge'],
             ])
             ->assertCreated()
-            ->assertJsonPath('data.value.email', 'info@socialsave.cc');
+            ->assertJsonPath('data.value.email', 'hello@geoapi.ge');
     }
 
     public function test_duplicate_page_slug_is_a_conflict(): void

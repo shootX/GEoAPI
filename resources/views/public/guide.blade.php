@@ -43,7 +43,7 @@
     <div>
     <div class="max-w-3xl">
         <h1 class="text-3xl font-extrabold leading-tight">{{ __('Documentation') }}</h1>
-        <p class="mt-3 text-sm leading-6 text-muted-foreground">{{ $en ? 'The secret key stays on your server. Send it as Authorization: Bearer carapi_sk_…' : 'საიდუმლო გასაღები carapi_sk_ მხოლოდ სერვერზე რჩება. სათაური: Authorization: Bearer.' }}</p>
+        <p class="mt-3 text-sm leading-6 text-muted-foreground">{{ $en ? 'The secret key stays on your server. Send it as Authorization: Bearer geoapi_sk_…' : 'საიდუმლო გასაღები geoapi_sk_ მხოლოდ სერვერზე რჩება. სათაური: Authorization: Bearer.' }}</p>
         <p class="mt-2 text-sm text-muted-foreground">{{ __('The example is illustrative.') }}</p>
         <p class="mt-3 text-sm"><a href="{{ url('/api/v1/docs') }}">{{ $en ? 'OpenAPI reference' : 'OpenAPI ცნობარი' }}</a> · <a href="{{ url('/api/v1/postman.json') }}">Postman</a> · <a href="{{ url('/api/v1/openapi.json') }}">openapi.json</a></p>
     </div>
@@ -53,14 +53,14 @@
     <section id="guide-widget" class="grid min-w-0 items-start gap-6 border-b border-border py-8 lg:grid-cols-2">
         <div class="min-w-0">
             <h2 class="text-lg font-semibold">{{ __('Widget') }}</h2>
-            <p class="mt-3 text-sm leading-6">{{ $en ? 'The browser calls POST /widget/v1/{public-key}/brands and the same path for models, years, and generations. On this site the key demo works only for this origin. A project key looks like carapi_pk_ and 32 hex characters. The carapi:change event includes generation_id after a generation is chosen. modification_id stays null; use the server API for modifications.' : 'ბრაუზერი იძახებს POST /widget/v1/{საჯარო-გასაღები}/brands და იმავე გზას მოდელების, წლებისა და თაობებისთვის. ამ საიტზე demo გასაღები მხოლოდ ამ origin-ზე მუშაობს. პროექტის გასაღები არის carapi_pk_ და 32 თექვსმეტობითი სიმბოლო. carapi:change მოვლენაში generation_id ივსება თაობის არჩევის შემდეგ. modification_id რჩება null; მოდიფიკაციისთვის გამოიყენეთ სერვერული API.' }}</p>
+            <p class="mt-3 text-sm leading-6">{{ $en ? 'The browser calls POST /widget/v1/{public-key}/brands and the same path for models, years, and generations. On this site the key demo works only for this origin. A project key looks like geoapi_pk_ and 32 hex characters. The geoapi:change event includes generation_id after a generation is chosen. modification_id stays null; use the server API for modifications.' : 'ბრაუზერი იძახებს POST /widget/v1/{საჯარო-გასაღები}/brands და იმავე გზას მოდელების, წლებისა და თაობებისთვის. ამ საიტზე demo გასაღები მხოლოდ ამ origin-ზე მუშაობს. პროექტის გასაღები არის geoapi_pk_ და 32 თექვსმეტობითი სიმბოლო. geoapi:change მოვლენაში generation_id ივსება თაობის არჩევის შემდეგ. modification_id რჩება null; მოდიფიკაციისთვის გამოიყენეთ სერვერული API.' }}</p>
         </div>
         <div class="codebox min-w-0">
             <div class="flex justify-end px-3 py-2">
                 <button type="button" class="text-xs font-semibold" data-copy-target="guide-embed" data-copied="{{ __('Copied') }}">{{ __('Copy') }}</button>
             </div>
-            <pre id="guide-embed">{{ '<script src="'.rtrim((string) config('app.url'), '/').'/widget/v1/carapi-filter.js"></script>' }}
-{{ '<carapi-filter public-key="demo"></carapi-filter>' }}</pre>
+            <pre id="guide-embed">{{ '<script src="'.rtrim((string) config('app.url'), '/').'/widget/v1/geoapi-filter.js"></script>' }}
+{{ '<geoapi-filter public-key="demo"></geoapi-filter>' }}</pre>
         </div>
     </section>
     <section id="guide-limits" class="grid min-w-0 items-start gap-6 border-b border-border py-8 lg:grid-cols-2">

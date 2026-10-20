@@ -27,7 +27,7 @@ final class WikimediaResolver
      *   CARAPI_USER_AGENT="MyCarImages/1.0 (https://example.com; ops@example.com)"
      * See https://meta.wikimedia.org/wiki/User-Agent_policy
      */
-    private const DEFAULT_UA = 'Anovo.Ge carapi/1.0 (https://anovo.ge)';
+    private const DEFAULT_UA = 'GeoAPI/1.0 (https://geoapi.ge)';
 
     private const WD      = 'https://www.wikidata.org/w/api.php';
     private const COMMONS = 'https://commons.wikimedia.org/w/api.php';

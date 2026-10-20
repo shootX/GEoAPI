@@ -1,6 +1,6 @@
 <?php
 /**
- * carapi — free, open real-photo car-image API (front controller).
+ * GeoAPI — vehicle catalog front controller.
  * @author Anovo.Ge https://anovo.ge
  *
  * Like imagin.studio's /getImage, but returns REAL photographs from Wikimedia
@@ -178,7 +178,7 @@ function carapi_get_image(): void
         );
         $res = (new Service($cache))->get($make, $model, $year);
     } catch (\Throwable $e) {
-        error_log('[carapi] getImage failed: ' . $e->getMessage());
+        error_log('[geoapi] getImage failed: ' . $e->getMessage());
     }
 
     if ($res) {
@@ -409,7 +409,7 @@ function carapi_closed(): void
 {
     header('Content-Type: text/html; charset=utf-8');
     header('Cache-Control: no-cache');
-    echo '<!doctype html><html lang="ka"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>მალე გაიხსნება — carapi</title></head><body>';
+    echo '<!doctype html><html lang="ka"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>მალე გაიხსნება — GeoAPI</title></head><body>';
     echo '<p id="closed">საჯარო გაშვება ჯერ არ დაწყებულა. რეგისტრაცია ჯერ არ არის გახსნილი.</p><p><a href="/">მთავარი</a> · <a href="/guide">დოკუმენტაცია</a></p>';
     echo '</body></html>';
 }
@@ -425,7 +425,7 @@ function carapi_terms(): void
 <section class="panel">
 <p>ვერსია 2026-09-26. ეს წესები არ არის ფასების, გადახდის ან უწყვეტი მუშაობის გარანტია.</p>
 <h1>გამოყენების წესები</h1>
-<p>მომსახურებას გაწვდით შპს „ინოვა ლაბ“, საიდენტიფიკაციო კოდი 432291851. კონტაქტი: <a href="mailto:info@socialsave.cc">info@socialsave.cc</a>.</p>
+<p>მომსახურებას გაწვდით შპს „ინოვა ლაბ“, საიდენტიფიკაციო კოდი 432291851. კონტაქტი: <a href="mailto:hello@geoapi.ge">hello@geoapi.ge</a>.</p>
 </section>
 <section class="panel"><h2>რას იღებთ</h2>
 <p>სერვერული API გაძლევთ ბრენდების, მოდელებისა და თაობების სიებს, რათა საკუთარი ინტერფეისი ააწყოთ. ვიჯეტი იგივე არჩევანს აჩვენებს თქვენს საიტზე და არჩეულ იდენტიფიკატორებს თქვენს გვერდს გადასცემს. ვიჯეტი თქვენი საიტის განცხადებებს თავისით არ ფილტრავს. მიმდინარე სერვერულ API-ს ფოტო არ აქვს. მოდიფიკაციების სია და დეტალი არის. ტექნიკური მახასიათებლების ცალკე მოთხოვნა არ არის.</p>
@@ -438,7 +438,7 @@ function carapi_terms(): void
 </section>
 <section class="panel"><h2>შეზღუდვა და განახლება</h2>
 <p>შეზღუდვა ან შეჩერება შეიძლება, თუ ანგარიში შეჩერებულია, ელფოსტა დაუდასტურებელია, გასაღები გაუქმებულია, ლიმიტი ამოიწურა, ან მოთხოვნა სისტემას ზიანს აყენებს. ეს პასუხისმგებლობის სრულ მოხსნას არ ნიშნავს.</p>
-<p>წესების მოქმედი ტექსტი ამ გვერდზეა. მხარდაჭერა: info@socialsave.cc. პერსონალურ მონაცემებზე იხილეთ <a href="/privacy">კონფიდენციალურობის პოლიტიკა</a>.</p>
+<p>წესების მოქმედი ტექსტი ამ გვერდზეა. მხარდაჭერა: hello@geoapi.ge. პერსონალურ მონაცემებზე იხილეთ <a href="/privacy">კონფიდენციალურობის პოლიტიკა</a>.</p>
 </section>
 HTML;
     echo '</main>';
@@ -457,7 +457,7 @@ function carapi_privacy(): void
 <section class="panel">
 <p class="note" id="updated">განახლდა 26 სექტემბერი, 2026. ეს ტექსტი არ ნიშნავს, რომ ყველა პროცესი სრულად შესაბამისია კანონთან.</p>
 <h1>კონფიდენციალურობის პოლიტიკა</h1>
-<p>ოპერატორი: შპს „ინოვა ლაბ“, საიდენტიფიკაციო კოდი 432291851. კონტაქტი: <a href="mailto:info@socialsave.cc">info@socialsave.cc</a>. საიტი: https://geoapi.ge.</p>
+<p>ოპერატორი: შპს „ინოვა ლაბ“, საიდენტიფიკაციო კოდი 432291851. კონტაქტი: <a href="mailto:hello@geoapi.ge">hello@geoapi.ge</a>. საიტი: https://geoapi.ge.</p>
 </section>
 <section class="panel" id="scope"><h2>ვის ეხება</h2>
 <p>ტექსტი ეხება საიტის სტუმრებს, ანგარიშის მფლობელებს, მათ წარმომადგენლებს, საკონტაქტო ელფოსტაზე მომწერ პირებს და სხვა საიტზე ჩასმული ვიჯეტის სტუმრებს.</p>
@@ -487,13 +487,13 @@ function carapi_privacy(): void
 <p>ვიჯეტის სკრიპტი ბრაუზერის მეხსიერებაში არჩევანს არ ინახავს და გარე შრიფტს არ ტვირთავს.</p>
 </section>
 <section class="panel" id="cookies"><h2>Cookie-ები და შრიფტი</h2>
-<p>ანგარიშის cookie-ს სახელია carapi_platform. იგი მხოლოდ საიტისთვისაა წასაკითხი, HTTPS-ზე დაცული კავშირით იგზავნება და ბრაუზერის დახურვამდე რჩება. სესია წყდება 30 წუთის უმოქმედობისას ან 12 საათში. გამოსვლა ამ cookie-ს შლის. ეს იმავე წამს ყველა ჩანაწერის წაშლას არ ნიშნავს.</p>
+<p>ანგარიშის cookie-ს სახელია geoapi_platform. იგი მხოლოდ საიტისთვისაა წასაკითხი, HTTPS-ზე დაცული კავშირით იგზავნება და ბრაუზერის დახურვამდე რჩება. სესია წყდება 30 წუთის უმოქმედობისას ან 12 საათში. გამოსვლა ამ cookie-ს შლის. ეს იმავე წამს ყველა ჩანაწერის წაშლას არ ნიშნავს.</p>
 <p>ღია და მუქი რეჟიმის არჩევანი ინახება მხოლოდ თქვენს ბრაუზერში და სერვერზე არ იგზავნება. ანალიტიკის სკრიპტი არ არის.</p>
 <p>შრიფტი საიტის საკუთარი ფაილია. გარე შრიფტის სერვისს აღარ ვიყენებთ.</p>
 </section>
 <section class="panel" id="recipients"><h2>ვინ ამუშავებს მონაცემს</h2>
 <p>GeoAPI-ის სერვერი განთავსებულია გერმანიაში. ჰოსტინგის პროვაიდერია Contabo. ეს მხოლოდ ამ სერვერს ეხება. სხვა მომსახურებისა და მიმღების მდებარეობა ამით არ დასტურდება. სერვერის მდებარეობა არც ხელშეკრულებას და არც მონაცემთა საერთაშორისო გადაცემის სამართლებრივ საფუძველს ადასტურებს.</p>
-<p>ანგარიში და კატალოგის აღრიცხვა ამ სერვერზე ინახება. სერვისულ წერილს აგზავნის ამავე სერვერის ფოსტა, მისამართიდან info@socialsave.cc. შემდეგ წერილი მიდის იმ საფოსტო სისტემაში, რომელსაც მიმღების მისამართი იყენებს.</p>
+<p>ანგარიში და კატალოგის აღრიცხვა ამ სერვერზე ინახება. სერვისულ წერილს აგზავნის ამავე სერვერის ფოსტა, მისამართიდან hello@geoapi.ge. შემდეგ წერილი მიდის იმ საფოსტო სისტემაში, რომელსაც მიმღების მისამართი იყენებს.</p>
 <p>მონაცემებს არ ვყიდით და მესამე პირის დამოუკიდებელ რეკლამას არ გადავცემთ. კანონით გათვალისწინებულ შემთხვევაში მონაცემი შეიძლება მოითხოვოს უფლებამოსილმა ორგანომ.</p>
 </section>
 <section class="panel" id="retention"><h2>რამდენ ხანს ინახება</h2>
@@ -513,15 +513,15 @@ function carapi_privacy(): void
 </table>
 </section>
 <section class="panel" id="rights"><h2>თქვენი უფლებები</h2>
-<p>ამჟამად მონაცემთა დაცვის ოფიცერი დანიშნული არ არის. პერსონალურ მონაცემებთან დაკავშირებულ საკითხებზე დაგვიკავშირდით: info@socialsave.cc.</p>
+<p>ამჟამად მონაცემთა დაცვის ოფიცერი დანიშნული არ არის. პერსონალურ მონაცემებთან დაკავშირებულ საკითხებზე დაგვიკავშირდით: hello@geoapi.ge.</p>
 <p>შეგიძლიათ მოითხოვოთ, რა მონაცემი გვაქვს და მიიღოთ ასლი. შეგიძლიათ მოითხოვოთ გასწორება და განახლება. შეგიძლიათ მოითხოვოთ დამუშავების შეწყვეტა ან წაშლა. დაბლოკვა და სხვა პირთან გადატანა შეგიძლიათ მაშინ, როცა კანონი ამას ითვალისწინებს. თუ კონკრეტული დამუშავება თქვენს თანხმობას ეფუძნება, თანხმობის გამოხმობა ნებისმიერ დროს შეგიძლიათ. ახლა მარკეტინგის თანხმობას არ ვიყენებთ.</p>
 <p>წაშლის ან დამუშავების შეწყვეტის მოთხოვნას ვასრულებთ მოთხოვნიდან არაუგვიანეს 10 სამუშაო დღისა, ან იმავე ვადაში გატყობინებთ დასაბუთებულ უარს და გასაჩივრების წესს, თუ კანონით სხვა რამ არ არის დადგენილი. ეს ვადა ყველა უფლებას ერთნაირად და უპირობოდ არ ეხება. ინფორმაციისა და ასლის ვადა ასევე 10 სამუშაო დღეა და განსაკუთრებულ შემთხვევაში კიდევ 10 სამუშაო დღით შეიძლება გაგრძელდეს, რის შესახებაც დაუყოვნებლივ გატყობინებთ. დაბლოკვის პასუხის ვადა სხვაა: გადაწყვეტილებისთანავე, მაგრამ არაუგვიანეს 3 სამუშაო დღისა.</p>
-<p>მოთხოვნა იგზავნება info@socialsave.cc-ზე. შეუძლია მოგვწეროს ანგარიშის მფლობელმა, საიტის ან ვიჯეტის სტუმარმა, პირმა, რომელსაც ელფოსტაზე წვდომა დაკარგა, და სათანადოდ უფლებამოსილმა წარმომადგენელმა. ანგარიშის ელფოსტიდან წერილი ერთადერთი გზა არ არის და მარტო ეს წერილი ყოველთვის საკმარისი მტკიცებულება არ არის. საჭიროებისას ვამოწმებთ დამატებით, მოთხოვნის რისკის მიხედვით. პაროლს, სრულ API გასაღებს ან პირადობის დოკუმენტს ყველა შემთხვევაში არ ვითხოვთ.</p>
+<p>მოთხოვნა იგზავნება hello@geoapi.ge-ზე. შეუძლია მოგვწეროს ანგარიშის მფლობელმა, საიტის ან ვიჯეტის სტუმარმა, პირმა, რომელსაც ელფოსტაზე წვდომა დაკარგა, და სათანადოდ უფლებამოსილმა წარმომადგენელმა. ანგარიშის ელფოსტიდან წერილი ერთადერთი გზა არ არის და მარტო ეს წერილი ყოველთვის საკმარისი მტკიცებულება არ არის. საჭიროებისას ვამოწმებთ დამატებით, მოთხოვნის რისკის მიხედვით. პაროლს, სრულ API გასაღებს ან პირადობის დოკუმენტს ყველა შემთხვევაში არ ვითხოვთ.</p>
 <p>შეგიძლიათ მიმართოთ საქართველოს სახელმწიფო აუდიტის სამსახურს ან სასამართლოს. ჩვენთან წინასწარი წერილი ამის პირობა არ არის.</p>
 </section>
 <section class="panel"><h2>უსაფრთხოება და ლიმიტები</h2>
 <p>კავშირი დაშიფრულია. პაროლი და საიდუმლო API გასაღების საიდუმლო ნაწილი ჰეშდება. მოთხოვნებს აქვს მოთხოვნების სიხშირის ლიმიტი და თვიური მოთხოვნების ლიმიტი. ვიჯეტი არ აფასებს კრედიტს, ჯანმრთელობას ან პირად თვისებებს.</p>
-<p>კითხვებისთვის: info@socialsave.cc.</p>
+<p>კითხვებისთვის: hello@geoapi.ge.</p>
 </section>
 HTML;
     echo '</main>';
@@ -654,7 +654,7 @@ JSON;
 }
 JSON;
     $eventJs = <<<'JS'
-document.querySelector("carapi-filter").addEventListener("carapi:change", function (event) {
+document.querySelector("geoapi-filter").addEventListener("geoapi:change", function (event) {
   var detail = event.detail;
   console.log(detail.brand_id, detail.model_id, detail.year, detail.body_type, detail.generation_id, detail.modification_id);
 });
@@ -662,7 +662,7 @@ JS;
     $facts = <<<TXT
 ბაზა: {$base}
 
-სერვერული API იყენებს საიდუმლო API გასაღებს carapi_sk_. ის მხოლოდ თქვენს სერვერზე უნდა იყოს.
+სერვერული API იყენებს საიდუმლო API გასაღებს geoapi_sk_. ის მხოლოდ თქვენს სერვერზე უნდა იყოს.
 Authorization: Bearer <SERVER_API_KEY>
 GET /api/v1/brands
 GET /api/v1/brands/{slug}/models
@@ -674,15 +674,15 @@ GET /api/v1/coverage
 თაობის id აიღეთ თაობების სიიდან. იგივე ჯგუფის სხვა შიდა id საჯარო id არ არის.
 ბრენდი, მოდელი, თაობა და მოდიფიკაცია ცალკე მოთხოვნებია.
 
-ვიჯეტი იყენებს საჯარო API გასაღებს carapi_pk_. ის HTML-ში დასაშვებია.
-<script src="{$base}/widget/v1/carapi-filter.js"></script>
-<carapi-filter public-key="demo"></carapi-filter>
-ამ საიტზე demo მხოლოდ ამ origin-ზე მუშაობს. პროექტის გასაღები არის carapi_pk_ და 32 თექვსმეტობითი სიმბოლო.
+ვიჯეტი იყენებს საჯარო API გასაღებს geoapi_pk_. ის HTML-ში დასაშვებია.
+<script src="{$base}/widget/v1/geoapi-filter.js"></script>
+<geoapi-filter public-key="demo"></geoapi-filter>
+ამ საიტზე demo მხოლოდ ამ origin-ზე მუშაობს. პროექტის გასაღები არის geoapi_pk_ და 32 თექვსმეტობითი სიმბოლო.
 ვიჯეტი მუშაობს მხოლოდ პროექტში ჩაწერილი origin-იდან, მაგალითად https://example.com.
 Origin არის პროტოკოლი, დომენი და საჭიროების შემთხვევაში პორტი. გვერდის ბილიკს არ შეიცავს.
 wildcard (*) და ცარიელი Origin არ მიიღება. http დასაშვებია მხოლოდ localhost-ისა და 127.0.0.1-ისთვის.
 
-carapi:change
+geoapi:change
 detail.brand_id, detail.model_id, detail.year და detail.body_type არის სტრიქონი ან null.
 detail.generation_id და detail.modification_id ამ ვერსიაში ყოველთვის null-ია. მოდიფიკაციის არჩევა მხარდაჭერილი არ არის.
 დამატებით შეიძლება იყოს brand_name, model_name, year_name და body_name.
@@ -719,8 +719,8 @@ TXT;
 
     echo '<h2 id="auth" class="doc-sec">ავტორიზაცია და API გასაღებები</h2>';
     echo '<p class="lead">GeoAPI იყენებს სხვადასხვა დანიშნულების საჯარო და საიდუმლო API გასაღებებს.</p>';
-    echo '<h2>საჯარო API გასაღები</h2><p>პრეფიქსია <code>carapi_pk_</code>. საჯარო API გასაღები გამოიყენება ვიჯეტის ბრაუზერში ჩასატვირთად. მისი გამოჩენა ვებსაიტის HTML ან JavaScript კოდში დასაშვებია.</p>';
-    echo '<h2>საიდუმლო API გასაღები</h2><p>პრეფიქსია <code>carapi_sk_</code>. საიდუმლო API გასაღები გამოიყენება სერვერული მოთხოვნების ავტორიზაციისთვის. მისი დამატება საჯაროდ ხელმისაწვდომ JavaScript კოდში დაუშვებელია.</p>';
+    echo '<h2>საჯარო API გასაღები</h2><p>პრეფიქსია <code>geoapi_pk_</code>. საჯარო API გასაღები გამოიყენება ვიჯეტის ბრაუზერში ჩასატვირთად. მისი გამოჩენა ვებსაიტის HTML ან JavaScript კოდში დასაშვებია.</p>';
+    echo '<h2>საიდუმლო API გასაღები</h2><p>პრეფიქსია <code>geoapi_sk_</code>. საიდუმლო API გასაღები გამოიყენება სერვერული მოთხოვნების ავტორიზაციისთვის. მისი დამატება საჯაროდ ხელმისაწვდომ JavaScript კოდში დაუშვებელია.</p>';
     echo '<p>სერვერული API მოთხოვნისას დაამატეთ <code>Authorization</code> სათაური Bearer სქემით და მიუთითეთ თქვენი საიდუმლო API გასაღები. ქვემოთ მხოლოდ ნიმუშია. რეალურ გასაღებს მომხმარებელი საკუთარ პროექტში ქმნის.</p>';
     echo '<div class="codeb"><div class="tb"><div class="tabs"><button type="button" class="on">მოთხოვნის მაგალითი</button></div></div><pre class="json">Authorization: Bearer &lt;SERVER_API_KEY&gt;</pre></div>';
     echo '<p>გასაღები არ იქმნება ელფოსტის დადასტურებისთანავე. ჯერ შექმენით პროექტი, შემდეგ კაბინეტში აირჩიეთ საჯარო ან საიდუმლო API გასაღები.</p>';
@@ -787,8 +787,8 @@ TXT;
     echo '<h2 id="widget" class="doc-sec">ვიჯეტის დამატება ვებსაიტზე</h2>';
     echo '<p>GeoAPI-ის ვიჯეტის გამოყენებით შეგიძლიათ თქვენს ვებსაიტს დაამატოთ ავტომობილის არჩევის ინტერფეისი. ვიჯეტი იტვირთება JavaScript ფაილის საშუალებით და მუშაობისთვის იყენებს საჯარო API გასაღებს.</p>';
     echo '<div class="codeb"><div class="tb"><div class="tabs"><button type="button" class="on" data-tab="html">HTML</button></div><button type="button" class="copy" data-copy-block>' . $copy . 'კოდის კოპირება</button></div>';
-    echo '<pre class="json" data-tab-panel="html">' . $h("<script src=\"" . $base . "/widget/v1/carapi-filter.js\"></script>\n<carapi-filter public-key=\"demo\"></carapi-filter>") . '</pre></div>';
-    echo '<p>ამ საიტზე <code>demo</code> მხოლოდ ამ origin-ზე მუშაობს. პროექტის გასაღები არის <code>carapi_pk_</code> და 32 თექვსმეტობითი სიმბოლო.</p>';
+    echo '<pre class="json" data-tab-panel="html">' . $h("<script src=\"" . $base . "/widget/v1/geoapi-filter.js\"></script>\n<geoapi-filter public-key=\"demo\"></geoapi-filter>") . '</pre></div>';
+    echo '<p>ამ საიტზე <code>demo</code> მხოლოდ ამ origin-ზე მუშაობს. პროექტის გასაღები არის <code>geoapi_pk_</code> და 32 თექვსმეტობითი სიმბოლო.</p>';
     echo '<p>ვიჯეტი კატალოგს იღებს <code>POST</code> მოთხოვნებით: <code>/widget/v1/{publicKey}/brands</code>, <code>/widget/v1/{publicKey}/brands/{slug}/models</code>, <code>/widget/v1/{publicKey}/models/{id}/years</code> და <code>/widget/v1/{publicKey}/models/{id}/generations</code>. ეს სერვერული <code>GET /api/v1</code> მოთხოვნებისაგან დამოუკიდებელი გზაა.</p>';
     echo '<p>ვიჯეტი კატალოგს იღებს <code>POST</code> მოთხოვნებით: <code>/widget/v1/{publicKey}/brands</code>, <code>/widget/v1/{publicKey}/brands/{slug}/models</code> და <code>/widget/v1/{publicKey}/models/{id}/years</code>. ეს სერვერული <code>GET /api/v1</code> მოთხოვნებისაგან დამოუკიდებელი გზაა.</p>';
 
@@ -798,7 +798,7 @@ TXT;
     echo '<p>Wildcard (<code>*</code>) და ცარიელი <code>Origin</code> სათაური არ მიიღება. <code>http</code> დასაშვებია მხოლოდ <code>localhost</code>-ისა და <code>127.0.0.1</code>-ისთვის. სხვა საიტს სჭირდება <code>https</code>.</p>';
 
     echo '<h2 id="event" class="doc-sec">ავტომობილის არჩევანის ცვლილება</h2>';
-    echo '<p>მომხმარებლის არჩევანის ცვლილებისას ვიჯეტი აგზავნის <code>carapi:change</code> მოვლენას. ამ მოვლენის <code>detail</code> ობიექტი შეიცავს მომხმარებლის მიერ არჩეულ ავტომობილთან დაკავშირებულ მონაცემებს.</p>';
+    echo '<p>მომხმარებლის არჩევანის ცვლილებისას ვიჯეტი აგზავნის <code>geoapi:change</code> მოვლენას. ამ მოვლენის <code>detail</code> ობიექტი შეიცავს მომხმარებლის მიერ არჩეულ ავტომობილთან დაკავშირებულ მონაცემებს.</p>';
     echo '<div class="codeb"><div class="tb"><button type="button" class="copy" data-copy-block>' . $copy . 'კოდის კოპირება</button></div><pre class="json">' . $h(trim($eventJs)) . '</pre></div>';
     echo '<h2>პასუხის სტრუქტურა</h2><table class="ptb"><thead><tr><th>ველი</th><th>ტიპი</th><th>დანიშნულება</th></tr></thead><tbody>';
     echo '<tr><td><code>brand_id</code></td><td><span class="pill">string ან null</span></td><td>არჩეული ბრენდის იდენტიფიკატორი. ცარიელი არჩევანისას <code>null</code>-ია.</td></tr>';
@@ -814,9 +814,9 @@ TXT;
     echo '<h2 id="agents" class="doc-sec">GeoAPI-ის ინტეგრაცია AI კოდის ასისტენტებით</h2>';
     echo '<p class="lead">შეგიძლიათ გამოიყენოთ Cursor, Claude Code ან Codex, რათა გაამარტივოთ GeoAPI-ის ინტეგრაცია თქვენს პროექტში. ასისტენტს უნდა ჰქონდეს ინფორმაცია API მეთოდების, ავტორიზაციისა და ვიჯეტის მუშაობის შესახებ.</p>';
     echo '<div class="agent-grid">';
-    echo '<article class="agent" id="cursor"><div class="mark">' . carapi_logo('cursor') . '</div><h3>GeoAPI-ის წესების ფაილის დამატება Cursor-ში</h3><span class="file">.cursor/rules/carapi.mdc</span><p>შექმენით პროექტში შესაბამისი Cursor Rules ფაილი და დაამატეთ GeoAPI-ის ინტეგრაციის ინსტრუქციები. ფაილს აქვს frontmatter <code>alwaysApply: true</code>-ით, ამიტომ Cursor ამ წესს პროექტში იყენებს.</p></article>';
+    echo '<article class="agent" id="cursor"><div class="mark">' . carapi_logo('cursor') . '</div><h3>GeoAPI-ის წესების ფაილის დამატება Cursor-ში</h3><span class="file">.cursor/rules/geoapi.mdc</span><p>შექმენით პროექტში შესაბამისი Cursor Rules ფაილი და დაამატეთ GeoAPI-ის ინტეგრაციის ინსტრუქციები. ფაილს აქვს frontmatter <code>alwaysApply: true</code>-ით, ამიტომ Cursor ამ წესს პროექტში იყენებს.</p></article>';
     echo '<article class="agent" id="claude"><div class="mark">' . carapi_logo('claude') . '</div><h3>GeoAPI-ის ინსტრუქციების დამატება CLAUDE.md ფაილში</h3><span class="file">CLAUDE.md</span><p>Claude Code პროექტის ფესვში არსებულ <code>CLAUDE.md</code> ფაილს კითხულობს. ეს Cursor-ის <code>.mdc</code> ფაილი არ არის და frontmatter არ სჭირდება.</p></article>';
-    echo '<article class="agent" id="codex"><div class="mark">' . carapi_logo('openai') . '</div><h3>GeoAPI-ის ინსტრუქციების დამატება AGENTS.md ფაილში</h3><span class="file">AGENTS.md</span><p>Codex პროექტის ფესვში არსებულ <code>AGENTS.md</code> ფაილს კითხულობს. ის ავტომატურად არ კითხულობს არც <code>.cursor/rules/carapi.mdc</code>-ს და არც <code>CLAUDE.md</code>-ს.</p></article>';
+    echo '<article class="agent" id="codex"><div class="mark">' . carapi_logo('openai') . '</div><h3>GeoAPI-ის ინსტრუქციების დამატება AGENTS.md ფაილში</h3><span class="file">AGENTS.md</span><p>Codex პროექტის ფესვში არსებულ <code>AGENTS.md</code> ფაილს კითხულობს. ის ავტომატურად არ კითხულობს არც <code>.cursor/rules/geoapi.mdc</code>-ს და არც <code>CLAUDE.md</code>-ს.</p></article>';
     echo '</div>';
     echo '<div class="codeb" style="margin-top:20px"><div class="tb"><div class="tabs"><button type="button" class="on" data-tab="cursor">Cursor</button><button type="button" data-tab="claude">Claude Code</button><button type="button" data-tab="codex">Codex</button></div><button type="button" class="copy" data-copy-block>' . $copy . 'კოდის კოპირება</button></div>';
     echo '<pre class="json" data-tab-panel="cursor">' . $h($cursorFile) . '</pre>';
@@ -858,7 +858,7 @@ function carapi_landing(): void
     }
     $chev = \Carapi\SiteChrome::icon('chev');
     $copy = \Carapi\SiteChrome::icon('copy');
-    $install = '&lt;script src="' . $base . '/widget/v1/carapi-filter.js"&gt;&lt;/script&gt;';
+    $install = '&lt;script src="' . $base . '/widget/v1/geoapi-filter.js"&gt;&lt;/script&gt;';
     echo \Carapi\SiteChrome::start(
         'GeoAPI — ავტომობილების კატალოგი, API და მზა ვიჯეტი',
         'GeoAPI დეველოპერებს სთავაზობს ავტომობილების ბრენდების, მოდელებისა და თაობების მონაცემებს REST API-ის საშუალებით და ავტომობილის არჩევის მზა ვიჯეტს ვებსაიტებისთვის.',
@@ -869,7 +869,7 @@ function carapi_landing(): void
 <main id="content">
 <section class="hero">
 <div class="wrap grid">
-<div class="date"><b class="mono">carapi</b><span class="mono">API v1</span><span class="ka">{$when}</span></div>
+<div class="date"><b class="mono">GeoAPI</b><span class="mono">API v1</span><span class="ka">{$when}</span></div>
 <div>
 <h1>ავტომობილების მონაცემები თქვენი საიტისთვის — <span>API ან მზა ვიჯეტი</span></h1>
 <div class="meta"><p>მიიღეთ ავტომობილების ბრენდების, მოდელებისა და თაობების მონაცემები API-ის საშუალებით, ან დაამატეთ თქვენს ვებსაიტს ავტომობილის არჩევის მზა ვიჯეტი.</p>

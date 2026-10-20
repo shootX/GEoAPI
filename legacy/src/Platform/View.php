@@ -131,7 +131,7 @@ final class View
             . '<div><small>დარჩენილი მოთხოვნები</small><b class="num" id="usage-month-remaining">' . ($usage === null ? '—' : self::e((string) $usage['remaining'])) . '</b><div class="d">განახლება ' . self::e(self::day($usage === null ? null : (string) $usage['reset_at'])) . '</div></div>'
             . '<div><small>დაშვებული დომენები</small><b class="num">' . count($origins) . '</b><div class="d">' . $activeKeys . ' აქტიური გასაღები</div></div></div>';
         if ($usage === null) {
-            $kpis .= '<p class="err">მოთხოვნების ლიმიტის კონფიგურაცია ვერ მოიძებნა. დაგვიკავშირდით: info@socialsave.cc.</p>';
+            $kpis .= '<p class="err">მოთხოვნების ლიმიტის კონფიგურაცია ვერ მოიძებნა. დაგვიკავშირდით: hello@geoapi.ge.</p>';
         }
         $report = self::usageReport($usage);
 
@@ -145,7 +145,7 @@ final class View
             $cards .= self::keyCard('ვიჯეტი საიტზე', 'საჯარო API გასაღები', $masked, '—', $state, $public);
         }
         foreach ($keys as $key) {
-            $masked = 'carapi_sk_' . (string) $key['key_selector'] . '_…';
+            $masked = 'geoapi_sk_' . (string) $key['key_selector'] . '_…';
             $state = $key['revoked_at'] !== null ? 'გაუქმებული' : 'აქტიური';
             $when = self::ago($key['last_used_at'] !== null ? (string) $key['last_used_at'] : null);
             $rows .= self::keyRow((string) $key['name'], 'საიდუმლო API გასაღები', $masked, $when, $state, $masked, $key['revoked_at'] === null ? (int) $key['id'] : null);
@@ -1461,7 +1461,7 @@ JS;
         echo '<main class="au" id="content"><div class="l"><div class="top">' . SiteChrome::logo()
             . '<a class="btn btn-g" href="/" style="height:36px">მთავარი</a></div><div class="form"><div class="dl"><b>' . self::e($step) . '</b>' . self::e($crumb) . '</div><h1>'
             . $heading . '</h1>' . ($sub !== '' ? '<p class="sub">' . $sub . '</p>' : '') . $form . $footer . '</div><div class="foot"><span>© '
-            . date('Y') . ' carapi</span><a href="/terms">გამოყენების წესები</a><a href="/privacy">კონფიდენციალურობა</a>' . SiteChrome::themeButton() . '</div></div>'
+            . date('Y') . ' GeoAPI</span><a href="/terms">გამოყენების წესები</a><a href="/privacy">კონფიდენციალურობა</a>' . SiteChrome::themeButton() . '</div></div>'
             . $aside . '</main>';
         echo '<script src="/assets/site.js?v=20261018f"></script>';
         echo SiteChrome::end();
@@ -1551,7 +1551,7 @@ JS;
             || (($_SERVER['HTTP_X_FORWARDED_PROTO'] ?? '') === 'https');
         $host = $_SERVER['HTTP_HOST'] ?? 'geoapi.ge';
         $base = ($https ? 'https' : 'http') . '://' . $host;
-        $snippet = '<script src="' . $base . '/widget/v1/carapi-filter.js"></script>' . "\n" . '<carapi-filter public-key="' . $key . '"></carapi-filter>';
+        $snippet = '<script src="' . $base . '/widget/v1/geoapi-filter.js"></script>' . "\n" . '<geoapi-filter public-key="' . $key . '"></geoapi-filter>';
 
         return '<textarea class="inp mono" readonly id="embed-code">' . self::e($snippet) . '</textarea>'
             . '<button class="btn btn-g" type="button" id="copy-embed" data-copy="embed-code" style="margin-top:12px">კოდის კოპირება</button>'

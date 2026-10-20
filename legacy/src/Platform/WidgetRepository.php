@@ -14,7 +14,7 @@ final class WidgetRepository
 
     public static function newKey(): string
     {
-        return 'carapi_pk_' . bin2hex(random_bytes(16));
+        return 'geoapi_pk_' . bin2hex(random_bytes(16));
     }
 
     /** @return array<string, mixed>|null */
@@ -47,8 +47,27 @@ final class WidgetRepository
         SQL);
         $stmt->execute(['public_key' => $publicKey]);
         $row = $stmt->fetch();
+        if ($row === false) {
+            $alt = self::alternateKey($publicKey);
+            if ($alt === null) {
+                return null;
+            }
+            $stmt->execute(['public_key' => $alt]);
+            $row = $stmt->fetch();
+        }
 
         return $row === false ? null : $this->cast($row);
+    }
+
+    private static function alternateKey(string $publicKey): ?string
+    {
+        foreach (['geoapi_pk_' => 'carapi_pk_', 'carapi_pk_' => 'geoapi_pk_'] as $from => $to) {
+            if (str_starts_with($publicKey, $from)) {
+                return $to.substr($publicKey, strlen($from));
+            }
+        }
+
+        return null;
     }
 
     public function ensure(int $userId, int $projectId): ?array

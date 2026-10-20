@@ -14,7 +14,7 @@
 - [x] Keep email verification, and sync `users.email_verified_at` with `platform.users.email_verified_at`.
 - [x] Admin unique conflicts return 409. Catalog creates accept an empty `source_url`. Equipment list requires `modification_id`. Generation list accepts `model_id` and `brand_id`.
 - [x] Public OpenAPI, sitemap, security headers, and a CORS allow-list with no wildcard.
-- [x] Widget `carapi:change` includes the chosen `generation_id`. `modification_id` stays null because the widget has no modifications route.
+- [x] Widget `geoapi:change` includes the chosen `generation_id`. `modification_id` stays null because the widget has no modifications route.
 - [x] English privacy and terms, Georgian password-reset status, home row count plus chassis groups.
 - [ ] Owner: set `APP_DEBUG=false` in production and configure SMTP, including installing PHPMailer if `CARAPI_MAIL_*` is used.
 - [ ] Owner: rotate any admin token that was pasted into the audit chat. It is not in this repository.

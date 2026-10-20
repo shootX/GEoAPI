@@ -8,7 +8,7 @@ final class Session
 {
     public static function start(): void
     {
-        if (session_status() === PHP_SESSION_ACTIVE && session_name() === 'carapi_platform') {
+        if (session_status() === PHP_SESSION_ACTIVE && session_name() === 'geoapi_platform') {
             self::expire();
 
             return;
@@ -27,7 +27,7 @@ final class Session
             || (($_SERVER['HTTP_X_FORWARDED_PROTO'] ?? '') === 'https');
 
         session_save_path($path);
-        session_name('carapi_platform');
+        session_name('geoapi_platform');
         self::restoreSessionId();
         session_set_cookie_params([
             'lifetime' => 0,
@@ -58,15 +58,15 @@ final class Session
 
     private static function restoreSessionId(): void
     {
-        $raw = $_COOKIE['carapi_platform'] ?? null;
-        $decrypted = function_exists('request') ? request()->cookie('carapi_platform') : null;
+        $raw = $_COOKIE['geoapi_platform'] ?? $_COOKIE['carapi_platform'] ?? null;
+        $decrypted = function_exists('request') ? (request()->cookie('geoapi_platform') ?? request()->cookie('carapi_platform')) : null;
         $sid = self::acceptSessionId($raw, $decrypted);
         if ($sid === null) {
-            unset($_COOKIE['carapi_platform']);
+            unset($_COOKIE['geoapi_platform']);
 
             return;
         }
-        $_COOKIE['carapi_platform'] = $sid;
+        $_COOKIE['geoapi_platform'] = $sid;
     }
 
     private static function validSessionId(mixed $sid): bool

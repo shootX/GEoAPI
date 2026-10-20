@@ -23,7 +23,7 @@ GeoAPI არის PHP 8.2+ ფრონტ-კონტროლერი Lara
 
 1. კატალოგი: ბრენდი → მოდელი → დაჯგუფებული თაობა. მოდიფიკაციების სია და ერთი მოდიფიკაციის დეტალი ცალკე დროშებით ირთვება. წყარო: `src/Catalog/Http.php`, `src/Catalog/CatalogRepository.php`.
 2. პლატფორმა: ანგარიში, პროექტი, საიდუმლო გასაღები, საჯარო ვიჯეტის გასაღები, კვოტა, ელფოსტა, ადმინის მიმოხილვა. სქემა `platform`. წყარო: `src/Platform/Http.php`, `migrations/`.
-3. ჩასასმელი ფილტრი `<carapi-filter>`: ბრენდი → მოდელი → წელი → ძარა. წყარო: `public/widget/v1/carapi-filter.js`, `src/Widget/Http.php`.
+3. ჩასასმელი ფილტრი `<geoapi-filter>`: ბრენდი → მოდელი → წელი → ძარა. წყარო: `public/widget/v1/geoapi-filter.js`, `src/Widget/Http.php`.
 
 საჯარო ენა ქართულია (`lang="ka"`). წყარო: `src/SiteChrome.php`.
 
@@ -64,7 +64,7 @@ GeoAPI არის PHP 8.2+ ფრონტ-კონტროლერი Lara
 9. `/` და `/docs` → ლენდინგი
 10. სხვა HTML გზა → 404
 
-სტატიკური ფაილები (`/assets/…`, `/widget/v1/carapi-filter.js`) ვებ-სერვერი პირდაპირ გასცემს. ჩაშენებულ PHP სერვერზე `index.php` არსებულ ფაილს თვითონ არ ერევა.
+სტატიკური ფაილები (`/assets/…`, `/widget/v1/geoapi-filter.js`) ვებ-სერვერი პირდაპირ გასცემს. ჩაშენებულ PHP სერვერზე `index.php` არსებულ ფაილს თვითონ არ ერევა.
 
 ### საჯარო ნავიგაცია
 
@@ -73,13 +73,13 @@ GeoAPI არის PHP 8.2+ ფრონტ-კონტროლერი Lara
 - ლოგო → `/`
 - დემო → `/#demo`
 - დოკუმენტაცია → `/guide`
-- თემის ღილაკი (მუქი ნაგულისხმევი, ღია `localStorage` გასაღები `carapi-theme`)
+- თემის ღილაკი (მუქი ნაგულისხმევი, ღია `localStorage` გასაღები `geoapi-theme`)
 - სტუმარი, პლატფორმა ჩართულია: „შესვლა“, „ანგარიშის შექმნა“
 - შესული მომხმარებელი: „კაბინეტი“, „ჩემი პროექტები“ — ორივე `/account`. ადმინის ბმული საჯარო ჰედერში არ არის
 - პლატფორმა გამორთულია: ღილაკი „მალე გაიხსნება“, მოქმედების გარეშე
 - მობილური (≤760px): ბურგერი ხსნის იმავე ბმულებს. „შესვლა“ და „კაბინეტი“ იმალება (`hide-m`)
 
-ფუტერი: დოკუმენტაცია, შესვლა, რეგისტრაცია (მხოლოდ თუ პლატფორმა ჩართულია), წესები, კონფიდენციალურობა, `info@socialsave.cc`. შესული მომხმარებლისთვისაც ფუტერი კვლავ შესვლა/რეგისტრაციას აჩვენებს — კაბინეტის ბმული ფუტერში არ არის.
+ფუტერი: დოკუმენტაცია, შესვლა, რეგისტრაცია (მხოლოდ თუ პლატფორმა ჩართულია), წესები, კონფიდენციალურობა, `hello@geoapi.ge`. შესული მომხმარებლისთვისაც ფუტერი კვლავ შესვლა/რეგისტრაციას აჩვენებს — კაბინეტის ბმული ფუტერში არ არის.
 
 ### პლატფორმის გზები
 
@@ -116,7 +116,7 @@ GeoAPI არის PHP 8.2+ ფრონტ-კონტროლერი Lara
 - `#limits` ლიმიტები და შეცდომები
 - `#widget` ვიჯეტის ჩასმა
 - `#domains` დაშვებული დომენები
-- `#event` მოვლენა `carapi:change`
+- `#event` მოვლენა `geoapi:change`
 - `#cursor`, `#claude`, `#codex` AI ინსტრუქციის ჩასმა
 - `#brands`, `#models`, `#generations`, `#modifications`, `#modification`, `#coverage`
 
@@ -149,7 +149,7 @@ GeoAPI არის PHP 8.2+ ფრონტ-კონტროლერი Lara
 
 დემო იძახებს `POST /widget/v1/demo/…` და პროექტის კვოტას არ ხარჯავს. წყარო: `src/Widget/Demo.php`, `public/assets/site.js`.
 
-მონაცემები დემოში: `id`, `name`, `slug` (ბრენდი), წლის `bodies`. არჩევანის JSON-შია `brand_id`, `model_id`, `year`, `body_type`. თაობა დემო ეძებს წელსა და ძარასთან შესატყვისად (`matchGeneration`), მაგრამ ვიჯეტის საჯარო მოვლენაში `generation_id` მაინც `null`-ია. წყარო: `public/widget/v1/carapi-filter.js` (`emit`).
+მონაცემები დემოში: `id`, `name`, `slug` (ბრენდი), წლის `bodies`. არჩევანის JSON-შია `brand_id`, `model_id`, `year`, `body_type`. თაობა დემო ეძებს წელსა და ძარასთან შესატყვისად (`matchGeneration`), მაგრამ ვიჯეტის საჯარო მოვლენაში `generation_id` მაინც `null`-ია. წყარო: `public/widget/v1/geoapi-filter.js` (`emit`).
 
 ცარიელი და შეცდომის ტექსტები დემოში: „მითითებული პირობებით ბრენდი/მოდელი ვერ მოიძებნა“, „ამ მოდელისთვის გამოშვების წლები ჯერ არ არის“, „კატალოგი დროებით მიუწვდომელია“.
 
@@ -227,9 +227,9 @@ production-ში დროშა ჩართულია თუ არა, ა
 | `#usage` | წუთის ლიმიტი, 30 დღის სვეტები, დღეების ცხრილი, მარშრუტების ცხრილი | მხოლოდ ნახვა |
 | `#overview` | სახელი და საიტი, სტატუსი | შენახვა, ჩართვა/გამორთვა |
 
-ოთხი რიცხვი: თვის გამოყენებული, პროცენტი, დარჩენილი და განახლების დღე, origin-ების რაოდენობა და აქტიური გასაღებები. თუ ლიმიტის ჩანაწერი არ არის, რიცხვებია „—“ და ჩნდება შეცდომა `info@socialsave.cc`. წყარო: `View::project`, `usageReport`.
+ოთხი რიცხვი: თვის გამოყენებული, პროცენტი, დარჩენილი და განახლების დღე, origin-ების რაოდენობა და აქტიური გასაღებები. თუ ლიმიტის ჩანაწერი არ არის, რიცხვებია „—“ და ჩნდება შეცდომა `hello@geoapi.ge`. წყარო: `View::project`, `usageReport`.
 
-საიდუმლო გასაღები სრულად მხოლოდ შექმნისთანავე ჩანს (`#new-key`). შემდეგ ცხრილშია `carapi_sk_{selector}_…`. საჯარო გასაღები შენიღბულია შუაში, მაგრამ კოპირების მნიშვნელობა სრულია — ის საიდუმლო არ არის.
+საიდუმლო გასაღები სრულად მხოლოდ შექმნისთანავე ჩანს (`#new-key`). შემდეგ ცხრილშია `geoapi_sk_{selector}_…`. საჯარო გასაღები შენიღბულია შუაში, მაგრამ კოპირების მნიშვნელობა სრულია — ის საიდუმლო არ არის.
 
 საიდუმლო გასაღების ფორმა იმალება, სანამ ელფოსტა დაუდასტურებელია. ვადა არასავალდებულო მომავალი თარიღია.
 
@@ -269,7 +269,7 @@ Explorer იმავე `playground/run` POST-ს იყენებს და 
 
 სტატუსი: ნაწილობრივ მუშაობს. ფაილი: `Platform\Http::preview`.
 
-მინიმალური HTML: სკრიპტი, `<carapi-filter>`, `<pre id="out">`. კაბინეტის ქრომი, თემა და ჰედერი არ არის. `carapi:change` წერს `detail`-ს pre-ში. იგივე თვიურ ლიმიტს იყენებს, როგორც ჩასმის ტექსტი ამბობს (`embedBlock`).
+მინიმალური HTML: სკრიპტი, `<geoapi-filter>`, `<pre id="out">`. კაბინეტის ქრომი, თემა და ჰედერი არ არის. `geoapi:change` წერს `detail`-ს pre-ში. იგივე თვიურ ლიმიტს იყენებს, როგორც ჩასმის ტექსტი ამბობს (`embedBlock`).
 
 თუ ვიჯეტის ჩანაწერი არ არის, 404. პრაქტიკაში ჩანაწერი პროექტის გვერდის GET-ზე იქმნება.
 
@@ -308,7 +308,7 @@ POST `/admin` არაფერს ცვლის: 405 და `Allow: GET`. �
 
 საფეხურები: ბრენდი, მოდელი, გამოშვების წელი, ძარის ტიპი. ძარის ქართული სახელები: სედანი, ჰეჩბეკი, ლიფტბეკი, უნივერსალი, კუპე, მინივენი, ფურგონი, პიკაპი. უცნობი კოდი რჩება როგორც მოვიდა.
 
-ატრიბუტი: `public-key`. მნიშვნელობა `demo` იძახებს `/widget/v1/demo/`. სხვა შემთხვევაში `/widget/v1/{key}/`. CSS ცვლადები: `--carapi-font`, `--carapi-ink`, `--carapi-control`, `--carapi-line`, `--carapi-radius`, `--carapi-accent`, `--carapi-muted`.
+ატრიბუტი: `public-key`. მნიშვნელობა `demo` იძახებს `/widget/v1/demo/`. სხვა შემთხვევაში `/widget/v1/{key}/`. CSS ცვლადები: `--geoapi-font`, `--geoapi-ink`, `--geoapi-control`, `--geoapi-line`, `--geoapi-radius`, `--geoapi-accent`, `--geoapi-muted`.
 
 `show-photos` ატრიბუტი ამ ფაილში არ არის.
 
@@ -349,7 +349,7 @@ POST `/admin` არაფერს ცვლის: 405 და `Allow: GET`. �
 | ადმინის მენიუ | `.admin-side` | დესკტოპი ღიაა, ≤900px გვერდითი უჯრა `.is-open` |
 | ადმინის გამორთული პუნქტი | `span[aria-disabled]` | არ არის ბმული |
 
-ვიჯეტის შიდა მდგომარეობები (`carapi-filter.js`):
+ვიჯეტის შიდა მდგომარეობები (`geoapi-filter.js`):
 
 - input ჩართული / `disabled`
 - სია ღია (`aria-expanded=true`) / დახურული (`hidden`)
@@ -440,7 +440,7 @@ POST `/admin` არაფერს ცვლის: 405 და `Allow: GET`. �
 
 ### 8.1 სერვერული კატალოგი
 
-ავტორიზაცია: `Authorization: Bearer carapi_sk_…`. `?apiKey=` და `X-API-Key` არ იკითხება. წყარო: `src/Catalog/Access.php`, `src/Platform/ApiKeys.php`.
+ავტორიზაცია: `Authorization: Bearer geoapi_sk_…`. `?apiKey=` და `X-API-Key` არ იკითხება. წყარო: `src/Catalog/Access.php`, `src/Platform/ApiKeys.php`.
 
 | მეთოდი და გზა | სტატუსი | პასუხის ველები |
 |---|---|---|
@@ -465,7 +465,7 @@ POST `/admin` არაფერს ცვლის: 405 და `Allow: GET`. �
 
 ### 8.2 ვიჯეტის API
 
-POST, არა GET. გასაღები გზაშია: `carapi_pk_` + 32 hex. სხეული JSON `page`, `per_page`.
+POST, არა GET. გასაღები გზაშია: `geoapi_pk_` + 32 hex. სხეული JSON `page`, `per_page`.
 
 | გზა | სტატუსი |
 |---|---|
@@ -479,7 +479,7 @@ POST, არა GET. გასაღები გზაშია: `carapi_pk_` +
 
 Origin უნდა ემთხვეოდეს შენახულ სიას. ვიჯეტი, პროექტი და მომხმარებელი აქტიური უნდა იყოს, ელფოსტა დადასტურებული. წყარო: `src/Widget/Http.php`.
 
-მოვლენა `carapi:change`: `brand_id`, `model_id`, `year`, `body_type`, `generation_id` null, `modification_id` null, და შესაბამისი `*_name`.
+მოვლენა `geoapi:change`: `brand_id`, `model_id`, `year`, `body_type`, `generation_id` null, `modification_id` null, და შესაბამისი `*_name`.
 
 ### 8.3 Playground-ის შიდა API
 
@@ -512,7 +512,7 @@ Origin უნდა ემთხვეოდეს შენახულ სი�
 2. რეგისტრაცია → სესია → `/account` → პროექტი. ელფოსტის ბმული იგზავნება. გაგზავნის წარუმატებლობა რეგისტრაციას არ აბრუნებს. წყარო: `register` try/catch.
 3. დადასტურება `/email/verify` → შეტყობინება. გასაღები ავტომატურად არ იქმნება.
 4. პროექტში საიდუმლო გასაღები ერთხელ ჩანს. სერვერი იძახებს `GET /api/v1/brands`. 200 ამცირებს თვის მრიცხველს.
-5. origin ინახება, ვიჯეტი ირთვება, საიტი სვამს `<carapi-filter>`. არჩევანი მიდის `carapi:change`-ით. საიტის განცხადებებს ვიჯეტი არ ფილტრავს. ეს ტექსტი წერია `/guide`-სა და `/terms`-ში.
+5. origin ინახება, ვიჯეტი ირთვება, საიტი სვამს `<geoapi-filter>`. არჩევანი მიდის `geoapi:change`-ით. საიტის განცხადებებს ვიჯეტი არ ფილტრავს. ეს ტექსტი წერია `/guide`-სა და `/terms`-ში.
 6. დეველოპერი Playground-იდან ან Explorer-იდან იგივე კატალოგს იძახებს და კვოტას ხარჯავს.
 7. ლიმიტის ამოწურვა აბრუნებს 429. კაბინეტის ნახვა კვოტას არ ხარჯავს. წყარო: `docs/USAGE_AND_LIMITS.md`, `src/Platform/UsageLimiter.php`.
 8. ადმინი შედის და ხვდება `/admin`. იქიდან შეუძლია `/account`. სხვა ადმინის გვერდი არ იხსნება.
@@ -615,7 +615,7 @@ Origin უნდა ემთხვეოდეს შენახულ სი�
 - [ ] 21. Explorer: კასკადი, „მეტი“, ცარიელი, დეტალი, ≤480px. `View::explorer`
 - [ ] 22. Preview. `Http::preview`
 - [ ] 23. ადმინის მიმოხილვა სამ სიგანეზე, ცარიელი ცხრილებით. `View::admin`, `public/assets/admin.css`
-- [ ] 24. `<carapi-filter>` ოთხი საფეხურით და CSS ცვლადებით. `public/widget/v1/carapi-filter.js`
+- [ ] 24. `<geoapi-filter>` ოთხი საფეხურით და CSS ცვლადებით. `public/widget/v1/geoapi-filter.js`
 - [ ] 25. მუქი და ღია თემა, სანამ ახალი თეთრი მიმართულება არ ჩაანაცვლებს. `public/assets/site.js`
 
 არ დაამატო ჩეკლისტში: ფასის ბარათი, განცხადება, VIN, ადმინის ჯერ არარსებული რვა გვერდი, `src/Auth/View.php`.
@@ -664,14 +664,14 @@ Origin უნდა ემთხვეოდეს შენახულ სი�
         └─ /explorer ─ იგივე POST ─ კვოტა
 
 სერვერი
-  Authorization: Bearer carapi_sk_…
+  Authorization: Bearer geoapi_sk_…
   GET /api/v1/brands → models → generations
       └─ თუ დროშა ჩართულია: modifications → modification
 
 სხვისი საიტი
-  <carapi-filter public-key="carapi_pk_…">
+  <geoapi-filter public-key="geoapi_pk_…">
   POST /widget/v1/{pk}/brands|models|years|generations
-  მოვლენა carapi:change (generation_id და modification_id null)
+  მოვლენა geoapi:change (generation_id და modification_id null)
 
 გასვლა POST /logout → /
 ```
@@ -703,4 +703,4 @@ Origin უნდა ემთხვეოდეს შენახულ სი�
 
 ეკრანების რაოდენობა: 20 უნიკალური. 18 მათგანს სჭირდება desktop, tablet და mobile (54 კადრი). 2 შიშველი გვერდია (დახურული რეგისტრაცია და preview). ვიჯეტი ცალკე კომპონენტია, საიტის გვერდი არა.
 
-ძირითადი ფაილები დიზაინერისთვის: `public/index.php`, `src/SiteChrome.php`, `src/Platform/View.php`, `src/Platform/Http.php`, `public/assets/site.css`, `public/assets/admin.css`, `public/widget/v1/carapi-filter.js`.
+ძირითადი ფაილები დიზაინერისთვის: `public/index.php`, `src/SiteChrome.php`, `src/Platform/View.php`, `src/Platform/Http.php`, `public/assets/site.css`, `public/assets/admin.css`, `public/widget/v1/geoapi-filter.js`.

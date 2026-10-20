@@ -29,12 +29,12 @@
 
 ### დოკუმენტაცია
 
-`/guide` მოიცავს დაწყებას, გასაღებებს, ლიმიტებს, ვიჯეტს, origin-ს, `carapi:change`-ს, Cursor / Claude Code / Codex-ს და ოთხ GET მეთოდს.
+`/guide` მოიცავს დაწყებას, გასაღებებს, ლიმიტებს, ვიჯეტს, origin-ს, `geoapi:change`-ს, Cursor / Claude Code / Codex-ს და ოთხ GET მეთოდს.
 
 - სერვერული მაგალითი: `Authorization: Bearer <SERVER_API_KEY>`
-- ვიჯეტის ნიმუში: `carapi_pk_example` და `https://geoapi.ge/widget/v1/carapi-filter.js`
+- ვიჯეტის ნიმუში: `geoapi_pk_example` და `https://geoapi.ge/widget/v1/geoapi-filter.js`
 - `generation_id` და `modification_id` ამ ვერსიაში ყოველთვის `null`-ია. მოდიფიკაციის არჩევა მხარდაჭერილი არ არის
-- Cursor იყენებს `.cursor/rules/carapi.mdc`-ს `alwaysApply: true` frontmatter-ით. Claude Code კითხულობს `CLAUDE.md`-ს. Codex კითხულობს `AGENTS.md`-ს. სამივე ერთ ფაილს ერთნაირად არ კითხულობს
+- Cursor იყენებს `.cursor/rules/geoapi.mdc`-ს `alwaysApply: true` frontmatter-ით. Claude Code კითხულობს `CLAUDE.md`-ს. Codex კითხულობს `AGENTS.md`-ს. სამივე ერთ ფაილს ერთნაირად არ კითხულობს
 - `page` და `per_page` წერია მხოლოდ სიის მეთოდებზე. `GET /api/v1/coverage` მათ არ იყენებს
 - 401: გასაღები არ არის, არასწორია, გაუქმებულია ან ვადაგასულია
 - 403: წვდომის პირობა (ელფოსტა, პროექტის მდგომარეობა, scope, ვიჯეტის origin)
@@ -64,7 +64,7 @@
 
 - `public/index.php` — მთავარი, დოკუმენტაცია, გამოყენების წესები, კონფიდენციალურობა, 404
 - `public/assets/site.js` — დემო, კოპირების შეტყობინება, პაროლის სიგრძის ტექსტი
-- `public/widget/v1/carapi-filter.js` — ვიჯეტის წარწერები. მოვლენის ველები უცვლელია
+- `public/widget/v1/geoapi-filter.js` — ვიჯეტის წარწერები. მოვლენის ველები უცვლელია
 - `src/SiteChrome.php` — მენიუ, footer, SEO სათაური
 - `src/Platform/View.php` — რეგისტრაცია, შესვლა, პაროლი, კაბინეტი
 - `src/Platform/Http.php` — ფორმის და წერილების ტექსტები
@@ -82,7 +82,7 @@
 - საჩივრის ორგანოს სახელი. ის არ გადარქმეულა
 - Contabo / გერმანია. მდებარეობა თავისთავად საერთაშორისო გადაცემის საფუძველი არ არის და ტექსტი ამას ასეც ტოვებს
 - შენახვის ვადები, 10 სამუშაო დღე, 24 საათი დადასტურების ბმულზე, 30 წუთი პაროლის ბმულზე
-- კომპანია: შპს „ინოვა ლაბ“, საიდენტიფიკაციო 432291851, info@socialsave.cc
+- კომპანია: შპს „ინოვა ლაბ“, საიდენტიფიკაციო 432291851, hello@geoapi.ge
 - ცალკე კონფიდენციალურობის მოსანიშნი ველი განზრახ არ დაემატა
 
 კონფიდენციალურობის ტექსტში „ზუსტად ორ წუთში“ ლოგის გაწმენდის ფანჯარას ეხება და მარკეტინგული დაპირება არ არის. ის დარჩა.
@@ -98,7 +98,7 @@
 | შემოწმება | შედეგი |
 | --- | --- |
 | `php -l` `public/index.php`, `View.php`, `Http.php` | სინტაქსი სწორია |
-| `node --check` `site.js`, `carapi-filter.js` | სწორია |
+| `node --check` `site.js`, `geoapi-filter.js` | სწორია |
 | `php tests/platform_auth_test.php` | ყველა შემოწმება გავიდა |
 | `php tests/email_reset_test.php` | ფუნქციური შემოწმებები გავიდა. ბოლო `working users unchanged` ჩავარდა, რადგან სამუშაო `carbase.platform.users` ცარიელი არ არის. ეს რეალური მონაცემია, ტექსტის ცვლილებით არ გაჩენილა |
 | `php tests/projects_api_keys_test.php` | ფუნქციური შემოწმებები გავიდა, მათ შორის გასაღების ერთხელ ჩვენება. `working carbase has no test keys` ჩავარდა, რადგან სამუშაო ბაზაში API გასაღებები უკვე არის |

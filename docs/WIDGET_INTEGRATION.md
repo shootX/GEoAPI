@@ -2,13 +2,13 @@
 
 production-ში სამივე დროშა ჩართულია. მონაცემები იხსნება, როცა ვიჯეტი, კატალოგი და პლატფორმა ერთად ჩართულია. ისტორიულად, ჩართვამდე, გამორთული მდგომარეობა 404-ს აბრუნებდა.
 
-საჯარო გასაღები `carapi_pk_...` პროექტის იდენტიფიკატორია. საიტის სტუმარი მას HTML-ში ხედავს. ეს საიდუმლო არ არის და Origin-ის შემოწმება ბრაუზერის შეზღუდვაა, არა ავთენტიფიკაცია: სხვა HTTP კლიენტს Origin-ის გაყალბება შეუძლია. სერვერული `carapi_sk_` გასაღები ჩასასმელ კოდში არასოდეს ხვდება.
+საჯარო გასაღები `geoapi_pk_...` პროექტის იდენტიფიკატორია. საიტის სტუმარი მას HTML-ში ხედავს. ეს საიდუმლო არ არის და Origin-ის შემოწმება ბრაუზერის შეზღუდვაა, არა ავთენტიფიკაცია: სხვა HTTP კლიენტს Origin-ის გაყალბება შეუძლია. სერვერული `geoapi_sk_` გასაღები ჩასასმელ კოდში არასოდეს ხვდება.
 
 ## ჩასმა
 
 ```html
-<script src="https://geoapi.ge/widget/v1/carapi-filter.js"></script>
-<carapi-filter public-key="carapi_pk_საჯარო_გასაღები"></carapi-filter>
+<script src="https://geoapi.ge/widget/v1/geoapi-filter.js"></script>
+<geoapi-filter public-key="geoapi_pk_საჯარო_გასაღები"></geoapi-filter>
 ```
 
 თითო ველი საძიებოა. დაწკაპებისას სრული სია იხსნება, ორი სიმბოლოს შემდეგ კი სია ფილტრდება. ქართულ განლაგებაზე აკრეფილი ტექსტიც ემთხვევა ლათინურ სახელს, მაგალითად „ტოყ“ პოულობს Toyota-ს. მუშაობს ისრებით, Enter-ით და Escape-ით. ძებნა ბრაუზერში ხდება უკვე ჩატვირთულ სიაში და დამატებით მოთხოვნას არ აგზავნის.
@@ -32,9 +32,9 @@ POST /widget/v1/{publicKey}/models/{id}/generations
 ## მოვლენა
 
 ```html
-<carapi-filter public-key="carapi_pk_საჯარო_გასაღები"></carapi-filter>
+<geoapi-filter public-key="geoapi_pk_საჯარო_გასაღები"></geoapi-filter>
 <script>
-  document.querySelector('carapi-filter').addEventListener('carapi:change', function (event) {
+  document.querySelector('geoapi-filter').addEventListener('geoapi:change', function (event) {
     var pick = event.detail;
     // pick.brand_id, pick.model_id, pick.generation_id სტრიქონია ან null
     // pick.modification_id ამ ვერსიაში null-ია

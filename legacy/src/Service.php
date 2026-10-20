@@ -31,7 +31,7 @@ final class Service
         $key = self::key($make, $model, $year);
 
         $meta = $this->cache->getMeta($key);
-        if (is_array($meta) && ($meta['source'] ?? '') === 'carapi' && empty($meta['catalog_url'])) {
+        if (is_array($meta) && in_array(($meta['source'] ?? ''), ['geoapi', 'carapi'], true) && empty($meta['catalog_url'])) {
             $status = (int)($meta['status'] ?? -1);
             if ($status === 1 && !empty($meta['file']) && $this->cache->hasImage((string) $meta['file'])
                 && ImagePolicy::mayRedistribute((string) ($meta['license'] ?? ''))) {
@@ -47,10 +47,10 @@ final class Service
         }
 
         $r = DromResolver::resolve($make, $model, $year);
-        if (!$r) { $this->cache->setMeta($key, ['status' => 0, 'source' => 'carapi']); return null; }
+        if (!$r) { $this->cache->setMeta($key, ['status' => 0, 'source' => 'geoapi']); return null; }
 
         $bytes = $this->download($r['thumb_url'] ?? $r['source_url']);
-        if ($bytes === null) { $this->cache->setMeta($key, ['status' => 0, 'source' => 'carapi']); return null; }
+        if ($bytes === null) { $this->cache->setMeta($key, ['status' => 0, 'source' => 'geoapi']); return null; }
 
         $ext  = self::extFromUrl($r['thumb_url'] ?? $r['source_url']);
         $file = md5($bytes) . '.' . $ext;

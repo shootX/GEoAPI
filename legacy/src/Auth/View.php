@@ -267,7 +267,7 @@ final class View
             'model' => $model,
             'year' => $year === '' ? null : (int) $year,
             'image_url' => $image,
-            'source' => 'carapi',
+            'source' => 'geoapi',
             'title' => trim($make . ' ' . $model),
             'period' => '',
             'generation' => '',
@@ -334,7 +334,7 @@ final class View
         header('Cache-Control: no-store');
         echo '<!doctype html><html lang="ka"><head><meta charset="utf-8">';
         echo '<meta name="viewport" content="width=device-width, initial-scale=1">';
-        echo '<title>' . self::e($title) . ' — carapi</title>';
+        echo '<title>' . self::e($title) . ' — GeoAPI</title>';
         echo '<link rel="stylesheet" href="/assets/fonts/fonts.css">';
         echo self::css();
         echo '</head><body>';

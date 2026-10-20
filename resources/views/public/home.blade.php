@@ -3,9 +3,9 @@
     $t = $en ? [
         'nav1' => 'Features', 'nav2' => 'How it works', 'nav3' => 'Pricing', 'nav4' => 'Questions', 'nav5' => 'Contact',
         'account' => 'Free account', 'menu' => 'Menu',
-        'eyebrow' => 'Catalog API · drom.ru',
+        'eyebrow' => 'Catalog API',
         'h1' => 'Vehicle data, API or a ready widget',
-        'lede' => 'Get brands, models, generations, and modifications from your server, or place a ready picker on the site. The source is drom.ru.',
+        'lede' => 'Get brands, models, generations, and modifications from your server, or place a ready picker on the site.',
         'create' => 'Create a free account', 'docs' => 'Documentation',
         'key' => 'Key', 'car' => 'Car', 'gen' => 'Generation XV70', 'engine' => 'Engine 2.5',
         'try' => 'Try it here', 'flow' => 'Brand → model → generation → modification',
@@ -35,29 +35,29 @@
         'storiesLede' => 'These are examples of how a catalog is used. They are not quotes from real customers.',
         'st1t' => 'A filter on a listing', 'st1p' => 'Four steps from brand to generation. A custom filter stands on that chain.', 'st1w' => 'Frontend', 'st1s' => 'Own screen', 'st1a' => 'F',
         'st2t' => 'A widget in a form', 'st2p' => 'The picker is on the site. The public key is in the browser. The secret stays on the server.', 'st2w' => 'Product', 'st2s' => 'Widget', 'st2a' => 'P',
-        'st3t' => 'A familiar catalog', 'st3p' => 'The data comes from drom.ru, so brand and generation follow that structure.', 'st3w' => 'Catalog', 'st3s' => 'Data', 'st3a' => 'C',
+        'st3t' => 'A familiar catalog', 'st3p' => 'Brand and generation follow one catalog structure.', 'st3w' => 'Catalog', 'st3s' => 'Data', 'st3a' => 'C',
         'faqEyebrow' => 'Questions', 'faqTitle' => 'Short answers',
-        'faq1q' => 'Where does the data come from?', 'faq1a' => 'The catalog source is drom.ru. A record can be incomplete. Not every model has a generation.',
+        'faq1q' => 'Where does the data come from?', 'faq1a' => 'Collected by the Global auto industry and is its property.',
         'faq2q' => 'What is in the free plan?', 'faq2a' => '60 requests a minute and 10,000 successful requests in a calendar month, per project.',
         'faq3q' => 'Where does the secret key stay?', 'faq3a' => 'On the server request. The widget uses the public key and does not send the session cookie.',
         'faq4q' => 'Is Pro for sale?', 'faq4a' => 'No. Pro is coming later. This page does not open a payment.',
         'faq5q' => 'Does the API have a photo?', 'faq5a' => 'The current server API has no photo. The modification list and the detail are there.',
         'contactEyebrow' => 'Contact', 'contactTitle' => 'Write to us',
-        'contactLede' => 'This form does not send a message. The live address is info@socialsave.cc.',
+        'contactLede' => 'This form does not send a message. The live address is hello@geoapi.ge.',
         'name' => 'Name', 'email' => 'Email', 'message' => 'Message', 'send' => 'Send',
         'asideTitle' => 'Start with the catalog',
         'asideP' => '314 brands, 4 710 models, 22 367 generations. The account is free, and Pro is not for sale yet.',
         'emailLine' => 'Email', 'server' => 'The server is in Germany.',
-        'foot' => 'Vehicle catalog API. The source is drom.ru.',
+        'foot' => 'Vehicle catalog API.',
         'product' => 'Product', 'doc' => 'Documentation', 'picker' => 'Picker', 'addresses' => 'Addresses', 'write' => 'Write to us',
         'legal' => 'Mockup. This file does not change the live site layout.',
         'pickBrand' => 'Choose a brand', 'pickPrev' => 'Choose the previous step first',
     ] : [
         'nav1' => 'შესაძლებლობები', 'nav2' => 'როგორ მუშაობს', 'nav3' => 'ფასები', 'nav4' => 'კითხვები', 'nav5' => 'კონტაქტი',
         'account' => 'უფასო ანგარიში', 'menu' => 'მენიუ',
-        'eyebrow' => 'კატალოგის API · drom.ru',
+        'eyebrow' => 'კატალოგის API',
         'h1' => 'ავტომობილების მონაცემები, API ან მზა ვიჯეტი',
-        'lede' => 'მიიღეთ მარკები, მოდელები, თაობები და მოდიფიკაციები თქვენი სერვერიდან, ან ჩასვით მზა არჩევანი საიტზე. მონაცემების წყაროა drom.ru.',
+        'lede' => 'მიიღეთ მარკები, მოდელები, თაობები და მოდიფიკაციები თქვენი სერვერიდან, ან ჩასვით მზა არჩევანი საიტზე.',
         'create' => 'უფასო ანგარიშის შექმნა', 'docs' => 'დოკუმენტაცია',
         'key' => 'გასაღები', 'car' => 'მანქანა', 'gen' => 'თაობა XV70', 'engine' => 'ძრავი 2.5',
         'try' => 'სცადეთ აქ', 'flow' => 'მარკა → მოდელი → თაობა → მოდიფიკაცია',
@@ -87,20 +87,20 @@
         'storiesLede' => 'ეს მაგალითებია, როგორ იყენებენ კატალოგს. რეალური მომხმარებლის ციტატა არ არის.',
         'st1t' => 'ფილტრი განცხადებაზე', 'st1p' => 'მარკიდან თაობამდე ოთხი საფეხურია. საკუთარი ფილტრი ამ ჯაჭვზე დგას.', 'st1w' => 'ფრონტენდი', 'st1s' => 'საკუთარი ეკრანი', 'st1a' => 'ფ',
         'st2t' => 'ვიჯეტი ფორმაში', 'st2p' => 'არჩევანი საიტზე ჩანს. საჯარო გასაღები ბრაუზერშია, საიდუმლო სერვერზე რჩება.', 'st2w' => 'პროდუქტი', 'st2s' => 'ვიჯეტი', 'st2a' => 'პ',
-        'st3t' => 'ნაცნობი კატალოგი', 'st3p' => 'მონაცემები drom.ru-დან მოდის, ამიტომ მარკა და თაობა იმ სტრუქტურას მიჰყვება.', 'st3w' => 'კატალოგი', 'st3s' => 'მონაცემები', 'st3a' => 'კ',
+        'st3t' => 'ნაცნობი კატალოგი', 'st3p' => 'მარკა და თაობა ერთი კატალოგის სტრუქტურას მიჰყვება.', 'st3w' => 'კატალოგი', 'st3s' => 'მონაცემები', 'st3a' => 'კ',
         'faqEyebrow' => 'კითხვები', 'faqTitle' => 'მოკლე პასუხები',
-        'faq1q' => 'საიდანაა მონაცემები?', 'faq1a' => 'კატალოგის წყაროა drom.ru. ჩანაწერი შეიძლება იყოს არასრული. ყველა მოდელს თაობა არ აქვს.',
+        'faq1q' => 'საიდანაა მონაცემები?', 'faq1a' => 'შეგროვებულია Global auto industry-ს მიერ და წარმოადგენს მის საკუთრებას.',
         'faq2q' => 'რა შედის უფასო გეგმაში?', 'faq2a' => 'წუთში 60 მოთხოვნა და კალენდარულ თვეში 10 000 წარმატებული მოთხოვნა, თითო პროექტზე.',
         'faq3q' => 'სად რჩება საიდუმლო გასაღები?', 'faq3a' => 'სერვერულ მოთხოვნაზე. ვიჯეტი საჯარო გასაღებს იყენებს და სესიის cookie-ს არ აგზავნის.',
         'faq4q' => 'Pro უკვე იყიდება?', 'faq4a' => 'არა. Pro მალე გამოჩნდება. ამ გვერდზე გადახდა არ იხსნება.',
         'faq5q' => 'ფოტო აქვს API-ს?', 'faq5a' => 'მიმდინარე სერვერულ API-ს ფოტო არ აქვს. მოდიფიკაციების სია და დეტალი არის.',
         'contactEyebrow' => 'კონტაქტი', 'contactTitle' => 'მოგვწერეთ',
-        'contactLede' => 'ფორმა ამ მოკაპში წერილს არ აგზავნის. ცოცხალი მისამართია info@socialsave.cc.',
+        'contactLede' => 'ფორმა ამ მოკაპში წერილს არ აგზავნის. ცოცხალი მისამართია hello@geoapi.ge.',
         'name' => 'სახელი', 'email' => 'ელფოსტა', 'message' => 'შეტყობინება', 'send' => 'გაგზავნა',
         'asideTitle' => 'დაიწყეთ კატალოგით',
         'asideP' => '314 მარკა, 4 710 მოდელი, 22 367 თაობა. ანგარიში უფასოა, Pro კი ჯერ არ იყიდება.',
         'emailLine' => 'ელფოსტა', 'server' => 'სერვერი გერმანიაშია.',
-        'foot' => 'ავტომობილების კატალოგის API. მონაცემები drom.ru-დან.',
+        'foot' => 'ავტომობილების კატალოგის API.',
         'product' => 'პროდუქტი', 'doc' => 'დოკუმენტაცია', 'picker' => 'ამომრჩევი', 'addresses' => 'მისამართები', 'write' => 'მოგვწერეთ',
         'legal' => 'მოკაპი. ცოცხალი საიტის განლაგება ამ ფაილით არ იცვლება.',
         'pickBrand' => 'აირჩიეთ მარკა', 'pickPrev' => 'ჯერ წინა საფეხური აირჩიეთ',
@@ -109,7 +109,7 @@
 @endphp
 @component('components.layouts.public', [
     'title' => 'GeoAPI — '.($en ? 'Vehicle data' : 'ავტომობილების მონაცემები'),
-    'description' => $en ? 'GeoAPI is a vehicle catalog API. The data comes from drom.ru.' : 'GeoAPI არის ავტომობილების კატალოგის API. მონაცემები drom.ru-დან მოდის.',
+    'description' => $en ? 'GeoAPI is a vehicle catalog API.' : 'GeoAPI არის ავტომობილების კატალოგის API.',
     'home' => true,
 ])
 <div class="mk">
@@ -308,7 +308,7 @@
                 <aside class="aside">
                     <h2 style="font-size:32px">{{ $t['asideTitle'] }}</h2>
                     <p>{{ $t['asideP'] }}</p>
-                    <p>{{ $t['emailLine'] }}: <a href="mailto:info@socialsave.cc">info@socialsave.cc</a><br>{{ $t['server'] }}</p>
+                    <p>{{ $t['emailLine'] }}: <a href="mailto:hello@geoapi.ge">hello@geoapi.ge</a><br>{{ $t['server'] }}</p>
                     <a class="btn btn-mint" href="#pricing">{{ $t['create'] }}</a>
                 </aside>
             </div>
@@ -335,7 +335,7 @@
                 </div>
                 <div>
                     <h3>{{ $t['nav5'] }}</h3>
-                    <a href="mailto:info@socialsave.cc">info@socialsave.cc</a>
+                    <a href="mailto:hello@geoapi.ge">hello@geoapi.ge</a>
                     <a href="#contact">{{ $t['write'] }}</a>
                 </div>
             </div>

@@ -14,9 +14,9 @@ final class SiteChrome
 
     public static function logo(string $href = '/'): string
     {
-        return '<a href="' . $href . '" aria-label="carapi მთავარი">'
-            . '<img class="lock lock-dark" src="/assets/brand/carapi-lockup-dark.svg" alt="carapi" height="36">'
-            . '<img class="lock lock-light" src="/assets/brand/carapi-lockup-light.svg" alt="" height="36">'
+        return '<a href="' . $href . '" aria-label="GeoAPI მთავარი">'
+            . '<img class="lock lock-dark" src="/assets/brand/geoapi-lockup-dark.svg" alt="GeoAPI" height="36">'
+            . '<img class="lock lock-light" src="/assets/brand/geoapi-lockup-light.svg" alt="" height="36">'
             . '</a>';
     }
 
@@ -57,7 +57,7 @@ final class SiteChrome
             : '';
 
         return '<footer class="site-foot"><div class="wrap row">'
-            . '<span>© ' . date('Y') . ' შპს „ინოვა ლაბ“ · <a href="mailto:info@socialsave.cc">info@socialsave.cc</a></span>'
+            . '<span>© ' . date('Y') . ' შპს „ინოვა ლაბ“ · <a href="mailto:hello@geoapi.ge">hello@geoapi.ge</a></span>'
             . '<div class="links"><a href="/guide">დოკუმენტაცია</a>' . $account
             . '<a href="/terms">გამოყენების წესები</a><a href="/privacy">კონფიდენციალურობა</a></div>'
             . '</div></footer><script src="/assets/site.js?v=20261018f"></script>';
@@ -66,11 +66,11 @@ final class SiteChrome
     public static function start(string $title, ?string $description = null, bool $exactTitle = false): string
     {
         $safe = htmlspecialchars($title, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
-        $pageTitle = $exactTitle ? $safe : $safe . ' — carapi';
+        $pageTitle = $exactTitle ? $safe : $safe . ' — GeoAPI';
         $summary = $description ?? 'GeoAPI დეველოპერებს სთავაზობს ავტომობილების ბრენდების, მოდელებისა და თაობების მონაცემებს REST API-ის საშუალებით და ავტომობილის არჩევის მზა ვიჯეტს ვებსაიტებისთვის.';
 
         return '<!doctype html><html lang="ka"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">'
-            . '<script>(function(){try{if(localStorage.getItem("carapi-theme")==="light")document.documentElement.dataset.theme="light"}catch(e){}})()</script>'
+            . '<script>(function(){try{var t=localStorage.getItem("geoapi-theme")||localStorage.getItem("carapi-theme");if(t==="light")document.documentElement.dataset.theme="light"}catch(e){}})()</script>'
             . '<title>' . $pageTitle . '</title>'
             . '<meta name="description" content="' . htmlspecialchars($summary, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') . '">'
             . '<link rel="icon" href="/assets/brand/favicon-32-lime.svg" type="image/svg+xml">'

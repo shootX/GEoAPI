@@ -245,7 +245,7 @@ final class Router
             );
             $photo = (new Service($cache))->get($make, $model, $year);
         } catch (\Throwable $e) {
-            error_log('[carapi] panel lookup failed: ' . $e->getMessage());
+            error_log('[geoapi] panel lookup failed: ' . $e->getMessage());
 
             return ['errors' => ['form' => 'ფოტო ვერ მოიძებნა, სცადეთ თავიდან']];
         }

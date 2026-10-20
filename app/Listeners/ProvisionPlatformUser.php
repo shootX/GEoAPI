@@ -71,7 +71,7 @@ final class ProvisionPlatformUser
 
     public function logout(Logout $event): void
     {
-        Cookie::queue(Cookie::forget('carapi_platform'));
+        Cookie::queue(Cookie::forget('geoapi_platform'));
     }
 
     public function verified(Verified $event): void
@@ -103,6 +103,6 @@ final class ProvisionPlatformUser
         $now = time();
         $payload = 'user_id|i:'.$legacyId.';auth_version|i:'.$version.';issued_at|i:'.$now.';last_seen|i:'.$now.';csrf|s:64:"'.bin2hex(random_bytes(32)).'";';
         file_put_contents($dir.'/sess_'.$sid, $payload, LOCK_EX);
-        Cookie::queue(cookie('carapi_platform', $sid, 0, '/', null, true, true, true, 'lax'));
+        Cookie::queue(cookie('geoapi_platform', $sid, 0, '/', null, true, true, true, 'lax'));
     }
 }

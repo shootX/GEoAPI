@@ -113,7 +113,7 @@
                 <div class="footer-grid">
                     <div>
                         <a class="m-logo" href="{{ url('/') }}"><span class="m-mark" aria-hidden="true"></span> GeoAPI</a>
-                        <p style="margin-top:10px">{{ __('Vehicle catalog API. The source is drom.ru.') }}</p>
+                        <p style="margin-top:10px">{{ __('Vehicle catalog API.') }}</p>
                     </div>
                     <div>
                         <h3>{{ __('Product') }}</h3>
@@ -129,7 +129,7 @@
                     </div>
                     <div>
                         <h3>{{ __('Contact') }}</h3>
-                        <a href="mailto:info@socialsave.cc">info@socialsave.cc</a>
+                        <a href="mailto:hello@geoapi.ge">hello@geoapi.ge</a>
                         <a href="{{ url('/privacy') }}">{{ __('Privacy') }}</a>
                         <a href="{{ url('/terms') }}">{{ __('Terms') }}</a>
                         @if ($showBlog)

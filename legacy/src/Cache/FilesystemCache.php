@@ -29,11 +29,11 @@ final class FilesystemCache implements CacheInterface
         $this->publicBaseUrl = $publicBaseUrl !== null && $publicBaseUrl !== '' ? rtrim($publicBaseUrl, '/') : null;
         foreach ([$this->dir, $this->dir . '/meta', $this->dir . '/img'] as $d) {
             if (!is_dir($d) && !@mkdir($d, 0775, true) && !is_dir($d)) {
-                throw new \RuntimeException("carapi cache directory is not creatable: $d");
+                throw new \RuntimeException("GeoAPI cache directory is not creatable: $d");
             }
         }
         if (!is_writable($this->dir . '/img')) {
-            throw new \RuntimeException("carapi cache directory is not writable: {$this->dir}");
+            throw new \RuntimeException("GeoAPI cache directory is not writable: {$this->dir}");
         }
     }
 
@@ -89,11 +89,11 @@ final class FilesystemCache implements CacheInterface
     {
         $tmp = $path . '.' . bin2hex(random_bytes(4)) . '.tmp';
         if (@file_put_contents($tmp, $data) === false) {
-            throw new \RuntimeException("carapi cache write failed: $path");
+            throw new \RuntimeException("GeoAPI cache write failed: $path");
         }
         if (!@rename($tmp, $path)) {
             @unlink($tmp);
-            throw new \RuntimeException("carapi cache rename failed: $path");
+            throw new \RuntimeException("GeoAPI cache rename failed: $path");
         }
     }
 }

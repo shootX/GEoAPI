@@ -18,7 +18,7 @@ final class SessionAuth
         $secure = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off')
             || (($_SERVER['HTTP_X_FORWARDED_PROTO'] ?? '') === 'https');
 
-        session_name('carapi');
+        session_name('geoapi');
         session_set_cookie_params([
             'lifetime' => 0,
             'path' => '/',

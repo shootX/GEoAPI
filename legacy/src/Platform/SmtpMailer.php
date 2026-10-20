@@ -47,7 +47,7 @@ final class SmtpMailer implements Mailer
             ],
         ];
         $mail->CharSet = 'UTF-8';
-        $mail->setFrom($from, self::env('CARAPI_MAIL_FROM_NAME') ?: 'carapi');
+        $mail->setFrom($from, self::env('CARAPI_MAIL_FROM_NAME') ?: 'GeoAPI');
         $mail->addAddress($to);
         $mail->Subject = $subject;
         $mail->Body = $text;

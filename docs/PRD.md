@@ -1,6 +1,6 @@
 # GeoAPI product
 
-Public catalog API and Georgian/English site at https://geoapi.ge. Data comes from drom.ru. Customers call the catalog with a secret key (`carapi_sk_…`) or embed the picker widget with a public key (`carapi_pk_…`). Keys belong to projects on tariff plans.
+Public catalog API and Georgian/English site at https://geoapi.ge. The catalog is the property of the Global auto industry. Customers call the catalog with a secret key (`geoapi_sk_…`) or embed the picker widget with a public key (`geoapi_pk_…`). Keys belong to projects on tariff plans.
 
 ## 2026-10-20
 

@@ -17,8 +17,8 @@
             <button type="button" class="inline-flex h-11 items-center rounded-md border border-border px-4 text-sm font-semibold" data-copy-target="vp-embed" data-copied="{{ __('Copied') }}">{{ __('Copy') }}</button>
         </div>
         <div class="codebox mt-3">
-            <pre id="vp-embed">{{ '<script src="'.rtrim((string) config('app.url'), '/').'/widget/v1/carapi-filter.js"></script>' }}
-{{ '<carapi-filter public-key="demo"></carapi-filter>' }}</pre>
+            <pre id="vp-embed">{{ '<script src="'.rtrim((string) config('app.url'), '/').'/widget/v1/geoapi-filter.js"></script>' }}
+{{ '<geoapi-filter public-key="demo"></geoapi-filter>' }}</pre>
         </div>
     </section>
 @endcomponent

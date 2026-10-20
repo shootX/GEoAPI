@@ -22,6 +22,7 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withMiddleware(function (Middleware $middleware): void {
 
         $middleware->encryptCookies(except: [
+            'geoapi_platform',
             'carapi_platform',
         ]);
         $middleware->web(append: [

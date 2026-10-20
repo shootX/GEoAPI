@@ -47,7 +47,7 @@ php bin/migrate.php
 
 ადმინისტრაციული მიგრაციის ცვლადებია `CARAPI_PLATFORM_ADMIN_*`. ისინი runtime პულში არ არის. საიდუმლოები GeoAPI-ის ცალკე FPM გარემოშია (`docs/DEPLOYMENT.md`), საერთო პულში არა.
 
-runtime როლია `carapi_platform_app`: `LOGIN`, არა სუპერმომხმარებელი და არა მფლობელი, DDL არ შეუძლია. აქვს `SELECT`, `INSERT`, `UPDATE` `platform.users`-ზე, `SELECT`, `INSERT`, `DELETE` `platform.login_attempts`-ზე და შესაბამისი sequence-ის `USAGE`. კატალოგზე `INSERT` არ აქვს. `carapi_catalog_reader`-ს `platform.users` არ ხსნის.
+runtime როლია `geoapi_platform_app`: `LOGIN`, არა სუპერმომხმარებელი და არა მფლობელი, DDL არ შეუძლია. აქვს `SELECT`, `INSERT`, `UPDATE` `platform.users`-ზე, `SELECT`, `INSERT`, `DELETE` `platform.login_attempts`-ზე და შესაბამისი sequence-ის `USAGE`. კატალოგზე `INSERT` არ აქვს. `carapi_catalog_reader`-ს `platform.users` არ ხსნის.
 
 ## მარშრუტები და სესია
 
@@ -61,7 +61,7 @@ runtime როლია `carapi_platform_app`: `LOGIN`, არა სუპე�
 
 ველები: სახელი, გვარი, ელფოსტა, პაროლი, გამეორება. პირადი ნომერი, ტელეფონი და კომპანიის ველები ამ ნაკადში არ არის. ელფოსტა იჭრება და `lowercase` ხდება. პაროლი არ იჭრება: 15–128 სიმბოლო, Unicode და ჰარები დაშვებულია. ჰეში არის `PASSWORD_ARGON2ID`. რეგისტრაციისას `email_verified_at` ცარიელი რჩება, სანამ მომხმარებელი ბმულს არ დაადასტურებს. წერილის გაგზავნა: `docs/EMAIL_AND_PASSWORD_RESET.md`. Production-ში SMTP მიერთებულია (`docs/EMAIL_AND_PASSWORD_RESET.md`). სამი ფუნქციური დროშა production-ში 1-ია.
 
-სესიის cookie-ის სახელია `carapi_platform`. `HttpOnly`, `SameSite=Lax`, HTTPS-ზე `Secure`. სესიაში მხოლოდ მომხმარებლის id და ვადის ნიშნულებია. შესვლისას session id ახლდება. უმოქმედობა 30 წუთი, სრული ვადა 12 საათი. `suspended` მომხმარებელი არსებული სესიითაც ვერ შედის. `GET /logout` არ გამოდის. უცნობი ელფოსტა და არასწორი პაროლი ერთნაირ შეტყობინებას იძლევა. ბაზის შეცდომა არის 503, SQL-ის გარეშე, SQLite-ზე გადართვის გარეშე.
+სესიის cookie-ის სახელია `geoapi_platform`. `HttpOnly`, `SameSite=Lax`, HTTPS-ზე `Secure`. სესიაში მხოლოდ მომხმარებლის id და ვადის ნიშნულებია. შესვლისას session id ახლდება. უმოქმედობა 30 წუთი, სრული ვადა 12 საათი. `suspended` მომხმარებელი არსებული სესიითაც ვერ შედის. `GET /logout` არ გამოდის. უცნობი ელფოსტა და არასწორი პაროლი ერთნაირ შეტყობინებას იძლევა. ბაზის შეცდომა არის 503, SQL-ის გარეშე, SQLite-ზე გადართვის გარეშე.
 
 კაბინეტი აჩვენებს სახელს, ელფოსტას, პროექტებს, სერვერულ გასაღებებს, ჩასასმელ ფილტრს და რეალურ მოხმარებას.
 

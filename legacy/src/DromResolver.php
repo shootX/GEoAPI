@@ -16,7 +16,7 @@ use Carapi\Http\SafeFetch;
 final class DromResolver
 {
     private const BASE = 'https://www.' . 'dro' . 'm.ru';
-    private const UA = 'Mozilla/5.0 (compatible; Anovo.Ge carapi/1.0; +https://anovo.ge)';
+    private const UA = 'Mozilla/5.0 (compatible; GeoAPI/1.0; +https://geoapi.ge)';
 
     /**
      * @return array{source:string,title:string,thumb_url:string,source_url:string,
@@ -57,7 +57,7 @@ final class DromResolver
         $name = (string)($data['m_name'] ?? $model);
         $title = trim((string)($group['title'] ?? "$firm $name"));
         return [
-            'source'      => 'carapi',
+            'source'      => 'geoapi',
             'title'       => $title,
             'thumb_url'   => $photo,
             'source_url'  => $photo,

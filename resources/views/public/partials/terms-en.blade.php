@@ -2,7 +2,7 @@
 <section class="panel">
 <p>Version 2026-09-26. These terms are not a price list, a payment promise, or an uptime guarantee.</p>
 <h1>Terms of use</h1>
-<p>The service is provided by LLC Inova Lab, identification code 432291851. Contact: <a href="mailto:info@socialsave.cc">info@socialsave.cc</a>.</p>
+<p>The service is provided by LLC Inova Lab, identification code 432291851. Contact: <a href="mailto:hello@geoapi.ge">hello@geoapi.ge</a>.</p>
 </section>
 <section class="panel"><h2>What you get</h2>
 <p>The server API returns brands, models, generations, and modifications so you can build your own interface. The widget shows the same choice on your site and sends the selected ids to your page. It does not filter your listings. Version 1 list endpoints do not return photo files. On the demo, a photo is shown only when it matches the chosen generation; otherwise a placeholder is shown. Modification list and detail are available. There is no separate technical-spec request.</p>
@@ -15,6 +15,6 @@
 </section>
 <section class="panel"><h2>Limits and changes</h2>
 <p>Access can be limited or paused when the account is suspended, the email is unverified, the key is revoked, the limit is used up, or a request harms the system. That is not a waiver of every responsibility.</p>
-<p>The current text is this page. Support: info@socialsave.cc. Personal data: <a href="/privacy">privacy policy</a>.</p>
+<p>The current text is this page. Support: hello@geoapi.ge. Personal data: <a href="/privacy">privacy policy</a>.</p>
 </section>
 </article>

@@ -92,9 +92,9 @@ final class AuditFixesTest extends TestCase
         $this->get('/guide')
             ->assertOk()
             ->assertSee('public-key=&quot;demo&quot;', false)
-            ->assertDontSee('carapi_pk_example', false);
+            ->assertDontSee('geoapi_pk_example', false);
 
-        $script = (string) file_get_contents(public_path('widget/v1/carapi-filter.js'));
+        $script = (string) file_get_contents(public_path('widget/v1/geoapi-filter.js'));
         $this->assertStringContainsString('generation_id: this.state.generation', $script);
     }
 }
