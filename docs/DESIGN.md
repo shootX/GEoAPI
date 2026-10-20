@@ -2,7 +2,7 @@
 
 The public site uses the approved palette: ink `#091413`, pine `#285A48`, leaf `#408A71`, mint `#B0E4CC`, wash `#f4faf7`. Georgian text uses the self-hosted Noto Sans Georgian file, with FiraGO for the other letters. The home page follows `docs/mockups/home.html`: gradient hero, API illustration, overlapping demo, four feature cards, how-it-works, pricing, example stories, FAQ, contact, and a four-column footer. Styles live in `public/assets/public-design.css`.
 
-The approved static mockups are `docs/mockups/home.html` and `docs/mockups/dashboard.html` on `cursor/home-mockup-81d8`. The live picker does not use that mockup's lightbox. The photo still opens inside `#vp-card`, from `GET /api/models/{id}/photo?generation=`, and only when `model_photos.generation_id` matches. Otherwise the card shows the car placeholder. `DemoWatermark` draws one small corner `GEOAPI.GE`.
+The approved static mockups are `docs/mockups/home.html` and `docs/mockups/dashboard.html` on `cursor/home-mockup-81d8`. The live picker does not use that mockup's lightbox. The photo still opens inside `#vp-card`, from `GET /api/models/{id}/photo?generation=`, and only when `model_photos.generation_id` matches. Otherwise the card shows the car placeholder. `DemoWatermark` draws a semi-transparent diagonal `GEOAPI.GE` across the whole photo. The bytes of the response are marked, so a download keeps the mark.
 
 ## 2026-10-20
 

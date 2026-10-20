@@ -41,3 +41,8 @@
 - [x] Picker skeletons, 120-second list cache, generation-matched photos, corner watermark, KA/EN value labels, deduped generations, sorted brands, collapsed API response, and the listed copy fixes.
 - [x] Pixel pass: home header, four demo selects (no year), testimonials, pricing and footer copy match `docs/mockups/home.html`. The photo stays in the card.
 - [x] `/dashboard` and `/account` render that cabinet. `CARAPI_CABINET_DEMO=1` fills the local screenshot with the mockup's project, usage, keys, and catalog cards.
+
+## 2026-10-20 — Full-screen photo watermark
+
+- [x] `DemoWatermark` again tiles a large diagonal `GEOAPI.GE` across the whole image. Demo, widget, and `/getimage` responses are marked in the file, not with a CSS overlay.
+- [x] The mark stays semi-transparent so the car remains visible. A download of the JPEG still contains the tiles.
