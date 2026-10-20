@@ -43,4 +43,4 @@ Free limits remain 60/minute and 10 000/month. The new daily cap is 2 000 succes
 
 ## 2026-10-20 — Auto-deploy
 
-Push to `main` is `.github/workflows/deploy.yml`. PHPUnit runs first on the GitHub runner. The server step uses `appleboy/ssh-action` and the secrets `DEPLOY_HOST`, `DEPLOY_USER`, `DEPLOY_SSH_KEY`, and `DEPLOY_PORT` (22 when unset). Commands run in `/www/wwwroot/car.socialsave.cc`. The checkout owner is `www`. PHP-FPM stays `carapi`. The workflow never writes `.env`. One-time setup is `docs/DEPLOY.md`. The public remote is `https://github.com/shootX/GEoAPI.git`.
+Push to `main` is `.github/workflows/deploy.yml`. PHPUnit runs first on the GitHub runner. The server step uses `appleboy/ssh-action` and the secrets `DEPLOY_HOST`, `DEPLOY_USER`, `DEPLOY_SSH_KEY`, and `DEPLOY_PORT` (22 when unset). Commands run in `/www/wwwroot/geoapi.ge`. The checkout owner is `www`. PHP-FPM stays `carapi`. The workflow never writes `.env`. One-time setup is `docs/DEPLOY.md`. The public remote is `https://github.com/shootX/GEoAPI.git`.

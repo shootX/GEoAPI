@@ -31,7 +31,7 @@
         'p1' => '60 requests a minute', 'p2' => '10,000 successful requests a month', 'p3' => 'Server API and widget', 'p4' => 'Limit per project',
         'q1' => 'The same catalog', 'q2' => 'A higher limit will be announced', 'q3' => 'Not for sale yet', 'q4' => 'The price will be announced separately',
         'notify' => 'We will let you know',
-        'storiesEyebrow' => 'In teams', 'storiesTitle' => 'Where CarAPI fits',
+        'storiesEyebrow' => 'In teams', 'storiesTitle' => 'Where GeoAPI fits',
         'storiesLede' => 'These are examples of how a catalog is used. They are not quotes from real customers.',
         'st1t' => 'A filter on a listing', 'st1p' => 'Four steps from brand to generation. A custom filter stands on that chain.', 'st1w' => 'Frontend', 'st1s' => 'Own screen', 'st1a' => 'F',
         'st2t' => 'A widget in a form', 'st2p' => 'The picker is on the site. The public key is in the browser. The secret stays on the server.', 'st2w' => 'Product', 'st2s' => 'Widget', 'st2a' => 'P',
@@ -83,7 +83,7 @@
         'p1' => '60 მოთხოვნა წუთში', 'p2' => '10 000 წარმატებული მოთხოვნა თვეში', 'p3' => 'სერვერული API და ვიჯეტი', 'p4' => 'ლიმიტი პროექტზე',
         'q1' => 'იგივე კატალოგი', 'q2' => 'გაზრდილი ლიმიტი გამოცხადდება', 'q3' => 'ჯერ არ იყიდება', 'q4' => 'ფასი ცალკე გამოცხადდება',
         'notify' => 'შეგატყობინებთ',
-        'storiesEyebrow' => 'გუნდებში', 'storiesTitle' => 'სად ჯდება CarAPI',
+        'storiesEyebrow' => 'გუნდებში', 'storiesTitle' => 'სად ჯდება GeoAPI',
         'storiesLede' => 'ეს მაგალითებია, როგორ იყენებენ კატალოგს. რეალური მომხმარებლის ციტატა არ არის.',
         'st1t' => 'ფილტრი განცხადებაზე', 'st1p' => 'მარკიდან თაობამდე ოთხი საფეხურია. საკუთარი ფილტრი ამ ჯაჭვზე დგას.', 'st1w' => 'ფრონტენდი', 'st1s' => 'საკუთარი ეკრანი', 'st1a' => 'ფ',
         'st2t' => 'ვიჯეტი ფორმაში', 'st2p' => 'არჩევანი საიტზე ჩანს. საჯარო გასაღები ბრაუზერშია, საიდუმლო სერვერზე რჩება.', 'st2w' => 'პროდუქტი', 'st2s' => 'ვიჯეტი', 'st2a' => 'პ',
@@ -108,14 +108,14 @@
     $check = '<svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="#408A71" stroke-width="1.8"><circle cx="9" cy="9" r="7"/><path d="M5.5 9.2l2.2 2.2 4.8-5"/></svg>';
 @endphp
 @component('components.layouts.public', [
-    'title' => 'CarAPI — '.($en ? 'Vehicle data' : 'ავტომობილების მონაცემები'),
-    'description' => $en ? 'CarAPI is a vehicle catalog API. The data comes from drom.ru.' : 'CarAPI არის ავტომობილების კატალოგის API. მონაცემები drom.ru-დან მოდის.',
+    'title' => 'GeoAPI — '.($en ? 'Vehicle data' : 'ავტომობილების მონაცემები'),
+    'description' => $en ? 'GeoAPI is a vehicle catalog API. The data comes from drom.ru.' : 'GeoAPI არის ავტომობილების კატალოგის API. მონაცემები drom.ru-დან მოდის.',
     'home' => true,
 ])
 <div class="mk">
     <header class="site-header">
         <div class="wrap">
-            <a class="logo" href="#top"><span class="mark" aria-hidden="true"></span> CarAPI</a>
+            <a class="logo" href="#top"><span class="mark" aria-hidden="true"></span> GeoAPI</a>
             <nav class="nav" id="nav" aria-label="{{ $en ? 'Main' : 'მთავარი' }}">
                 <a href="#features">{{ $t['nav1'] }}</a>
                 <a href="#how">{{ $t['nav2'] }}</a>
@@ -318,7 +318,7 @@
         <div class="wrap">
             <div class="footer-grid">
                 <div>
-                    <a class="logo" href="#top"><span class="mark"></span> CarAPI</a>
+                    <a class="logo" href="#top"><span class="mark"></span> GeoAPI</a>
                     <p style="margin-top:10px">{{ $t['foot'] }}</p>
                 </div>
                 <div>

@@ -13,7 +13,7 @@ final class PublicPostmanController extends Controller
     {
         return response()->json([
             'info' => [
-                'name' => 'CarAPI',
+                'name' => 'GeoAPI',
                 'schema' => 'https://schema.getpostman.com/json/collection/v2.1.0/collection.json',
                 'description' => 'Public catalog API. Set baseUrl and token.',
             ],

@@ -76,7 +76,7 @@ final class CurlFetchTransport implements FetchTransport
             CURLOPT_CONNECTTIMEOUT => min(4, $timeout),
             CURLOPT_HTTPGET => true,
             CURLOPT_UNRESTRICTED_AUTH => false,
-            CURLOPT_USERAGENT => 'CarAPI/1.0',
+            CURLOPT_USERAGENT => 'GeoAPI/1.0',
         ];
     }
 }

@@ -23,14 +23,14 @@
             'inLanguage' => $locale,
             'mainEntityOfPage' => $canonical,
             'image' => $image,
-            'author' => ['@type' => 'Organization', 'name' => 'CarAPI'],
-            'publisher' => ['@type' => 'Organization', 'name' => 'CarAPI'],
+            'author' => ['@type' => 'Organization', 'name' => 'GeoAPI'],
+            'publisher' => ['@type' => 'Organization', 'name' => 'GeoAPI'],
         ],
         [
             '@context' => 'https://schema.org',
             '@type' => 'BreadcrumbList',
             'itemListElement' => [
-                ['@type' => 'ListItem', 'position' => 1, 'name' => 'CarAPI', 'item' => url('/')],
+                ['@type' => 'ListItem', 'position' => 1, 'name' => 'GeoAPI', 'item' => url('/')],
                 ['@type' => 'ListItem', 'position' => 2, 'name' => $en ? 'Blog' : 'ბლოგი', 'item' => url('/'.$locale.'/blog')],
                 ['@type' => 'ListItem', 'position' => 3, 'name' => $translation['title'], 'item' => $canonical],
             ],
@@ -38,7 +38,7 @@
     ];
 @endphp
 @component('components.layouts.public', [
-    'title' => $headline.' — CarAPI',
+    'title' => $headline.' — GeoAPI',
     'description' => $summary,
     'robots' => $draft ? 'noindex, nofollow' : null,
     'seo' => [

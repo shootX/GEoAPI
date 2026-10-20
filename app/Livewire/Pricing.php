@@ -15,7 +15,7 @@ final class Pricing extends Component
     public function render()
     {
         return view('public.pricing')->layoutData([
-            'title' => __('Pricing').' — CarAPI',
+            'title' => __('Pricing').' — GeoAPI',
             'description' => __('The free plan is the current limit. Pro is not on sale yet.'),
         ]);
     }

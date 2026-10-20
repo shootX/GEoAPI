@@ -822,7 +822,7 @@ final class Http
         }
         try {
             $token = (new Tokens(Connection::pdo()))->issue((int) $user['id'], 'verify_email', (string) $user['email']);
-                Mail::make()->send((string) $user['email'], 'ელფოსტის დადასტურება', "დაადასტურეთ CarAPI ანგარიშის ელფოსტა ამ ბმულით. ბმული 24 საათი მოქმედებს.\n" . Mail::appUrl() . '/email/verify?token=' . $token);
+                Mail::make()->send((string) $user['email'], 'ელფოსტის დადასტურება', "დაადასტურეთ GeoAPI ანგარიშის ელფოსტა ამ ბმულით. ბმული 24 საათი მოქმედებს.\n" . Mail::appUrl() . '/email/verify?token=' . $token);
         } catch (UnavailableException) {
             error_log('[platform] verification mail failed');
             View::account($user, (new ProjectRepository(Connection::pdo()))->forUser((int) $user['id']), ['form' => 'დადასტურების წერილი ვერ გაიგზავნა. სცადეთ მოგვიანებით.'], []);
@@ -950,7 +950,7 @@ final class Http
         try {
             $sentTo = self::emailForResetToken((string) ($input['token'] ?? ''));
             if ($sentTo !== null) {
-                Mail::make()->send($sentTo, 'პაროლი შეიცვალა', 'თქვენი CarAPI ანგარიშის პაროლი შეიცვალა. თუ ეს ცვლილება თქვენ არ განგიხორციელებიათ, დაგვიკავშირდით: info@socialsave.cc.');
+                Mail::make()->send($sentTo, 'პაროლი შეიცვალა', 'თქვენი GeoAPI ანგარიშის პაროლი შეიცვალა. თუ ეს ცვლილება თქვენ არ განგიხორციელებიათ, დაგვიკავშირდით: info@socialsave.cc.');
             }
         } catch (UnavailableException) {
             error_log('[platform] reset notice failed');

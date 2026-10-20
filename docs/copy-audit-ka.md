@@ -1,4 +1,4 @@
-# CarAPI — ქართული ტექსტების აუდიტი
+# GeoAPI — ქართული ტექსტების აუდიტი
 
 თარიღი: 2026-10-18
 
@@ -10,7 +10,7 @@
 
 ### მთავარი გვერდი
 
-- SEO სათაური: `CarAPI — ავტომობილების კატალოგი, API და მზა ვიჯეტი`
+- SEO სათაური: `GeoAPI — ავტომობილების კატალოგი, API და მზა ვიჯეტი`
 - აღწერა, H1, ორი ღილაკი და დემოს ტექსტი დავალების ფორმულირებით
 - დემოს ველები: აირჩიეთ ბრენდი / მოდელი / წელი / ძარის ტიპი
 - დამოკიდებული ველი აჩვენებს `ჯერ აირჩიეთ ბრენდი` და `ჯერ აირჩიეთ მოდელი`
@@ -32,7 +32,7 @@
 `/guide` მოიცავს დაწყებას, გასაღებებს, ლიმიტებს, ვიჯეტს, origin-ს, `carapi:change`-ს, Cursor / Claude Code / Codex-ს და ოთხ GET მეთოდს.
 
 - სერვერული მაგალითი: `Authorization: Bearer <SERVER_API_KEY>`
-- ვიჯეტის ნიმუში: `carapi_pk_example` და `https://car.socialsave.cc/widget/v1/carapi-filter.js`
+- ვიჯეტის ნიმუში: `carapi_pk_example` და `https://geoapi.ge/widget/v1/carapi-filter.js`
 - `generation_id` და `modification_id` ამ ვერსიაში ყოველთვის `null`-ია. მოდიფიკაციის არჩევა მხარდაჭერილი არ არის
 - Cursor იყენებს `.cursor/rules/carapi.mdc`-ს `alwaysApply: true` frontmatter-ით. Claude Code კითხულობს `CLAUDE.md`-ს. Codex კითხულობს `AGENTS.md`-ს. სამივე ერთ ფაილს ერთნაირად არ კითხულობს
 - `page` და `per_page` წერია მხოლოდ სიის მეთოდებზე. `GET /api/v1/coverage` მათ არ იყენებს

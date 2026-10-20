@@ -16,7 +16,7 @@ use PDO;
 use PDOException;
 
 #[Layout('components.layouts.cabinet')]
-#[Title('CarAPI')]
+#[Title('GeoAPI')]
 final class Projects extends Component
 {
     public string $name = '';

@@ -8,7 +8,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="robots" content="noindex, nofollow">
-    <title>{{ $heading }} — CarAPI ადმინი</title>
+    <title>{{ $heading }} — GeoAPI ადმინი</title>
     <link rel="icon" href="/assets/brand/favicon-32-lime.svg" type="image/svg+xml">
     <link rel="stylesheet" href="/assets/fonts/fonts.css?v=20261018">
     <link rel="stylesheet" href="/assets/admin.css?v=20261020r">
@@ -17,7 +17,7 @@
     <a class="admin-skip" href="#admin-content">შინაარსზე გადასვლა</a>
     <header class="admin-bar">
         <button class="admin-menu" type="button" aria-expanded="false" aria-controls="admin-nav">მენიუ</button>
-        <p class="admin-brand">CarAPI <span>ადმინი</span></p>
+        <p class="admin-brand">GeoAPI <span>ადმინი</span></p>
         <h1>{{ $heading }}</h1>
         <div class="admin-who">
             <p><b>{{ $name }}</b><span>{{ $user?->email }}</span></p>

@@ -2,12 +2,12 @@
 <section class="panel">
 <p class="note" id="updated">Updated 26 September 2026. This text does not mean every process already meets every legal duty.</p>
 <h1>Privacy policy</h1>
-<p>Operator: LLC Inova Lab, identification code 432291851. Contact: <a href="mailto:info@socialsave.cc">info@socialsave.cc</a>. Site: https://car.socialsave.cc.</p>
+<p>Operator: LLC Inova Lab, identification code 432291851. Contact: <a href="mailto:info@socialsave.cc">info@socialsave.cc</a>. Site: https://geoapi.ge.</p>
 </section>
 <section class="panel" id="scope"><h2>Who this covers</h2>
 <p>Visitors, account holders, their representatives, people who email the contact address, and visitors of a widget embedded on another site.</p>
 <p>This is not the terms of use, a catalog license, or a paid-service contract. Reading the page is not consent to every kind of processing or to marketing.</p>
-<p>If the widget is on another company's site, that site's accounts and listings are defined by that operator. CarAPI only receives the widget's catalog request.</p>
+<p>If the widget is on another company's site, that site's accounts and listings are defined by that operator. GeoAPI only receives the widget's catalog request.</p>
 </section>
 <section class="panel" id="data"><h2>What is processed</h2>
 <p>Registration asks for a name, email, and password. A personal number, phone, VIN, plate, or bank card is not requested. The password is stored only as a hash. The database stores account status, email verification time, created time, and last sign-in time.</p>
@@ -28,14 +28,14 @@
 <p>Registration needs a name, email, and password. Without one of them the account is not created. We do not ask for other data for that.</p>
 </section>
 <section class="panel" id="widget"><h2>Widget</h2>
-<p>The visitor's browser sends CarAPI the public key, the page origin, and list parameters such as a page number or a model id. The request uses <code>credentials: omit</code> and does not send the CarAPI session cookie. The IP is used for the limit. Chosen ids and names stay on the host page through the event. CarAPI does not build a lasting profile of that choice.</p>
+<p>The visitor's browser sends GeoAPI the public key, the page origin, and list parameters such as a page number or a model id. The request uses <code>credentials: omit</code> and does not send the GeoAPI session cookie. The IP is used for the limit. Chosen ids and names stay on the host page through the event. GeoAPI does not build a lasting profile of that choice.</p>
 </section>
 <section class="panel" id="cookies"><h2>Cookies</h2>
 <p>The account cookie is named carapi_platform. It is readable only by the site, is sent over HTTPS, and lasts until the browser closes. The session ends after 30 minutes idle or 12 hours. Signing out deletes the cookie. That does not by itself delete every record at the same moment.</p>
 <p>There is no analytics script. The font is a file on this site.</p>
 </section>
 <section class="panel" id="recipients"><h2>Who processes the data</h2>
-<p>The CarAPI server is in Germany. The host is Contabo. That statement is only about this server. Account and catalog records are stored on it. Service email is sent from this server, from info@socialsave.cc, and then follows the recipient's mail system.</p>
+<p>The GeoAPI server is in Germany. The host is Contabo. That statement is only about this server. Account and catalog records are stored on it. Service email is sent from this server, from info@socialsave.cc, and then follows the recipient's mail system.</p>
 <p>We do not sell the data or pass it to an independent advertiser. A competent authority can request data when the law allows it.</p>
 </section>
 <section class="panel" id="retention"><h2>How long it is kept</h2>

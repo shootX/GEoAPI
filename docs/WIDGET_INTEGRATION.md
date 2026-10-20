@@ -7,7 +7,7 @@ production-ში სამივე დროშა ჩართულია. �
 ## ჩასმა
 
 ```html
-<script src="https://car.socialsave.cc/widget/v1/carapi-filter.js"></script>
+<script src="https://geoapi.ge/widget/v1/carapi-filter.js"></script>
 <carapi-filter public-key="carapi_pk_საჯარო_გასაღები"></carapi-filter>
 ```
 

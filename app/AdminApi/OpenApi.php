@@ -35,7 +35,7 @@ final class OpenApi
         return [
             'openapi' => '3.0.3',
             'info' => [
-                'title' => 'CarAPI Admin',
+                'title' => 'GeoAPI Admin',
                 'version' => '1.0.0',
                 'description' => 'ადმინის API. ავტორიზაცია: Authorization: Bearer {token}. ტოკენს სჭირდება abilities: ["*"] და მომხმარებლის როლი admin. pages-ის გამოქვეყნებული slug ცვლის ჩაშენებულ საჯარო გვერდს. ცარიელი სია ნიშნავს, რომ ჩანს კოდის გვერდი. model-photos-ის გზის id არის model_id. equipment-ის სიას სჭირდება modification_id. generations იღებს model_id და brand_id ფილტრს. ბლოგი: /api/admin/blog/posts, /categories, /tags. სტატუსი draft, published ან scheduled. scheduled-ს სჭირდება publish_at. სლაგი ცარიელი რომ იყოს, სათაურიდან ივსება. ყდა: POST /api/admin/blog/posts/{id}/cover.',
             ],

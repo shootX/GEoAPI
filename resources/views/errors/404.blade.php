@@ -1,5 +1,5 @@
 @component('components.layouts.public', [
-    'title' => __('Page not found').' — CarAPI',
+    'title' => __('Page not found').' — GeoAPI',
     'description' => __('That address does not exist.'),
 ])
     <h1 class="text-3xl font-extrabold">{{ __('Page not found') }}</h1>

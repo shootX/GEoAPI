@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>CarAPI Admin API</title>
+    <title>GeoAPI Admin API</title>
     <link rel="stylesheet" href="/assets/fonts/fonts.css">
     <link rel="stylesheet" href="https://unpkg.com/swagger-ui-dist@5.17.14/swagger-ui.css">
     <style>
@@ -18,7 +18,7 @@
 </head>
 <body>
     <header>
-        <h1>CarAPI Admin API</h1>
+        <h1>GeoAPI Admin API</h1>
         <p>Authorization: Bearer ტოკენი, abilities: ["*"], როლი admin. სპეციფიკაცია: <a href="{{ $specUrl }}">openapi.json</a></p>
     </header>
     <section id="ops">

@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="robots" content="noindex">
-    <title>{{ __('Coming soon') }} — CarAPI</title>
+    <title>{{ __('Coming soon') }} — GeoAPI</title>
     <x-electrik::brand-styles />
     @vite(['resources/css/app.css'])
     <style>
@@ -33,9 +33,9 @@
         @include('components.locale-switch')
     </div>
     <main>
-        <img src="{{ asset('logo.png') }}" alt="CarAPI" width="88" height="88">
+        <img src="{{ asset('logo.png') }}" alt="GeoAPI" width="88" height="88">
         <h1>{{ __('Coming soon') }}</h1>
-        <p class="lead">{{ __('CarAPI opens soon. Leave your email and we will tell you when it does.') }}</p>
+        <p class="lead">{{ __('GeoAPI opens soon. Leave your email and we will tell you when it does.') }}</p>
         @if (session('coming_soon_saved'))
             <p class="ok">{{ __('Thank you. We will tell you when it opens.') }}</p>
         @else

@@ -1,6 +1,6 @@
-# CarAPI product
+# GeoAPI product
 
-Public catalog API and Georgian/English site at https://car.socialsave.cc. Data comes from drom.ru. Customers call the catalog with a secret key (`carapi_sk_…`) or embed the picker widget with a public key (`carapi_pk_…`). Keys belong to projects on tariff plans.
+Public catalog API and Georgian/English site at https://geoapi.ge. Data comes from drom.ru. Customers call the catalog with a secret key (`carapi_sk_…`) or embed the picker widget with a public key (`carapi_pk_…`). Keys belong to projects on tariff plans.
 
 ## 2026-10-20
 

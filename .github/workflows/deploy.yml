@@ -1,4 +1,4 @@
-# Push to main: run PHPUnit, then deploy /www/wwwroot/car.socialsave.cc.
+# Push to main: run PHPUnit, then deploy /www/wwwroot/geoapi.ge.
 # This file never reads or writes the server .env.
 
 name: Deploy
@@ -55,7 +55,7 @@ jobs:
             bash -s <<'EOF'
             set -e
             umask 002
-            cd /www/wwwroot/car.socialsave.cc
+            cd /www/wwwroot/geoapi.ge
             php artisan down --retry=15 || true
             bring_up() {
               status=$?
@@ -85,4 +85,4 @@ jobs:
           port: ${{ secrets.DEPLOY_PORT || 22 }}
           command_timeout: 2m
           script: |
-            cd /www/wwwroot/car.socialsave.cc && php artisan up
+            cd /www/wwwroot/geoapi.ge && php artisan up

@@ -17,10 +17,10 @@ final class View
             . (isset($errors['password']) ? '<p class="hint err">' . self::e($errors['password']) . '</p>' : '')
             . '</div>';
         self::auth(
-            'შედით CarAPI ანგარიშში',
+            'შედით GeoAPI ანგარიშში',
             '01',
             'შესვლა',
-            'შედით <span>CarAPI ანგარიშში</span>',
+            'შედით <span>GeoAPI ანგარიშში</span>',
             'მართეთ თქვენი პროექტები, API გასაღებები, დაშვებული დომენები და მოთხოვნების მოხმარება.',
             $fields,
             '/login',
@@ -44,11 +44,11 @@ final class View
             . '<label class="chk"><input type="checkbox" name="accept_terms" value="1"' . $checked . '> <span>ვეთანხმები <a href="/terms">გამოყენების წესებს</a>. ეს მარკეტინგის ან მონაცემთა ყველა დამუშავების თანხმობა არ არის.</span></label>'
             . (isset($errors['accept_terms']) ? '<p class="hint err">' . self::e($errors['accept_terms']) . '</p>' : '');
         self::auth(
-            'შექმენით CarAPI ანგარიში',
+            'შექმენით GeoAPI ანგარიში',
             '02',
             'რეგისტრაცია',
-            'შექმენით <span>CarAPI ანგარიში</span>',
-            'დარეგისტრირდით, დაადასტურეთ ელფოსტა და შექმენით პროექტი, რათა გამოიყენოთ CarAPI-ის ვიჯეტი ან სერვერული API. თითო პროექტისთვის მოქმედებს მოთხოვნების ლიმიტი: 60 მოთხოვნა წუთში და 10&nbsp;000 წარმატებული მოთხოვნა კალენდარულ თვეში.',
+            'შექმენით <span>GeoAPI ანგარიში</span>',
+            'დარეგისტრირდით, დაადასტურეთ ელფოსტა და შექმენით პროექტი, რათა გამოიყენოთ GeoAPI-ის ვიჯეტი ან სერვერული API. თითო პროექტისთვის მოქმედებს მოთხოვნების ლიმიტი: 60 მოთხოვნა წუთში და 10&nbsp;000 წარმატებული მოთხოვნა კალენდარულ თვეში.',
             $fields,
             '/register',
             'ანგარიშის შექმნა',
@@ -216,7 +216,7 @@ final class View
         }
         $ops = (string) json_encode(Playground::clientOps(), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
         $main = '<div class="pn"><div class="sh"><div><h1>API Playground</h1>'
-            . '<p>გამოცადეთ CarAPI-ის მოთხოვნები პროექტის კაბინეტიდან, ბრენდიდან კონკრეტულ მოდიფიკაციამდე.</p></div></div>'
+            . '<p>გამოცადეთ GeoAPI-ის მოთხოვნები პროექტის კაბინეტიდან, ბრენდიდან კონკრეტულ მოდიფიკაციამდე.</p></div></div>'
             . '<p class="hint">Playground-ის წარმატებული მოთხოვნები ითვლება თქვენი პროექტის API კვოტაში.</p>'
             . '<form id="playground-form" method="post" action="/account/projects/' . $id . '/playground/run">'
             . '<input type="hidden" name="_csrf" value="' . self::e(Session::csrf()) . '">'
@@ -998,13 +998,13 @@ JS;
         $name = trim((string) $user['first_name'] . ' ' . (string) $user['last_name']);
         $email = (string) $user['email'];
         echo '<!doctype html><html lang="ka"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">'
-            . '<title>' . self::e($heading) . ' — CarAPI ადმინი</title>'
+            . '<title>' . self::e($heading) . ' — GeoAPI ადმინი</title>'
             . '<link rel="icon" href="/assets/brand/favicon-32-lime.svg" type="image/svg+xml">'
             . '<link rel="stylesheet" href="/assets/fonts/fonts.css?v=20261018">'
             . '<link rel="stylesheet" href="/assets/admin.css?v=20261020r"></head><body class="admin-app">';
         echo '<a class="admin-skip" href="#admin-content">შინაარსზე გადასვლა</a>';
         echo '<header class="admin-bar"><button class="admin-menu" type="button" aria-expanded="false" aria-controls="admin-nav">მენიუ</button>'
-            . '<p class="admin-brand">CarAPI <span>ადმინი</span></p><h1>' . self::e($heading) . '</h1>'
+            . '<p class="admin-brand">GeoAPI <span>ადმინი</span></p><h1>' . self::e($heading) . '</h1>'
             . '<div class="admin-who"><p><b>' . self::e($name) . '</b><span>' . self::e($email) . '</span></p>'
             . '<a href="/account">დეველოპერის კაბინეტი</a>'
             . '<form method="post" action="/logout"><input type="hidden" name="_csrf" value="' . self::e(Session::csrf()) . '"><button type="submit">გასვლა</button></form></div></header>';
@@ -1549,7 +1549,7 @@ JS;
         $key = (string) $widget['public_key'];
         $https = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off')
             || (($_SERVER['HTTP_X_FORWARDED_PROTO'] ?? '') === 'https');
-        $host = $_SERVER['HTTP_HOST'] ?? 'car.socialsave.cc';
+        $host = $_SERVER['HTTP_HOST'] ?? 'geoapi.ge';
         $base = ($https ? 'https' : 'http') . '://' . $host;
         $snippet = '<script src="' . $base . '/widget/v1/carapi-filter.js"></script>' . "\n" . '<carapi-filter public-key="' . $key . '"></carapi-filter>';
 

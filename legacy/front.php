@@ -395,7 +395,7 @@ function carapi_demo_key(): string
     }
     try {
         $stmt = \Carapi\Platform\Connection::pdo()->query(
-            "SELECT public_key FROM platform.widgets WHERE enabled = true AND allowed_origins @> '[\"https://car.socialsave.cc\"]'::jsonb LIMIT 1"
+            "SELECT public_key FROM platform.widgets WHERE enabled = true AND allowed_origins @> '[\"https://geoapi.ge\"]'::jsonb LIMIT 1"
         );
         $key = $stmt ? $stmt->fetchColumn() : false;
 
@@ -457,12 +457,12 @@ function carapi_privacy(): void
 <section class="panel">
 <p class="note" id="updated">განახლდა 26 სექტემბერი, 2026. ეს ტექსტი არ ნიშნავს, რომ ყველა პროცესი სრულად შესაბამისია კანონთან.</p>
 <h1>კონფიდენციალურობის პოლიტიკა</h1>
-<p>ოპერატორი: შპს „ინოვა ლაბ“, საიდენტიფიკაციო კოდი 432291851. კონტაქტი: <a href="mailto:info@socialsave.cc">info@socialsave.cc</a>. საიტი: https://car.socialsave.cc.</p>
+<p>ოპერატორი: შპს „ინოვა ლაბ“, საიდენტიფიკაციო კოდი 432291851. კონტაქტი: <a href="mailto:info@socialsave.cc">info@socialsave.cc</a>. საიტი: https://geoapi.ge.</p>
 </section>
 <section class="panel" id="scope"><h2>ვის ეხება</h2>
 <p>ტექსტი ეხება საიტის სტუმრებს, ანგარიშის მფლობელებს, მათ წარმომადგენლებს, საკონტაქტო ელფოსტაზე მომწერ პირებს და სხვა საიტზე ჩასმული ვიჯეტის სტუმრებს.</p>
 <p>ეს არ არის გამოყენების წესები, კატალოგის ლიცენზია ან ფასიან მომსახურებაზე შეთანხმება. გვერდის გაცნობა არ არის თანხმობა მონაცემების ნებისმიერი მიზნით დამუშავებაზე ან მარკეტინგზე.</p>
-<p>თუ ვიჯეტი სხვა კომპანიის საიტზეა, იმ საიტის ანგარიშებსა და განცხადებებს იმ საიტის ოპერატორი განსაზღვრავს. CarAPI მხოლოდ ვიჯეტის კატალოგის მოთხოვნას იღებს.</p>
+<p>თუ ვიჯეტი სხვა კომპანიის საიტზეა, იმ საიტის ანგარიშებსა და განცხადებებს იმ საიტის ოპერატორი განსაზღვრავს. GeoAPI მხოლოდ ვიჯეტის კატალოგის მოთხოვნას იღებს.</p>
 </section>
 <section class="panel" id="data"><h2>რა მონაცემები მუშავდება</h2>
 <p>რეგისტრაცია ითხოვს სახელს, გვარს, ელფოსტას და პაროლს. პირადი ნომერი, ტელეფონი, VIN, სანომრე ნიშანი და საბანკო ბარათი არ იკითხება. პაროლი ინახება მხოლოდ ჰეშით. ბაზაში ინახება ანგარიშის სტატუსი, ელფოსტის დადასტურების დრო, შექმნის დრო და ბოლო შესვლის დრო.</p>
@@ -483,7 +483,7 @@ function carapi_privacy(): void
 <p>რეგისტრაციას სჭირდება სახელი, გვარი, ელფოსტა და პაროლი. რომელიმე რომ არ იყოს, ანგარიში არ იქმნება. ამისთვის სხვა მონაცემს არ ვითხოვთ.</p>
 </section>
 <section class="panel" id="widget"><h2>ვიჯეტი</h2>
-<p>სტუმრის ბრაუზერი CarAPI-ს უგზავნის საჯარო გასაღებს, გვერდის origin-ს და სიის პარამეტრებს, მაგალითად გვერდის ნომერს ან მოდელის იდენტიფიკატორს. მოთხოვნა მიდის <code>credentials: omit</code> რეჟიმით და CarAPI-ის სესიის cookie-ს არ აგზავნის. IP გამოიყენება ლიმიტისთვის. არჩეული იდენტიფიკატორები და სახელები მოვლენით რჩება მასპინძელ გვერდზე. CarAPI ამ არჩევანის მუდმივ პროფილს არ ქმნის.</p>
+<p>სტუმრის ბრაუზერი GeoAPI-ს უგზავნის საჯარო გასაღებს, გვერდის origin-ს და სიის პარამეტრებს, მაგალითად გვერდის ნომერს ან მოდელის იდენტიფიკატორს. მოთხოვნა მიდის <code>credentials: omit</code> რეჟიმით და GeoAPI-ის სესიის cookie-ს არ აგზავნის. IP გამოიყენება ლიმიტისთვის. არჩეული იდენტიფიკატორები და სახელები მოვლენით რჩება მასპინძელ გვერდზე. GeoAPI ამ არჩევანის მუდმივ პროფილს არ ქმნის.</p>
 <p>ვიჯეტის სკრიპტი ბრაუზერის მეხსიერებაში არჩევანს არ ინახავს და გარე შრიფტს არ ტვირთავს.</p>
 </section>
 <section class="panel" id="cookies"><h2>Cookie-ები და შრიფტი</h2>
@@ -492,7 +492,7 @@ function carapi_privacy(): void
 <p>შრიფტი საიტის საკუთარი ფაილია. გარე შრიფტის სერვისს აღარ ვიყენებთ.</p>
 </section>
 <section class="panel" id="recipients"><h2>ვინ ამუშავებს მონაცემს</h2>
-<p>CarAPI-ის სერვერი განთავსებულია გერმანიაში. ჰოსტინგის პროვაიდერია Contabo. ეს მხოლოდ ამ სერვერს ეხება. სხვა მომსახურებისა და მიმღების მდებარეობა ამით არ დასტურდება. სერვერის მდებარეობა არც ხელშეკრულებას და არც მონაცემთა საერთაშორისო გადაცემის სამართლებრივ საფუძველს ადასტურებს.</p>
+<p>GeoAPI-ის სერვერი განთავსებულია გერმანიაში. ჰოსტინგის პროვაიდერია Contabo. ეს მხოლოდ ამ სერვერს ეხება. სხვა მომსახურებისა და მიმღების მდებარეობა ამით არ დასტურდება. სერვერის მდებარეობა არც ხელშეკრულებას და არც მონაცემთა საერთაშორისო გადაცემის სამართლებრივ საფუძველს ადასტურებს.</p>
 <p>ანგარიში და კატალოგის აღრიცხვა ამ სერვერზე ინახება. სერვისულ წერილს აგზავნის ამავე სერვერის ფოსტა, მისამართიდან info@socialsave.cc. შემდეგ წერილი მიდის იმ საფოსტო სისტემაში, რომელსაც მიმღების მისამართი იყენებს.</p>
 <p>მონაცემებს არ ვყიდით და მესამე პირის დამოუკიდებელ რეკლამას არ გადავცემთ. კანონით გათვალისწინებულ შემთხვევაში მონაცემი შეიძლება მოითხოვოს უფლებამოსილმა ორგანომ.</p>
 </section>
@@ -692,12 +692,12 @@ detail.generation_id და detail.modification_id ამ ვერსიაშ�
 მიმდინარე სერვერულ API-ს ფოტო არ აქვს. მოდიფიკაციების სია და დეტალი არის. ტექნიკური მახასიათებლების ცალკე მოთხოვნა არ არის.
 საიდუმლო API გასაღები ბრაუზერში არ ჩასვათ.
 TXT;
-    $cursorFile = "---\ndescription: CarAPI ვიჯეტი და სერვერული კატალოგი\nalwaysApply: true\n---\n\nეს ფაილი Cursor-ის წესია და ამ პროექტში მოქმედებს.\n\n" . trim($facts);
+    $cursorFile = "---\ndescription: GeoAPI ვიჯეტი და სერვერული კატალოგი\nalwaysApply: true\n---\n\nეს ფაილი Cursor-ის წესია და ამ პროექტში მოქმედებს.\n\n" . trim($facts);
     $claudeFile = "ეს ფაილი Claude Code კითხულობს პროექტის ინსტრუქციად, როცა CLAUDE.md პროექტის ფესვშია.\n\n" . trim($facts);
     $codexFile = "ეს ფაილი Codex კითხულობს AGENTS.md ინსტრუქციად. Cursor-ის .mdc ფაილს ავტომატურად არ კითხულობს.\n\n" . trim($facts);
     echo \Carapi\SiteChrome::start(
-        'CarAPI-ის დოკუმენტაცია',
-        'გაეცანით CarAPI-ის ინტეგრაციის ინსტრუქციებს, ავტორიზაციას, API მეთოდებს, ვიჯეტის გამოყენებასა და მონაცემების მიღების მაგალითებს.',
+        'GeoAPI-ის დოკუმენტაცია',
+        'გაეცანით GeoAPI-ის ინტეგრაციის ინსტრუქციებს, ავტორიზაციას, API მეთოდებს, ვიჯეტის გამოყენებასა და მონაცემების მიღების მაგალითებს.',
         true
     );
     echo \Carapi\SiteChrome::header('guide');
@@ -709,8 +709,8 @@ TXT;
     echo '<h5>API მეთოდები</h5><a href="#brands">ბრენდების მიღება<em>GET</em></a><a href="#models">მოდელების მიღება<em>GET</em></a><a href="#generations">თაობების მიღება<em>GET</em></a><a href="#modifications">მოდიფიკაციების მიღება<em>GET</em></a><a href="#modification">მოდიფიკაციის დეტალი<em>GET</em></a><a href="#coverage">კატალოგის სტატისტიკა<em>GET</em></a>';
     echo '</aside><article class="ct">';
     echo $status;
-    echo '<div class="crumb">დოკუმენტაცია / დაწყება</div><h1 id="start" class="doc-sec">როგორ დავიწყოთ CarAPI-ის გამოყენება</h1>';
-    echo '<p class="lead">CarAPI-ის გამოყენებისთვის შექმენით ანგარიში, დაადასტურეთ ელფოსტის მისამართი და დაამატეთ პროექტი. შემდეგ აირჩიეთ ინტეგრაციის მეთოდი თქვენი აპლიკაციის საჭიროებების მიხედვით.</p>';
+    echo '<div class="crumb">დოკუმენტაცია / დაწყება</div><h1 id="start" class="doc-sec">როგორ დავიწყოთ GeoAPI-ის გამოყენება</h1>';
+    echo '<p class="lead">GeoAPI-ის გამოყენებისთვის შექმენით ანგარიში, დაადასტურეთ ელფოსტის მისამართი და დაამატეთ პროექტი. შემდეგ აირჩიეთ ინტეგრაციის მეთოდი თქვენი აპლიკაციის საჭიროებების მიხედვით.</p>';
     echo '<h2>ინტეგრაცია მზა ვიჯეტით</h2>';
     echo '<p>ვიჯეტი მომხმარებელს საშუალებას აძლევს, თქვენს ვებსაიტზე აირჩიოს ავტომობილის ბრენდი, მოდელი, გამოშვების წელი და ძარის ტიპი. ინტეგრაციისთვის საჭიროა საჯარო API გასაღები და დაშვებული საიტის მისამართი.</p>';
     echo '<h2>ინტეგრაცია სერვერული API-ით</h2>';
@@ -718,7 +718,7 @@ TXT;
     echo '<div class="call">' . $info . '<span>ვიჯეტი არ ფილტრავს თქვენი ვებსაიტის განცხადებებს ავტომატურად. მომხმარებლის არჩევანის საკუთარ მონაცემებთან დაკავშირება უნდა განხორციელდეს თქვენს აპლიკაციაში.</span></div>';
 
     echo '<h2 id="auth" class="doc-sec">ავტორიზაცია და API გასაღებები</h2>';
-    echo '<p class="lead">CarAPI იყენებს სხვადასხვა დანიშნულების საჯარო და საიდუმლო API გასაღებებს.</p>';
+    echo '<p class="lead">GeoAPI იყენებს სხვადასხვა დანიშნულების საჯარო და საიდუმლო API გასაღებებს.</p>';
     echo '<h2>საჯარო API გასაღები</h2><p>პრეფიქსია <code>carapi_pk_</code>. საჯარო API გასაღები გამოიყენება ვიჯეტის ბრაუზერში ჩასატვირთად. მისი გამოჩენა ვებსაიტის HTML ან JavaScript კოდში დასაშვებია.</p>';
     echo '<h2>საიდუმლო API გასაღები</h2><p>პრეფიქსია <code>carapi_sk_</code>. საიდუმლო API გასაღები გამოიყენება სერვერული მოთხოვნების ავტორიზაციისთვის. მისი დამატება საჯაროდ ხელმისაწვდომ JavaScript კოდში დაუშვებელია.</p>';
     echo '<p>სერვერული API მოთხოვნისას დაამატეთ <code>Authorization</code> სათაური Bearer სქემით და მიუთითეთ თქვენი საიდუმლო API გასაღები. ქვემოთ მხოლოდ ნიმუშია. რეალურ გასაღებს მომხმარებელი საკუთარ პროექტში ქმნის.</p>';
@@ -785,7 +785,7 @@ TXT;
     echo '<div class="codeb"><pre class="json">' . $h(trim($coverageJson)) . '</pre></div>';
 
     echo '<h2 id="widget" class="doc-sec">ვიჯეტის დამატება ვებსაიტზე</h2>';
-    echo '<p>CarAPI-ის ვიჯეტის გამოყენებით შეგიძლიათ თქვენს ვებსაიტს დაამატოთ ავტომობილის არჩევის ინტერფეისი. ვიჯეტი იტვირთება JavaScript ფაილის საშუალებით და მუშაობისთვის იყენებს საჯარო API გასაღებს.</p>';
+    echo '<p>GeoAPI-ის ვიჯეტის გამოყენებით შეგიძლიათ თქვენს ვებსაიტს დაამატოთ ავტომობილის არჩევის ინტერფეისი. ვიჯეტი იტვირთება JavaScript ფაილის საშუალებით და მუშაობისთვის იყენებს საჯარო API გასაღებს.</p>';
     echo '<div class="codeb"><div class="tb"><div class="tabs"><button type="button" class="on" data-tab="html">HTML</button></div><button type="button" class="copy" data-copy-block>' . $copy . 'კოდის კოპირება</button></div>';
     echo '<pre class="json" data-tab-panel="html">' . $h("<script src=\"" . $base . "/widget/v1/carapi-filter.js\"></script>\n<carapi-filter public-key=\"demo\"></carapi-filter>") . '</pre></div>';
     echo '<p>ამ საიტზე <code>demo</code> მხოლოდ ამ origin-ზე მუშაობს. პროექტის გასაღები არის <code>carapi_pk_</code> და 32 თექვსმეტობითი სიმბოლო.</p>';
@@ -811,12 +811,12 @@ TXT;
     echo '<p>დამატებით ველებია <code>brand_name</code>, <code>model_name</code>, <code>year_name</code> და <code>body_name</code>. თითოეული სტრიქონი ან <code>null</code>-ია და მხოლოდ ეკრანზე საჩვენებელ სახელს შეიცავს.</p>';
     echo '<p>მაგალითი, არა მიმდინარე შედეგი: <code>{"brand_id":"10","model_id":"20","year":"2018","body_type":"sedan","generation_id":null,"modification_id":null,"brand_name":"Toyota","model_name":"Camry","year_name":"2018","body_name":"სედანი"}</code></p>';
 
-    echo '<h2 id="agents" class="doc-sec">CarAPI-ის ინტეგრაცია AI კოდის ასისტენტებით</h2>';
-    echo '<p class="lead">შეგიძლიათ გამოიყენოთ Cursor, Claude Code ან Codex, რათა გაამარტივოთ CarAPI-ის ინტეგრაცია თქვენს პროექტში. ასისტენტს უნდა ჰქონდეს ინფორმაცია API მეთოდების, ავტორიზაციისა და ვიჯეტის მუშაობის შესახებ.</p>';
+    echo '<h2 id="agents" class="doc-sec">GeoAPI-ის ინტეგრაცია AI კოდის ასისტენტებით</h2>';
+    echo '<p class="lead">შეგიძლიათ გამოიყენოთ Cursor, Claude Code ან Codex, რათა გაამარტივოთ GeoAPI-ის ინტეგრაცია თქვენს პროექტში. ასისტენტს უნდა ჰქონდეს ინფორმაცია API მეთოდების, ავტორიზაციისა და ვიჯეტის მუშაობის შესახებ.</p>';
     echo '<div class="agent-grid">';
-    echo '<article class="agent" id="cursor"><div class="mark">' . carapi_logo('cursor') . '</div><h3>CarAPI-ის წესების ფაილის დამატება Cursor-ში</h3><span class="file">.cursor/rules/carapi.mdc</span><p>შექმენით პროექტში შესაბამისი Cursor Rules ფაილი და დაამატეთ CarAPI-ის ინტეგრაციის ინსტრუქციები. ფაილს აქვს frontmatter <code>alwaysApply: true</code>-ით, ამიტომ Cursor ამ წესს პროექტში იყენებს.</p></article>';
-    echo '<article class="agent" id="claude"><div class="mark">' . carapi_logo('claude') . '</div><h3>CarAPI-ის ინსტრუქციების დამატება CLAUDE.md ფაილში</h3><span class="file">CLAUDE.md</span><p>Claude Code პროექტის ფესვში არსებულ <code>CLAUDE.md</code> ფაილს კითხულობს. ეს Cursor-ის <code>.mdc</code> ფაილი არ არის და frontmatter არ სჭირდება.</p></article>';
-    echo '<article class="agent" id="codex"><div class="mark">' . carapi_logo('openai') . '</div><h3>CarAPI-ის ინსტრუქციების დამატება AGENTS.md ფაილში</h3><span class="file">AGENTS.md</span><p>Codex პროექტის ფესვში არსებულ <code>AGENTS.md</code> ფაილს კითხულობს. ის ავტომატურად არ კითხულობს არც <code>.cursor/rules/carapi.mdc</code>-ს და არც <code>CLAUDE.md</code>-ს.</p></article>';
+    echo '<article class="agent" id="cursor"><div class="mark">' . carapi_logo('cursor') . '</div><h3>GeoAPI-ის წესების ფაილის დამატება Cursor-ში</h3><span class="file">.cursor/rules/carapi.mdc</span><p>შექმენით პროექტში შესაბამისი Cursor Rules ფაილი და დაამატეთ GeoAPI-ის ინტეგრაციის ინსტრუქციები. ფაილს აქვს frontmatter <code>alwaysApply: true</code>-ით, ამიტომ Cursor ამ წესს პროექტში იყენებს.</p></article>';
+    echo '<article class="agent" id="claude"><div class="mark">' . carapi_logo('claude') . '</div><h3>GeoAPI-ის ინსტრუქციების დამატება CLAUDE.md ფაილში</h3><span class="file">CLAUDE.md</span><p>Claude Code პროექტის ფესვში არსებულ <code>CLAUDE.md</code> ფაილს კითხულობს. ეს Cursor-ის <code>.mdc</code> ფაილი არ არის და frontmatter არ სჭირდება.</p></article>';
+    echo '<article class="agent" id="codex"><div class="mark">' . carapi_logo('openai') . '</div><h3>GeoAPI-ის ინსტრუქციების დამატება AGENTS.md ფაილში</h3><span class="file">AGENTS.md</span><p>Codex პროექტის ფესვში არსებულ <code>AGENTS.md</code> ფაილს კითხულობს. ის ავტომატურად არ კითხულობს არც <code>.cursor/rules/carapi.mdc</code>-ს და არც <code>CLAUDE.md</code>-ს.</p></article>';
     echo '</div>';
     echo '<div class="codeb" style="margin-top:20px"><div class="tb"><div class="tabs"><button type="button" class="on" data-tab="cursor">Cursor</button><button type="button" data-tab="claude">Claude Code</button><button type="button" data-tab="codex">Codex</button></div><button type="button" class="copy" data-copy-block>' . $copy . 'კოდის კოპირება</button></div>';
     echo '<pre class="json" data-tab-panel="cursor">' . $h($cursorFile) . '</pre>';
@@ -825,7 +825,7 @@ TXT;
     echo '<p>მისამართი ამ საიტზეა: <code>' . $h($base) . '</code>. ვიჯეტის ჩართვამდე პროექტში ჩაწერეთ საიტის origin.</p>';
 
     echo '<h2 id="limits" class="doc-sec">მოთხოვნების ლიმიტები და შეცდომების დამუშავება</h2>';
-    echo '<p>CarAPI-ის მოთხოვნებზე მოქმედებს სიხშირისა და თვიური მოხმარების შეზღუდვები. ნაგულისხმევი ლიმიტი თითო პროექტზეა: 60 მოთხოვნა წუთში და 10 000 წარმატებული მოთხოვნა კალენდარულ თვეში. ლიმიტის მიღწევის შემთხვევაში API აბრუნებს შესაბამის HTTP სტატუსს.</p>';
+    echo '<p>GeoAPI-ის მოთხოვნებზე მოქმედებს სიხშირისა და თვიური მოხმარების შეზღუდვები. ნაგულისხმევი ლიმიტი თითო პროექტზეა: 60 მოთხოვნა წუთში და 10 000 წარმატებული მოთხოვნა კალენდარულ თვეში. ლიმიტის მიღწევის შემთხვევაში API აბრუნებს შესაბამის HTTP სტატუსს.</p>';
     echo '<p><strong>401 — ავტორიზაცია ვერ შესრულდა.</strong> API გასაღები არ არის მითითებული, არასწორია ან ვეღარ გამოიყენება. გაუქმებული ან ვადაგასული საიდუმლო გასაღებიც ამ სტატუსს აბრუნებს.</p>';
     echo '<p><strong>403 — მოთხოვნა არ არის დაშვებული.</strong> მოთხოვნა არ აკმაყოფილებს შესაბამისი გასაღების ან პროექტის წვდომის პირობებს. ასეთი პირობაა, მაგალითად, დაუდასტურებელი ელფოსტა, გამორთული პროექტი ან ვიჯეტისთვის დაუშვებელი origin.</p>';
     echo '<p><strong>429 — მოთხოვნების ლიმიტი მიღწეულია.</strong> მოთხოვნების რაოდენობამ გადააჭარბა დაშვებულ ზღვარს. კოდია <code>RATE_LIMIT_EXCEEDED</code> სიხშირის ლიმიტზე და <code>MONTHLY_QUOTA_EXCEEDED</code> თვიურ ლიმიტზე. თუ პასუხი შეიცავს <code>Retry-After</code> სათაურს, გამოიყენეთ ის განმეორებითი მცდელობის დაგეგმვისთვის.</p>';
@@ -860,8 +860,8 @@ function carapi_landing(): void
     $copy = \Carapi\SiteChrome::icon('copy');
     $install = '&lt;script src="' . $base . '/widget/v1/carapi-filter.js"&gt;&lt;/script&gt;';
     echo \Carapi\SiteChrome::start(
-        'CarAPI — ავტომობილების კატალოგი, API და მზა ვიჯეტი',
-        'CarAPI დეველოპერებს სთავაზობს ავტომობილების ბრენდების, მოდელებისა და თაობების მონაცემებს REST API-ის საშუალებით და ავტომობილის არჩევის მზა ვიჯეტს ვებსაიტებისთვის.',
+        'GeoAPI — ავტომობილების კატალოგი, API და მზა ვიჯეტი',
+        'GeoAPI დეველოპერებს სთავაზობს ავტომობილების ბრენდების, მოდელებისა და თაობების მონაცემებს REST API-ის საშუალებით და ავტომობილის არჩევის მზა ვიჯეტს ვებსაიტებისთვის.',
         true
     );
     echo \Carapi\SiteChrome::header();

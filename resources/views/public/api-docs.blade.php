@@ -2,10 +2,10 @@
     $en = app()->getLocale() === 'en';
 @endphp
 @component('components.layouts.public', [
-    'title' => ($en ? 'API reference' : 'API ცნობარი').' — CarAPI',
+    'title' => ($en ? 'API reference' : 'API ცნობარი').' — GeoAPI',
     'description' => $en
-        ? 'Interactive reference for the CarAPI public catalog.'
-        : 'CarAPI-ის საჯარო კატალოგის ინტერაქტიული ცნობარი.',
+        ? 'Interactive reference for the GeoAPI public catalog.'
+        : 'GeoAPI-ის საჯარო კატალოგის ინტერაქტიული ცნობარი.',
 ])
     <div class="page-intro">
         <h1 class="text-3xl font-extrabold leading-tight">{{ $en ? 'API reference' : 'API ცნობარი' }}</h1>

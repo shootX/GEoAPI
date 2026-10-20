@@ -1,6 +1,6 @@
 @component('components.layouts.public', [
-    'title' => (app()->getLocale() === 'en' ? 'Terms of use' : 'გამოყენების წესები').' — CarAPI',
-    'description' => app()->getLocale() === 'en' ? 'CarAPI terms of use' : 'CarAPI-ის გამოყენების წესები',
+    'title' => (app()->getLocale() === 'en' ? 'Terms of use' : 'გამოყენების წესები').' — GeoAPI',
+    'description' => app()->getLocale() === 'en' ? 'GeoAPI terms of use' : 'GeoAPI-ის გამოყენების წესები',
 ])
 @if (app()->getLocale() === 'en')
     @include('public.partials.terms-en')

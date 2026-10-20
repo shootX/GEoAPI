@@ -1,7 +1,7 @@
 @php
     $en = $locale === 'en';
-    $title = ($en ? 'Blog' : 'ბლოგი').' — CarAPI';
-    $description = $en ? 'Notes from CarAPI.' : 'ჩანაწერები CarAPI-დან.';
+    $title = ($en ? 'Blog' : 'ბლოგი').' — GeoAPI';
+    $description = $en ? 'Notes from GeoAPI.' : 'ჩანაწერები GeoAPI-დან.';
     $seo = [
         'canonical' => url('/'.$locale.'/blog'),
         'hreflang' => [

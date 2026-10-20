@@ -3,7 +3,7 @@
 A push to `main` runs `.github/workflows/deploy.yml`.
 
 1. GitHub Actions runs PHPUnit on a clean runner (PHP 8.4, sqlite). The runner's copy of `.env.example` stays on that runner.
-2. If PHPUnit is green, the workflow SSHes to the server and deploys `/www/wwwroot/car.socialsave.cc`.
+2. If PHPUnit is green, the workflow SSHes to the server and deploys `/www/wwwroot/geoapi.ge`.
 3. A second push waits. The concurrency group is `production-deploy` and an in-progress deploy is not cancelled.
 4. If a command fails after maintenance mode, the remote script runs `php artisan up` and exits non-zero. The workflow then SSHes once more and runs `php artisan up` again.
 
@@ -81,11 +81,11 @@ Keep `github-actions.pub` if you want a local copy of the public key. It is alre
 The repository is public: `shootX/GEoAPI`. `git pull` over HTTPS needs no GitHub deploy key.
 
 ```sh
-cd /www/wwwroot/car.socialsave.cc
+cd /www/wwwroot/geoapi.ge
 sudo -u www git remote -v
 sudo -u www git remote set-url origin https://github.com/shootX/GEoAPI.git
-sudo -u www git config --global --get-all safe.directory | grep -qx /www/wwwroot/car.socialsave.cc \
-  || sudo -u www git config --global --add safe.directory /www/wwwroot/car.socialsave.cc
+sudo -u www git config --global --get-all safe.directory | grep -qx /www/wwwroot/geoapi.ge \
+  || sudo -u www git config --global --add safe.directory /www/wwwroot/geoapi.ge
 sudo -u www git status
 ```
 
@@ -112,7 +112,7 @@ sudo -u www git --version
 Make `www` the owner of the checkout. Leave `.env` in place and mode `640`. Keep `storage/`, `bootstrap/cache/`, `data/`, and `cache/` writable by `carapi` (the FPM user). A group-writable tree plus `umask 002` in the workflow is what makes new cache files usable by both users.
 
 ```sh
-cd /www/wwwroot/car.socialsave.cc
+cd /www/wwwroot/geoapi.ge
 chown -R www:www .
 chmod 640 .env
 usermod -aG www carapi
@@ -143,7 +143,7 @@ Paste the private key before shredding it. Do not store it in the repository, in
 Check the login from another machine, with the private key still available:
 
 ```sh
-ssh -i /path/to/github-actions -p 22 www@DEPLOY_HOST 'cd /www/wwwroot/car.socialsave.cc && php -v && git remote -v'
+ssh -i /path/to/github-actions -p 22 www@DEPLOY_HOST 'cd /www/wwwroot/geoapi.ge && php -v && git remote -v'
 ```
 
 ### 6. First deploy

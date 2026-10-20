@@ -45,7 +45,7 @@ php bin/migrate.php
 | `CARAPI_PLATFORM_ATTEMPT_LIMIT` | ელფოსტაზე, ნაგულისხმევი 8 / 900 წამი |
 | `CARAPI_PLATFORM_IP_ATTEMPT_LIMIT` | IP-ზე, ნაგულისხმევი 30 |
 
-ადმინისტრაციული მიგრაციის ცვლადებია `CARAPI_PLATFORM_ADMIN_*`. ისინი runtime პულში არ არის. საიდუმლოები CarAPI-ის ცალკე FPM გარემოშია (`docs/DEPLOYMENT.md`), საერთო პულში არა.
+ადმინისტრაციული მიგრაციის ცვლადებია `CARAPI_PLATFORM_ADMIN_*`. ისინი runtime პულში არ არის. საიდუმლოები GeoAPI-ის ცალკე FPM გარემოშია (`docs/DEPLOYMENT.md`), საერთო პულში არა.
 
 runtime როლია `carapi_platform_app`: `LOGIN`, არა სუპერმომხმარებელი და არა მფლობელი, DDL არ შეუძლია. აქვს `SELECT`, `INSERT`, `UPDATE` `platform.users`-ზე, `SELECT`, `INSERT`, `DELETE` `platform.login_attempts`-ზე და შესაბამისი sequence-ის `USAGE`. კატალოგზე `INSERT` არ აქვს. `carapi_catalog_reader`-ს `platform.users` არ ხსნის.
 

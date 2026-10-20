@@ -1,4 +1,4 @@
 User-agent: *
 Disallow:
 
-Sitemap: https://car.socialsave.cc/sitemap.xml
+Sitemap: https://geoapi.ge/sitemap.xml

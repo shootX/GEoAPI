@@ -68,7 +68,7 @@ final class Register extends \Electrik\Livewire\Auth\Register
     public function render()
     {
         return view('livewire.auth.register')->layoutData([
-            'title' => __('Create account').' — CarAPI',
+            'title' => __('Create account').' — GeoAPI',
             'description' => __('Password must be at least 15 characters.'),
         ]);
     }

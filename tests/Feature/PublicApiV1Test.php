@@ -234,7 +234,7 @@ final class PublicApiV1Test extends TestCase
         $this->getJson('/api/v1/openapi.json')
             ->assertOk()
             ->assertJsonPath('openapi', '3.0.3')
-            ->assertJsonPath('info.title', 'CarAPI')
+            ->assertJsonPath('info.title', 'GeoAPI')
             ->assertJsonPath('paths./api/v1/engines.get.summary', 'Engine volume, fuel, and power stored on modifications')
             ->assertJsonPath('paths./api/v1/bodies.get.summary', 'Distinct body types stored on models, generations, and modifications')
             ->assertJsonPath('paths./api/v1/fuel.get.summary', 'Fuel consumption stored on modification specs')
@@ -246,7 +246,7 @@ final class PublicApiV1Test extends TestCase
         $this->getJson('/api/v1/postman.json')
             ->assertOk()
             ->assertJsonPath('info.schema', 'https://schema.getpostman.com/json/collection/v2.1.0/collection.json')
-            ->assertJsonPath('info.name', 'CarAPI');
+            ->assertJsonPath('info.name', 'GeoAPI');
         $this->assertNotEmpty($this->getJson('/api/v1/postman.json')->json('item'));
 
         $this->get('/api/v1/docs')

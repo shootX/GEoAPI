@@ -1,6 +1,6 @@
-# CarAPI-ის გამოყოფილი PHP გარემო
+# GeoAPI-ის გამოყოფილი PHP გარემო
 
-2026-09-26-დან `car.socialsave.cc` საჯაროდ ჩართულია. სამივე დროშა FPM-ში 1-ია: `CARAPI_PLATFORM_ENABLED`, `CARAPI_CATALOG_ENABLED`, `CARAPI_WIDGET_ENABLED`. SMTP მიერთებულია. ანგარიშის მონაცემების ავტომატური სარეზერვო ასლი გამართული არ არის და აღდგენა არ არის გარანტირებული.
+2026-09-26-დან `geoapi.ge` საჯაროდ ჩართულია. სამივე დროშა FPM-ში 1-ია: `CARAPI_PLATFORM_ENABLED`, `CARAPI_CATALOG_ENABLED`, `CARAPI_WIDGET_ENABLED`. SMTP მიერთებულია. ანგარიშის მონაცემების ავტომატური სარეზერვო ასლი გამართული არ არის და აღდგენა არ არის გარანტირებული.
 
 ## რა დგას
 
@@ -11,7 +11,7 @@
 - FPM socket: `/www/server/php/carapi/fpm.sock` მხოლოდ `carapi`-სთვის
 - nginx-ის socket: `/www/server/php/carapi/nginx.sock`
 - პროქსი `/www/server/php/carapi/peer-proxy.py` აკავშირებს მხოლოდ იმ პროცესს, რომლის executable არის `/www/server/nginx/sbin/nginx` და მშობელი მიმდინარე nginx master-ია
-- სესიები: `/www/wwwroot/car.socialsave.cc/data/sessions`
+- სესიები: `/www/wwwroot/geoapi.ge/data/sessions`
 - საიდუმლო წყარო: `/www/server/carapi/*.env`, public/-ისა და Git-ის გარეთ
 - runtime იღებს `carapi_catalog_reader` და `carapi_platform_app` ანგარიშებს. მიგრაციის ადმინისტრატორი პულში არ არის
 - `clear_env = yes`. ცვლადები პულში აშკარადაა ჩამოთვლილი
@@ -55,10 +55,10 @@ php bin/check-carapi-deploy.php
 
 ## Rollback
 
-მთლიანი `nginx.conf` არ დააბრუნოთ: იქ სხვა საიტების გვიანი ცვლილებებიცაა. CarAPI-ს ცვლილებაა `include carapi-log.conf;` ხაზი და დომენის ვირტუალური ჰოსტი.
+მთლიანი `nginx.conf` არ დააბრუნოთ: იქ სხვა საიტების გვიანი ცვლილებებიცაა. GeoAPI-ს ცვლილებაა `include carapi-log.conf;` ხაზი და დომენის ვირტუალური ჰოსტი.
 
 ```sh
-cp /www/server/carapi/backups/car.socialsave.cc.conf.YYYYMMDDHHMMSS /www/server/panel/vhost/nginx/car.socialsave.cc.conf
+cp /www/server/carapi/backups/geoapi.ge.conf.YYYYMMDDHHMMSS /www/server/panel/vhost/nginx/geoapi.ge.conf
 # nginx.conf-იდან ამოშალეთ მხოლოდ ხაზი: include carapi-log.conf;
 /www/server/nginx/sbin/nginx -t && /www/server/nginx/sbin/nginx -s reload
 systemctl disable --now carapi-fpm-proxy.service carapi-php-fpm.service
@@ -76,4 +76,4 @@ systemctl disable --now carapi-fpm-proxy.service carapi-php-fpm.service
 
 სამი დროშა production-ში 1-ია. fake transport production-ში არ გამოიყენება.
 
-SMTP, 2026-09-26: კონფიგურაცია მიერთებულია (`CARAPI_MAIL_TRANSPORT=smtp`, `mail.socialsave.cc:587`, `tls`, `info@socialsave.cc`, `CARAPI_APP_URL=https://car.socialsave.cc`). პაროლი მხოლოდ `/www/server/carapi/mail.env`-ში და FPM-ის გარემოშია. `clear_env=yes` შენარჩუნებულია. Postfix-ის 587 პორტი Let's Encrypt-ის `*.socialsave.cc` სერტიფიკატს იძლევა, ვადა 2026-12-22. AUTH TLS-ის შემდეგ გავიდა. სატესტო წერილი `sh.chkhvirkia@gmail.com`-ზე გაიგზავნა, Gmail-მა `250` დააბრუნა და მომხმარებელმა ამ ერთი წერილის მიღება დაადასტურა. ეს მომავალი მიწოდების გარანტია არ არის. `php bin/check-carapi-deploy.php` აბრუნებს `ok`.
+SMTP, 2026-09-26: კონფიგურაცია მიერთებულია (`CARAPI_MAIL_TRANSPORT=smtp`, `mail.socialsave.cc:587`, `tls`, `info@socialsave.cc`, `CARAPI_APP_URL=https://geoapi.ge`). პაროლი მხოლოდ `/www/server/carapi/mail.env`-ში და FPM-ის გარემოშია. `clear_env=yes` შენარჩუნებულია. Postfix-ის 587 პორტი Let's Encrypt-ის `*.socialsave.cc` სერტიფიკატს იძლევა, ვადა 2026-12-22. AUTH TLS-ის შემდეგ გავიდა. სატესტო წერილი `sh.chkhvirkia@gmail.com`-ზე გაიგზავნა, Gmail-მა `250` დააბრუნა და მომხმარებელმა ამ ერთი წერილის მიღება დაადასტურა. ეს მომავალი მიწოდების გარანტია არ არის. `php bin/check-carapi-deploy.php` აბრუნებს `ok`.

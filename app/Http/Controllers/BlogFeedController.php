@@ -17,7 +17,7 @@ final class BlogFeedController extends Controller
             $locale = app()->getLocale() === 'en' ? 'en' : 'ka';
         }
         $posts = BlogPost::query()->visible()->translated($locale)->orderByDesc('publish_at')->orderByDesc('id')->limit(20)->get();
-        $channel = $locale === 'en' ? 'CarAPI blog' : 'CarAPI ბლოგი';
+        $channel = $locale === 'en' ? 'GeoAPI blog' : 'GeoAPI ბლოგი';
         $xml = '<?xml version="1.0" encoding="UTF-8"?>'."\n";
         $xml .= '<rss version="2.0"><channel>';
         $xml .= '<title>'.e($channel).'</title>';

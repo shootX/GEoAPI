@@ -25,10 +25,10 @@
     ];
 @endphp
 @component('components.layouts.public', [
-    'title' => __('Documentation').' — CarAPI',
+    'title' => __('Documentation').' — GeoAPI',
     'description' => $en
-        ? 'CarAPI authorization, endpoints, widget, and error codes.'
-        : 'CarAPI-ის ავტორიზაცია, მისამართები, ვიჯეტი და შეცდომის კოდები.',
+        ? 'GeoAPI authorization, endpoints, widget, and error codes.'
+        : 'GeoAPI-ის ავტორიზაცია, მისამართები, ვიჯეტი და შეცდომის კოდები.',
 ])
     <div class="guide-layout">
     <aside class="guide-toc" aria-label="{{ __('On this page') }}">

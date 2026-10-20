@@ -1,5 +1,5 @@
 @component('components.layouts.public', [
-    'title' => ($title ?? 'CarAPI'),
+    'title' => ($title ?? 'GeoAPI'),
 ])
     <div class="mx-auto w-full max-w-md">
         {{ $slot }}

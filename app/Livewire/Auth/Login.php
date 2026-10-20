@@ -14,7 +14,7 @@ final class Login extends \Electrik\Livewire\Auth\Login
     public function render()
     {
         return view('livewire.auth.login')->layoutData([
-            'title' => __('Sign in').' — CarAPI',
+            'title' => __('Sign in').' — GeoAPI',
             'description' => __('Welcome back. Enter your credentials to continue.'),
         ]);
     }

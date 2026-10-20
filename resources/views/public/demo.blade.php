@@ -1,5 +1,5 @@
 @component('components.layouts.public', [
-    'title' => __('Vehicle picker').' — CarAPI',
+    'title' => __('Vehicle picker').' — GeoAPI',
     'description' => __('Choose a brand, model, year, generation, and modification.'),
 ])
     <h1 class="text-3xl font-extrabold leading-tight">{{ __('Vehicle picker') }}</h1>

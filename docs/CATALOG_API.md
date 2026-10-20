@@ -35,7 +35,7 @@ export CARAPI_CATALOG_PASSWORD='...'
 php -S 127.0.0.1:8080 -t public public/index.php
 ```
 
-PHP-FPM-ის პულში `env[CARAPI_CATALOG_ENABLED] = 1`. გასაღების გარეშე https://car.socialsave.cc/api/v1/brands აბრუნებს 401-ს. ისტორიულად, ჩართვამდე, პასუხი 404 იყო.
+PHP-FPM-ის პულში `env[CARAPI_CATALOG_ENABLED] = 1`. გასაღების გარეშე https://geoapi.ge/api/v1/brands აბრუნებს 401-ს. ისტორიულად, ჩართვამდე, პასუხი 404 იყო.
 
 შეიქმნა როლი `carapi_catalog_reader`: `LOGIN`, არა `SUPERUSER`, `CREATEDB`, `CREATEROLE`, `REPLICATION`, `BYPASSRLS`. ცხრილების მფლობელი არ არის, სხვა როლის წევრი არ არის. უფლებებია `CONNECT` ბაზაზე `carbase`, `USAGE` სქემაზე `public` და `SELECT` ექვს ცხრილზე, რომლებსაც `src/Catalog/CatalogRepository.php` კითხულობს. სხვა ცხრილი ამ მოთხოვნებს არ სჭირდება. `GRANT ALL`, მომავალი ცხრილების ავტომატური `SELECT` და sequence-ები არ მინიჭებია.
 
@@ -43,7 +43,7 @@ PHP-FPM-ის პულში `env[CARAPI_CATALOG_ENABLED] = 1`. გასა�
 
 `PUBLIC`-ს `carbase`-ზე აქვს `CONNECT` და `TEMP`, ამიტომ როლსაც აქვს `TEMP`. ეს ცხრილის ჩაწერა არ არის. `PUBLIC` არც ერთ მომხმარებლის ცხრილს არ კითხულობს. საერთო უფლება არ გაუქმებულა, რომ სხვა ბაზების კავშირი არ გაწყდეს. როლს სხვა ბაზის ცხრილის `SELECT` არა აქვს.
 
-ისტორიულად პაროლი საერთო PHP-FPM პულში არ ჩაწერილა. ახლა CarAPI-ს ცალკე პული აქვს (`docs/DEPLOYMENT.md`). პაროლი კვლავ public/-ისა და Git-ის გარეთაა. production-ში API ჩართულია და გასაღებს ითხოვს.
+ისტორიულად პაროლი საერთო PHP-FPM პულში არ ჩაწერილა. ახლა GeoAPI-ს ცალკე პული აქვს (`docs/DEPLOYMENT.md`). პაროლი კვლავ public/-ისა და Git-ის გარეთაა. production-ში API ჩართულია და გასაღებს ითხოვს.
 
 შემოწმება ახალი როლით: `tests/catalog_api_test.php` გავიდა, `current_user` იყო `carapi_catalog_reader`, შედეგი დაემთხვა SQL-ს, SQLite არ შეიქმნა, `DromResolver` არ ჩაიტვირთა. ჩაწერის პრაქტიკული უარყოფა შემოწმდა ცალკე სატესტო ბაზაზე, `carbase` არ შეცვლილა.
 

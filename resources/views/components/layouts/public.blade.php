@@ -11,7 +11,7 @@
         $ogType = $seo['type'] ?? 'website';
         $twitterCard = $seo['card'] ?? 'summary';
     @endphp
-    <title>{{ $title ?? 'CarAPI' }}</title>
+    <title>{{ $title ?? 'GeoAPI' }}</title>
     @if (!empty($description))
         <meta name="description" content="{{ $description }}">
     @endif
@@ -23,7 +23,7 @@
     @foreach ($hreflang as $lang => $href)
         <link rel="alternate" hreflang="{{ $lang }}" href="{{ $href }}">
     @endforeach
-    <meta property="og:title" content="{{ $title ?? 'CarAPI' }}">
+    <meta property="og:title" content="{{ $title ?? 'GeoAPI' }}">
     @if (!empty($description))
         <meta property="og:description" content="{{ $description }}">
         <meta name="twitter:description" content="{{ $description }}">
@@ -32,7 +32,7 @@
     <meta property="og:type" content="{{ $ogType }}">
     <meta property="og:image" content="{{ $ogImage }}">
     <meta name="twitter:card" content="{{ $twitterCard }}">
-    <meta name="twitter:title" content="{{ $title ?? 'CarAPI' }}">
+    <meta name="twitter:title" content="{{ $title ?? 'GeoAPI' }}">
     <link rel="stylesheet" href="{{ asset('assets/public-design.css') }}?v=20261021live">
     <x-electrik::brand-styles />
     @vite(['resources/css/app.css', 'resources/js/app.js'])
@@ -69,7 +69,7 @@
     <div class="flex min-h-screen flex-col">
         <header class="site-header {{ $homeNav ? 'is-overlay' : 'is-solid' }}">
             <div class="m-wrap">
-                <a class="m-logo" href="{{ url('/') }}"><span class="m-mark" aria-hidden="true"></span> CarAPI</a>
+                <a class="m-logo" href="{{ url('/') }}"><span class="m-mark" aria-hidden="true"></span> GeoAPI</a>
                 <nav class="m-nav" aria-label="{{ __('Menu') }}">
                     @foreach ($nav as $item)
                         <a href="{{ $item['href'] }}">{{ $item['label'] }}</a>
@@ -112,7 +112,7 @@
             <div class="m-wrap">
                 <div class="footer-grid">
                     <div>
-                        <a class="m-logo" href="{{ url('/') }}"><span class="m-mark" aria-hidden="true"></span> CarAPI</a>
+                        <a class="m-logo" href="{{ url('/') }}"><span class="m-mark" aria-hidden="true"></span> GeoAPI</a>
                         <p style="margin-top:10px">{{ __('Vehicle catalog API. The source is drom.ru.') }}</p>
                     </div>
                     <div>
@@ -137,7 +137,7 @@
                         @endif
                     </div>
                 </div>
-                <p class="legal">© {{ date('Y') }} CarAPI</p>
+                <p class="legal">© {{ date('Y') }} GeoAPI</p>
             </div>
         </footer>
     </div>

@@ -51,7 +51,7 @@ final class AuditFixesTest extends TestCase
         $this->get('/api/v1/openapi.json')
             ->assertOk()
             ->assertJsonPath('openapi', '3.0.3')
-            ->assertJsonPath('info.title', 'CarAPI');
+            ->assertJsonPath('info.title', 'GeoAPI');
 
         $this->get('/sitemap.xml')
             ->assertOk()
@@ -61,7 +61,7 @@ final class AuditFixesTest extends TestCase
         $this->get('/docs')->assertRedirect('/guide');
 
         $robots = (string) file_get_contents(public_path('robots.txt'));
-        $this->assertStringContainsString('Sitemap: https://car.socialsave.cc/sitemap.xml', $robots);
+        $this->assertStringContainsString('Sitemap: https://geoapi.ge/sitemap.xml', $robots);
     }
 
     public function test_english_privacy_and_georgian_password_reset_copy(): void
@@ -83,7 +83,7 @@ final class AuditFixesTest extends TestCase
     {
         $this->get('/no-such-public-page')
             ->assertNotFound()
-            ->assertSee('CarAPI', false)
+            ->assertSee('GeoAPI', false)
             ->assertDontSee('vendor/', false);
     }
 
