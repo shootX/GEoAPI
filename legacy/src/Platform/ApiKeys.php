@@ -16,7 +16,7 @@ final class ApiKeys
         return [
             'selector' => $selector,
             'secret' => $secret,
-            'token' => 'geoapi_sk_' . $selector . '_' . $secret,
+            'token' => 'geoapi_sk_'.$selector.'_'.$secret,
             'hash' => hash('sha256', $secret),
         ];
     }
@@ -53,7 +53,7 @@ final class ApiKeys
         SQL);
         $stmt->execute(['selector' => $selector]);
         $row = $stmt->fetch();
-        if ($row === false || !self::matches($secret, (string) $row['secret_hash'])) {
+        if ($row === false || ! self::matches($secret, (string) $row['secret_hash'])) {
             return null;
         }
         if ($row['revoked_at'] !== null || ($row['expires_at'] !== null && strtotime((string) $row['expires_at']) <= time())) {
@@ -69,6 +69,18 @@ final class ApiKeys
 
     public static function touch(PDO $pdo, int $id): void
     {
+        if ($pdo->getAttribute(PDO::ATTR_DRIVER_NAME) === 'sqlite') {
+            $now = UsageLimiter::now();
+            $stmt = $pdo->prepare(
+                'UPDATE platform.api_keys SET last_used_at = :now WHERE id = :id AND (last_used_at IS NULL OR last_used_at < :cutoff)'
+            );
+            $stmt->bindValue('now', gmdate('Y-m-d H:i:s', $now));
+            $stmt->bindValue('id', $id, PDO::PARAM_INT);
+            $stmt->bindValue('cutoff', gmdate('Y-m-d H:i:s', $now - 60));
+            $stmt->execute();
+
+            return;
+        }
         $stmt = $pdo->prepare(
             "UPDATE platform.api_keys SET last_used_at = now() WHERE id = :id AND (last_used_at IS NULL OR last_used_at < now() - interval '1 minute')"
         );

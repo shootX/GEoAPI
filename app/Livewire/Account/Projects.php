@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Livewire\Account;
 
+use App\Access\LegacyGate;
 use Carapi\Platform\ApiKeys;
 use Carapi\Platform\Connection;
 use Carapi\Platform\ProjectRepository;
@@ -98,8 +99,8 @@ final class Projects extends Component
 
             return;
         }
-        if (class_exists(\App\Access\LegacyGate::class)) {
-            $denial = \App\Access\LegacyGate::issueKey($userId);
+        if (class_exists(LegacyGate::class)) {
+            $denial = LegacyGate::issueKey($userId);
             if ($denial !== null) {
                 $this->addError('key_name', (string) ($denial['body']['error']['message'] ?? ''));
 
@@ -238,12 +239,13 @@ final class Projects extends Component
     {
         $today = gmmktime(0, 0, 0, (int) gmdate('n'), (int) gmdate('j'), (int) gmdate('Y'));
         $start = $today - (29 * 86400);
-        $stmt = $pdo->prepare(<<<'SQL'
-            SELECT day::text AS day, sum(used_count) AS used
+        $day = $pdo->getAttribute(PDO::ATTR_DRIVER_NAME) === 'sqlite' ? 'day' : 'day::text';
+        $stmt = $pdo->prepare(
+            'SELECT '.$day.' AS day, sum(used_count) AS used
             FROM platform.daily_usage
             WHERE project_id = :id AND day >= :start AND day <= :end
-            GROUP BY day
-        SQL);
+            GROUP BY day'
+        );
         $stmt->bindValue('id', $projectId, PDO::PARAM_INT);
         $stmt->bindValue('start', gmdate('Y-m-d', $start));
         $stmt->bindValue('end', gmdate('Y-m-d', $today));
@@ -262,7 +264,7 @@ final class Projects extends Component
     }
 
     /** @param array<string, mixed> $base
-     *  @return array<string, mixed>
+     * @return array<string, mixed>
      */
     private function demoSnapshot(array $base): array
     {

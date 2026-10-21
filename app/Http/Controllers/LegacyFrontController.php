@@ -14,6 +14,13 @@ final class LegacyFrontController extends Controller
     {
         require_once base_path('legacy/front.php');
         if (app()->runningUnitTests()) {
+            $_SERVER['REQUEST_URI'] = $request->getRequestUri();
+            $_SERVER['REQUEST_METHOD'] = $request->getMethod();
+            if ($request->headers->has('Origin')) {
+                $_SERVER['HTTP_ORIGIN'] = (string) $request->headers->get('Origin');
+            } else {
+                unset($_SERVER['HTTP_ORIGIN']);
+            }
             ob_start();
             carapi_handle_request();
             $body = ob_get_clean();

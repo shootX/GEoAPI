@@ -39,21 +39,41 @@ final class ProjectRepository
 
     public function insert(int $userId, string $name, ?string $website): int
     {
-        $this->pdo->beginTransaction();
-        $stmt = $this->pdo->prepare(
-            'INSERT INTO platform.projects (user_id, name, website_url) VALUES (:user_id, :name, :website) RETURNING id'
-        );
-        $stmt->bindValue('user_id', $userId, PDO::PARAM_INT);
-        $stmt->bindValue('name', $name);
-        $stmt->bindValue('website', $website);
-        $stmt->execute();
-        $id = (int) $stmt->fetchColumn();
-        $limits = $this->pdo->prepare(
-            $this->limitsInsert()
-        );
-        $limits->bindValue('id', $id, PDO::PARAM_INT);
-        $limits->execute();
-        $this->pdo->commit();
+        $nested = $this->pdo->inTransaction();
+        if ($nested) {
+            $this->pdo->exec('SAVEPOINT project_insert');
+        } else {
+            $this->pdo->beginTransaction();
+        }
+        try {
+            $stmt = $this->pdo->prepare(
+                'INSERT INTO platform.projects (user_id, name, website_url) VALUES (:user_id, :name, :website) RETURNING id'
+            );
+            $stmt->bindValue('user_id', $userId, PDO::PARAM_INT);
+            $stmt->bindValue('name', $name);
+            $stmt->bindValue('website', $website);
+            $stmt->execute();
+            $id = (int) $stmt->fetchColumn();
+            $stmt->closeCursor();
+            $limits = $this->pdo->prepare(
+                $this->limitsInsert()
+            );
+            $limits->bindValue('id', $id, PDO::PARAM_INT);
+            $limits->execute();
+            $limits->closeCursor();
+            if ($nested) {
+                $this->pdo->exec('RELEASE SAVEPOINT project_insert');
+            } else {
+                $this->pdo->commit();
+            }
+        } catch (\Throwable $e) {
+            if ($nested && $this->pdo->inTransaction()) {
+                $this->pdo->exec('ROLLBACK TO SAVEPOINT project_insert');
+            } elseif ($this->pdo->inTransaction()) {
+                $this->pdo->rollBack();
+            }
+            throw $e;
+        }
 
         return $id;
     }
@@ -69,7 +89,7 @@ final class ProjectRepository
         $stmt->bindValue('user_id', $userId, PDO::PARAM_INT);
         $stmt->execute();
 
-        return $stmt->rowCount() > 0;
+        return $this->wrote($stmt);
     }
 
     public function setStatus(int $userId, int $id, string $status): bool
@@ -82,7 +102,7 @@ final class ProjectRepository
         $stmt->bindValue('user_id', $userId, PDO::PARAM_INT);
         $stmt->execute();
 
-        return $stmt->rowCount() > 0;
+        return $this->wrote($stmt);
     }
 
     /** @return list<array<string, mixed>> */
@@ -119,27 +139,62 @@ final class ProjectRepository
         $stmt->bindValue('user_id', $userId, PDO::PARAM_INT);
         $stmt->execute();
 
-        return $stmt->rowCount() > 0;
+        return $this->wrote($stmt);
     }
 
     public function revoke(int $userId, int $projectId, int $keyId): bool
     {
-        $stmt = $this->pdo->prepare(<<<'SQL'
-            UPDATE platform.api_keys k
-            SET revoked_at = now()
-            FROM platform.projects p
-            WHERE k.id = :key_id AND k.project_id = :project_id AND k.project_id = p.id AND p.user_id = :user_id AND k.revoked_at IS NULL
-        SQL);
+        if ($this->pdo->getAttribute(PDO::ATTR_DRIVER_NAME) === 'sqlite') {
+            $stmt = $this->pdo->prepare(<<<'SQL'
+                UPDATE platform.api_keys
+                SET revoked_at = now()
+                WHERE id = :key_id AND project_id = :project_id AND revoked_at IS NULL
+                  AND project_id IN (SELECT id FROM platform.projects WHERE user_id = :user_id)
+            SQL);
+        } else {
+            $stmt = $this->pdo->prepare(<<<'SQL'
+                UPDATE platform.api_keys k
+                SET revoked_at = now()
+                FROM platform.projects p
+                WHERE k.id = :key_id AND k.project_id = :project_id AND k.project_id = p.id AND p.user_id = :user_id AND k.revoked_at IS NULL
+            SQL);
+        }
         $stmt->bindValue('key_id', $keyId, PDO::PARAM_INT);
         $stmt->bindValue('project_id', $projectId, PDO::PARAM_INT);
         $stmt->bindValue('user_id', $userId, PDO::PARAM_INT);
         $stmt->execute();
 
-        return $stmt->rowCount() > 0;
+        return $this->wrote($stmt);
+    }
+
+    private function wrote(\PDOStatement $stmt): bool
+    {
+        if ($stmt->rowCount() > 0) {
+            return true;
+        }
+        if ($this->pdo->getAttribute(PDO::ATTR_DRIVER_NAME) !== 'sqlite') {
+            return false;
+        }
+        $changes = $this->pdo->query('SELECT changes()');
+
+        return $changes !== false && (int) $changes->fetchColumn() > 0;
     }
 
     private function limitsInsert(): string
     {
+        if ($this->pdo->getAttribute(PDO::ATTR_DRIVER_NAME) === 'sqlite') {
+            $stmt = $this->pdo->query('PRAGMA platform.table_info(project_limits)');
+            $perDay = false;
+            foreach ($stmt ? $stmt->fetchAll() : [] as $column) {
+                if (($column['name'] ?? '') === 'per_day') {
+                    $perDay = true;
+                }
+            }
+
+            return $perDay
+                ? 'INSERT INTO platform.project_limits (project_id, per_minute, monthly_quota, per_day) VALUES (:id, 60, 10000, 2000)'
+                : 'INSERT INTO platform.project_limits (project_id, per_minute, monthly_quota) VALUES (:id, 60, 10000)';
+        }
         $stmt = $this->pdo->query(<<<'SQL'
             SELECT 1
             FROM information_schema.columns

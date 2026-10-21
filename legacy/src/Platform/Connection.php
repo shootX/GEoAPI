@@ -27,7 +27,7 @@ final class Connection
         $statementTimeout = self::intEnv('CARAPI_PLATFORM_STATEMENT_TIMEOUT_MS', 3000, 100, 10000);
 
         if ($host === '' || $database === '' || $user === '') {
-            throw new UnavailableException();
+            throw new UnavailableException;
         }
 
         $dsn = sprintf(
@@ -44,16 +44,26 @@ final class Connection
                 PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
                 PDO::ATTR_EMULATE_PREPARES => false,
             ]);
-            $pdo->exec('SET statement_timeout = ' . $statementTimeout);
+            $pdo->exec('SET statement_timeout = '.$statementTimeout);
             $pdo->exec("SET lock_timeout = '1s'");
         } catch (PDOException) {
             error_log('[platform] database unavailable');
-            throw new UnavailableException();
+            throw new UnavailableException;
         }
 
         self::$pdo = $pdo;
 
         return $pdo;
+    }
+
+    public static function active(): bool
+    {
+        return self::$pdo instanceof PDO;
+    }
+
+    public static function use(PDO $pdo): void
+    {
+        self::$pdo = $pdo;
     }
 
     public static function reset(): void
@@ -71,7 +81,7 @@ final class Connection
     private static function intEnv(string $name, int $default, int $min, int $max): int
     {
         $raw = carapi_env($name);
-        if (!is_string($raw) || !preg_match('/^[0-9]+$/', $raw)) {
+        if (! is_string($raw) || ! preg_match('/^[0-9]+$/', $raw)) {
             return $default;
         }
 

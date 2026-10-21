@@ -14,14 +14,15 @@ final class CatalogRepository
     /** @return array{rows:list<array<string, mixed>>, total:int} */
     public function brands(int $limit, int $offset): array
     {
-        $total = $this->count('SELECT count(*) FROM public.brands');
-        $stmt = $this->pdo->prepare(<<<'SQL'
-            SELECT id::text AS id, slug, name, synonyms,
+        $table = $this->relation('brands');
+        $total = $this->count('SELECT count(*) FROM '.$table);
+        $stmt = $this->pdo->prepare(
+            'SELECT '.$this->asText('id').' AS id, slug, name, synonyms,
                    is_lcv_or_commercial, logo_url_light, logo_url_dark
-            FROM public.brands
+            FROM '.$table.'
             ORDER BY name, id
-            LIMIT :limit OFFSET :offset
-        SQL);
+            LIMIT :limit OFFSET :offset'
+        );
         $this->bindLimit($stmt, $limit, $offset);
         $stmt->execute();
 
@@ -438,6 +439,16 @@ final class CatalogRepository
         $out['measured_at'] = (string) $row['measured_at'];
 
         return $out;
+    }
+
+    private function relation(string $table): string
+    {
+        return $this->pdo->getAttribute(PDO::ATTR_DRIVER_NAME) === 'pgsql' ? 'public.'.$table : $table;
+    }
+
+    private function asText(string $column): string
+    {
+        return $this->pdo->getAttribute(PDO::ATTR_DRIVER_NAME) === 'pgsql' ? $column.'::text' : $column;
     }
 
     private function count(string $sql): int
