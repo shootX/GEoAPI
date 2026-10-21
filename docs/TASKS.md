@@ -62,3 +62,13 @@
 - [x] `.github/workflows/deploy.yml` runs PHPUnit on push to `main`, then SSHes with `DEPLOY_HOST`, `DEPLOY_USER`, `DEPLOY_SSH_KEY`, and optional `DEPLOY_PORT`.
 - [x] The remote script deploys `/www/wwwroot/geoapi.ge` and runs `php artisan up` if a later command fails. Concurrency group `production-deploy` does not cancel an in-progress deploy. The workflow does not edit `.env`.
 - [ ] Owner: one-time setup in `docs/DEPLOY.md` (deploy key, `authorized_keys`, the four secrets, remote `shootX/GEoAPI`, `safe.directory`, owner `www`).
+
+## 2026-10-21 — WP-00 read-only audit
+
+- [x] Read-only audit only. No application code, schema, `.env`, server, or migration change. `composer update`, `npm update`, `migrate`, `seed`, and deploy were not run.
+- [x] Reports: `docs/audits/geoapi-current-state.md`, `docs/audits/geoapi-features.csv`, `docs/audits/geoapi-db-schema.md`, `docs/audits/geoapi-security.md`, `docs/audits/geoapi-ci.md`.
+- [x] HEAD equals `61c6cd7dcb78bfd467b73be71bb519b3dca6ff2d`. Diff against that commit is empty.
+- [ ] WP-01 is not started. Proposed CI fix (not applied): in `.github/workflows/deploy.yml`, run `php artisan key:generate --force` after `composer install` and before `vendor/bin/phpunit`. Do not commit a production `APP_KEY`.
+- [ ] Owner: live PostgreSQL counts and `migrate:status` are still `UNKNOWN`. Do not publish historical row counts as current totals.
+- [ ] Owner: commit `b3ec4558022778b0534d9f233df9294be14689d8` is not on `main` but is still reachable by SHA and added `.env.bak-2026-10-20-1633` plus two session files. Contents were not read here. Rotate anything that file exposed, and tighten `.gitignore` (`.env.*`, `*.bak`, `storage/framework/carapi-sessions/`) in a later change.
+- [ ] Owner: confirm the live nginx document root. HEAD deploys with `cd /www/wwwroot/geoapi.ge`. The checkout path in `b746497` was `/www/wwwroot/car.socialsave.cc`. The absolute `.../public` root was not in git history and was not read from the server.
