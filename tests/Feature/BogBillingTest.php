@@ -202,7 +202,7 @@ final class BogBillingTest extends TestCase
         $this->assertSame(2000, (int) DB::table('platform.project_limits')->where('project_id', 7)->value('monthly_quota'));
         $this->assertSame('paid', DB::table('billing_orders')->where('public_id', $publicId)->value('status'));
 
-        $over = $this->callbackBody($publicId, 'bog-partial', 'refunded_partially', null, '159.30');
+        $over = $this->callbackBody($publicId, 'bog-partial', 'refunded_partially', null, '159.31');
         $this->postRaw($over, $this->sign($over))->assertOk();
         $this->assertSame('15.50', number_format((float) DB::table('billing_orders')->where('public_id', $publicId)->value('refunded_gel'), 2, '.', ''));
         $this->assertSame(2000, (int) DB::table('platform.project_limits')->where('project_id', 7)->value('monthly_quota'));
