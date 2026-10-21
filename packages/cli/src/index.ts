@@ -257,6 +257,11 @@ function read(values: Record<string, string | boolean | undefined>, flags: Parse
       if (url.protocol !== "http:" && url.protocol !== "https:") {
         return "--base-url must be an http(s) URL.";
       }
+      // The key travels in the Authorization header; plain http is only allowed to this machine.
+      const local = ["localhost", "127.0.0.1", "[::1]"].includes(url.hostname);
+      if (url.protocol === "http:" && !local) {
+        return "--base-url must use https (http only for localhost).";
+      }
     } catch {
       return "--base-url must be an http(s) URL.";
     }
@@ -360,6 +365,6 @@ export async function main(argv: string[], io: Io): Promise<number> {
 
 const isMain = process.argv[1] !== undefined && import.meta.url === pathToFileURL(process.argv[1]).href;
 if (isMain) {
-  const code = await main(process.argv.slice(2), { stdout: process.stdout, stderr: process.stderr, env: process.env });
-  process.exit(code);
+  // exitCode (not process.exit) lets piped stdout flush completely, e.g. `geoapi brands list | jq`.
+  process.exitCode = await main(process.argv.slice(2), { stdout: process.stdout, stderr: process.stderr, env: process.env });
 }

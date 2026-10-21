@@ -213,3 +213,21 @@ test("the executable help and a missing key do not call the network", () => {
   assert.equal(missing.stdout, "");
   assert.match(missing.stderr, /GEOAPI_API_KEY is required/);
 });
+
+test("refuses plain http base URLs except localhost", async () => {
+  const io = () => { const out = { stdout: "", stderr: "" }; return [out, { stdout: { write: (c) => { out.stdout += c; } }, stderr: { write: (c) => { out.stderr += c; } }, env: { GEOAPI_API_KEY: "geoapi_sk_test_secret" }, fetch: async () => new Response(JSON.stringify({ brands_count: 1 }), { status: 200, headers: { "content-type": "application/json" } }) }]; };
+  let [out, env] = io();
+  assert.equal(await main(["coverage", "--base-url", "http://example.com"], env), 2);
+  assert.match(out.stderr, /https/);
+  [out, env] = io();
+  assert.equal(await main(["coverage", "--base-url", "http://127.0.0.1:8080"], env), 0);
+});
+
+test("the executable sets the exit code without process.exit and writes full help", async () => {
+  const { spawnSync } = await import("node:child_process");
+  const { fileURLToPath } = await import("node:url");
+  const entry = fileURLToPath(new URL("../dist/index.js", import.meta.url));
+  const r = spawnSync(process.execPath, [entry, "--help"], { encoding: "utf8" });
+  assert.equal(r.status, 0);
+  assert.match(r.stdout, /geoapi <command>/);
+});
