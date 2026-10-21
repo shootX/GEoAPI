@@ -170,8 +170,23 @@ return new class extends Migration
         // Production keeps the platform schema in the same database: use that connection, no extra credentials.
         if (DB::connection()->getDriverName() === 'pgsql'
             && DB::selectOne("SELECT 1 AS ok FROM information_schema.schemata WHERE schema_name = 'platform'") !== null) {
-            foreach ($statements as $sql) {
-                DB::statement($sql);
+            // Skip what already exists: ALTER needs table ownership even when it would be a no-op,
+            // and production applies these columns ahead of the deploy as the table owner.
+            $have = static fn (string $table, string $column): ?object => DB::selectOne(
+                "SELECT column_default FROM information_schema.columns WHERE table_schema = 'platform' AND table_name = ? AND column_name = ?",
+                [$table, $column],
+            );
+            $grandfathered = $have('users', 'grandfathered');
+            if ($grandfathered === null) {
+                DB::statement($statements[0]);
+                DB::statement($statements[1]);
+            } elseif (! str_starts_with((string) $grandfathered->column_default, 'false')) {
+                DB::statement($statements[1]);
+            }
+            foreach (['plan_code' => 2, 'plan_ends_at' => 3, 'unlimited_month' => 4] as $column => $index) {
+                if ($have('project_limits', $column) === null) {
+                    DB::statement($statements[$index]);
+                }
             }
 
             return;
