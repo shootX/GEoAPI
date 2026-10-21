@@ -21,8 +21,11 @@ final class FrontendBuildTest extends TestCase
     public function test_deploy_rebuilds_the_gitignored_vite_bundle(): void
     {
         $deploy = (string) file_get_contents(dirname(__DIR__, 2).'/.github/workflows/deploy.yml');
-        $this->assertStringContainsString('npm ci', $deploy);
-        $this->assertStringContainsString('npm run build', $deploy);
-        $this->assertLessThan(strpos($deploy, 'npm run build'), strpos($deploy, 'php artisan view:cache'));
+        $job = substr($deploy, (int) strpos($deploy, "\n  deploy:\n"));
+        $this->assertStringContainsString('npm ci', $job);
+        $this->assertStringContainsString('npm run build', $job);
+        $this->assertLessThan(strpos($job, 'npm run build'), strpos($job, 'php artisan view:cache'));
+        $this->assertStringContainsString('needs: [test, sdk]', $job);
+        $this->assertStringContainsString('packages/sdk-js', $deploy);
     }
 }

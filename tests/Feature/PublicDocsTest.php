@@ -65,6 +65,9 @@ final class PublicDocsTest extends TestCase
                 'not published',
                 '1.2.0',
                 'https://geoapi.ge',
+                '401, not 405',
+                'not enforced in production today',
+                'packages/sdk-js',
             ] as $needle) {
                 $this->assertStringContainsString($needle, $description, $row['path'].' '.$needle);
             }
@@ -229,6 +232,42 @@ final class PublicDocsTest extends TestCase
         $limited->assertJsonPath('error.code', 'RATE_LIMIT_EXCEEDED')->assertHeader('Retry-After');
         $this->assertMatchesSchema($limited->json(), $schema, PublicSpec::document(), '429');
         $this->assertSame(['code', 'message'], array_keys($limited->json('error')));
+    }
+
+    public function test_a_post_without_a_key_is_401_and_the_daily_cap_is_documented_inactive(): void
+    {
+        $this->withoutTestProject();
+        $this->postJson('/api/v1/brands')
+            ->assertUnauthorized()
+            ->assertJsonPath('error.code', 'unauthorized');
+        $_ENV['CARAPI_CATALOG_TEST_PROJECT'] = '7';
+        $_SERVER['CARAPI_CATALOG_TEST_PROJECT'] = '7';
+        $this->postJson('/api/v1/brands')
+            ->assertStatus(405)
+            ->assertHeader('Allow', 'GET')
+            ->assertJsonPath('error.code', 'method_not_allowed');
+
+        $english = (string) $this->withSession(['locale' => 'en'])->get('/guide')->assertOk()->getContent();
+        $this->assertStringContainsString('401, not 405', $english);
+        $this->assertStringContainsString('not enforced in production today', $english);
+        $this->assertStringContainsString('packages/sdk-js', $english);
+        $this->assertStringContainsString('requestId is null', $english);
+        $this->assertStringContainsString('<details class="guide-toc guide-toc-mobile">', $english);
+        $this->assertStringContainsString('<summary>On this page</summary>', $english);
+        $this->assertStringContainsString('class="guide-toc guide-toc-desktop"', $english);
+
+        $georgian = (string) $this->withSession(['locale' => 'ka'])->get('/guide')->assertOk()->getContent();
+        $this->assertStringContainsString('არა 405', $georgian);
+        $this->assertStringContainsString('პროდაქშენში დღეს არ მოქმედებს', $georgian);
+        $this->assertStringContainsString('<summary>ამ გვერდზე</summary>', $georgian);
+
+        $css = (string) file_get_contents(public_path('assets/public-design.css'));
+        $this->assertStringContainsString('.guide-toc-mobile { display: none; }', $css);
+        $this->assertStringContainsString('.guide-toc-desktop { display: none; }', $css);
+        $this->assertStringContainsString('.guide-toc-mobile { display: block; }', $css);
+
+        $snapshot = json_decode((string) file_get_contents(base_path('packages/sdk-js/openapi.json')), true, 512, JSON_THROW_ON_ERROR);
+        $this->assertSame(PublicSpec::document(), $snapshot);
     }
 
     /** @param array<string, string> $samples */

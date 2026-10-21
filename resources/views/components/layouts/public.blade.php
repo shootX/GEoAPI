@@ -36,7 +36,7 @@
     <meta property="og:image" content="{{ $ogImage }}">
     <meta name="twitter:card" content="{{ $twitterCard }}">
     <meta name="twitter:title" content="{{ $title ?? 'GeoAPI' }}">
-    <link rel="stylesheet" href="{{ asset('assets/public-design.css') }}?v=20261021logo">
+    <link rel="stylesheet" href="{{ asset('assets/public-design.css') }}?v=20261021toc">
     <x-electrik::brand-styles />
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <style>

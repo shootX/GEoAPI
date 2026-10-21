@@ -1,0 +1,30 @@
+{
+  "name": "@geoapi/sdk",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=20"
+  },
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist",
+    "openapi.json",
+    "CHANGELOG.md"
+  ],
+  "scripts": {
+    "generate": "node scripts/generate.mjs",
+    "prebuild": "node scripts/generate.mjs --check",
+    "build": "tsc -p tsconfig.build.json",
+    "test": "node scripts/generate.mjs --check && tsc -p tsconfig.json --noEmit && tsc -p tsconfig.build.json && node --test test/client.test.mjs"
+  },
+  "devDependencies": {
+    "@types/node": "^22.15.0",
+    "typescript": "^5.9.2"
+  }
+}

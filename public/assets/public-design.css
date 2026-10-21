@@ -672,6 +672,9 @@
 .guide-layout { display: grid; grid-template-columns: 220px minmax(0, 1fr); gap: 28px; align-items: start; }
 .codebox .tabs { flex-wrap: wrap; }
 .guide-toc { position: sticky; top: 92px; display: grid; gap: 8px; padding: 14px; border: 1px solid #d7e7df; border-radius: 16px; background: #fff; }
+.guide-toc-links { display: grid; gap: 8px; }
+.guide-toc-mobile { display: none; }
+.guide-toc summary { cursor: pointer; font-weight: 700; }
 .guide-toc a { color: #285A48; text-decoration: none; font-size: 14px; font-weight: 600; }
 .guide-toc a:hover { color: #091413; }
 .api-fold { margin-top: 18px; border: 1px solid #d7e7df; border-radius: 16px; background: #fff; padding: 12px 16px; }
@@ -685,6 +688,8 @@
     .m-menu { display: inline-flex; margin-left: auto; }
     .site-footer .footer-grid, .plan-grid, .guide-layout { grid-template-columns: 1fr; }
     .guide-toc { position: static; }
+    .guide-toc-desktop { display: none; }
+    .guide-toc-mobile { display: block; }
 }
 @media (max-width: 640px) {
     .site-header .m-wrap, .site-footer .m-wrap { width: min(1120px, calc(100% - 28px)); }

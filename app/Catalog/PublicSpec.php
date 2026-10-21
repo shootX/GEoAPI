@@ -120,11 +120,11 @@ final class PublicSpec
                 'paragraphs' => $english ? [
                     'Create an account, then a project. The secret geoapi_sk_ is shown once on the create response. Store it on your server. The next cabinet page does not show it again.',
                     'Call GET /api/v1/brands, then GET /api/v1/brands/{slug}/models, then GET /api/v1/models/{id}/years or /generations, then modifications. Replace the slug and ids with values from the previous response.',
-                    'The browser embed uses the public key geoapi_pk_, never the secret. There is no published SDK, MCP adapter, or CLI.',
+                    'The browser embed uses the public key geoapi_pk_, never the secret. The TypeScript SDK is packages/sdk-js in this repository. MCP and CLI are not published.',
                 ] : [
                     'შექმენით ანგარიში და პროექტი. საიდუმლო geoapi_sk_ ერთხელ ჩანს შექმნის პასუხში. შეინახეთ ის სერვერზე. შემდეგი კაბინეტის გვერდი მას აღარ აჩვენებს.',
                     'გამოიძახეთ GET /api/v1/brands, შემდეგ GET /api/v1/brands/{slug}/models, შემდეგ GET /api/v1/models/{id}/years ან /generations, შემდეგ მოდიფიკაციები. slug და id წინა პასუხიდან ჩასვით.',
-                    'ბრაუზერის ჩასმა იყენებს საჯარო გასაღებს geoapi_pk_. საიდუმლო გასაღები იქ არ დებს. SDK, MCP და CLI გამოქვეყნებული არ არის.',
+                    'ბრაუზერის ჩასმა იყენებს საჯარო გასაღებს geoapi_pk_. საიდუმლო გასაღები იქ არ დებს. TypeScript SDK არის packages/sdk-js ამ რეპოზიტორიაში. MCP და CLI გამოქვეყნებული არ არის.',
                 ],
             ],
             [
@@ -133,12 +133,12 @@ final class PublicSpec
                 'paragraphs' => $english ? [
                     'The catalog reads Authorization: Bearer geoapi_sk_…. A query string, a cookie, and a cabinet session are not credentials. geoapi_pk_ is only the widget key.',
                     'A Sanctum token with cars:read or * also needs X-CARAPI-PROJECT naming that user\'s active project. A secret key ignores X-CARAPI-PROJECT and meters its own project.',
-                    '401 unauthorized means the key is missing, unknown, revoked, or expired. The response includes WWW-Authenticate: Bearer and no quota headers. 403 forbidden means the key is valid but the project is disabled, the owner is suspended, or the email is unverified.',
+                    '401 unauthorized means the key is missing, unknown, revoked, or expired. The response includes WWW-Authenticate: Bearer and no quota headers. Authentication runs before the HTTP method is checked, so POST without an accepted key is 401, not 405. 405 method_not_allowed is returned only after the key is accepted. Use GET. 403 forbidden means the key is valid but the project is disabled, the owner is suspended, or the email is unverified.',
                     'Rotation creates a new key and sets revoked_at on the old one. Keys are not deleted. Re-enabling a project does not restore a revoked key.',
                 ] : [
                     'კატალოგი კითხულობს Authorization: Bearer geoapi_sk_…. მოთხოვნის სტრიქონი, cookie და კაბინეტის სესია გასაღები არ არის. geoapi_pk_ მხოლოდ ვიჯეტის გასაღებია.',
                     'Sanctum ტოკენს cars:read ან * სჭირდება X-CARAPI-PROJECT, რომელიც ამ მომხმარებლის აქტიურ პროექტს ასახელებს. საიდუმლო გასაღები X-CARAPI-PROJECT-ს არ ითვალისწინებს და საკუთარ პროექტს ითვლის.',
-                    '401 unauthorized ნიშნავს, რომ გასაღები არ არის, უცნობია, გაუქმებულია ან ვადაგასულია. პასუხს აქვს WWW-Authenticate: Bearer და არ აქვს quota სათაურები. 403 forbidden ნიშნავს, რომ გასაღები სწორია, მაგრამ პროექტი გამორთულია, მფლობელი შეჩერებულია ან ელფოსტა დაუდასტურებელია.',
+                    '401 unauthorized ნიშნავს, რომ გასაღები არ არის, უცნობია, გაუქმებულია ან ვადაგასულია. პასუხს აქვს WWW-Authenticate: Bearer და არ აქვს quota სათაურები. ავტორიზაცია HTTP მეთოდის შემოწმებამდე ხდება, ამიტომ მიღებული გასაღების გარეშე POST არის 401 და არა 405. 405 method_not_allowed ბრუნდება მხოლოდ მას შემდეგ, რაც გასაღები მიღებულია. გამოიყენეთ GET. 403 forbidden ნიშნავს, რომ გასაღები სწორია, მაგრამ პროექტი გამორთულია, მფლობელი შეჩერებულია ან ელფოსტა დაუდასტურებელია.',
                     'როტაცია ქმნის ახალ გასაღებს და ძველზე revoked_at-ს წერს. გასაღები ფიზიკურად არ იშლება. პროექტის ხელახლა ჩართვა გაუქმებულ გასაღებს არ აბრუნებს.',
                 ],
             ],
@@ -161,13 +161,13 @@ final class PublicSpec
                 'id' => 'guide-limits',
                 'title' => $english ? 'Limits' : 'ლიმიტები',
                 'paragraphs' => $english ? [
-                    'Free, per project: 60 requests each UTC minute, 2 000 successful requests each UTC day when the per-day column is present, and 10 000 successful requests each UTC month. The widget and the server key share that counter. Pro is not for sale.',
-                    'A missing per-day column skips the daily check. A missing limits row is 503, not unlimited. A failed meter is 503 and the body is not the catalog.',
+                    'Free, per project: 60 requests each UTC minute and 10 000 successful requests each UTC month. Those two caps are active. The 2 000 successful requests per UTC day limit is not enforced in production today. The widget and the server key share the counter. Pro is not for sale.',
+                    'The daily check runs only when platform.project_limits.per_day exists. That column is not active in production, so the daily cap is skipped. A missing limits row is 503, not unlimited. A failed meter is 503 and the body is not the catalog.',
                     'A successful response sends X-RateLimit-Limit, X-RateLimit-Remaining, and X-RateLimit-Reset for the minute, plus X-Quota-Limit, X-Quota-Remaining, and X-Quota-Reset for the month. 401 does not send quota headers.',
                     '429 is JSON with Retry-After. Codes: RATE_LIMIT_EXCEEDED, DAILY_QUOTA_EXCEEDED, MONTHLY_QUOTA_EXCEEDED. On 429 the X-RateLimit-* headers describe the window that was hit, not X-Quota-*. Wait Retry-After seconds. Do not retry 401, 403, 404, or 422. 401, 403, 404, 405, 422, 429, and 503 do not spend the month. Failures still use the minute window. A new key does not reset the counter.',
                 ] : [
-                    'Free, პროექტზე: UTC წუთში 60 მოთხოვნა, UTC დღეში 2 000 წარმატებული მოთხოვნა როცა დღის სვეტი არსებობს, და UTC თვეში 10 000 წარმატებული მოთხოვნა. ვიჯეტი და სერვერის გასაღები ერთ მრიცხველს იყოფს. Pro არ იყიდება.',
-                    'დღის სვეტის არყოფნა დღიურ შემოწმებას ტოვებს. ლიმიტების სტრიქონის არყოფნა არის 503, არა შეუზღუდავი. მრიცხველის შეცდომა არის 503 და სხეული კატალოგი არ არის.',
+                    'Free, პროექტზე: UTC წუთში 60 მოთხოვნა და UTC თვეში 10 000 წარმატებული მოთხოვნა. ეს ორი ზღვარი აქტიურია. UTC დღეში 2 000 წარმატებული მოთხოვნის ზღვარი პროდაქშენში დღეს არ მოქმედებს. ვიჯეტი და სერვერის გასაღები ერთ მრიცხველს იყოფს. Pro არ იყიდება.',
+                    'დღიური შემოწმება მხოლოდ მაშინ ეშვება, როცა platform.project_limits.per_day არსებობს. ეს სვეტი პროდაქშენში აქტიური არ არის, ამიტომ დღიური ზღვარი გამოტოვებულია. ლიმიტების სტრიქონის არყოფნა არის 503, არა შეუზღუდავი. მრიცხველის შეცდომა არის 503 და სხეული კატალოგი არ არის.',
                     'წარმატებული პასუხი აგზავნის X-RateLimit-Limit, X-RateLimit-Remaining და X-RateLimit-Reset წუთისთვის, პლუს X-Quota-Limit, X-Quota-Remaining და X-Quota-Reset თვისთვის. 401 quota სათაურებს არ აგზავნის.',
                     '429 არის JSON და Retry-After. კოდები: RATE_LIMIT_EXCEEDED, DAILY_QUOTA_EXCEEDED, MONTHLY_QUOTA_EXCEEDED. 429-ზე X-RateLimit-* იმ ფანჯარას აღწერს, რომელიც ამოიწურა, არა X-Quota-*. დაელოდეთ Retry-After წამს. 401, 403, 404 და 422 ხელახლა არ გაგზავნოთ. 401, 403, 404, 405, 422, 429 და 503 თვეს არ ხარჯავს. წარუმატებელი მოთხოვნა მაინც ხარჯავს წუთს. ახალი გასაღები მრიცხველს არ ანულებს.',
                 ],
@@ -177,10 +177,10 @@ final class PublicSpec
                 'title' => $english ? 'Changelog' : 'ცვლილებები',
                 'paragraphs' => $english ? [
                     'OpenAPI info.version is 1.2.0. It documents the catalog that is deployed: the list envelope, years, specs, equipment, and colors with a verified flag. This version does not deprecate a field.',
-                    'The host is https://geoapi.ge. This page is not an incident log. SDK, MCP, and CLI packages are not published, so they have no version here.',
+                    'The host is https://geoapi.ge. This page is not an incident log. The TypeScript SDK in packages/sdk-js is 0.1.0 and is not on the public npm registry. MCP and CLI are not published.',
                 ] : [
                     'OpenAPI info.version არის 1.2.0. ის აღწერს კატალოგს, რომელიც გაშვებულია: სიის კონვერტს, წლებს, სპეციფიკაციას, კომპლექტაციას და ფერებს verified დროშით. ეს ვერსია ველს არ აუქმებს.',
-                    'ჰოსტია https://geoapi.ge. ეს გვერდი ინციდენტების ჟურნალი არ არის. SDK, MCP და CLI პაკეტები გამოქვეყნებული არ არის, ამიტომ მათ ვერსია აქ არ აქვს.',
+                    'ჰოსტია https://geoapi.ge. ეს გვერდი ინციდენტების ჟურნალი არ არის. TypeScript SDK packages/sdk-js-ში არის 0.1.0 და საჯარო npm რეესტრში არ დევს. MCP და CLI გამოქვეყნებული არ არის.',
                 ],
             ],
             [
@@ -200,11 +200,11 @@ final class PublicSpec
                 'id' => 'guide-packages',
                 'title' => $english ? 'SDK, MCP, and CLI' : 'SDK, MCP და CLI',
                 'paragraphs' => $english ? [
-                    'A JavaScript or TypeScript SDK, an MCP adapter, and a CLI are not published. There is no install command and no package version. Call the HTTP API on this page.',
-                    'The only browser file is the widget script served by this site. It uses geoapi_pk_. It does not contain a secret key.',
+                    'The TypeScript SDK is packages/sdk-js in this repository, version 0.1.0. It calls this REST API and does not keep a second copy of the catalog rules. It is not on the public npm registry. Node 20 or newer. Construct it with new GeoAPI({ apiKey }). brands.list, models.byBrand, generations.byModel, modifications.list, and modifications.get cover the picker. It retries 429 and 503 at most twice and honors Retry-After. It does not retry 400, 401, or 403. GeoAPIError has status, code, and requestId. requestId is null because this API does not send one.',
+                    'A secret key is refused in the browser. MCP and CLI are not published. The widget script is the browser embed. It uses geoapi_pk_ and does not contain a secret key.',
                 ] : [
-                    'JavaScript ან TypeScript SDK, MCP ადაპტერი და CLI გამოქვეყნებული არ არის. ინსტალაციის ბრძანება და პაკეტის ვერსია არ არსებობს. გამოიყენეთ ამ გვერდის HTTP API.',
-                    'ბრაუზერის ერთადერთი ფაილი ამ საიტის ვიჯეტის სკრიპტია. ის იყენებს geoapi_pk_. საიდუმლო გასაღები მასში არ არის.',
+                    'TypeScript SDK არის packages/sdk-js ამ რეპოზიტორიაში, ვერსია 0.1.0. ის ამ REST API-ს იძახებს და კატალოგის წესების მეორე ასლს არ ინახავს. საჯარო npm რეესტრში არ დევს. სჭირდება Node 20 ან უფრო ახალი. იქმნება new GeoAPI({ apiKey })-ით. brands.list, models.byBrand, generations.byModel, modifications.list და modifications.get ამრჩევს ფარავს. 429-სა და 503-ს ხელახლა ცდის მაქსიმუმ ორჯერ და Retry-After-ს ითვალისწინებს. 400, 401 და 403 ხელახლა არ იგზავნება. GeoAPIError-ს აქვს status, code და requestId. requestId არის null, რადგან ეს API მას არ აგზავნის.',
+                    'საიდუმლო გასაღები ბრაუზერში უარყოფილია. MCP და CLI გამოქვეყნებული არ არის. ვიჯეტის სკრიპტი ბრაუზერის ჩასმაა. ის იყენებს geoapi_pk_ და საიდუმლო გასაღებს არ შეიცავს.',
                 ],
             ],
             [
@@ -212,11 +212,11 @@ final class PublicSpec
                 'title' => $english ? 'Errors' : 'შეცდომები',
                 'paragraphs' => $english ? [
                     'Every error is JSON with error.code and error.message only. There is no request id.',
-                    '401 unauthorized. The key is missing or no longer works. 403 forbidden. The project, email, or origin does not match. 404 not_found. The record was not found. 405 method_not_allowed. Use GET. 422 invalid_parameter. page, limit, per_page, sort, direction, a filter, or id is invalid. 429 uses RATE_LIMIT_EXCEEDED, DAILY_QUOTA_EXCEEDED, or MONTHLY_QUOTA_EXCEEDED. 503 unavailable. The service or the meter is temporarily unavailable.',
+                    '401 unauthorized. The key is missing or no longer works. This check happens before the method, so a non-GET request without an accepted key is 401, not 405. 403 forbidden. The project, email, or origin does not match. 404 not_found. The record was not found. 405 method_not_allowed is returned only after the key is accepted. Use GET. 422 invalid_parameter. page, limit, per_page, sort, direction, a filter, or id is invalid. 429 uses RATE_LIMIT_EXCEEDED, DAILY_QUOTA_EXCEEDED, or MONTHLY_QUOTA_EXCEEDED. 503 unavailable. The service or the meter is temporarily unavailable.',
                     'Georgian is the default message. Send Accept-Language: en for the English message.',
                 ] : [
                     'ყოველი შეცდომა არის JSON მხოლოდ error.code და error.message ველებით. მოთხოვნის id არ არის.',
-                    '401 unauthorized. გასაღები არ არის ან ვეღარ გამოიყენება. 403 forbidden. პროექტი, ელფოსტა ან origin არ ემთხვევა. 404 not_found. ჩანაწერი ვერ მოიძებნა. 405 method_not_allowed. გამოიყენეთ GET. 422 invalid_parameter. page, limit, per_page, sort, direction, ფილტრი ან id არასწორია. 429 იყენებს RATE_LIMIT_EXCEEDED, DAILY_QUOTA_EXCEEDED ან MONTHLY_QUOTA_EXCEEDED. 503 unavailable. სერვისი ან მრიცხველი დროებით მიუწვდომელია.',
+                    '401 unauthorized. გასაღები არ არის ან ვეღარ გამოიყენება. ეს შემოწმება მეთოდამდე ხდება, ამიტომ მიღებული გასაღების გარეშე არა-GET მოთხოვნა არის 401 და არა 405. 403 forbidden. პროექტი, ელფოსტა ან origin არ ემთხვევა. 404 not_found. ჩანაწერი ვერ მოიძებნა. 405 method_not_allowed ბრუნდება მხოლოდ მას შემდეგ, რაც გასაღები მიღებულია. გამოიყენეთ GET. 422 invalid_parameter. page, limit, per_page, sort, direction, ფილტრი ან id არასწორია. 429 იყენებს RATE_LIMIT_EXCEEDED, DAILY_QUOTA_EXCEEDED ან MONTHLY_QUOTA_EXCEEDED. 503 unavailable. სერვისი ან მრიცხველი დროებით მიუწვდომელია.',
                     'შეტყობინება ნაგულისხმევად ქართულია. ინგლისურისთვის გაგზავნეთ Accept-Language: en.',
                 ],
             ],
@@ -246,7 +246,7 @@ final class PublicSpec
             .'Dimensions and performance groups are null because those columns are not stored. '
             .'Colors return every stored row with a verified flag. '
             .'Document version '.self::VERSION.' matches the deployed catalog. '
-            .'SDK, MCP, and CLI packages are not published. '
+            .'The TypeScript SDK is packages/sdk-js 0.1.0 in this repository and is not on the public npm registry. MCP and CLI are not published. '
             .'The host is '.self::ORIGIN.'.';
     }
 
@@ -460,10 +460,10 @@ final class PublicSpec
     private static function contract(): string
     {
         return 'Authentication: Authorization: Bearer geoapi_sk_… from your server. Query strings, cookies, and a cabinet session are not credentials. geoapi_pk_ is the widget key, not a catalog bearer. Sanctum cars:read or * also requires X-CARAPI-PROJECT naming that user\'s active project. A secret key ignores X-CARAPI-PROJECT.'."\n\n"
-            .'Errors, JSON error.code and error.message only, no request id: 401 unauthorized, 403 forbidden, 404 not_found, 405 method_not_allowed (GET only), 422 invalid_parameter, 429 RATE_LIMIT_EXCEEDED or DAILY_QUOTA_EXCEEDED or MONTHLY_QUOTA_EXCEEDED, 503 unavailable.'."\n\n"
-            .'Limits: one project shares 60 requests each UTC minute, 2 000 successful requests each UTC day when the per-day column is present, and 10 000 successful requests each UTC month with the widget. A missing per-day column skips the daily check. A missing limits row or a failed meter is 503, not an unmetered success. 401, 403, 404, 405, 422, 429, and 503 do not spend the month. Failures still use the minute window. On 429, wait Retry-After seconds. Do not retry 401, 403, 404, or 422. Success sends X-RateLimit-* for the minute and X-Quota-* for the month. 429 sends X-RateLimit-* for the window that was hit.'."\n\n"
+            .'Errors, JSON error.code and error.message only, no request id: 401 unauthorized, 403 forbidden, 404 not_found, 405 method_not_allowed, 422 invalid_parameter, 429 RATE_LIMIT_EXCEEDED or DAILY_QUOTA_EXCEEDED or MONTHLY_QUOTA_EXCEEDED, 503 unavailable. Authentication runs before the method check. A non-GET request without an accepted key is 401, not 405. 405 is returned only after the key is accepted. Use GET.'."\n\n"
+            .'Limits: one project shares 60 requests each UTC minute and 10 000 successful requests each UTC month with the widget. Those caps are active. The 2 000 successful requests per UTC day limit is not enforced in production today, because the daily check runs only when platform.project_limits.per_day exists. A missing limits row or a failed meter is 503, not an unmetered success. 401, 403, 404, 405, 422, 429, and 503 do not spend the month. Failures still use the minute window. On 429, wait Retry-After seconds. Do not retry 401, 403, 404, or 422. Success sends X-RateLimit-* for the minute and X-Quota-* for the month. 429 sends X-RateLimit-* for the window that was hit.'."\n\n"
             .'Coverage: JSON ids are strings. null means the stored value is missing. dimensions and performance are null. Colors include unverified rows with verified false. Photo files and VIN are not on these routes. Photo rights are not established.'."\n\n"
-            .'Version '.self::VERSION.' at '.self::ORIGIN.'. SDK, MCP, and CLI packages are not published. The widget is the browser embed and uses geoapi_pk_.';
+            .'Version '.self::VERSION.' at '.self::ORIGIN.'. The TypeScript SDK is packages/sdk-js 0.1.0 in this repository and is not on the public npm registry. MCP and CLI are not published. The widget is the browser embed and uses geoapi_pk_.';
     }
 
     /** @return array<string, mixed> */

@@ -12,7 +12,7 @@ Public catalog API and Georgian/English site at https://geoapi.ge. The catalog i
 
 ## 2026-10-21 — billing decision (WP-11)
 
-The owner decided the commercial plans below. Build them in WP-11, after WP-10 and before WP-12. Nothing in this section is implemented. Until that work package, the running Free limits stay 60 requests per UTC minute, 2 000 successful requests per UTC day, and 10 000 successful requests per UTC month, and Pro is not sold.
+The owner decided the commercial plans below. Build them in WP-11, after WP-10 and before WP-12. Nothing in this section is implemented. Until that work package, the running Free limits stay 60 requests per UTC minute and 10 000 successful requests per UTC month. The 2 000 successful requests per UTC day limit is not enforced in production today, because the daily check runs only when `platform.project_limits.per_day` exists. Pro is not sold.
 
 - The payment provider is the Bank of Georgia Payments API. Authentication is OAuth client credentials. Only test/sandbox mode is allowed until the owner says otherwise.
 - `BOG_CLIENT_ID` and `BOG_CLIENT_SECRET` will be supplied later through the environment. They are never committed.
