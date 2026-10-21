@@ -19,6 +19,16 @@ final class Register extends \Electrik\Livewire\Auth\Register
 {
     public bool $accept_terms = false;
 
+    public string $buyer_kind = 'individual';
+
+    public string $company_name = '';
+
+    public string $company_code = '';
+
+    public string $company_address = '';
+
+    public bool $vat_payer = false;
+
     public function register(CreateNewUser $createNewUser): void
     {
         abort_unless(config('electrik.auth.registration', true), 404);
@@ -33,6 +43,12 @@ final class Register extends \Electrik\Livewire\Auth\Register
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users,email'],
             'password' => ['required', 'string', 'min:15', 'confirmed'],
             'accept_terms' => ['accepted'],
+            'buyer_kind' => ['required', 'in:individual,legal'],
+            'company_name' => ['required_if:buyer_kind,legal', 'nullable', 'string', 'max:255'],
+            // Georgian identification code: 9 digits for a legal entity, 11 for an individual entrepreneur.
+            'company_code' => ['required_if:buyer_kind,legal', 'nullable', 'string', 'regex:/^(\d{9}|\d{11})$/'],
+            'company_address' => ['required_if:buyer_kind,legal', 'nullable', 'string', 'max:500'],
+            'vat_payer' => ['boolean'],
         ]);
 
         if ($invite && strcasecmp($validated['email'], $invite->email) !== 0) {
@@ -46,6 +62,14 @@ final class Register extends \Electrik\Livewire\Auth\Register
             'email' => $validated['email'],
             'password' => $validated['password'],
         ]);
+        $legal = $validated['buyer_kind'] === 'legal';
+        $user->forceFill([
+            'buyer_kind' => $validated['buyer_kind'],
+            'company_name' => $legal ? $validated['company_name'] : null,
+            'company_code' => $legal ? $validated['company_code'] : null,
+            'company_address' => $legal ? $validated['company_address'] : null,
+            'vat_payer' => $legal && $this->vat_payer,
+        ])->save();
 
         Auth::login($user);
         session()->regenerate();

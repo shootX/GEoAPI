@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Livewire\Account;
 
 use App\Access\ProductAccess;
+use App\Models\User;
 use Illuminate\Support\Facades\DB;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Title;
@@ -22,8 +23,8 @@ final class Products extends Component
         abort_unless($product !== null && (string) $product->status === 'published', 404);
         $plan = DB::table('api_plans')
             ->where('api_product_id', $product->id)
+            ->where('code', 'cars-included')
             ->where('status', 'published')
-            ->where('is_addon', false)
             ->first();
         abort_unless($plan !== null, 404);
 
@@ -82,7 +83,7 @@ final class Products extends Component
         $user = auth()->user();
         $legacyId = $user?->legacy_platform_user_id;
         $products = DB::table('api_products')->orderBy('id')->get();
-        $plans = DB::table('api_plans')->get()->groupBy('api_product_id');
+        $plans = DB::table('api_plans')->where('code', 'cars-included')->get()->groupBy('api_product_id');
         $entitlements = $legacyId === null
             ? collect()
             : DB::table('api_entitlements')->where('legacy_user_id', $legacyId)->get()->keyBy('api_product_id');
@@ -91,7 +92,7 @@ final class Products extends Component
             'products' => $products,
             'plans' => $plans,
             'entitlements' => $entitlements,
-            'abilities' => $user instanceof \App\Models\User ? ProductAccess::tokenAbilitiesFor($user) : [],
+            'abilities' => $user instanceof User ? ProductAccess::tokenAbilitiesFor($user) : [],
         ]);
     }
 }

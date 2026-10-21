@@ -16,7 +16,7 @@ final class Pricing extends Component
     {
         return view('public.pricing')->layoutData([
             'title' => __('Pricing').' — GeoAPI',
-            'description' => __('The free plan is the current limit. Pro is not on sale yet.'),
+            'description' => 'Free, Basic, and Premium. Prices include VAT.',
         ]);
     }
 }

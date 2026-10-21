@@ -11,6 +11,10 @@ final class PostgresUsageStore implements UsageStore
 {
     private ?bool $perDayColumn = null;
 
+    private string|false|null $planMode = null;
+
+    private bool $usageSavepoint = false;
+
     public function __construct(private PDO $pdo) {}
 
     public function bumpWindow(string $scope, string $subject, int $limit, int $now): array
@@ -47,7 +51,7 @@ final class PostgresUsageStore implements UsageStore
         $stmt->execute(['id' => $projectId, 'period' => $period]);
         $used = (int) ($stmt->fetchColumn() ?: 0);
 
-        return $this->monthView($limits['monthly_quota'], $used, $now);
+        return $this->monthView($limits['monthly_quota'], $used, $now, (bool) ($limits['unlimited'] ?? false));
     }
 
     public function previewDay(int $projectId, int $now): ?array
@@ -87,19 +91,33 @@ final class PostgresUsageStore implements UsageStore
         }
         $period = gmdate('Y-m-01', $now);
         $day = gmdate('Y-m-d', $now);
-        $this->pdo->beginTransaction();
-        $month = $this->pdo->prepare(<<<'SQL'
-            INSERT INTO platform.monthly_usage (project_id, period, used_count)
-            VALUES (:id, :period, 1)
-            ON CONFLICT (project_id, period)
-            DO UPDATE SET used_count = platform.monthly_usage.used_count + 1
-            WHERE platform.monthly_usage.used_count < :quota
-            RETURNING used_count
-        SQL);
-        $month->execute(['id' => $projectId, 'period' => $period, 'quota' => $limits['monthly_quota']]);
+        $this->beginUsage();
+        $unlimited = (bool) ($limits['unlimited'] ?? false);
+        if ($unlimited) {
+            $month = $this->pdo->prepare(<<<'SQL'
+                INSERT INTO platform.monthly_usage (project_id, period, used_count)
+                VALUES (:id, :period, 1)
+                ON CONFLICT (project_id, period)
+                DO UPDATE SET used_count = platform.monthly_usage.used_count + 1
+                RETURNING used_count
+            SQL);
+            $month->execute(['id' => $projectId, 'period' => $period]);
+        } else {
+            $month = $this->pdo->prepare(<<<'SQL'
+                INSERT INTO platform.monthly_usage (project_id, period, used_count)
+                VALUES (:id, :period, 1)
+                ON CONFLICT (project_id, period)
+                DO UPDATE SET used_count = platform.monthly_usage.used_count + 1
+                WHERE platform.monthly_usage.used_count < :quota
+                RETURNING used_count
+            SQL);
+            $month->execute(['id' => $projectId, 'period' => $period, 'quota' => $limits['monthly_quota']]);
+        }
         $used = $month->fetchColumn();
+        $month->closeCursor();
+        unset($month);
         if ($used === false) {
-            $this->pdo->rollBack();
+            $this->rollBackUsage();
 
             return ['ok' => false, 'reason' => 'month', 'limit' => $limits['monthly_quota'], 'used' => $limits['monthly_quota'], 'remaining' => 0, 'reset_at' => $this->nextMonth($now)];
         }
@@ -110,23 +128,26 @@ final class PostgresUsageStore implements UsageStore
             DO UPDATE SET used_count = platform.daily_usage.used_count + 1
         SQL);
         $daily->execute(['id' => $projectId, 'day' => $day, 'route' => $route]);
+        $daily->closeCursor();
+        unset($daily);
         if ($limits['per_day'] !== null) {
             $dayUsed = $this->dayUsed($projectId, $now);
             if ($dayUsed > $limits['per_day']) {
-                $this->pdo->rollBack();
+                $this->rollBackUsage();
 
                 return ['ok' => false, 'reason' => 'day', 'limit' => $limits['per_day'], 'used' => $limits['per_day'], 'remaining' => 0, 'reset_at' => $this->nextDay($now)];
             }
         }
-        $this->pdo->commit();
+        $this->commitUsage();
         $used = (int) $used;
 
         return [
             'ok' => true,
             'limit' => $limits['monthly_quota'],
             'used' => $used,
-            'remaining' => max(0, $limits['monthly_quota'] - $used),
+            'remaining' => $unlimited ? $used : max(0, $limits['monthly_quota'] - $used),
             'reset_at' => $this->nextMonth($now),
+            'unlimited' => $unlimited,
         ];
     }
 
@@ -177,7 +198,7 @@ final class PostgresUsageStore implements UsageStore
 
             return $right['used'] <=> $left['used'];
         });
-        $view = $this->monthView($limits['monthly_quota'], $used, $now);
+        $view = $this->monthView($limits['monthly_quota'], $used, $now, (bool) ($limits['unlimited'] ?? false));
 
         return [
             'limit' => $view['limit'],
@@ -198,9 +219,38 @@ final class PostgresUsageStore implements UsageStore
         return $limits['per_minute'] ?? null;
     }
 
-    /** @return array{per_minute:int,monthly_quota:int,per_day:?int}|null */
+    /** @return array{per_minute:int,monthly_quota:int,per_day:?int,unlimited:bool}|null */
     private function limits(int $projectId): ?array
     {
+        if ($this->planMode !== false) {
+            $withDay = $this->planMode !== 'noday';
+            $sql = $withDay
+                ? 'SELECT per_minute, monthly_quota, per_day, plan_code, plan_ends_at, unlimited_month FROM platform.project_limits WHERE project_id = :id'
+                : 'SELECT per_minute, monthly_quota, plan_code, plan_ends_at, unlimited_month FROM platform.project_limits WHERE project_id = :id';
+            try {
+                $stmt = $this->pdo->prepare($sql);
+                $stmt->execute(['id' => $projectId]);
+                $row = $stmt->fetch();
+                $this->planMode = $withDay ? 'full' : 'noday';
+                $this->perDayColumn = $withDay;
+                if ($row === false) {
+                    return null;
+                }
+
+                return $this->shaped($row, $withDay);
+            } catch (PDOException $e) {
+                if ($withDay && $this->missingColumn($e, 'per_day') && ! $this->missingColumn($e, 'plan_code')) {
+                    $this->planMode = 'noday';
+
+                    return $this->limits($projectId);
+                }
+                if ($this->missingColumn($e, 'plan_code') || $this->missingColumn($e, 'plan_ends_at') || $this->missingColumn($e, 'unlimited_month') || $this->missingColumn($e, 'per_day')) {
+                    $this->planMode = false;
+                } else {
+                    throw $e;
+                }
+            }
+        }
         if ($this->perDayColumn !== false) {
             try {
                 $stmt = $this->pdo->prepare(
@@ -217,6 +267,7 @@ final class PostgresUsageStore implements UsageStore
                     'per_minute' => (int) $row['per_minute'],
                     'monthly_quota' => (int) $row['monthly_quota'],
                     'per_day' => (int) $row['per_day'],
+                    'unlimited' => false,
                 ];
             } catch (PDOException $e) {
                 if ($this->perDayColumn === true || ($e->getCode() !== '42703' && ! str_contains($e->getMessage(), 'per_day'))) {
@@ -238,7 +289,82 @@ final class PostgresUsageStore implements UsageStore
             'per_minute' => (int) $row['per_minute'],
             'monthly_quota' => (int) $row['monthly_quota'],
             'per_day' => null,
+            'unlimited' => false,
         ];
+    }
+
+    /** @param  array<string, mixed>  $row
+     * @return array{per_minute:int,monthly_quota:int,per_day:?int,unlimited:bool}
+     */
+    private function shaped(array $row, bool $withDay): array
+    {
+        $plan = isset($row['plan_code']) && $row['plan_code'] !== null && $row['plan_code'] !== '' ? (string) $row['plan_code'] : null;
+        $ends = $row['plan_ends_at'] ?? null;
+        $expired = is_string($ends) && $ends !== '' && strtotime($ends) !== false && strtotime($ends) <= time();
+        $paid = $plan !== null && ! in_array($plan, ['free', 'cars-included'], true);
+        $unlimited = $this->truthy($row['unlimited_month'] ?? false);
+        $quota = (int) $row['monthly_quota'];
+        if ($paid && $expired) {
+            $quota = 100;
+            $unlimited = false;
+        }
+
+        return [
+            'per_minute' => (int) $row['per_minute'],
+            'monthly_quota' => $quota,
+            'per_day' => $withDay ? (int) $row['per_day'] : null,
+            'unlimited' => $unlimited,
+        ];
+    }
+
+    /**
+     * A caller that already holds a transaction still has to count. The savepoint
+     * rolls back only this write. Cursors are closed first because SQLite will
+     * not release a savepoint while a statement is open.
+     */
+    private function beginUsage(): void
+    {
+        if ($this->pdo->inTransaction()) {
+            $this->pdo->exec('SAVEPOINT usage_commit');
+            $this->usageSavepoint = true;
+
+            return;
+        }
+        $this->usageSavepoint = false;
+        $this->pdo->beginTransaction();
+    }
+
+    private function commitUsage(): void
+    {
+        if ($this->usageSavepoint) {
+            $this->pdo->exec('RELEASE SAVEPOINT usage_commit');
+            $this->usageSavepoint = false;
+
+            return;
+        }
+        $this->pdo->commit();
+    }
+
+    private function rollBackUsage(): void
+    {
+        if ($this->usageSavepoint) {
+            $this->pdo->exec('ROLLBACK TO SAVEPOINT usage_commit');
+            $this->pdo->exec('RELEASE SAVEPOINT usage_commit');
+            $this->usageSavepoint = false;
+
+            return;
+        }
+        $this->pdo->rollBack();
+    }
+
+    private function truthy(mixed $value): bool
+    {
+        return $value === true || $value === 1 || $value === '1' || $value === 't' || $value === 'true';
+    }
+
+    private function missingColumn(PDOException $e, string $column): bool
+    {
+        return $e->getCode() === '42703' || str_contains($e->getMessage(), $column);
     }
 
     private function dayUsed(int $projectId, int $now): int
@@ -247,19 +373,33 @@ final class PostgresUsageStore implements UsageStore
             'SELECT COALESCE(sum(used_count), 0) FROM platform.daily_usage WHERE project_id = :id AND day = :day'
         );
         $stmt->execute(['id' => $projectId, 'day' => gmdate('Y-m-d', $now)]);
+        $used = (int) $stmt->fetchColumn();
+        $stmt->closeCursor();
 
-        return (int) $stmt->fetchColumn();
+        return $used;
     }
 
-    /** @return array{limit:int,used:int,remaining:int,exhausted:bool,reset_at:int} */
-    private function monthView(int $limit, int $used, int $now): array
+    /** @return array{limit:int,used:int,remaining:int,exhausted:bool,reset_at:int,unlimited:bool} */
+    private function monthView(int $limit, int $used, int $now, bool $unlimited = false): array
     {
+        if ($unlimited) {
+            return [
+                'limit' => $limit,
+                'used' => $used,
+                'remaining' => $used,
+                'exhausted' => false,
+                'reset_at' => $this->nextMonth($now),
+                'unlimited' => true,
+            ];
+        }
+
         return [
             'limit' => $limit,
             'used' => $used,
             'remaining' => max(0, $limit - $used),
             'exhausted' => $used >= $limit,
             'reset_at' => $this->nextMonth($now),
+            'unlimited' => false,
         ];
     }
 

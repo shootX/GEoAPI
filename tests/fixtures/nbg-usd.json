@@ -1,0 +1,15 @@
+[
+  {
+    "date": "2026-10-21T00:00:00.000Z",
+    "currencies": [
+      {
+        "code": "USD",
+        "quantity": 1,
+        "rateFormated": "2.7000",
+        "rate": 2.7,
+        "name": "US Dollar",
+        "diff": 0
+      }
+    ]
+  }
+]

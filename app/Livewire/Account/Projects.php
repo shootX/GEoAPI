@@ -149,6 +149,7 @@ final class Projects extends Component
             'limit' => 10000,
             'remaining' => 10000,
             'perMinute' => 60,
+            'unlimited' => false,
             'days' => $emptyDays,
             'activeKeys' => 0,
             'cars' => [],
@@ -187,6 +188,7 @@ final class Projects extends Component
         $base['limit'] = $usage['limit'];
         $base['remaining'] = max(0, $usage['limit'] - $usage['used']);
         $base['perMinute'] = $usage['per_minute'];
+        $base['unlimited'] = $usage['unlimited'];
         $base['days'] = $this->days($pdo, $id);
         $keys = $repo->keys($this->legacyId(), $id);
         $base['keys'] = $keys;
@@ -206,13 +208,47 @@ final class Projects extends Component
         return $base;
     }
 
-    /** @return array{used:int,limit:int,per_minute:int} */
+    /** @return array{used:int,limit:int,per_minute:int,unlimited:bool} */
     private function usage(PDO $pdo, int $projectId): array
     {
-        $stmt = $pdo->prepare(<<<'SQL'
+        try {
+            $row = $this->usageRow($pdo, $projectId, true);
+        } catch (PDOException $e) {
+            if (! str_contains($e->getMessage(), 'plan_code') && ! str_contains($e->getMessage(), 'unlimited_month') && ! str_contains($e->getMessage(), 'plan_ends_at')) {
+                throw $e;
+            }
+            $row = $this->usageRow($pdo, $projectId, false);
+        }
+        if ($row === null) {
+            return ['used' => 0, 'limit' => 10000, 'per_minute' => 60, 'unlimited' => false];
+        }
+        $plan = isset($row['plan_code']) && $row['plan_code'] !== null && $row['plan_code'] !== '' ? (string) $row['plan_code'] : null;
+        $ends = $row['plan_ends_at'] ?? null;
+        $expired = is_string($ends) && $ends !== '' && strtotime($ends) !== false && strtotime($ends) <= time();
+        $paid = $plan !== null && ! in_array($plan, ['free', 'cars-included'], true);
+        $unlimited = isset($row['unlimited_month']) && in_array($row['unlimited_month'], [1, '1', true, 't', 'true'], true);
+        $limit = (int) $row['monthly_quota'];
+        if ($paid && $expired) {
+            $limit = 100;
+            $unlimited = false;
+        }
+
+        return [
+            'used' => (int) $row['used_count'],
+            'limit' => $limit,
+            'per_minute' => (int) $row['per_minute'],
+            'unlimited' => $unlimited && ! ($paid && $expired),
+        ];
+    }
+
+    /** @return array<string, mixed>|null */
+    private function usageRow(PDO $pdo, int $projectId, bool $planColumns): ?array
+    {
+        $extra = $planColumns ? ",\n                   l.plan_code AS plan_code,\n                   l.plan_ends_at AS plan_ends_at,\n                   l.unlimited_month AS unlimited_month" : '';
+        $stmt = $pdo->prepare(<<<SQL
             SELECT COALESCE(l.monthly_quota, 10000) AS monthly_quota,
                    COALESCE(l.per_minute, 60) AS per_minute,
-                   COALESCE(m.used_count, 0) AS used_count
+                   COALESCE(m.used_count, 0) AS used_count{$extra}
             FROM platform.projects p
             LEFT JOIN platform.project_limits l ON l.project_id = p.id
             LEFT JOIN platform.monthly_usage m ON m.project_id = p.id AND m.period = :period
@@ -223,15 +259,8 @@ final class Projects extends Component
         $stmt->bindValue('user_id', $this->legacyId(), PDO::PARAM_INT);
         $stmt->execute();
         $row = $stmt->fetch();
-        if ($row === false) {
-            return ['used' => 0, 'limit' => 10000, 'per_minute' => 60];
-        }
 
-        return [
-            'used' => (int) $row['used_count'],
-            'limit' => (int) $row['monthly_quota'],
-            'per_minute' => (int) $row['per_minute'],
-        ];
+        return $row === false ? null : $row;
     }
 
     /** @return list<array{day:string,used:int}> */
