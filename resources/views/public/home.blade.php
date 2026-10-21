@@ -115,7 +115,7 @@
 <div class="mk">
     <header class="site-header">
         <div class="wrap">
-            <a class="logo" href="#top"><img src="{{ asset('assets/brand/geoapi-lockup.png') }}" alt="geoapi.ge" height="36"></a>
+            <a class="logo" href="#top"><img src="{{ asset('assets/brand/geoapi-lockup.png') }}" alt="geoapi.ge" height="28"></a>
             <nav class="nav" id="nav" aria-label="{{ $en ? 'Main' : 'მთავარი' }}">
                 <a href="#features">{{ $t['nav1'] }}</a>
                 <a href="#how">{{ $t['nav2'] }}</a>
@@ -123,8 +123,10 @@
                 <a href="#faq">{{ $t['nav4'] }}</a>
                 <a href="#contact">{{ $t['nav5'] }}</a>
             </nav>
-            <a class="header-cta" href="#pricing">{{ $t['account'] }}</a>
-            <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="nav">{{ $t['menu'] }}</button>
+            <div class="header-tools">
+                <a class="header-cta" href="#pricing">{{ $t['account'] }}</a>
+                <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="nav">{{ $t['menu'] }}</button>
+            </div>
         </div>
     </header>
     <main id="top">
