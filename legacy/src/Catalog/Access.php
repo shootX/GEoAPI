@@ -19,9 +19,6 @@ final class Access
         if ($testProject !== null) {
             return ['key_id' => 0, 'project_id' => $testProject];
         }
-        if (! self::platformReady()) {
-            throw new UnavailableException;
-        }
         $token = self::bearer();
         $parsed = $token === null ? null : ApiKeys::parse($token);
         if ($parsed === null) {
@@ -32,6 +29,9 @@ final class Access
                 }
             }
             throw new DeniedException(401);
+        }
+        if (! self::platformReady()) {
+            throw new UnavailableException;
         }
         try {
             $found = ApiKeys::lookup(PlatformConnection::pdo(), $parsed['selector'], $parsed['secret']);

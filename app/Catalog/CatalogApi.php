@@ -152,7 +152,28 @@ final class CatalogApi
     {
         $kind = $route['kind'];
         if ($kind === 'coverage') {
+            $parsed = ListQuery::parse($_GET, [], []);
+            if ($parsed->fails() || $parsed->q !== null || $parsed->sort !== null || $parsed->modifiedAfter !== null || $parsed->filters !== []) {
+                return ['error' => $this->error(422, 'invalid_parameter', 'ფილტრი ამ მისამართზე არ გამოიყენება.')];
+            }
+
             return ['body' => $catalog->coverage()];
+        }
+        if ($kind === 'modification_specs') {
+            $row = $catalog->modificationSpecs((string) $route['id']);
+            if ($row === null) {
+                return ['error' => $this->error(404, 'not_found', 'მითითებული მოდიფიკაცია ვერ მოიძებნა.')];
+            }
+
+            return ['body' => ['data' => $row]];
+        }
+        if ($kind === 'modification_equipment') {
+            $row = $catalog->modificationEquipment((string) $route['id']);
+            if ($row === null) {
+                return ['error' => $this->error(404, 'not_found', 'მითითებული მოდიფიკაცია ვერ მოიძებნა.')];
+            }
+
+            return ['body' => ['data' => $row]];
         }
         if ($kind === 'modification') {
             $row = $catalog->modification((string) $route['id']);
@@ -167,7 +188,10 @@ final class CatalogApi
         if ($parsed->fails()) {
             return ['error' => $this->error(422, 'invalid_parameter', (string) $parsed->error)];
         }
-        if ($kind === 'bodies' && $parsed->modifiedAfter !== null) {
+        if ($kind === 'years' && $parsed->q !== null) {
+            return ['error' => $this->error(422, 'invalid_parameter', 'ფილტრი q ამ მისამართზე არ გამოიყენება.')];
+        }
+        if (in_array($kind, ['bodies', 'years'], true) && $parsed->modifiedAfter !== null) {
             return ['error' => $this->error(422, 'invalid_parameter', 'ფილტრი modified_after ამ მისამართზე არ გამოიყენება.')];
         }
         if ($parsed->sort === 'modified' && ! $catalog->hasUpdatedAt($this->modifiedTable($kind))) {
@@ -183,6 +207,7 @@ final class CatalogApi
             'generations' => $catalog->generations((string) $route['id'], $parsed),
             'modifications' => $catalog->modificationsForGeneration((string) $route['id'], $parsed),
             'modification_search' => $catalog->searchModifications($parsed),
+            'years' => $catalog->years((string) $route['id'], $parsed),
             'engines' => $catalog->engines($parsed),
             'bodies' => $catalog->bodies($parsed),
             'fuel' => $catalog->fuel($parsed),
@@ -194,6 +219,7 @@ final class CatalogApi
                 'models' => 'მითითებული ბრენდი ვერ მოიძებნა.',
                 'generations' => 'მითითებული მოდელი ვერ მოიძებნა.',
                 'modifications' => 'მითითებული თაობა ვერ მოიძებნა.',
+                'years' => 'მითითებული მოდელი ვერ მოიძებნა.',
                 default => 'მითითებული მისამართით მონაცემები ვერ მოიძებნა.',
             };
 
@@ -210,6 +236,7 @@ final class CatalogApi
             'brands' => '/api/v1/brands',
             'models' => '/api/v1/brands/'.rawurlencode((string) $route['slug']).'/models',
             'generations' => '/api/v1/models/'.$route['id'].'/generations',
+            'years' => '/api/v1/models/'.$route['id'].'/years',
             'modifications' => '/api/v1/generations/'.$route['id'].'/modifications',
             'modification_search' => '/api/v1/modifications',
             'engines' => '/api/v1/engines',
@@ -225,6 +252,7 @@ final class CatalogApi
         return match ($kind) {
             'brands', 'models' => ['name', 'id', 'modified'],
             'generations' => ['year_start', 'name', 'id', 'modified'],
+            'years' => ['year', 'id'],
             'modifications', 'modification_search' => ['name', 'id', 'year_start', 'engine_volume_cc', 'modified'],
             'engines' => ['volume_cc', 'id', 'power_hp', 'modified'],
             'bodies' => ['name', 'id', 'count'],
@@ -259,60 +287,70 @@ final class CatalogApi
         };
     }
 
+    /** @return list<string> */
+    public static function templates(): array
+    {
+        return array_column(self::definitions(), 'template');
+    }
+
+    /**
+     * Route table shared with PublicSpec. More specific patterns come first.
+     *
+     * @return list<array{template:string, kind:string, pattern:string, param?:string, id?:bool, gate?:string}>
+     */
+    private static function definitions(): array
+    {
+        return [
+            ['template' => '/api/v1/brands', 'kind' => 'brands', 'pattern' => '#^/api/v1/brands$#'],
+            ['template' => '/api/v1/brands/{slug}/models', 'kind' => 'models', 'pattern' => '#^/api/v1/brands/([^/]+)/models$#u', 'param' => 'slug'],
+            ['template' => '/api/v1/models/{id}/years', 'kind' => 'years', 'pattern' => '#^/api/v1/models/([^/]+)/years$#', 'param' => 'id', 'id' => true],
+            ['template' => '/api/v1/models/{id}/generations', 'kind' => 'generations', 'pattern' => '#^/api/v1/models/([^/]+)/generations$#', 'param' => 'id', 'id' => true],
+            ['template' => '/api/v1/generations/{id}/modifications', 'kind' => 'modifications', 'pattern' => '#^/api/v1/generations/([^/]+)/modifications$#', 'param' => 'id', 'id' => true, 'gate' => 'CARAPI_MODIFICATIONS_ENABLED'],
+            ['template' => '/api/v1/modifications/{id}/specs', 'kind' => 'modification_specs', 'pattern' => '#^/api/v1/modifications/([^/]+)/specs$#', 'param' => 'id', 'id' => true, 'gate' => 'CARAPI_MODIFICATION_DETAILS_ENABLED'],
+            ['template' => '/api/v1/modifications/{id}/equipment', 'kind' => 'modification_equipment', 'pattern' => '#^/api/v1/modifications/([^/]+)/equipment$#', 'param' => 'id', 'id' => true, 'gate' => 'CARAPI_MODIFICATION_DETAILS_ENABLED'],
+            ['template' => '/api/v1/modifications/{id}', 'kind' => 'modification', 'pattern' => '#^/api/v1/modifications/([^/]+)$#', 'param' => 'id', 'id' => true, 'gate' => 'CARAPI_MODIFICATION_DETAILS_ENABLED'],
+            ['template' => '/api/v1/modifications', 'kind' => 'modification_search', 'pattern' => '#^/api/v1/modifications$#', 'gate' => 'CARAPI_MODIFICATIONS_ENABLED'],
+            ['template' => '/api/v1/engines', 'kind' => 'engines', 'pattern' => '#^/api/v1/engines$#', 'gate' => 'CARAPI_MODIFICATIONS_ENABLED'],
+            ['template' => '/api/v1/bodies', 'kind' => 'bodies', 'pattern' => '#^/api/v1/bodies$#'],
+            ['template' => '/api/v1/fuel', 'kind' => 'fuel', 'pattern' => '#^/api/v1/fuel$#', 'gate' => 'CARAPI_MODIFICATIONS_ENABLED'],
+            ['template' => '/api/v1/colors', 'kind' => 'colors', 'pattern' => '#^/api/v1/colors$#'],
+            ['template' => '/api/v1/coverage', 'kind' => 'coverage', 'pattern' => '#^/api/v1/coverage$#'],
+        ];
+    }
+
     /** @return array{kind:string, slug?:string, id?:string, response?:array{status:int, headers:array<string, string>, body:array<string, mixed>}}|null */
     private function route(string $path): ?array
     {
         $path = rawurldecode($path);
-        $flat = [
-            '/api/v1/brands' => 'brands',
-            '/api/v1/coverage' => 'coverage',
-            '/api/v1/engines' => 'engines',
-            '/api/v1/bodies' => 'bodies',
-            '/api/v1/fuel' => 'fuel',
-            '/api/v1/colors' => 'colors',
-        ];
-        if (isset($flat[$path])) {
-            if (in_array($flat[$path], ['engines', 'fuel'], true) && ! $this->enabled('CARAPI_MODIFICATIONS_ENABLED')) {
+        foreach (self::definitions() as $definition) {
+            if (preg_match($definition['pattern'], $path, $match) !== 1) {
+                continue;
+            }
+            if (isset($definition['gate']) && ! $this->enabled($definition['gate'])) {
                 return null;
             }
-
-            return ['kind' => $flat[$path]];
-        }
-        if ($path === '/api/v1/modifications') {
-            return $this->enabled('CARAPI_MODIFICATIONS_ENABLED') ? ['kind' => 'modification_search'] : null;
-        }
-        if (preg_match('#^/api/v1/brands/([^/]+)/models$#u', $path, $match) === 1) {
-            return ['kind' => 'models', 'slug' => $match[1]];
-        }
-        if (preg_match('#^/api/v1/modifications/([^/]+)$#', $path, $match) === 1) {
-            if (! $this->enabled('CARAPI_MODIFICATION_DETAILS_ENABLED')) {
-                return null;
+            if (! isset($definition['param'])) {
+                return ['kind' => $definition['kind']];
             }
-            if (preg_match('/^[1-9][0-9]{0,18}$/', $match[1]) !== 1) {
-                return ['kind' => 'invalid', 'response' => $this->error(422, 'invalid_parameter', 'მოდიფიკაციის id არასწორია. გამოიყენეთ დადებითი მთელი რიცხვი, რომელიც API-ის პასუხშია.')];
+            if (($definition['id'] ?? false) && preg_match('/^[1-9][0-9]{0,18}$/', $match[1]) !== 1) {
+                return ['kind' => 'invalid', 'response' => $this->error(422, 'invalid_parameter', $this->idMessage($definition['kind']))];
             }
 
-            return ['kind' => 'modification', 'id' => $match[1]];
-        }
-        if (preg_match('#^/api/v1/generations/([^/]+)/modifications$#', $path, $match) === 1) {
-            if (! $this->enabled('CARAPI_MODIFICATIONS_ENABLED')) {
-                return null;
-            }
-            if (preg_match('/^[1-9][0-9]{0,18}$/', $match[1]) !== 1) {
-                return ['kind' => 'invalid', 'response' => $this->error(422, 'invalid_parameter', 'თაობის id არასწორია. გამოიყენეთ დადებითი მთელი რიცხვი, რომელიც API-ის პასუხშია.')];
-            }
-
-            return ['kind' => 'modifications', 'id' => $match[1]];
-        }
-        if (preg_match('#^/api/v1/models/([^/]+)/generations$#', $path, $match) === 1) {
-            if (preg_match('/^[1-9][0-9]{0,18}$/', $match[1]) !== 1) {
-                return ['kind' => 'invalid', 'response' => $this->error(422, 'invalid_parameter', 'მოდელის id არასწორია. გამოიყენეთ დადებითი მთელი რიცხვი, რომელიც API-ის პასუხშია.')];
-            }
-
-            return ['kind' => 'generations', 'id' => $match[1]];
+            return ['kind' => $definition['kind'], $definition['param'] => $match[1]];
         }
 
         return null;
+    }
+
+    private function idMessage(string $kind): string
+    {
+        $label = match ($kind) {
+            'modifications' => 'თაობის',
+            'generations', 'years' => 'მოდელის',
+            default => 'მოდიფიკაციის',
+        };
+
+        return $label.' id არასწორია. გამოიყენეთ დადებითი მთელი რიცხვი, რომელიც API-ის პასუხშია.';
     }
 
     private function enabled(string $name): bool
@@ -324,7 +362,7 @@ final class CatalogApi
 
     private function modificationDetail(string $path): bool
     {
-        return preg_match('#^/api/v1/modifications/[^/]+$#', rawurldecode($path)) === 1;
+        return preg_match('#^/api/v1/modifications/[^/]+(?:/(?:specs|equipment))?$#', rawurldecode($path)) === 1;
     }
 
     /** @param array<string, string> $headers @return array{status:int, headers:array<string, string>, body:array<string, mixed>} */

@@ -255,6 +255,126 @@ final class PublicCatalog
         ];
     }
 
+    /** @return array{rows:list<array<string, mixed>>, total:int}|null */
+    public function years(string $modelId, ListQuery $query, ?int $currentYear = null): ?array
+    {
+        if ($this->one('SELECT id FROM '.$this->table('models').' WHERE id = :id', ['id' => $modelId]) === null) {
+            return null;
+        }
+        $currentYear ??= (int) gmdate('Y');
+        $spans = $this->all(
+            'SELECT year_start, year_end FROM '.$this->table('generations').' WHERE model_id = :id',
+            ['id' => $modelId],
+        );
+        if ($this->hasTable('modifications') && $this->hasColumn('modifications', 'year_start')) {
+            $spans = array_merge($spans, $this->all(
+                'SELECT year_start, year_end FROM '.$this->table('modifications').' WHERE model_id = :id',
+                ['id' => $modelId],
+            ));
+        }
+        $years = [];
+        foreach ($spans as $span) {
+            foreach ($this->expandYears($span['year_start'] ?? null, $span['year_end'] ?? null, $currentYear) as $year) {
+                $years[$year] = $year;
+            }
+        }
+        $rows = [];
+        foreach ($years as $year) {
+            $rows[] = ['id' => (string) $year, 'year' => $year];
+        }
+        $this->sortRows($rows, $query, ['year' => 'year', 'id' => 'year'], function (array $left, array $right): int {
+            return ((int) $left['year']) <=> ((int) $right['year']);
+        });
+
+        return $this->slice($rows, $query);
+    }
+
+    /** @return array<string, mixed>|null */
+    public function modificationSpecs(string $id): ?array
+    {
+        if (! $this->hasTable('modifications')) {
+            return null;
+        }
+        $row = $this->one(
+            'SELECT id, engine_volume_cc, transmission, drive_type FROM '.$this->table('modifications').' WHERE id = :id',
+            ['id' => $id],
+        );
+        if ($row === null) {
+            return null;
+        }
+        $stored = $this->storedSpecs($id);
+
+        return [
+            'modification_id' => (string) $row['id'],
+            'engine' => [
+                'volume_cc' => $this->intOrNull($row['engine_volume_cc']),
+                'fuel' => $this->text($stored['fuel_type'] ?? null),
+                'power_hp' => $this->number($stored['power_hp'] ?? null),
+            ],
+            'transmission' => [
+                'type' => $this->text($row['transmission']),
+                'drive' => $this->text($row['drive_type']),
+            ],
+            'dimensions' => null,
+            'performance' => null,
+            'consumption' => [
+                'city_l' => $this->number($stored['fuel_city_l'] ?? null),
+                'highway_l' => $this->number($stored['fuel_highway_l'] ?? null),
+                'combined_l' => $this->number($stored['fuel_combined_l'] ?? null),
+                'unit' => 'L/100km',
+            ],
+        ];
+    }
+
+    /** @return array<string, mixed>|null */
+    public function modificationEquipment(string $id): ?array
+    {
+        if ($this->one('SELECT id FROM '.$this->table('modifications').' WHERE id = :id', ['id' => $id]) === null) {
+            return null;
+        }
+        $groups = [
+            'modification_id' => (string) $id,
+            'standard' => [],
+            'optional' => [],
+            'not_available' => [],
+            'unknown' => [],
+        ];
+        if (! $this->equipmentReadable()) {
+            return $groups;
+        }
+        $rows = $this->all(
+            'SELECT id, category, name, status, value FROM '.$this->table('modification_equipment').' WHERE modification_id = :id ORDER BY id',
+            ['id' => $id],
+        );
+        $seen = [];
+        foreach ($rows as $row) {
+            $name = $this->text($row['name']);
+            if ($name === null) {
+                continue;
+            }
+            $bucket = match ($this->text($row['status'])) {
+                'included' => 'standard',
+                'option' => 'optional',
+                'not_available' => 'not_available',
+                default => 'unknown',
+            };
+            $category = $this->text($row['category']);
+            $key = $bucket.'|'.mb_strtolower($category ?? '').'|'.mb_strtolower($name);
+            if (isset($seen[$key])) {
+                continue;
+            }
+            $seen[$key] = true;
+            $groups[$bucket][] = [
+                'id' => (string) $row['id'],
+                'category' => $category,
+                'name' => $name,
+                'value' => $this->text($row['value']),
+            ];
+        }
+
+        return $groups;
+    }
+
     /** @return array{rows:list<array<string, mixed>>, total:int} */
     public function engines(ListQuery $query): array
     {
@@ -565,7 +685,7 @@ final class PublicCatalog
         if ($models) {
             $sql .= ' JOIN '.$this->table('models').' mo ON mo.id = mod.model_id JOIN '.$this->table('brands').' b ON b.id = mo.brand_id ';
         }
-        if ($spec) {
+        if ($spec && $this->specsReadable()) {
             $sql .= ' LEFT JOIN '.$this->table('modification_specs').' spec ON spec.modification_id = mod.id ';
         }
 
@@ -576,6 +696,9 @@ final class PublicCatalog
     {
         if (! in_array($key, ['fuel_type', 'fuel_city_l', 'fuel_highway_l', 'fuel_combined_l', 'power_hp'], true)) {
             throw new \InvalidArgumentException($key);
+        }
+        if (! $this->specsReadable()) {
+            return 'NULL';
         }
         if ($this->driver === 'pgsql') {
             return "NULLIF(btrim(spec.specs->>'".$key."'), '')";
@@ -947,6 +1070,80 @@ final class PublicCatalog
 
         return $stmt->fetchColumn();
     }
+
+    /** @return list<int> */
+    private function expandYears(mixed $start, mixed $end, int $currentYear): array
+    {
+        if ($start === null || $start === '' || ! is_numeric($start)) {
+            return [];
+        }
+        $from = (int) $start;
+        if ($from < 1886 || $from > $currentYear) {
+            return [];
+        }
+        if ($end === null || $end === '' || ! is_numeric($end)) {
+            $to = $currentYear;
+        } else {
+            $to = min((int) $end, $currentYear);
+        }
+        if ($to < $from) {
+            return [];
+        }
+        $years = [];
+        for ($year = $from; $year <= $to; $year++) {
+            $years[] = $year;
+        }
+
+        return $years;
+    }
+
+    /** @return array<string, mixed> */
+    private function storedSpecs(string $id): array
+    {
+        if (! $this->specsReadable()) {
+            return [];
+        }
+        $row = $this->one(
+            'SELECT specs FROM '.$this->table('modification_specs').' WHERE modification_id = :id',
+            ['id' => $id],
+        );
+        $value = $row['specs'] ?? null;
+        if (is_string($value)) {
+            $decoded = json_decode($value, true);
+            $value = is_array($decoded) ? $decoded : null;
+        }
+        if (! is_array($value)) {
+            return [];
+        }
+        $stored = [];
+        foreach (['fuel_type', 'fuel_city_l', 'fuel_highway_l', 'fuel_combined_l', 'power_hp'] as $key) {
+            if (array_key_exists($key, $value)) {
+                $stored[$key] = $value[$key];
+            }
+        }
+
+        return $stored;
+    }
+
+    private function specsReadable(): bool
+    {
+        return $this->hasTable('modification_specs') && $this->hasColumn('modification_specs', 'specs');
+    }
+
+    private function equipmentReadable(): bool
+    {
+        if (! $this->hasTable('modification_equipment')) {
+            return false;
+        }
+        foreach (['id', 'modification_id', 'category', 'name', 'status', 'value'] as $column) {
+            if (! $this->hasColumn('modification_equipment', $column)) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
 
     private function table(string $name): string
     {
