@@ -71,12 +71,14 @@
 .mk .center .lede { margin-inline: auto; }
 
 .mk .site-header {
-            position: absolute;
-            inset: 0 0 auto;
-            z-index: 5;
-            color: var(--ink);
-            background: #fff;
-            border-bottom: 1px solid var(--line);
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 30;
+            color: #fff;
+            background: var(--pine);
+            border-bottom: 0;
         }
 
 .mk .site-header .wrap {
@@ -94,7 +96,7 @@
             text-decoration: none;
         }
 
-.mk .logo img { height: 28px; width: auto; display: block; }
+.mk .logo img { height: 14px; width: auto; display: block; }
 
 .mk .mark {
             width: 22px;
@@ -105,9 +107,15 @@
 
 .mk .nav { display: flex; gap: 22px; margin-left: auto; }
 
-.mk .nav a { color: rgba(9,20,19,0.78); text-decoration: none; font-size: 15px; font-weight: 500; }
+.mk .nav a {
+            color: rgba(255,255,255,0.86);
+            text-decoration: none;
+            font-family: "Noto Sans Georgian", "FiraGO", "Fira Sans", ui-sans-serif, system-ui, sans-serif;
+            font-size: 15px;
+            font-weight: 500;
+        }
 
-.mk .nav a:hover { color: var(--ink); }
+.mk .nav a:hover { color: #fff; }
 
 .mk .header-tools {
             display: flex;
@@ -125,9 +133,9 @@
             height: 36px;
             padding: 0 14px;
             border-radius: 999px;
-            font-family: inherit;
-            font-size: 13px;
-            font-weight: 600;
+            font-family: "Noto Sans Georgian", "FiraGO", "Fira Sans", ui-sans-serif, system-ui, sans-serif;
+            font-size: 14px;
+            font-weight: 500;
             line-height: 1;
             white-space: nowrap;
         }
@@ -141,9 +149,10 @@
 
 .mk .menu-toggle {
             display: none;
-            background: #fff;
-            color: var(--ink);
-            border: 1px solid var(--line);
+            background: transparent;
+            color: var(--mint);
+            border: 1px solid rgba(176, 228, 204, 0.7);
+            letter-spacing: 0.01em;
         }
 
 .mk .hero {
@@ -565,8 +574,19 @@
 .mk .nav { display: none; }
 .mk .header-tools { margin-left: auto; }
 .mk .menu-toggle { display: inline-flex; }
-.mk .nav.open { display: grid; position: absolute; top: 76px; left: 20px; right: 20px; background: #16352b; border-radius: 16px; padding: 12px; }
-.mk .nav.open a, .mk .nav.open a:hover { color: #fff; }
+.mk .nav.open {
+            display: grid;
+            position: absolute;
+            top: 100%;
+            left: 16px;
+            right: 16px;
+            background: #16352b;
+            border-radius: 0 0 16px 16px;
+            padding: 8px;
+            font-family: "Noto Sans Georgian", "FiraGO", "Fira Sans", ui-sans-serif, system-ui, sans-serif;
+        }
+.mk .nav.open a, .mk .nav.open a:hover { color: #fff; padding: 10px 12px; border-radius: 10px; }
+.mk .nav.open a:hover { background: rgba(176, 228, 204, 0.12); }
 .mk .wires { display: none; }
 .mk .code-card, .mk .chip { position: static; width: auto; }
 .mk .chips { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }

@@ -115,7 +115,7 @@
 <div class="mk">
     <header class="site-header">
         <div class="wrap">
-            <a class="logo" href="#top"><img src="{{ asset('assets/brand/geoapi-lockup.png') }}" alt="geoapi.ge" height="28"></a>
+            <a class="logo" href="#top"><img src="{{ asset('assets/brand/geoapi-lockup-light.png') }}" alt="geoapi.ge" height="14"></a>
             <nav class="nav" id="nav" aria-label="{{ $en ? 'Main' : 'მთავარი' }}">
                 <a href="#features">{{ $t['nav1'] }}</a>
                 <a href="#how">{{ $t['nav2'] }}</a>
