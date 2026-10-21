@@ -1,5 +1,5 @@
-# Push to main: run PHPUnit, then deploy /www/wwwroot/geoapi.ge.
-# This file never reads or writes the server .env.
+# Push to main: PHPUnit, then deploy DEPLOY_PATH (default /www/wwwroot/geoapi.ge).
+# Pull requests run the test job only. This file never reads or writes the server .env.
 
 name: Deploy
 
@@ -7,10 +7,9 @@ on:
   push:
     branches:
       - main
-
-concurrency:
-  group: production-deploy
-  cancel-in-progress: false
+  pull_request:
+    branches:
+      - main
 
 permissions:
   contents: read
@@ -36,26 +35,50 @@ jobs:
           composer install --no-interaction --prefer-dist --no-progress
 
       - name: Run PHPUnit
-        run: vendor/bin/phpunit
+        run: |
+          php artisan key:generate --force
+          vendor/bin/phpunit
 
   deploy:
     name: Deploy
     needs: test
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
+    concurrency:
+      group: production-deploy
+      cancel-in-progress: false
+    env:
+      DEPLOY_PATH: ${{ secrets.DEPLOY_PATH || vars.DEPLOY_PATH || '/www/wwwroot/geoapi.ge' }}
     steps:
       - name: Deploy over SSH
+        id: deploy
         uses: appleboy/ssh-action@v1.2.5
+        env:
+          DEPLOY_PATH: ${{ env.DEPLOY_PATH }}
         with:
           host: ${{ secrets.DEPLOY_HOST }}
           username: ${{ secrets.DEPLOY_USER }}
           key: ${{ secrets.DEPLOY_SSH_KEY }}
           port: ${{ secrets.DEPLOY_PORT || 22 }}
           command_timeout: 30m
+          envs: DEPLOY_PATH
           script: |
             bash -s <<'EOF'
-            set -e
+            set -euo pipefail
             umask 002
-            cd /www/wwwroot/geoapi.ge
+            DEPLOY_PATH="${DEPLOY_PATH:-/www/wwwroot/geoapi.ge}"
+            case "$DEPLOY_PATH" in
+              /*) ;;
+              *)
+                echo "Deploy aborted: DEPLOY_PATH must be an absolute path. Refusing to mkdir or clone." >&2
+                exit 1
+                ;;
+            esac
+            if [ ! -d "$DEPLOY_PATH" ] || [ ! -e "$DEPLOY_PATH/.git" ]; then
+              echo "Deploy aborted: '$DEPLOY_PATH' is missing or has no .git. Refusing to mkdir or clone." >&2
+              exit 1
+            fi
+            cd "$DEPLOY_PATH"
             php artisan down --retry=15 || true
             bring_up() {
               status=$?
@@ -71,6 +94,7 @@ jobs:
             php artisan config:cache
             php artisan route:cache
             php artisan view:cache
+            php artisan queue:restart
             php artisan up
             trap - EXIT
             EOF
@@ -78,11 +102,32 @@ jobs:
       - name: Bring the site back up
         if: failure()
         uses: appleboy/ssh-action@v1.2.5
+        env:
+          DEPLOY_PATH: ${{ env.DEPLOY_PATH }}
         with:
           host: ${{ secrets.DEPLOY_HOST }}
           username: ${{ secrets.DEPLOY_USER }}
           key: ${{ secrets.DEPLOY_SSH_KEY }}
           port: ${{ secrets.DEPLOY_PORT || 22 }}
           command_timeout: 2m
+          envs: DEPLOY_PATH
           script: |
-            cd /www/wwwroot/geoapi.ge && php artisan up
+            bash -s <<'EOF'
+            set -euo pipefail
+            DEPLOY_PATH="${DEPLOY_PATH:-/www/wwwroot/geoapi.ge}"
+            if [ ! -d "$DEPLOY_PATH" ] || [ ! -e "$DEPLOY_PATH/.git" ]; then
+              echo "Deploy aborted: '$DEPLOY_PATH' is missing or has no .git. Refusing to mkdir or clone." >&2
+              exit 1
+            fi
+            cd "$DEPLOY_PATH"
+            php artisan up
+            EOF
+
+      - name: Check https://geoapi.ge/up
+        if: steps.deploy.outcome == 'success'
+        run: |
+          code=$(curl -sS -o /dev/null -w '%{http_code}' --max-time 30 https://geoapi.ge/up || true)
+          if [ "$code" != "200" ]; then
+            echo "Health check failed: https://geoapi.ge/up returned '${code:-curl-error}', expected 200." >&2
+            exit 1
+          fi
