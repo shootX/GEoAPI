@@ -16,6 +16,7 @@ use App\Http\Controllers\PhotoReportController;
 use App\Http\Controllers\PublicOpenApiController;
 use App\Http\Controllers\PublicPageController;
 use App\Http\Controllers\PublicPostmanController;
+use App\Http\Controllers\ReadyController;
 use App\Http\Controllers\SitemapController;
 use App\Livewire\Account\Billing;
 use App\Livewire\Account\Errors;
@@ -96,3 +97,5 @@ Route::post('/billing/provider-webhook', PaymentWebhookController::class)
 
 Route::post('/billing/bog/callback', BogCallbackController::class)
     ->name('billing.bog.callback');
+
+Route::get('/ready', ReadyController::class)->name('ready');

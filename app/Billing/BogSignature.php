@@ -6,7 +6,8 @@ namespace App\Billing;
 
 /**
  * BOG Callback-Signature is SHA256withRSA over the raw body.
- * The sandbox public key is published by the bank. It is not a secret.
+ * The public keys are published by the bank. They are not secrets.
+ * BOG_ENV selects which key is used unless BOG_CALLBACK_PUBLIC_KEY is set.
  */
 final class BogSignature
 {
@@ -27,6 +28,11 @@ PEM;
         $override = config('services.bog.public_key');
         if (is_string($override) && trim($override) !== '') {
             return trim($override);
+        }
+        $env = config('services.bog.env') === 'production' ? 'production' : 'sandbox';
+        $selected = config('services.bog.'.$env.'.public_key');
+        if (is_string($selected) && trim($selected) !== '') {
+            return trim($selected);
         }
 
         return self::PUBLIC_KEY;

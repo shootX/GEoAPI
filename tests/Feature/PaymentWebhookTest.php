@@ -286,7 +286,11 @@ final class PaymentWebhookTest extends TestCase
             if ($event->message !== 'stripe.webhook.rejected') {
                 continue;
             }
-            $this->assertSame(['reason' => $reason], $event->context);
+            $context = $event->context;
+            $this->assertArrayHasKey('request_id', $context);
+            $this->assertMatchesRegularExpression('/^[A-Za-z0-9._-]{1,64}$/', (string) $context['request_id']);
+            unset($context['request_id']);
+            $this->assertSame(['reason' => $reason], $context);
             $matched = true;
         }
         $this->assertTrue($matched);

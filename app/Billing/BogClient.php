@@ -7,13 +7,19 @@ namespace App\Billing;
 use Illuminate\Support\Facades\Http;
 
 /**
- * Bank of Georgia sandbox only. Production hosts are not accepted.
+ * Bank of Georgia. BOG_ENV=production selects the production hosts.
+ * Any other value, including empty, stays on the sandbox hosts.
  */
 final class BogClient
 {
     public const TOKEN_URL = 'https://oauth2-sandbox.bog.ge/auth/realms/bog/protocol/openid-connect/token';
 
     public const ORDER_URL = 'https://api-sandbox.bog.ge/payments/v1/ecommerce/orders';
+
+    public static function environment(): string
+    {
+        return config('services.bog.env') === 'production' ? 'production' : 'sandbox';
+    }
 
     public static function configured(): bool
     {
@@ -31,11 +37,11 @@ final class BogClient
         if (! self::configured()) {
             throw new BillingNotConfigured('payments not configured');
         }
-        self::assertSandboxUrl(self::TOKEN_URL);
-        self::assertSandboxUrl(self::ORDER_URL);
+        $tokenUrl = self::endpoint('token_url');
+        $orderUrl = self::endpoint('order_url');
         self::assertAmount($gel);
         self::assertCallback($callback);
-        $token = self::token();
+        $token = self::token($tokenUrl);
         $payload = [
             'callback_url' => $callback,
             'external_order_id' => $externalId,
@@ -65,7 +71,7 @@ final class BogClient
                 'Content-Type' => 'application/json',
             ])
             ->withBody($json, 'application/json')
-            ->post(self::ORDER_URL);
+            ->post($orderUrl);
         if (! $response->successful()) {
             throw new BillingNotConfigured('order');
         }
@@ -79,13 +85,13 @@ final class BogClient
         return ['id' => $id, 'redirect' => $redirect];
     }
 
-    private static function token(): string
+    private static function token(string $url): string
     {
         $id = trim((string) config('services.bog.client_id'));
         $secret = trim((string) config('services.bog.client_secret'));
         $response = Http::withBasicAuth($id, $secret)
             ->asForm()
-            ->post(self::TOKEN_URL, ['grant_type' => 'client_credentials']);
+            ->post($url, ['grant_type' => 'client_credentials']);
         $token = $response->successful() ? $response->json('access_token') : null;
         if (! is_string($token) || $token === '') {
             throw new BillingNotConfigured('token');
@@ -94,12 +100,22 @@ final class BogClient
         return $token;
     }
 
-    private static function assertSandboxUrl(string $url): void
+    private static function endpoint(string $key): string
     {
-        $host = parse_url($url, PHP_URL_HOST);
-        if (! in_array($host, ['oauth2-sandbox.bog.ge', 'api-sandbox.bog.ge'], true)) {
-            throw new BillingNotConfigured('sandbox');
+        $env = self::environment();
+        $url = config('services.bog.'.$env.'.'.$key);
+        if (! is_string($url) || $url === '') {
+            throw new BillingNotConfigured($env);
         }
+        $host = parse_url($url, PHP_URL_HOST);
+        $allowed = $env === 'production'
+            ? ['oauth2.bog.ge', 'api.bog.ge']
+            : ['oauth2-sandbox.bog.ge', 'api-sandbox.bog.ge'];
+        if (! is_string($host) || ! in_array($host, $allowed, true)) {
+            throw new BillingNotConfigured($env);
+        }
+
+        return $url;
     }
 
     private static function assertAmount(string $gel): void

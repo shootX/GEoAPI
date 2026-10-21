@@ -44,5 +44,6 @@
         <env name="BOG_CLIENT_ID" value="" force="true"/>
         <env name="BOG_CLIENT_SECRET" value="" force="true"/>
         <env name="BOG_CALLBACK_PUBLIC_KEY" value="" force="true"/>
+        <env name="BOG_ENV" value="sandbox" force="true"/>
     </php>
 </phpunit>
