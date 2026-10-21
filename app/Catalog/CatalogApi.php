@@ -184,7 +184,7 @@ final class CatalogApi
             return ['body' => ['data' => $row]];
         }
 
-        $parsed = ListQuery::parse($_GET, $this->sortable($kind), $this->filters($kind));
+        $parsed = ListQuery::parse($_GET, self::sortAllowlist($kind), self::filterAllowlist($kind));
         if ($parsed->fails()) {
             return ['error' => $this->error(422, 'invalid_parameter', (string) $parsed->error)];
         }
@@ -246,8 +246,12 @@ final class CatalogApi
         };
     }
 
-    /** @return list<string> */
-    private function sortable(string $kind): array
+    /**
+     * Sort fields a list route accepts. `PublicSpec` publishes this allowlist.
+     *
+     * @return list<string>
+     */
+    public static function sortAllowlist(string $kind): array
     {
         return match ($kind) {
             'brands', 'models' => ['name', 'id', 'modified'],
@@ -261,8 +265,12 @@ final class CatalogApi
         };
     }
 
-    /** @return list<string> */
-    private function filters(string $kind): array
+    /**
+     * Filter names a list route accepts. `q` and `modified_after` are separate.
+     *
+     * @return list<string>
+     */
+    public static function filterAllowlist(string $kind): array
     {
         return match ($kind) {
             'models' => ['body'],
@@ -273,6 +281,25 @@ final class CatalogApi
             'colors' => ['brand_id', 'model_id'],
             default => [],
         };
+    }
+
+    /**
+     * Query parameter names a list route accepts, in document order.
+     * Years reject `q`. Years and bodies reject `modified_after`.
+     *
+     * @return list<string>
+     */
+    public static function listParameters(string $kind): array
+    {
+        $names = ['page', 'limit', 'per_page', 'sort', 'direction'];
+        if ($kind !== 'years') {
+            $names[] = 'q';
+        }
+        if (! in_array($kind, ['years', 'bodies'], true)) {
+            $names[] = 'modified_after';
+        }
+
+        return array_merge($names, self::filterAllowlist($kind));
     }
 
     private function modifiedTable(string $kind): string

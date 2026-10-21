@@ -111,3 +111,11 @@
 - [x] Widget and catalog share the project counter. A widget request with no matching `Origin` is 403 and spends nothing. Sending an allowed `Origin` is not proof of a browser; `docs/WIDGET_INTEGRATION.md` already says a non-browser client can spoof it.
 - [x] Six overlapping requests with one unit left return one 200 and five `MONTHLY_QUOTA_EXCEEDED`. The stored count is 1. Stats are by UTC day and route. `platform.daily_usage` has no key column, so usage is not split by key. Error JSON stays `error.code` and `error.message`. Logs from this path do not include the key.
 - [ ] Pro is not for sale. Photo rights are still unknown. VIN was not added.
+
+## 2026-10-21 — WP-07 developer documentation
+
+- [x] `PublicSpec` is the source for `/api/v1/openapi.json`, `/api/v1/postman.json`, and `/guide`. OpenAPI stays 3.0.3, `info.version` 1.2.0, server `https://geoapi.ge`. The official OpenAPI 3.0.3 schema reports 0 errors.
+- [x] Every public route documents auth, parameters, errors 401/403/404/405/422/429/503, pagination, Free limits, null coverage, and the fact that SDK, MCP, and CLI packages are not published. Admin routes stay off the public document.
+- [x] Colors are documented as every stored row, with `verified: false` when the photo was not confirmed. `/fuel` documents the same filters the code accepts, including `body`, `drive`, and `transmission`. Sort allowlists come from `CatalogApi`.
+- [x] Guide samples are cURL, JavaScript, Node, Python, and PHP against `https://geoapi.ge`. The placeholder is `geoapi_sk_…`. Postman uses `{{token}}` and does not contain a real key. The published example for each route returns 200 in the test catalog and matches the response schema.
+- [ ] Pro is not for sale. The WP-11 prices are not the running limits. Photo rights are still unknown. VIN was not added.
