@@ -136,3 +136,11 @@
 - [x] `packages/sdk-js/scripts/smoke.mjs` names the quickstart call that failed and stops. `npm test` checks that reporter and does not run the live script. The owner merge of PR #20 waits 250 ms times the attempt when `Retry-After` is missing, sets `GeoAPIError.retryAfter`, and refuses a secret key in a web worker.
 - [x] CI builds the SDK, then tests the MCP package on Node 20 and Node 22. Deploy waits for PHPUnit, the SDK job, and the MCP job. A pull request still skips Deploy. The root Vite `npm ci` is unchanged.
 - [ ] Photo rights are still unknown. VIN was not added. The WP-11 prices are not the running limits. CLI was not started.
+
+## 2026-10-21 — WP-10 CLI
+
+- [x] `packages/cli` is `@geoapi/cli` 0.1.0, private, Node 20 or newer. It calls `@geoapi/sdk` and does not keep a second HTTP client. It is not published on the public npm registry. The command is `node /absolute/path/to/GEoAPI/packages/cli/dist/index.js`.
+- [x] Examples: `geoapi brands list --limit 20 --json`, `geoapi models list --brand bmw`, `geoapi modifications list --model-id 314 --year-from 2020`, and `geoapi coverage`. `--json` is one compact JSON document on stdout. `--pretty` indents it. Rows stay in the API order. `--limit` and `--page` are sent through the SDK.
+- [x] The key is `GEOAPI_API_KEY` only. `--api-key` is refused and the value is not printed. `geoapi_sk_` and `carapi_sk_` text is replaced with `[redacted]` on stdout and stderr. Exit 0 is success, 2 is invalid input, 3 is auth, 4 is rate limited, and 5 is network or service. 429 and 503 use the SDK retry, at most twice.
+- [x] CI builds the SDK, then tests the CLI on Node 20 and Node 22. Deploy waits for PHPUnit, the SDK job, the MCP job, and the CLI job. A pull request still skips Deploy. The root Vite `npm ci` is unchanged. Staging and production were not called. CI ran on Linux. The program does not spawn a shell.
+- [ ] Photo rights are still unknown. VIN was not added. The WP-11 prices are not the running limits. WP-11 was not started.

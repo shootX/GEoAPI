@@ -25,8 +25,9 @@ final class FrontendBuildTest extends TestCase
         $this->assertStringContainsString('npm ci', $job);
         $this->assertStringContainsString('npm run build', $job);
         $this->assertLessThan(strpos($job, 'npm run build'), strpos($job, 'php artisan view:cache'));
-        $this->assertStringContainsString('needs: [test, sdk, mcp]', $job);
+        $this->assertStringContainsString('needs: [test, sdk, mcp, cli]', $job);
         $this->assertStringContainsString('packages/sdk-js', $deploy);
         $this->assertStringContainsString('packages/mcp-server', $deploy);
+        $this->assertStringContainsString('packages/cli', $deploy);
     }
 }
