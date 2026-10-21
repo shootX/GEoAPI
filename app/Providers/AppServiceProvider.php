@@ -34,7 +34,10 @@ class AppServiceProvider extends ServiceProvider
         config(['carapi.locale' => (string) config('app.locale')]);
 
         // Registered before Electrik's /dashboard so the cabinet wins the match.
-        Route::middleware(['web', 'auth'])->get('/dashboard', Projects::class);
+        // It must keep the name: both routes share GET /dashboard, so the
+        // route collection (and route:cache) keeps only one of them, and
+        // Electrik views call route('dashboard') (403 page, app layout).
+        Route::middleware(['web', 'auth'])->get('/dashboard', Projects::class)->name('dashboard');
 
         $this->app->booted(function (): void {
             require base_path('routes/admin-api.php');
