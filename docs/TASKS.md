@@ -127,3 +127,12 @@
 - [x] CI runs the SDK on Node 20 and Node 22. Deploy waits for PHPUnit and the SDK job. A pull request still skips Deploy. The root Vite `npm ci` is unchanged.
 - [x] Authentication is documented before the method check: POST without an accepted key is 401, and 405 is returned only after the key is accepted. The 2 000/UTC day cap is documented as inactive in production. No new production query was run. `/guide` keeps the contents list open on a wide screen and collapses it behind "On this page" at 980px and below.
 - [ ] Staging smoke was not run. There is no staging token, and this package was not published. Photo rights and VIN stay out. WP-09 was not started.
+
+## 2026-10-21 — WP-09 MCP server
+
+- [x] `packages/mcp-server` is `@geoapi/mcp-server` 0.1.0, private, Node 20 or newer. It is a local stdio process. It calls `@geoapi/sdk` and does not add a Laravel route or a second catalog client. It is not on the public npm registry. CLI stays unpublished.
+- [x] Tools: `geoapi_list_brands`, `geoapi_list_models`, `geoapi_list_generations`, `geoapi_list_years`, `geoapi_list_modifications`, `geoapi_get_modification`, `geoapi_get_specs`, `geoapi_get_equipment`, `geoapi_get_coverage`. Years and equipment are included because those REST routes exist. There is no photo tool. `limit` defaults to 20 and cannot exceed 100. Schemas are strict and have no API key field.
+- [x] The key is `GEOAPI_API_KEY` in the host environment. `cursor.example.json` uses the placeholder `geoapi_sk_…`. 401 is not retried. 429 and 503 follow the SDK retry, then the tool error has `status`, `code`, `message`, `retryAfter`, and `requestId` null. Tool text and logs do not contain the token. Two clients keep separate keys. The BMW models and one generation prompt is a mock `fetch` test. Staging and production were not called.
+- [x] `packages/sdk-js/scripts/smoke.mjs` names the quickstart call that failed and stops. `npm test` checks that reporter and does not run the live script. The owner merge of PR #20 waits 250 ms times the attempt when `Retry-After` is missing, sets `GeoAPIError.retryAfter`, and refuses a secret key in a web worker.
+- [x] CI builds the SDK, then tests the MCP package on Node 20 and Node 22. Deploy waits for PHPUnit, the SDK job, and the MCP job. A pull request still skips Deploy. The root Vite `npm ci` is unchanged.
+- [ ] Photo rights are still unknown. VIN was not added. The WP-11 prices are not the running limits. CLI was not started.

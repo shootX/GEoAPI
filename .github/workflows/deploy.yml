@@ -64,9 +64,40 @@ jobs:
           npm test
           npm run build
 
+  mcp:
+    name: MCP (Node ${{ matrix.node }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        node: ["20", "22"]
+    steps:
+      - name: Check out
+        uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node }}
+          cache: npm
+          cache-dependency-path: packages/mcp-server/package-lock.json
+
+      - name: Build the SDK
+        working-directory: packages/sdk-js
+        run: |
+          npm ci
+          npm run build
+
+      - name: Test and build the MCP server
+        working-directory: packages/mcp-server
+        run: |
+          npm ci
+          npm test
+          npm run build
+
   deploy:
     name: Deploy
-    needs: [test, sdk]
+    needs: [test, sdk, mcp]
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     concurrency:
