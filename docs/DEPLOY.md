@@ -2,16 +2,17 @@
 
 A push to `main` runs `.github/workflows/deploy.yml`.
 
-1. GitHub Actions runs PHPUnit on a clean runner (PHP 8.4, sqlite). The runner's copy of `.env.example` stays on that runner.
-2. If PHPUnit is green, the workflow SSHes to the server and deploys `/www/wwwroot/geoapi.ge`.
-3. A second push waits. The concurrency group is `production-deploy` and an in-progress deploy is not cancelled.
-4. If a command fails after maintenance mode, the remote script runs `php artisan up` and exits non-zero. The workflow then SSHes once more and runs `php artisan up` again.
+1. GitHub Actions runs PHPUnit on a clean runner (PHP 8.4, sqlite). The runner copies `.env.example` to `.env`, runs `composer install`, then `php artisan key:generate --force`, then `vendor/bin/phpunit`. That application key exists only on the runner. It is not committed and it is not the production key. A pull request into `main` runs this test job only and never the deploy job.
+2. If PHPUnit is green on a push to `main`, the workflow SSHes to the server. The checkout path is `DEPLOY_PATH` (Actions secret or repository variable). When that value is empty, the path is `/www/wwwroot/geoapi.ge`. If the directory is missing, or it has no `.git`, the script prints an error and exits. It does not create the directory and it does not clone.
+3. A second deploy waits. The deploy job's concurrency group is `production-deploy` and an in-progress deploy is not cancelled. Pull-request test runs are outside that group.
+4. If a command fails after maintenance mode, the remote script runs `php artisan up` and exits non-zero. The workflow then SSHes once more and runs `php artisan up` again. After a successful remote script, the runner requests `https://geoapi.ge/up` and fails the job unless the status is 200.
 
 The workflow does not create, edit, or replace `.env`. It does not change `APP_DEBUG` or `MAIL_*`.
 
 Remote commands, in order:
 
 ```sh
+# abort if DEPLOY_PATH is not absolute, or the directory or its .git is missing
 php artisan down --retry=15 || true
 git pull origin main
 composer install --no-dev --optimize-autoloader --no-interaction
@@ -21,7 +22,9 @@ php artisan optimize:clear
 php artisan config:cache
 php artisan route:cache
 php artisan view:cache
+php artisan queue:restart
 php artisan up
+# runner: curl -fsS https://geoapi.ge/up must be HTTP 200
 ```
 
 `php artisan migrate --force` uses the credentials already in `.env` and the SSH user's environment. Catalog migrations need `CARAPI_CATALOG_ADMIN_*` in that environment (the table owner, not `carapi_catalog_reader`). Variables that exist only in the PHP-FPM pool are not visible to this SSH session. Do not copy them into `.env` from the workflow.
@@ -76,20 +79,40 @@ shred -u "$WWW_HOME/.ssh/github-actions" || rm -f "$WWW_HOME/.ssh/github-actions
 
 Keep `github-actions.pub` if you want a local copy of the public key. It is already in `authorized_keys`.
 
-### 3. Git remote and safe.directory
+### 3. Deploy key for the private repository
 
-The repository is public: `shootX/GEoAPI`. `git pull` over HTTPS needs no GitHub deploy key.
+`git pull` uses a read-only GitHub deploy key. This key is not the Actions login key from step 2. The Actions key lets GitHub SSH into the server. The deploy key lets `www` pull `shootX/GEoAPI`. Do not put the deploy-key private file in GitHub Actions secrets or in `.env`.
+
+`DEPLOY_PATH` below is the existing checkout. The default is `/www/wwwroot/geoapi.ge`. Do not `mkdir` a new tree and do not `git clone` from this workflow. If the directory or its `.git` is missing, fix the path before the first deploy.
 
 ```sh
-cd /www/wwwroot/geoapi.ge
-sudo -u www git remote -v
-sudo -u www git remote set-url origin https://github.com/shootX/GEoAPI.git
-sudo -u www git config --global --get-all safe.directory | grep -qx /www/wwwroot/geoapi.ge \
-  || sudo -u www git config --global --add safe.directory /www/wwwroot/geoapi.ge
+DEPLOY_PATH=/www/wwwroot/geoapi.ge
+test -e "$DEPLOY_PATH/.git" || { echo "missing git checkout: $DEPLOY_PATH"; exit 1; }
+sudo -u www ssh-keygen -t ed25519 -f "$WWW_HOME/.ssh/github-deploy" -N "" -C "geoapi-readonly-deploy"
+cat "$WWW_HOME/.ssh/github-deploy.pub"
+```
+
+Add that public key in GitHub: repository **Settings → Deploy keys → Add deploy key**. Leave **Allow write access** off.
+
+```sh
+sudo -u www tee "$WWW_HOME/.ssh/config" >/dev/null <<'EOF'
+Host github.com
+  HostName github.com
+  User git
+  IdentityFile ~/.ssh/github-deploy
+  IdentitiesOnly yes
+EOF
+chown www:www "$WWW_HOME/.ssh/config"
+chmod 600 "$WWW_HOME/.ssh/config"
+sudo -u www ssh -o StrictHostKeyChecking=accept-new -T git@github.com || true
+cd "$DEPLOY_PATH"
+sudo -u www git remote set-url origin git@github.com:shootX/GEoAPI.git
+sudo -u www git config --global --get-all safe.directory | grep -qx "$DEPLOY_PATH" \
+  || sudo -u www git config --global --add safe.directory "$DEPLOY_PATH"
 sudo -u www git status
 ```
 
-`git status` must be clean. Do not keep local edits to tracked files on the server. `.env` is gitignored, so `git pull` leaves it in place.
+`ssh -T` answers with a successful authentication line and a non-zero exit. That is GitHub's normal reply for a deploy key. `git status` must be clean. Do not keep local edits to tracked files on the server. `.env` is gitignored, so `git pull` leaves it in place.
 
 ### 4. File owner `www`, and PHP on the SSH path
 
@@ -112,7 +135,8 @@ sudo -u www git --version
 Make `www` the owner of the checkout. Leave `.env` in place and mode `640`. Keep `storage/`, `bootstrap/cache/`, `data/`, and `cache/` writable by `carapi` (the FPM user). A group-writable tree plus `umask 002` in the workflow is what makes new cache files usable by both users.
 
 ```sh
-cd /www/wwwroot/geoapi.ge
+DEPLOY_PATH=/www/wwwroot/geoapi.ge
+cd "$DEPLOY_PATH"
 chown -R www:www .
 chmod 640 .env
 usermod -aG www carapi
@@ -135,8 +159,9 @@ On https://github.com/shootX/GEoAPI/settings/secrets/actions add repository secr
 | --- | --- |
 | `DEPLOY_HOST` | Server hostname or IP |
 | `DEPLOY_USER` | `www` |
-| `DEPLOY_SSH_KEY` | Full private key from step 2, including the `BEGIN` and `END` lines |
+| `DEPLOY_SSH_KEY` | Full private key from step 2, including the `BEGIN` and `END` lines. This is the server login key, not the GitHub deploy key |
 | `DEPLOY_PORT` | `22`. Optional. The workflow uses 22 when this secret is empty |
+| `DEPLOY_PATH` | Absolute path of the existing checkout. Optional secret or repository variable. Empty means `/www/wwwroot/geoapi.ge`. The workflow aborts if this directory or its `.git` is missing |
 
 Paste the private key before shredding it. Do not store it in the repository, in chat, or in `.env`.
 

@@ -60,3 +60,9 @@ Commit `b3ec4558022778b0534d9f233df9294be14689d8` is diverged from `main` (paren
 Open pull requests on 2026-10-21: #1 draft, base `main`, conflicting; #2 draft, base `cursor/critical-audit-fixes-8fe2`, not `main`; #10 draft, base `main`, mergeable, no checks. #3 is merged (2026-10-20T10:39:01Z), not an open draft.
 
 Public `GET /api/v1/brands` and `/api/v1/coverage` returned 401. OpenAPI 3.0.3 version 1.1.0 at `https://geoapi.ge` matched the paths in `CatalogApi`. The published widget file hash matched HEAD, including `modification_id: null`. VIN was not added. WP-01 was not started.
+
+## 2026-10-21 — WP-01
+
+The test job copies `.env.example`, installs dependencies, runs `php artisan key:generate --force`, then `vendor/bin/phpunit`. Pull requests run that job only. The deploy job runs only on a push to `main`. Its path is the secret or variable `DEPLOY_PATH`, default `/www/wwwroot/geoapi.ge`. A missing directory or missing `.git` aborts the script with no `mkdir` and no clone. After `migrate --force`, the remote script still builds the config, route, and view caches, then `queue:restart`. The runner fails the deploy job when `https://geoapi.ge/up` is not 200. `docs/DEPLOY.md` separates the Actions login key from the read-only GitHub deploy key used for `git pull`.
+
+`.gitignore` now has `.env.*` with `!.env.example`, `*.bak*`, and contents of `storage/framework/{sessions,carapi-sessions,cache,views}` plus `/storage/logs`, each with a tracked `.gitignore` keeper. No previously tracked generated file matched those patterns. `.env.example` and the keeper files stay tracked. Production `.env`, secrets, and `APP_DEBUG` were not changed.
