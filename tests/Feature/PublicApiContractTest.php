@@ -129,7 +129,8 @@ final class PublicApiContractTest extends TestCase
             ->assertJsonPath('data.unknown.0.name', 'Mystery');
 
         $this->getJson('/api/v1/colors?q=white')->assertOk()->assertJsonPath('data.0.verified', true);
-        $this->getJson('/api/v1/colors?q=red')->assertOk()->assertJsonPath('meta.total', 0);
+        // Backward compatible: unverified colors stay listed, flagged verified=false.
+        $this->getJson('/api/v1/colors?q=red')->assertOk()->assertJsonPath('meta.total', 1)->assertJsonPath('data.0.verified', false);
         $this->assertStringNotContainsString('hidden prompt', (string) $this->getJson('/api/v1/colors')->getContent());
     }
 

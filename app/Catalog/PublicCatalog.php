@@ -485,7 +485,7 @@ final class PublicCatalog
     /** @return array{rows:list<array<string, mixed>>, total:int} */
     public function colors(ListQuery $query): array
     {
-        $where = [$this->trimmed('photo.color')." <> ''", $this->verifiedSql('photo')];
+        $where = [$this->trimmed('photo.color')." <> ''"];
         $params = [];
         if ($query->q !== null) {
             $where[] = 'lower('.$this->trimmed('photo.color').") LIKE :q ESCAPE '\\'";
@@ -1144,14 +1144,6 @@ final class PublicCatalog
         return true;
     }
 
-    private function verifiedSql(string $alias): string
-    {
-        if (! $this->hasColumn('model_photos', 'verified')) {
-            return '1 = 0';
-        }
-
-        return $this->driver === 'pgsql' ? $alias.'.verified IS TRUE' : $alias.'.verified = 1';
-    }
 
     private function table(string $name): string
     {

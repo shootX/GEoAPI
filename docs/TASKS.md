@@ -80,9 +80,10 @@
 - [x] OpenAPI and `/guide` were left unchanged. This route is not documented there.
 - [ ] Owner: set `STRIPE_WEBHOOK_SECRET` on the server only when a paid product is approved. Until then the route stays 503 and must not grant a plan.
 
-## 2026-10-21 — WP-03 live catalog (BLOCKED)
+## 2026-10-21 — WP-03 live catalog (partly done)
 
-- [ ] BLOCKED. This environment cannot open the live catalog or platform database. No `SELECT` was run. Counts, foreign keys, indexes, triggers, photo rights, and `platform.project_limits.per_day` stay `UNKNOWN`.
+- [x] Row counts, pending migrations and the WP-04 indexes were measured read-only on production (see MEMORY.md, WP-03).
+- [ ] Foreign keys, triggers, photo rights, and `platform.project_limits.per_day` are still `UNKNOWN`.
 - [ ] Owner: run `docs/audits/wp03-owner-queries.sql` as the read-only catalog role and paste every result back, including errors. Do not run `INSERT`, `UPDATE`, `DELETE`, `ALTER`, `migrate`, or `down`. Also paste `php artisan migrate:status` without printing `.env`.
 
 ## 2026-10-21 — WP-04 REST catalog
@@ -90,4 +91,5 @@
 - [x] `CatalogApi`, `PublicCatalog`, `ListQuery`, and `PublicSpec` use one route list. List responses keep `data`, `meta`, and `collection`. `limit` stays 1–1000. Sort stays on an allowlist. `Authorization: Bearer geoapi_sk_…` is unchanged.
 - [x] `GET /api/v1/models/{id}/years` expands stored `year_start`/`year_end` on generations and modifications. An open `year_end` stops at the current UTC year. `GET /api/v1/modifications/{id}/specs` returns stored engine, transmission, and L/100km consumption. `GET /api/v1/modifications/{id}/equipment` groups `included` / `option` / `not_available` and puts anything else in `unknown`.
 - [x] MISSING: dimension and performance columns are not stored (`dimensions` and `performance` are null). Photo list routes are not added: `model_photos` is one row per model, and attribution for `photos` / `generations.photo_urls` is not established. The existing `/api/models/{id}/photo` route stays. A separate `/search` route was not added; `GET /api/v1/modifications` remains the search. VIN was not added. The widget still calculates years in its own SQL; WP-05 should use this endpoint.
-- [ ] Owner: WP-03 results are still required before treating live counts or photo rights as known.
+- [x] Colors stay backward compatible: unverified rows are still listed with `verified: false`.
+- [ ] Photo rights (WP-03) are still unknown.
