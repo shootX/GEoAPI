@@ -176,3 +176,41 @@ ssh -i /path/to/github-actions -p 22 www@DEPLOY_HOST 'cd /www/wwwroot/geoapi.ge 
 Merge to `main`. The Actions tab runs **PHPUnit**, then **Deploy**. A red test run does not SSH. A failed deploy turns maintenance mode off.
 
 There is no new PHP-FPM variable. After a deploy that includes catalog migrations, `CARAPI_CATALOG_ADMIN_USER` must already be visible to `php artisan migrate --force` under the `www` SSH session.
+
+## Queue worker and scheduler (server, one-time)
+
+Both run as `www` with the FPM pool's PHP binary, `/www/server/php/84/bin/php` (cron's default PATH does not include `/usr/local/bin`).
+
+Supervisor program `/etc/supervisor/conf.d/geoapi-queue.conf`:
+
+```ini
+[program:geoapi-queue]
+command=/www/server/php/84/bin/php artisan queue:work --sleep=3 --tries=3 --max-time=3600
+directory=/www/wwwroot/geoapi.ge
+user=www
+umask=002
+autostart=true
+autorestart=true
+startsecs=5
+stopwaitsecs=3660
+stopasgroup=true
+killasgroup=true
+numprocs=1
+redirect_stderr=true
+stdout_logfile=/www/wwwroot/geoapi.ge/storage/logs/worker.log
+stdout_logfile_maxbytes=20MB
+stdout_logfile_backups=3
+```
+
+```sh
+supervisorctl reread && supervisorctl add geoapi-queue
+supervisorctl status geoapi-queue   # RUNNING
+```
+
+`www` crontab entry (`crontab -e -u www`; leave other projects' lines alone):
+
+```
+* * * * * cd /www/wwwroot/geoapi.ge && /www/server/php/84/bin/php artisan schedule:run >> /dev/null 2>&1
+```
+
+The deploy's `php artisan queue:restart` makes the worker exit after its current job; supervisor starts it again on the new code. `--max-time=3600` also recycles it hourly. Touch only `geoapi-queue`; other supervisor programs on this server belong to other projects.
