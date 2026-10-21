@@ -7,7 +7,9 @@ use App\Http\Controllers\Admin\DisableComingSoonController;
 use App\Http\Controllers\Api\V1\CatalogController;
 use App\Http\Controllers\BlogController;
 use App\Http\Controllers\BlogFeedController;
+use App\Http\Controllers\BogCallbackController;
 use App\Http\Controllers\ComingSoonSignupController;
+use App\Http\Controllers\InvoiceController;
 use App\Http\Controllers\LocaleController;
 use App\Http\Controllers\PaymentWebhookController;
 use App\Http\Controllers\PhotoReportController;
@@ -15,6 +17,7 @@ use App\Http\Controllers\PublicOpenApiController;
 use App\Http\Controllers\PublicPageController;
 use App\Http\Controllers\PublicPostmanController;
 use App\Http\Controllers\SitemapController;
+use App\Livewire\Account\Billing;
 use App\Livewire\Account\Errors;
 use App\Livewire\Account\Products;
 use App\Livewire\Account\Projects;
@@ -79,5 +82,17 @@ Route::get('/account/products', Products::class)
     ->middleware(['web', 'auth'])
     ->name('account.products');
 
+Route::get('/account/billing', Billing::class)
+    ->middleware(['web', 'auth'])
+    ->name('account.billing');
+
+Route::get('/account/billing/invoices/{id}', InvoiceController::class)
+    ->middleware(['web', 'auth'])
+    ->whereNumber('id')
+    ->name('account.invoice');
+
 Route::post('/billing/provider-webhook', PaymentWebhookController::class)
     ->name('billing.provider-webhook');
+
+Route::post('/billing/bog/callback', BogCallbackController::class)
+    ->name('billing.bog.callback');

@@ -1,77 +1,66 @@
 @php
     $en = app()->getLocale() === 'en';
+    $rate = null;
+    try {
+        $rate = \App\Billing\NbgRate::latest();
+    } catch (\Throwable) {
+        $rate = null;
+    }
+    $gel = function (int $cents) use ($rate): ?string {
+        if ($rate === null) {
+            return null;
+        }
+
+        return \App\Billing\Plans::formatTetri(\App\Billing\Plans::gelTetri($cents, $rate['rate'], $rate['quantity']));
+    };
+    $basicMonth = 5900;
+    $basicYear = \App\Billing\Plans::usdCents('basic', 'year');
+    $premiumMonth = 9900;
+    $premiumYear = \App\Billing\Plans::usdCents('premium', 'year');
 @endphp
 <div>
 <div class="page-intro">
     <h1 class="text-3xl font-extrabold leading-tight">{{ __('Pricing') }}</h1>
-    <p class="mt-3 text-base leading-7">{{ __('The free plan is the current limit. Pro is not on sale yet.') }}</p>
+    <p class="mt-3 text-base leading-7">{{ $en ? 'A new project starts at 100 successful requests a month. An existing project keeps 10 000 until a plan is chosen. Prices include VAT. A year is 12% below twelve monthly prices.' : 'ახალი პროექტი თვეში 100 წარმატებული მოთხოვნით იწყება. არსებული პროექტი 10 000-ს ინარჩუნებს, სანამ გეგმას აირჩევს. ფასი დღგ-ს შეიცავს. წელიწადი 12 თვის ფასზე 12%-ით ნაკლებია.' }}</p>
+    @if ($rate)
+        <p class="mt-2 text-sm">{{ $en ? 'National Bank of Georgia rate' : 'ეროვნული ბანკის კურსი' }}: 1 USD = {{ $rate['rate'] }} GEL, {{ $rate['rated_on'] }}.</p>
+    @else
+        <p class="mt-2 text-sm">{{ $en ? 'the rate is unavailable. GEL is shown on the billing page after the rate is stored.' : 'კურსი ჯერ არ არის. ლარი გადახდის გვერდზე გამოჩნდება, როცა კურსი შეინახება.' }}</p>
+    @endif
 </div>
 <div class="mk"><div class="plan-grid">
     <article class="price featured">
         <span class="tag">{{ $en ? 'Now' : 'ახლა' }}</span>
         <h2>Free</h2>
-        <div class="amount">0 ₾</div>
+        <div class="amount">0 USD</div>
         <ul>
-            <li>{{ __('60 requests per minute, 2,000 per day, and 10,000 successful requests per calendar month, per project.') }}</li>
-            <li>{{ __('Server API') }}</li>
-            <li>{{ __('Widget') }}</li>
+            <li>{{ $en ? '100 successful requests a month for a new project.' : 'ახალ პროექტზე თვეში 100 წარმატებული მოთხოვნა.' }}</li>
+            <li>{{ $en ? 'An existing project keeps 10 000 until a plan is chosen.' : 'არსებული პროექტი 10 000-ს ინარჩუნებს, სანამ გეგმას აირჩევს.' }}</li>
+            <li>{{ $en ? '60 requests a minute. The daily cap is unchanged.' : 'წუთში 60 მოთხოვნა. დღიური ზღვარი უცვლელია.' }}</li>
         </ul>
         <a class="btn" href="{{ route('register') }}">{{ __('Create a free account') }}</a>
     </article>
     <article class="price">
-        <span class="tag" style="background:#e7f6ef;color:#285A48">{{ __('Soon') }}</span>
-        <h2>Pro — {{ __('Soon') }}</h2>
-        <div class="amount">{{ $en ? 'Price soon' : 'ფასი მალე' }}</div>
+        <span class="tag">Basic</span>
+        <h2>Basic</h2>
+        <div class="amount">59 USD</div>
         <ul>
-            <li>{{ __('This plan is not available yet.') }}</li>
-            <li>{{ $en ? 'The same catalog' : 'იგივე კატალოგი' }}</li>
-            <li>{{ $en ? 'Not for sale yet' : 'ჯერ არ იყიდება' }}</li>
+            <li>{{ $en ? '2 000 successful requests a month.' : 'თვეში 2 000 წარმატებული მოთხოვნა.' }}</li>
+            <li>{{ $en ? 'Year: '.number_format($basicYear / 100, 2, '.', '').' USD'.($gel($basicYear) ? ' / '.$gel($basicYear).' GEL' : '') : 'წელი: '.number_format($basicYear / 100, 2, '.', '').' USD'.($gel($basicYear) ? ' / '.$gel($basicYear).' GEL' : '') }}</li>
+            <li>{{ $gel($basicMonth) ? ($en ? 'Month: '.$gel($basicMonth).' GEL' : 'თვე: '.$gel($basicMonth).' GEL') : ($en ? 'GEL follows the stored bank rate.' : 'ლარი შენახულ საბანკო კურსს მიჰყვება.') }}</li>
         </ul>
-        <form class="notify" method="post" action="{{ route('coming-soon.store') }}">
-            @csrf
-            <label>{{ __('Email') }}
-                <input type="email" name="email" required autocomplete="email" placeholder="email">
-            </label>
-            <button class="btn btn-line" type="submit">{{ __('Notify me at launch') }}</button>
-        </form>
+        <a class="btn" href="{{ route('register') }}">{{ $en ? 'Create an account' : 'ანგარიშის შექმნა' }}</a>
+    </article>
+    <article class="price">
+        <span class="tag">Premium</span>
+        <h2>Premium</h2>
+        <div class="amount">99 USD</div>
+        <ul>
+            <li>{{ $en ? 'Unlimited successful requests a month.' : 'თვეში შეუზღუდავი წარმატებული მოთხოვნა.' }}</li>
+            <li>{{ $en ? 'Year: '.number_format($premiumYear / 100, 2, '.', '').' USD'.($gel($premiumYear) ? ' / '.$gel($premiumYear).' GEL' : '') : 'წელი: '.number_format($premiumYear / 100, 2, '.', '').' USD'.($gel($premiumYear) ? ' / '.$gel($premiumYear).' GEL' : '') }}</li>
+            <li>{{ $gel($premiumMonth) ? ($en ? 'Month: '.$gel($premiumMonth).' GEL' : 'თვე: '.$gel($premiumMonth).' GEL') : ($en ? 'GEL follows the stored bank rate.' : 'ლარი შენახულ საბანკო კურსს მიჰყვება.') }}</li>
+        </ul>
+        <a class="btn" href="{{ route('register') }}">{{ $en ? 'Create an account' : 'ანგარიშის შექმნა' }}</a>
     </article>
 </div></div>
-<div class="mt-8 overflow-x-auto">
-    <table class="w-full text-sm">
-        <thead>
-            <tr>
-                <th class="py-2 text-left"></th>
-                <th class="py-2 text-left">Free</th>
-                <th class="py-2 text-left">Pro</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr class="border-t border-border">
-                <th class="py-3 text-left font-medium">{{ __('Requests per minute') }}</th>
-                <td>60</td>
-                <td>{{ __('Soon') }}</td>
-            </tr>
-            <tr class="border-t border-border">
-                <th class="py-3 text-left font-medium">{{ __('Requests per day') }}</th>
-                <td>2 000</td>
-                <td>{{ __('Soon') }}</td>
-            </tr>
-            <tr class="border-t border-border">
-                <th class="py-3 text-left font-medium">{{ __('Successful requests per month') }}</th>
-                <td>10 000</td>
-                <td>{{ __('Soon') }}</td>
-            </tr>
-            <tr class="border-t border-border">
-                <th class="py-3 text-left font-medium">{{ __('Server API') }}</th>
-                <td>{{ __('Included') }}</td>
-                <td>{{ __('Soon') }}</td>
-            </tr>
-            <tr class="border-t border-border">
-                <th class="py-3 text-left font-medium">{{ __('Widget') }}</th>
-                <td>{{ __('Included') }}</td>
-                <td>{{ __('Soon') }}</td>
-            </tr>
-        </tbody>
-    </table>
-</div>
 </div>

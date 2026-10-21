@@ -17,6 +17,7 @@
             <button type="button" data-screen="overview" aria-current="page">{{ $en ? 'Overview' : 'მიმოხილვა' }}</button>
             <button type="button" data-screen="keys">{{ $en ? 'API keys' : 'API გასაღებები' }}</button>
             <button type="button" data-screen="plan">{{ $en ? 'Plan' : 'გეგმა' }}</button>
+            <a href="{{ route('account.billing') }}">{{ $en ? 'Billing' : 'გადახდა' }}</a>
             <button type="button" data-screen="catalog">{{ $en ? 'Catalog' : 'კატალოგი' }}</button>
         </nav>
     </aside>
@@ -40,7 +41,7 @@
                 <section class="panel">
                     <h2>{{ $en ? 'Monthly quota' : 'თვიური კვოტა' }}</h2>
                     <div class="quota" aria-label="{{ $fmt($used) }} / {{ $fmt($limit) }}"><span style="width: {{ $quota }}%"></span></div>
-                    <p class="muted" style="margin-top:8px">{{ $en ? $fmt($used).' successful requests of '.$fmt($limit).'. Free plan, per project.' : $fmt($used).' წარმატებული მოთხოვნა '.$fmt($limit).'-დან. უფასო გეგმა, პროექტზე.' }}</p>
+                    <p class="muted" style="margin-top:8px">@if (! empty($unlimited)){{ $en ? $fmt($used).' successful requests. Unlimited for this project.' : $fmt($used).' წარმატებული მოთხოვნა. ამ პროექტზე შეუზღუდავია.' }}@else{{ $en ? $fmt($used).' successful requests of '.$fmt($limit).'. Free plan, per project.' : $fmt($used).' წარმატებული მოთხოვნა '.$fmt($limit).'-დან. უფასო გეგმა, პროექტზე.' }}@endif</p>
                 </section>
                 <section class="panel">
                     <h2>{{ $en ? 'Requests in the last 30 days' : 'მოთხოვნები ბოლო 30 დღეში' }}</h2>

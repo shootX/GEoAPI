@@ -39,6 +39,7 @@ final class ProjectRepository
 
     public function insert(int $userId, string $name, ?string $website): int
     {
+        $limitsSql = $this->limitsInsert($userId);
         $nested = $this->pdo->inTransaction();
         if ($nested) {
             $this->pdo->exec('SAVEPOINT project_insert');
@@ -55,9 +56,7 @@ final class ProjectRepository
             $stmt->execute();
             $id = (int) $stmt->fetchColumn();
             $stmt->closeCursor();
-            $limits = $this->pdo->prepare(
-                $this->limitsInsert()
-            );
+            $limits = $this->pdo->prepare($limitsSql);
             $limits->bindValue('id', $id, PDO::PARAM_INT);
             $limits->execute();
             $limits->closeCursor();
@@ -180,32 +179,69 @@ final class ProjectRepository
         return $changes !== false && (int) $changes->fetchColumn() > 0;
     }
 
-    private function limitsInsert(): string
+    private function limitsInsert(int $userId): string
     {
+        $grandfathered = $this->grandfathered($userId);
+        $quota = $grandfathered ? 10000 : 100;
+        $columns = ['project_id', 'per_minute', 'monthly_quota'];
+        $values = [':id', '60', (string) $quota];
+        if ($this->hasColumn('project_limits', 'per_day')) {
+            $columns[] = 'per_day';
+            $values[] = '2000';
+        }
+        if ($this->hasColumn('project_limits', 'plan_code')) {
+            $columns[] = 'plan_code';
+            $values[] = $grandfathered ? 'NULL' : "'free'";
+        }
+        if ($this->hasColumn('project_limits', 'unlimited_month')) {
+            $columns[] = 'unlimited_month';
+            $values[] = '0';
+        }
+
+        return 'INSERT INTO platform.project_limits ('.implode(', ', $columns).') VALUES ('.implode(', ', $values).')';
+    }
+
+    private function grandfathered(int $userId): bool
+    {
+        if (! $this->hasColumn('users', 'grandfathered')) {
+            return true;
+        }
+        $stmt = $this->pdo->prepare('SELECT grandfathered FROM platform.users WHERE id = :id');
+        $stmt->bindValue('id', $userId, PDO::PARAM_INT);
+        $stmt->execute();
+        $row = $stmt->fetch();
+        if ($row === false) {
+            return true;
+        }
+        $value = $row['grandfathered'];
+
+        return ! in_array($value, [0, '0', false, 'f', 'F', 'false'], true);
+    }
+
+    private function hasColumn(string $table, string $column): bool
+    {
+        if (! in_array($table, ['users', 'project_limits'], true) || ! preg_match('/^[a-z_]+$/', $column)) {
+            return false;
+        }
         if ($this->pdo->getAttribute(PDO::ATTR_DRIVER_NAME) === 'sqlite') {
-            $stmt = $this->pdo->query('PRAGMA platform.table_info(project_limits)');
-            $perDay = false;
-            foreach ($stmt ? $stmt->fetchAll() : [] as $column) {
-                if (($column['name'] ?? '') === 'per_day') {
-                    $perDay = true;
+            $stmt = $this->pdo->query('PRAGMA platform.table_info('.$table.')');
+            foreach ($stmt ? $stmt->fetchAll() : [] as $info) {
+                if (($info['name'] ?? '') === $column) {
+                    return true;
                 }
             }
 
-            return $perDay
-                ? 'INSERT INTO platform.project_limits (project_id, per_minute, monthly_quota, per_day) VALUES (:id, 60, 10000, 2000)'
-                : 'INSERT INTO platform.project_limits (project_id, per_minute, monthly_quota) VALUES (:id, 60, 10000)';
+            return false;
         }
-        $stmt = $this->pdo->query(<<<'SQL'
+        $stmt = $this->pdo->prepare(<<<'SQL'
             SELECT 1
             FROM information_schema.columns
             WHERE table_schema = 'platform'
-              AND table_name = 'project_limits'
-              AND column_name = 'per_day'
+              AND table_name = :table
+              AND column_name = :column
         SQL);
-        if ($stmt !== false && $stmt->fetchColumn() !== false) {
-            return 'INSERT INTO platform.project_limits (project_id, per_minute, monthly_quota, per_day) VALUES (:id, 60, 10000, 2000)';
-        }
+        $stmt->execute(['table' => $table, 'column' => $column]);
 
-        return 'INSERT INTO platform.project_limits (project_id, per_minute, monthly_quota) VALUES (:id, 60, 10000)';
+        return $stmt->fetchColumn() !== false;
     }
 }

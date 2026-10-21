@@ -74,7 +74,7 @@ final class CatalogApi
         if ($projectHit['exceeded']) {
             return $this->limited('RATE_LIMIT_EXCEEDED', max(1, $projectHit['retry_after']), $projectHit['limit'], 0, $projectHit['reset_at']);
         }
-        if ($preview['exhausted']) {
+        if (empty($preview['unlimited']) && $preview['exhausted']) {
             return $this->limited('MONTHLY_QUOTA_EXCEEDED', max(1, $preview['reset_at'] - $now), $preview['limit'], 0, $preview['reset_at']);
         }
         if ($day['enforced'] && $day['exhausted']) {
@@ -130,11 +130,14 @@ final class CatalogApi
             return $this->limited('MONTHLY_QUOTA_EXCEEDED', max(1, $saved['reset_at'] - $now), $saved['limit'], 0, $saved['reset_at']);
         }
 
+        $quotaLimit = ! empty($saved['unlimited']) ? 'unlimited' : (string) $saved['limit'];
+        $quotaRemaining = ! empty($saved['unlimited']) ? 'unlimited' : (string) $saved['remaining'];
+
         return [
             'status' => 200,
             'headers' => [
-                'X-Quota-Limit' => (string) $saved['limit'],
-                'X-Quota-Remaining' => (string) $saved['remaining'],
+                'X-Quota-Limit' => $quotaLimit,
+                'X-Quota-Remaining' => $quotaRemaining,
                 'X-Quota-Reset' => (string) $saved['reset_at'],
                 'X-RateLimit-Limit' => (string) $projectHit['limit'],
                 'X-RateLimit-Remaining' => (string) max(0, $projectHit['limit'] - $projectHit['count']),

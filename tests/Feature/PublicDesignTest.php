@@ -20,8 +20,11 @@ class PublicDesignTest extends TestCase
             ->get('/pricing')
             ->assertOk()
             ->assertSee('Free')
-            ->assertSee('Pro — მალე')
+            ->assertSee('Basic')
+            ->assertSee('Premium')
+            ->assertSee('59 USD')
             ->assertSee('10 000')
+            ->assertDontSee('$59')
             ->assertDontSee('Stripe');
     }
 

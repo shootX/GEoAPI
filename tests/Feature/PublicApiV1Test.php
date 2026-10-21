@@ -206,9 +206,12 @@ final class PublicApiV1Test extends TestCase
         $this->withSession(['locale' => 'ka'])->get('/pricing')
             ->assertOk()
             ->assertSee('Free')
-            ->assertSee('Pro — მალე')
+            ->assertSee('Basic')
+            ->assertSee('Premium')
             ->assertSee('2 000')
             ->assertSee('10 000')
+            ->assertSee('59 USD')
+            ->assertDontSee('$59')
             ->assertDontSee('Stripe');
     }
 }

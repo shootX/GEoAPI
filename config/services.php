@@ -39,4 +39,10 @@ return [
         'webhook_secret' => env('STRIPE_WEBHOOK_SECRET'),
     ],
 
+    'bog' => [
+        'client_id' => env('BOG_CLIENT_ID'),
+        'client_secret' => env('BOG_CLIENT_SECRET'),
+        'public_key' => env('BOG_CALLBACK_PUBLIC_KEY'),
+    ],
+
 ];

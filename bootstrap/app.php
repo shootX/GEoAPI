@@ -46,6 +46,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'api/*',
             'widget/*',
             'billing/provider-webhook',
+            'billing/bog/callback',
         ]);
         $middleware->api(append: [
             BindTeamFromAccessToken::class,

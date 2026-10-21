@@ -118,7 +118,7 @@
 - [x] Every public route documents auth, parameters, errors 401/403/404/405/422/429/503, pagination, Free limits, null coverage, and the fact that SDK, MCP, and CLI packages are not published. Admin routes stay off the public document.
 - [x] Colors are documented as every stored row, with `verified: false` when the photo was not confirmed. `/fuel` documents the same filters the code accepts, including `body`, `drive`, and `transmission`. Sort allowlists come from `CatalogApi`.
 - [x] Guide samples are cURL, JavaScript, Node, Python, and PHP against `https://geoapi.ge`. The placeholder is `geoapi_sk_…`. Postman uses `{{token}}` and does not contain a real key. The published example for each route returns 200 in the test catalog and matches the response schema.
-- [ ] Pro is not for sale. The WP-11 prices are not the running limits. Photo rights are still unknown. VIN was not added.
+- [ ] Photo rights are still unknown. VIN was not added. Plan prices are in the WP-11 section.
 
 ## 2026-10-21 — WP-08 TypeScript SDK
 
@@ -135,7 +135,7 @@
 - [x] The key is `GEOAPI_API_KEY` in the host environment. `cursor.example.json` uses the placeholder `geoapi_sk_…`. 401 is not retried. 429 and 503 follow the SDK retry, then the tool error has `status`, `code`, `message`, `retryAfter`, and `requestId` null. Tool text and logs do not contain the token. Two clients keep separate keys. The BMW models and one generation prompt is a mock `fetch` test. Staging and production were not called.
 - [x] `packages/sdk-js/scripts/smoke.mjs` names the quickstart call that failed and stops. `npm test` checks that reporter and does not run the live script. The owner merge of PR #20 waits 250 ms times the attempt when `Retry-After` is missing, sets `GeoAPIError.retryAfter`, and refuses a secret key in a web worker.
 - [x] CI builds the SDK, then tests the MCP package on Node 20 and Node 22. Deploy waits for PHPUnit, the SDK job, and the MCP job. A pull request still skips Deploy. The root Vite `npm ci` is unchanged.
-- [ ] Photo rights are still unknown. VIN was not added. The WP-11 prices are not the running limits. CLI was not started.
+- [ ] Photo rights are still unknown. VIN was not added. Plan prices are in the WP-11 section.
 
 ## 2026-10-21 — WP-10 CLI
 
@@ -143,4 +143,14 @@
 - [x] Examples: `geoapi brands list --limit 20 --json`, `geoapi models list --brand bmw`, `geoapi modifications list --model-id 314 --year-from 2020`, and `geoapi coverage`. `--json` is one compact JSON document on stdout. `--pretty` indents it. Rows stay in the API order. `--limit` and `--page` are sent through the SDK.
 - [x] The key is `GEOAPI_API_KEY` only. `--api-key` is refused and the value is not printed. `geoapi_sk_` and `carapi_sk_` text is replaced with `[redacted]` on stdout and stderr. Exit 0 is success, 2 is invalid input, 3 is auth, 4 is rate limited, and 5 is network or service. 429 and 503 use the SDK retry, at most twice.
 - [x] CI builds the SDK, then tests the CLI on Node 20 and Node 22. Deploy waits for PHPUnit, the SDK job, the MCP job, and the CLI job. A pull request still skips Deploy. The root Vite `npm ci` is unchanged. Staging and production were not called. CI ran on Linux. The program does not spawn a shell.
-- [ ] Photo rights are still unknown. VIN was not added. The WP-11 prices are not the running limits. WP-11 was not started.
+- [ ] Photo rights are still unknown. VIN was not added. WP-11 is the next section.
+
+## 2026-10-21 — WP-11 BOG billing
+
+- [x] Checkout uses the Bank of Georgia sandbox only (`oauth2-sandbox.bog.ge`, `api-sandbox.bog.ge`). `BOG_CLIENT_ID` and `BOG_CLIENT_SECRET` are empty in `.env.example` and forced empty in `phpunit.xml`. They are not committed. When either is empty, `/account/billing` shows "payments not configured", sends no HTTP request, and leaves the quota unchanged.
+- [x] Free is 100 successful requests per UTC month. Basic is 2 000 per UTC month at 59 USD (5 900 cents) and 62 304 cents for a year. Premium is unlimited at 99 USD (9 900 cents) and 104 544 cents for a year. A year is `usd_cents * 12 * 88 / 100`. Prices include VAT. The minute cap stays 60. No new minute or day cap was added. The public OpenAPI document does not contain `59`. The guide says `59 USD` and does not contain `$59`.
+- [x] GEL uses the cached National Bank of Georgia USD rate (`billing:nbg-rate`, daily at 09:00). A failed fetch keeps the last stored rate and its date. With no stored rate, a paid checkout does not open an order. Tests use `tests/fixtures/nbg-usd.json` and do not call the bank.
+- [x] Registration accepts an individual or a legal entity. A legal entity stores company name, identification code, legal address, and a VAT-payer flag. The invoice PDF includes those fields and "Prices include VAT".
+- [x] `POST /billing/bog/callback` checks the RSA signature on the raw body before JSON is read. A bad signature is 400 and stores nothing. `completed` grants once. The same status again is 200 and does not grant again. `refunded` and `refunded_partially` restore the quota and entitlement stored on the order. The success and fail redirect URLs do not grant. Stripe's webhook still does not grant.
+- [x] Existing users stay at 10 000 per UTC month until that project chooses a plan. The migration adds `grandfathered` without updating `monthly_quota` or any catalog table. Platform DDL is skipped when the environment is `testing`. A missing plan column keeps the previous monthly number. A missing limits row is still 503. A past `plan_ends_at` meters at 100, and `billing:expire` then writes the free row and an audit record. Catalog access stays active.
+- [ ] Photo rights are still unknown. VIN was not added. Production was not migrated and the sandbox credentials were not placed in the environment. WP-12 was not started.

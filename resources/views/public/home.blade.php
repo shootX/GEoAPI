@@ -16,7 +16,7 @@
         'f1t' => 'Read it from your server', 'f1p' => 'Build your own screen on top of brands, models, generations, and modifications.',
         'f2t' => 'Drop a picker on your site', 'f2p' => 'Visitors choose a vehicle in the browser. The secret key never leaves your server.',
         'f3t' => 'Stable identifiers', 'f3p' => 'slug and id, pages with <b>page</b> and <b>per_page</b>. The response is JSON.',
-        'f4t' => 'Start on the free plan', 'f4p' => '60 requests a minute and 10,000 successful requests a month, per project.',
+        'f4t' => 'Start on the free plan', 'f4p' => '60 requests a minute. A new project has 100 successful requests a month. An existing project keeps 10 000 until a plan is chosen.',
         'howEyebrow' => 'How it works', 'howTitle' => 'Three steps to the catalog',
         'howLede' => 'An account, a key, and one chain: brand, model, generation, modification.',
         'c1' => 'The server key stays on your server.',
@@ -25,12 +25,12 @@
         's1t' => 'Project and key', 's1p' => 'A free account, a confirmed email, and one project.',
         's2t' => 'Request', 's2p' => 'GET /api/v1/brands, then models, generations, and modifications.',
         's3t' => 'Your screen or the widget', 's3p' => 'Your own interface, or a ready picker in the site form.',
-        'priceEyebrow' => 'Pricing', 'priceTitle' => 'Free now, Pro soon',
-        'priceLede' => 'Pro is not for sale yet. This page does not open a payment.',
-        'now' => 'Now', 'free' => 'Free', 'soon' => 'Soon', 'proAmount' => 'Price soon',
-        'p1' => '60 requests a minute', 'p2' => '10,000 successful requests a month', 'p3' => 'Server API and widget', 'p4' => 'Limit per project',
-        'q1' => 'The same catalog', 'q2' => 'A higher limit will be announced', 'q3' => 'Not for sale yet', 'q4' => 'The price will be announced separately',
-        'notify' => 'We will let you know',
+        'priceEyebrow' => 'Pricing', 'priceTitle' => 'Free, Basic, and Premium',
+        'priceLede' => 'New projects start at 100 successful requests a month. An existing project keeps 10 000 until a plan is chosen. Prices include VAT.',
+        'now' => 'Now', 'free' => 'Free', 'soon' => 'Paid', 'proAmount' => '59 USD / 99 USD',
+        'p1' => '60 requests a minute', 'p2' => '100 a month, or 10 000 until you choose', 'p3' => 'Server API and widget', 'p4' => 'Limit per project',
+        'q1' => 'Basic: 2 000 successful requests a month', 'q2' => 'Premium: unlimited successful requests a month', 'q3' => 'A year is 12% below twelve monthly prices', 'q4' => 'GEL is shown from the bank rate on the billing page',
+        'notify' => 'See pricing',
         'storiesEyebrow' => 'In teams', 'storiesTitle' => 'Where GeoAPI fits',
         'storiesLede' => 'These are examples of how a catalog is used. They are not quotes from real customers.',
         'st1t' => 'A filter on a listing', 'st1p' => 'Four steps from brand to generation. A custom filter stands on that chain.', 'st1w' => 'Frontend', 'st1s' => 'Own screen', 'st1a' => 'F',
@@ -38,15 +38,15 @@
         'st3t' => 'A familiar catalog', 'st3p' => 'Brand and generation follow one catalog structure.', 'st3w' => 'Catalog', 'st3s' => 'Data', 'st3a' => 'C',
         'faqEyebrow' => 'Questions', 'faqTitle' => 'Short answers',
         'faq1q' => 'Where does the data come from?', 'faq1a' => 'Collected by the Global auto industry and is its property.',
-        'faq2q' => 'What is in the free plan?', 'faq2a' => '60 requests a minute and 10,000 successful requests in a calendar month, per project.',
+        'faq2q' => 'What is in the free plan?', 'faq2a' => '60 requests a minute. A new project has 100 successful requests a month. An existing project keeps 10 000 until a plan is chosen.',
         'faq3q' => 'Where does the secret key stay?', 'faq3a' => 'On the server request. The widget uses the public key and does not send the session cookie.',
-        'faq4q' => 'Is Pro for sale?', 'faq4a' => 'No. Pro is coming later. This page does not open a payment.',
+        'faq4q' => 'What do Basic and Premium cost?', 'faq4a' => 'Basic is 59 USD a month. Premium is 99 USD a month. Prices include VAT. Checkout is on the account billing page.',
         'faq5q' => 'Does the API have a photo?', 'faq5a' => 'The current server API has no photo. The modification list and the detail are there.',
         'contactEyebrow' => 'Contact', 'contactTitle' => 'Write to us',
         'contactLede' => 'This form does not send a message. The live address is hello@geoapi.ge.',
         'name' => 'Name', 'email' => 'Email', 'message' => 'Message', 'send' => 'Send',
         'asideTitle' => 'Start with the catalog',
-        'asideP' => '314 brands, 4 710 models, 22 367 generations. The account is free, and Pro is not for sale yet.',
+        'asideP' => '314 brands, 4 710 models, 22 367 generations. An existing project keeps 10 000 requests a month until a plan is chosen.',
         'emailLine' => 'Email', 'server' => 'The server is in Germany.',
         'foot' => 'Vehicle catalog API.',
         'product' => 'Product', 'doc' => 'Documentation', 'picker' => 'Picker', 'addresses' => 'Addresses', 'write' => 'Write to us',
@@ -68,7 +68,7 @@
         'f1t' => 'წაიკითხეთ თქვენი სერვერიდან', 'f1p' => 'ააწყვეთ საკუთარი ეკრანი მარკებზე, მოდელებზე, თაობებსა და მოდიფიკაციებზე.',
         'f2t' => 'ჩასვით არჩევანი საიტზე', 'f2p' => 'სტუმარი ავტომობილს ბრაუზერში ირჩევს. საიდუმლო გასაღები სერვერს არ ტოვებს.',
         'f3t' => 'სუფთა იდენტიფიკატორები', 'f3p' => 'slug და id, გვერდები <b>page</b> და <b>per_page</b>. პასუხი JSON-ია.',
-        'f4t' => 'დაიწყეთ უფასო გეგმით', 'f4p' => 'წუთში 60 მოთხოვნა და თვეში 10 000 წარმატებული მოთხოვნა, პროექტზე.',
+        'f4t' => 'დაიწყეთ უფასო გეგმით', 'f4p' => 'წუთში 60 მოთხოვნა. ახალ პროექტს თვეში 100 წარმატებული მოთხოვნა აქვს. არსებული პროექტი 10 000-ს ინარჩუნებს, სანამ გეგმას აირჩევს.',
         'howEyebrow' => 'როგორ მუშაობს', 'howTitle' => 'სამი ნაბიჯი კატალოგამდე',
         'howLede' => 'ანგარიში, გასაღები და ერთი ჯაჭვი: მარკა, მოდელი, თაობა, მოდიფიკაცია.',
         'c1' => 'სერვერული გასაღები მხოლოდ თქვენს სერვერზე რჩება.',
@@ -77,12 +77,12 @@
         's1t' => 'პროექტი და გასაღები', 's1p' => 'უფასო ანგარიში, დადასტურებული ელფოსტა და ერთი პროექტი.',
         's2t' => 'მოთხოვნა', 's2p' => 'GET /api/v1/brands, შემდეგ მოდელები, თაობები და მოდიფიკაციები.',
         's3t' => 'თქვენი ეკრანი ან ვიჯეტი', 's3p' => 'საკუთარი ინტერფეისი, ან მზა არჩევანი საიტის ფორმაში.',
-        'priceEyebrow' => 'ფასები', 'priceTitle' => 'უფასო ახლა, Pro მალე',
-        'priceLede' => 'Pro ჯერ არ იყიდება. გადახდა ამ გვერდზე არ იხსნება.',
-        'now' => 'ახლა', 'free' => 'უფასო', 'soon' => 'მალე', 'proAmount' => 'ფასი მალე',
-        'p1' => '60 მოთხოვნა წუთში', 'p2' => '10 000 წარმატებული მოთხოვნა თვეში', 'p3' => 'სერვერული API და ვიჯეტი', 'p4' => 'ლიმიტი პროექტზე',
-        'q1' => 'იგივე კატალოგი', 'q2' => 'გაზრდილი ლიმიტი გამოცხადდება', 'q3' => 'ჯერ არ იყიდება', 'q4' => 'ფასი ცალკე გამოცხადდება',
-        'notify' => 'შეგატყობინებთ',
+        'priceEyebrow' => 'ფასები', 'priceTitle' => 'უფასო, Basic და Premium',
+        'priceLede' => 'ახალი პროექტი თვეში 100 წარმატებული მოთხოვნით იწყება. არსებული პროექტი 10 000-ს ინარჩუნებს, სანამ გეგმას აირჩევს. ფასი დღგ-ს შეიცავს.',
+        'now' => 'ახლა', 'free' => 'უფასო', 'soon' => 'ფასიანი', 'proAmount' => '59 USD / 99 USD',
+        'p1' => '60 მოთხოვნა წუთში', 'p2' => 'თვეში 100, ან 10 000 სანამ აირჩევთ', 'p3' => 'სერვერული API და ვიჯეტი', 'p4' => 'ლიმიტი პროექტზე',
+        'q1' => 'Basic: თვეში 2 000 წარმატებული მოთხოვნა', 'q2' => 'Premium: შეუზღუდავი წარმატებული მოთხოვნა თვეში', 'q3' => 'წელიწადი 12 თვის ფასზე 12%-ით ნაკლებია', 'q4' => 'ლარი გადახდის გვერდზე ბანკის კურსით ჩანს',
+        'notify' => 'ფასების ნახვა',
         'storiesEyebrow' => 'გუნდებში', 'storiesTitle' => 'სად ჯდება GeoAPI',
         'storiesLede' => 'ეს მაგალითებია, როგორ იყენებენ კატალოგს. რეალური მომხმარებლის ციტატა არ არის.',
         'st1t' => 'ფილტრი განცხადებაზე', 'st1p' => 'მარკიდან თაობამდე ოთხი საფეხურია. საკუთარი ფილტრი ამ ჯაჭვზე დგას.', 'st1w' => 'ფრონტენდი', 'st1s' => 'საკუთარი ეკრანი', 'st1a' => 'ფ',
@@ -90,9 +90,9 @@
         'st3t' => 'ნაცნობი კატალოგი', 'st3p' => 'მარკა და თაობა ერთი კატალოგის სტრუქტურას მიჰყვება.', 'st3w' => 'კატალოგი', 'st3s' => 'მონაცემები', 'st3a' => 'კ',
         'faqEyebrow' => 'კითხვები', 'faqTitle' => 'მოკლე პასუხები',
         'faq1q' => 'საიდანაა მონაცემები?', 'faq1a' => 'შეგროვებულია Global auto industry-ს მიერ და წარმოადგენს მის საკუთრებას.',
-        'faq2q' => 'რა შედის უფასო გეგმაში?', 'faq2a' => 'წუთში 60 მოთხოვნა და კალენდარულ თვეში 10 000 წარმატებული მოთხოვნა, თითო პროექტზე.',
+        'faq2q' => 'რა შედის უფასო გეგმაში?', 'faq2a' => 'წუთში 60 მოთხოვნა. ახალ პროექტს თვეში 100 წარმატებული მოთხოვნა აქვს. არსებული პროექტი 10 000-ს ინარჩუნებს, სანამ გეგმას აირჩევს.',
         'faq3q' => 'სად რჩება საიდუმლო გასაღები?', 'faq3a' => 'სერვერულ მოთხოვნაზე. ვიჯეტი საჯარო გასაღებს იყენებს და სესიის cookie-ს არ აგზავნის.',
-        'faq4q' => 'Pro უკვე იყიდება?', 'faq4a' => 'არა. Pro მალე გამოჩნდება. ამ გვერდზე გადახდა არ იხსნება.',
+        'faq4q' => 'რა ღირს Basic და Premium?', 'faq4a' => 'Basic თვეში 59 USD ღირს. Premium თვეში 99 USD ღირს. ფასი დღგ-ს შეიცავს. გადახდა ანგარიშის გვერდზეა.',
         'faq5q' => 'ფოტო აქვს API-ს?', 'faq5a' => 'მიმდინარე სერვერულ API-ს ფოტო არ აქვს. მოდიფიკაციების სია და დეტალი არის.',
         'contactEyebrow' => 'კონტაქტი', 'contactTitle' => 'მოგვწერეთ',
         'contactLede' => 'ფორმა ამ მოკაპში წერილს არ აგზავნის. ცოცხალი მისამართია hello@geoapi.ge.',
@@ -250,7 +250,7 @@
                     </article>
                     <article class="price">
                         <span class="tag" style="background:#e7f6ef;color:#285A48">{{ $t['soon'] }}</span>
-                        <h3>Pro</h3>
+                        <h3>Basic / Premium</h3>
                         <div class="amount">{{ $t['proAmount'] }}</div>
                         <ul>
                             <li>{{ $t['q1'] }}</li>
@@ -258,7 +258,7 @@
                             <li>{{ $t['q3'] }}</li>
                             <li>{{ $t['q4'] }}</li>
                         </ul>
-                        <a class="btn btn-line" href="#contact">{{ $t['notify'] }}</a>
+                        <a class="btn btn-line" href="{{ route('pricing') }}">{{ $t['notify'] }}</a>
                     </article>
                 </div>
             </div>

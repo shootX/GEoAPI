@@ -10,6 +10,20 @@
                 <x-slate::input wire:model="email" type="email" label="{{ __('Email') }}" autocomplete="username" required :readonly="$inviteLockedEmail" />
                 <x-slate::input wire:model="password" type="password" label="{{ __('Password') }}" autocomplete="new-password" required />
                 <x-slate::input wire:model="password_confirmation" type="password" label="{{ __('Repeat the password') }}" autocomplete="new-password" required />
+                <fieldset class="space-y-2 text-sm">
+                    <legend>{{ __('Account type') }}</legend>
+                    <label class="flex items-center gap-2"><input type="radio" wire:model.live="buyer_kind" value="individual"> {{ __('Individual') }}</label>
+                    <label class="flex items-center gap-2"><input type="radio" wire:model.live="buyer_kind" value="legal"> {{ __('Legal entity') }}</label>
+                </fieldset>
+                @if ($buyer_kind === 'legal')
+                    <x-slate::input wire:model="company_name" type="text" label="{{ __('Company name') }}" required />
+                    <x-slate::input wire:model="company_code" type="text" label="{{ __('Identification code') }}" required />
+                    <x-slate::input wire:model="company_address" type="text" label="{{ __('Legal address') }}" required />
+                    <label class="flex items-start gap-2 text-sm">
+                        <input type="checkbox" wire:model="vat_payer" class="mt-1" value="1">
+                        <span>{{ __('VAT payer') }}</span>
+                    </label>
+                @endif
                 <label class="flex items-start gap-2 text-sm">
                     <input type="checkbox" wire:model="accept_terms" class="mt-1" value="1">
                     <span>{{ __('I agree to the') }} <a href="{{ url('/terms') }}" class="underline">{{ __('terms of use') }}</a>.</span>
