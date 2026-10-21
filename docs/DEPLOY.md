@@ -22,6 +22,8 @@ php artisan optimize:clear
 php artisan config:cache
 php artisan route:cache
 php artisan view:cache
+npm ci --no-audit --no-fund --loglevel=error
+npm run build   # Vite: public/build is gitignored, so it must be rebuilt on every deploy
 php artisan queue:restart
 php artisan up
 # runner: curl -fsS https://geoapi.ge/up must be HTTP 200
@@ -214,3 +216,7 @@ supervisorctl status geoapi-queue   # RUNNING
 ```
 
 The deploy's `php artisan queue:restart` makes the worker exit after its current job; supervisor starts it again on the new code. `--max-time=3600` also recycles it hourly. Touch only `geoapi-queue`; other supervisor programs on this server belong to other projects.
+
+## Front-end assets
+
+`public/build` (Vite output) is gitignored, so the deploy rebuilds it with `npm ci` and `npm run build` on the server (Node 22 at `/usr/bin/node`). Before this step existed, the server kept a bundle built on 2026-10-20 from older CSS that requested `/assets/fonts/bpg-arial.woff2`, which returned 404. The current `resources/css/app.css` uses FiraGO from `resources/fonts`, which Vite copies into `public/build/assets`.
