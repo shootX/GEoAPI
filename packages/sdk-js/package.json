@@ -21,7 +21,7 @@
     "generate": "node scripts/generate.mjs",
     "prebuild": "node scripts/generate.mjs --check",
     "build": "tsc -p tsconfig.build.json",
-    "test": "node scripts/generate.mjs --check && tsc -p tsconfig.json --noEmit && tsc -p tsconfig.build.json && node --test test/client.test.mjs"
+    "test": "node scripts/generate.mjs --check && tsc -p tsconfig.json --noEmit && tsc -p tsconfig.build.json && node --test test/client.test.mjs test/smoke.test.mjs"
   },
   "devDependencies": {
     "@types/node": "^22.15.0",

@@ -120,11 +120,11 @@ final class PublicSpec
                 'paragraphs' => $english ? [
                     'Create an account, then a project. The secret geoapi_sk_ is shown once on the create response. Store it on your server. The next cabinet page does not show it again.',
                     'Call GET /api/v1/brands, then GET /api/v1/brands/{slug}/models, then GET /api/v1/models/{id}/years or /generations, then modifications. Replace the slug and ids with values from the previous response.',
-                    'The browser embed uses the public key geoapi_pk_, never the secret. The TypeScript SDK is packages/sdk-js in this repository. MCP and CLI are not published.',
+                    'The browser embed uses the public key geoapi_pk_, never the secret. The TypeScript SDK is packages/sdk-js in this repository. The MCP server is packages/mcp-server in this repository. CLI is not published.',
                 ] : [
                     'შექმენით ანგარიში და პროექტი. საიდუმლო geoapi_sk_ ერთხელ ჩანს შექმნის პასუხში. შეინახეთ ის სერვერზე. შემდეგი კაბინეტის გვერდი მას აღარ აჩვენებს.',
                     'გამოიძახეთ GET /api/v1/brands, შემდეგ GET /api/v1/brands/{slug}/models, შემდეგ GET /api/v1/models/{id}/years ან /generations, შემდეგ მოდიფიკაციები. slug და id წინა პასუხიდან ჩასვით.',
-                    'ბრაუზერის ჩასმა იყენებს საჯარო გასაღებს geoapi_pk_. საიდუმლო გასაღები იქ არ დებს. TypeScript SDK არის packages/sdk-js ამ რეპოზიტორიაში. MCP და CLI გამოქვეყნებული არ არის.',
+                    'ბრაუზერის ჩასმა იყენებს საჯარო გასაღებს geoapi_pk_. საიდუმლო გასაღები იქ არ დებს. TypeScript SDK არის packages/sdk-js ამ რეპოზიტორიაში. MCP სერვერი არის packages/mcp-server ამ რეპოზიტორიაში. CLI გამოქვეყნებული არ არის.',
                 ],
             ],
             [
@@ -177,10 +177,10 @@ final class PublicSpec
                 'title' => $english ? 'Changelog' : 'ცვლილებები',
                 'paragraphs' => $english ? [
                     'OpenAPI info.version is 1.2.0. It documents the catalog that is deployed: the list envelope, years, specs, equipment, and colors with a verified flag. This version does not deprecate a field.',
-                    'The host is https://geoapi.ge. This page is not an incident log. The TypeScript SDK in packages/sdk-js is 0.1.0 and is not on the public npm registry. MCP and CLI are not published.',
+                    'The host is https://geoapi.ge. This page is not an incident log. The TypeScript SDK in packages/sdk-js is 0.1.0 and is not on the public npm registry. The MCP server in packages/mcp-server is 0.1.0 and is not on the public npm registry. CLI is not published.',
                 ] : [
                     'OpenAPI info.version არის 1.2.0. ის აღწერს კატალოგს, რომელიც გაშვებულია: სიის კონვერტს, წლებს, სპეციფიკაციას, კომპლექტაციას და ფერებს verified დროშით. ეს ვერსია ველს არ აუქმებს.',
-                    'ჰოსტია https://geoapi.ge. ეს გვერდი ინციდენტების ჟურნალი არ არის. TypeScript SDK packages/sdk-js-ში არის 0.1.0 და საჯარო npm რეესტრში არ დევს. MCP და CLI გამოქვეყნებული არ არის.',
+                    'ჰოსტია https://geoapi.ge. ეს გვერდი ინციდენტების ჟურნალი არ არის. TypeScript SDK packages/sdk-js-ში არის 0.1.0 და საჯარო npm რეესტრში არ დევს. MCP სერვერი packages/mcp-server-ში არის 0.1.0 და საჯარო npm რეესტრში არ დევს. CLI გამოქვეყნებული არ არის.',
                 ],
             ],
             [
@@ -200,11 +200,11 @@ final class PublicSpec
                 'id' => 'guide-packages',
                 'title' => $english ? 'SDK, MCP, and CLI' : 'SDK, MCP და CLI',
                 'paragraphs' => $english ? [
-                    'The TypeScript SDK is packages/sdk-js in this repository, version 0.1.0. It calls this REST API and does not keep a second copy of the catalog rules. It is not on the public npm registry. Node 20 or newer. Construct it with new GeoAPI({ apiKey }). brands.list, models.byBrand, generations.byModel, modifications.list, and modifications.get cover the picker. It retries 429 and 503 at most twice and honors Retry-After. It does not retry 400, 401, or 403. GeoAPIError has status, code, and requestId. requestId is null because this API does not send one.',
-                    'A secret key is refused in the browser. MCP and CLI are not published. The widget script is the browser embed. It uses geoapi_pk_ and does not contain a secret key.',
+                    'The TypeScript SDK is packages/sdk-js in this repository, version 0.1.0. It calls this REST API and does not keep a second copy of the catalog rules. It is not on the public npm registry. Node 20 or newer. Construct it with new GeoAPI({ apiKey }). brands.list, models.byBrand, generations.byModel, modifications.list, and modifications.get cover the picker. It retries 429 and 503 at most twice. A present Retry-After is capped at 2 seconds. A missing Retry-After waits 250 ms times the attempt. It does not retry 400, 401, or 403. GeoAPIError has status, code, retryAfter, and requestId. requestId is null because this API does not send one. scripts/smoke.mjs names the call that failed.',
+                    'A secret key is refused in a browser page and in a web worker. The MCP server is packages/mcp-server in this repository, version 0.1.0. It is a local stdio process, not an HTTP route, and it is not on the public npm registry. GEOAPI_API_KEY is geoapi_sk_… in the host environment, never a tool argument. The tools are geoapi_list_brands, geoapi_list_models, geoapi_list_generations, geoapi_list_years, geoapi_list_modifications, geoapi_get_modification, geoapi_get_specs, geoapi_get_equipment, and geoapi_get_coverage. A prompt such as list BMW models and one generation uses those tools. This page does not run that prompt against production. CLI is not published. The widget script is the browser embed. It uses geoapi_pk_ and does not contain a secret key.',
                 ] : [
-                    'TypeScript SDK არის packages/sdk-js ამ რეპოზიტორიაში, ვერსია 0.1.0. ის ამ REST API-ს იძახებს და კატალოგის წესების მეორე ასლს არ ინახავს. საჯარო npm რეესტრში არ დევს. სჭირდება Node 20 ან უფრო ახალი. იქმნება new GeoAPI({ apiKey })-ით. brands.list, models.byBrand, generations.byModel, modifications.list და modifications.get ამრჩევს ფარავს. 429-სა და 503-ს ხელახლა ცდის მაქსიმუმ ორჯერ და Retry-After-ს ითვალისწინებს. 400, 401 და 403 ხელახლა არ იგზავნება. GeoAPIError-ს აქვს status, code და requestId. requestId არის null, რადგან ეს API მას არ აგზავნის.',
-                    'საიდუმლო გასაღები ბრაუზერში უარყოფილია. MCP და CLI გამოქვეყნებული არ არის. ვიჯეტის სკრიპტი ბრაუზერის ჩასმაა. ის იყენებს geoapi_pk_ და საიდუმლო გასაღებს არ შეიცავს.',
+                    'TypeScript SDK არის packages/sdk-js ამ რეპოზიტორიაში, ვერსია 0.1.0. ის ამ REST API-ს იძახებს და კატალოგის წესების მეორე ასლს არ ინახავს. საჯარო npm რეესტრში არ დევს. სჭირდება Node 20 ან უფრო ახალი. იქმნება new GeoAPI({ apiKey })-ით. brands.list, models.byBrand, generations.byModel, modifications.list და modifications.get ამრჩევს ფარავს. 429-სა და 503-ს ხელახლა ცდის მაქსიმუმ ორჯერ. Retry-After იზღუდება 2 წამით. სათაურის არყოფნისას ლოდინი არის 250 მილიწამი გამრავლებული მცდელობაზე. 400, 401 და 403 ხელახლა არ იგზავნება. GeoAPIError-ს აქვს status, code, retryAfter და requestId. requestId არის null, რადგან ეს API მას არ აგზავნის. scripts/smoke.mjs ასახელებს მოთხოვნას, რომელიც ჩავარდა.',
+                    'საიდუმლო გასაღები უარყოფილია ბრაუზერის გვერდზე და web worker-ში. MCP სერვერი არის packages/mcp-server ამ რეპოზიტორიაში, ვერსია 0.1.0. ის ლოკალური stdio პროცესია, არა HTTP მისამართი, და საჯარო npm რეესტრში არ დევს. GEOAPI_API_KEY არის geoapi_sk_… ჰოსტის გარემოში და არა tool-ის არგუმენტი. ხელსაწყოებია geoapi_list_brands, geoapi_list_models, geoapi_list_generations, geoapi_list_years, geoapi_list_modifications, geoapi_get_modification, geoapi_get_specs, geoapi_get_equipment და geoapi_get_coverage. მოთხოვნა, როგორიცაა BMW-ის მოდელები და ერთი თაობა, ამ ხელსაწყოებს იყენებს. ეს გვერდი ამ მოთხოვნას პროდაქშენზე არ უშვებს. CLI გამოქვეყნებული არ არის. ვიჯეტის სკრიპტი ბრაუზერის ჩასმაა. ის იყენებს geoapi_pk_ და საიდუმლო გასაღებს არ შეიცავს.',
                 ],
             ],
             [
@@ -246,7 +246,7 @@ final class PublicSpec
             .'Dimensions and performance groups are null because those columns are not stored. '
             .'Colors return every stored row with a verified flag. '
             .'Document version '.self::VERSION.' matches the deployed catalog. '
-            .'The TypeScript SDK is packages/sdk-js 0.1.0 in this repository and is not on the public npm registry. MCP and CLI are not published. '
+            .'The TypeScript SDK is packages/sdk-js 0.1.0 in this repository and is not on the public npm registry. The MCP server is packages/mcp-server 0.1.0 in this repository and is not on the public npm registry. CLI is not published. '
             .'The host is '.self::ORIGIN.'.';
     }
 
@@ -463,7 +463,7 @@ final class PublicSpec
             .'Errors, JSON error.code and error.message only, no request id: 401 unauthorized, 403 forbidden, 404 not_found, 405 method_not_allowed, 422 invalid_parameter, 429 RATE_LIMIT_EXCEEDED or DAILY_QUOTA_EXCEEDED or MONTHLY_QUOTA_EXCEEDED, 503 unavailable. Authentication runs before the method check. A non-GET request without an accepted key is 401, not 405. 405 is returned only after the key is accepted. Use GET.'."\n\n"
             .'Limits: one project shares 60 requests each UTC minute and 10 000 successful requests each UTC month with the widget. Those caps are active. The 2 000 successful requests per UTC day limit is not enforced in production today, because the daily check runs only when platform.project_limits.per_day exists. A missing limits row or a failed meter is 503, not an unmetered success. 401, 403, 404, 405, 422, 429, and 503 do not spend the month. Failures still use the minute window. On 429, wait Retry-After seconds. Do not retry 401, 403, 404, or 422. Success sends X-RateLimit-* for the minute and X-Quota-* for the month. 429 sends X-RateLimit-* for the window that was hit.'."\n\n"
             .'Coverage: JSON ids are strings. null means the stored value is missing. dimensions and performance are null. Colors include unverified rows with verified false. Photo files and VIN are not on these routes. Photo rights are not established.'."\n\n"
-            .'Version '.self::VERSION.' at '.self::ORIGIN.'. The TypeScript SDK is packages/sdk-js 0.1.0 in this repository and is not on the public npm registry. MCP and CLI are not published. The widget is the browser embed and uses geoapi_pk_.';
+            .'Version '.self::VERSION.' at '.self::ORIGIN.'. The TypeScript SDK is packages/sdk-js 0.1.0 in this repository and is not on the public npm registry. The MCP server is packages/mcp-server 0.1.0 in this repository, speaks stdio, and is not on the public npm registry. CLI is not published. The widget is the browser embed and uses geoapi_pk_.';
     }
 
     /** @return array<string, mixed> */

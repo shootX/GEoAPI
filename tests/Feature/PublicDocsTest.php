@@ -68,6 +68,8 @@ final class PublicDocsTest extends TestCase
                 '401, not 405',
                 'not enforced in production today',
                 'packages/sdk-js',
+                'packages/mcp-server',
+                'CLI is not published',
             ] as $needle) {
                 $this->assertStringContainsString($needle, $description, $row['path'].' '.$needle);
             }
@@ -162,6 +164,9 @@ final class PublicDocsTest extends TestCase
             $this->assertStringNotContainsString('$59', $html);
             $this->assertStringNotContainsString('npm install', $html);
             $this->assertStringContainsString($locale === 'en' ? 'not published' : 'გამოქვეყნებული არ არის', $html);
+            $this->assertStringContainsString('packages/mcp-server', $html);
+            $this->assertStringContainsString('geoapi_list_brands', $html);
+            $this->assertStringContainsString($locale === 'en' ? 'CLI is not published' : 'CLI გამოქვეყნებული არ არის', $html);
             $this->assertStringContainsString('public-key=&quot;demo&quot;', $html);
             preg_match_all('#https://geoapi\.ge(/api/v1/[^\\\\\s"<&]+)#', $html, $matches);
             $paths = array_values(array_unique($matches[1]));

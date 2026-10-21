@@ -1,0 +1,11 @@
+{
+  "mcpServers": {
+    "geoapi": {
+      "command": "node",
+      "args": ["packages/mcp-server/dist/index.js"],
+      "env": {
+        "GEOAPI_API_KEY": "geoapi_sk_…"
+      }
+    }
+  }
+}

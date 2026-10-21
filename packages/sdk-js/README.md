@@ -22,3 +22,5 @@ const detail = await api.modifications.get("12345");
 `GeoAPIError` has `status`, `code`, `retryAfter`, and `requestId`. `requestId` is null because the API response is only `error.code` and `error.message`.
 
 `npm test` uses a mock `fetch` and a local `node:http` server. It does not call production and it does not run a staging smoke test.
+
+`node scripts/smoke.mjs` runs the five quickstart calls against `GEOAPI_BASE_URL` or `https://geoapi.ge`. If a call throws, stderr says `smoke failed at <call>` with the status, code, and `retryAfter`. The process exits 1. The API key is not printed. `npm test` only checks that reporter; it does not run the live script.
