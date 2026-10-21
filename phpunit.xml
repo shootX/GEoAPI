@@ -40,5 +40,6 @@
         <env name="CARAPI_CATALOG_ADMIN_USER" value=""/>
         <env name="CARAPI_CATALOG_ADMIN_PASSWORD" value=""/>
         <env name="CARAPI_CABINET_DEMO" value="false"/>
+        <env name="STRIPE_WEBHOOK_SECRET" value="" force="true"/>
     </php>
 </phpunit>
