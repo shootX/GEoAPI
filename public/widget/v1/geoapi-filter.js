@@ -207,7 +207,11 @@
           rows = rows.concat(json.data || []);
           total = json.meta ? json.meta.total : rows.length;
           page += 1;
-        } while (rows.length < total && page < 1000);
+          if (!(rows.length < total && page < 1000)) {
+            break;
+          }
+          // A `continue` above (retry) must re-enter the loop, so the exit test lives here.
+        } while (true);
       } catch (e) {
         this.status.textContent = 'ქსელის შეცდომა. სერვერთან დაკავშირება ვერ მოხერხდა. შეამოწმეთ ინტერნეტკავშირი და სცადეთ ხელახლა.';
         this.status.className = 'err';
