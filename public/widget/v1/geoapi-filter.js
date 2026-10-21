@@ -153,7 +153,7 @@
       var total = 0;
       var retries = 0;
       try {
-        do {
+        while (page < 1000) {
           var payload = Object.assign({ page: page, per_page: 100 }, body);
           var response;
           try {
@@ -207,11 +207,11 @@
           rows = rows.concat(json.data || []);
           total = json.meta ? json.meta.total : rows.length;
           page += 1;
-          if (!(rows.length < total && page < 1000)) {
+          if (rows.length >= total) {
             break;
           }
-          // A `continue` above (retry) must re-enter the loop, so the exit test lives here.
-        } while (true);
+          // Retries `continue` back to the top; the exit test lives here, not in a do/while condition.
+        }
       } catch (e) {
         this.status.textContent = 'ქსელის შეცდომა. სერვერთან დაკავშირება ვერ მოხერხდა. შეამოწმეთ ინტერნეტკავშირი და სცადეთ ხელახლა.';
         this.status.className = 'err';
