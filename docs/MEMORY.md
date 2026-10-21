@@ -44,3 +44,19 @@ Free limits remain 60/minute and 10 000/month. The new daily cap is 2 000 succes
 ## 2026-10-20 — Auto-deploy
 
 Push to `main` is `.github/workflows/deploy.yml`. PHPUnit runs first on the GitHub runner. The server step uses `appleboy/ssh-action` and the secrets `DEPLOY_HOST`, `DEPLOY_USER`, `DEPLOY_SSH_KEY`, and `DEPLOY_PORT` (22 when unset). Commands run in `/www/wwwroot/geoapi.ge`. The checkout owner is `www`. PHP-FPM stays `carapi`. The workflow never writes `.env`. One-time setup is `docs/DEPLOY.md`. The public remote is `https://github.com/shootX/GEoAPI.git`.
+
+## 2026-10-21 — WP-00
+
+HEAD and `origin/main` are `61c6cd7dcb78bfd467b73be71bb519b3dca6ff2d`. There is no diff against that commit. The audit did not open PostgreSQL, so every live `COUNT(*)` stays unknown. Older figures in this file (about 350k modifications, about 38M equipment rows, home `22 367`) were not measured again.
+
+CI on `61c6cd7` is run 39509993059: PHPUnit failed with `MissingAppKeyException`, Deploy was skipped. All five Deploy runs failed the same way. `.github/workflows/deploy.yml` copies `.env.example` (`APP_KEY=` empty) and runs `vendor/bin/phpunit`. `phpunit.xml` does not set `APP_KEY`. A local-only rerun on PHP 8.4.27 reproduced exit 2 with 48 tests, 94 assertions, 30 errors. After `php artisan key:generate --force` in that ephemeral copy, PHPUnit exited 0: 48 tests, 407 assertions. That `.env` and `vendor/` are not part of the audit commit. The workflow was not changed.
+
+`POST /billing/provider-webhook` records a Stripe event id without reading `Stripe-Signature`. `config/services.php` has no `stripe` key. `PaymentEvents::record` only inserts `payment_events`. It does not grant a plan.
+
+Commit `b3ec4558022778b0534d9f233df9294be14689d8` is diverged from `main` (parent `b746497`) and still readable by SHA. It added `.env.bak-2026-10-20-1633`, two `storage/framework/carapi-sessions/sess_*` files, and `public/assets/fonts/bpg-arial.woff2`. The file contents were not opened. `.gitignore` does not ignore `.env.*`, `*.bak`, or `storage/framework/carapi-sessions/`. On 2026-10-21T19:12:07Z, `GET /assets/fonts/bpg-arial.woff2` returned 404. The CSS served at that time does not reference that file. HEAD does not contain it.
+
+`deploy.yml` at HEAD uses `/www/wwwroot/geoapi.ge`. At `b746497` it used `/www/wwwroot/car.socialsave.cc`. Because every Deploy job was skipped, Actions has not shown which directory the server uses. The string `/www/wwwroot/car.socialsave.cc/public` is not in this repository's history. The live nginx root was not read.
+
+Open pull requests on 2026-10-21: #1 draft, base `main`, conflicting; #2 draft, base `cursor/critical-audit-fixes-8fe2`, not `main`; #10 draft, base `main`, mergeable, no checks. #3 is merged (2026-10-20T10:39:01Z), not an open draft.
+
+Public `GET /api/v1/brands` and `/api/v1/coverage` returned 401. OpenAPI 3.0.3 version 1.1.0 at `https://geoapi.ge` matched the paths in `CatalogApi`. The published widget file hash matched HEAD, including `modification_id: null`. VIN was not added. WP-01 was not started.
