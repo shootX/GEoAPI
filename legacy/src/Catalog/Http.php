@@ -85,13 +85,49 @@ final class Http
                     'rows' => array_slice($choices['rows'], $page['offset'], $page['per_page']),
                     'total' => $choices['total'],
                 ];
-            } else {
+            } elseif ($kind === 'widget:generations') {
                 if (! $repo->modelExists((string) $id)) {
                     self::json(404, ['error' => ['code' => 'not_found', 'message' => 'მითითებული მოდელი ვერ მოიძებნა.']]);
 
                     return;
                 }
-                $result = $repo->generations((string) $id, $page['per_page'], $page['offset']);
+                $year = self::yearParam($_GET['year'] ?? null, false);
+                if ($year === false) {
+                    return;
+                }
+                if ($year === null) {
+                    $result = $repo->generations((string) $id, $page['per_page'], $page['offset']);
+                } else {
+                    $choices = PickerSelection::generations(Connection::pdo(), (string) $id, $year);
+                    if ($choices === null) {
+                        self::json(404, ['error' => ['code' => 'not_found', 'message' => 'მითითებული მოდელი ვერ მოიძებნა.']]);
+
+                        return;
+                    }
+                    $result = [
+                        'rows' => array_slice($choices['rows'], $page['offset'], $page['per_page']),
+                        'total' => $choices['total'],
+                    ];
+                }
+            } elseif ($kind === 'widget:modifications') {
+                $year = self::yearParam($_GET['year'] ?? null, true);
+                if ($year === false) {
+                    return;
+                }
+                $choices = PickerSelection::modifications(Connection::pdo(), (string) $id, $year);
+                if ($choices === null) {
+                    self::json(404, ['error' => ['code' => 'not_found', 'message' => 'მითითებული თაობა ვერ მოიძებნა.']]);
+
+                    return;
+                }
+                $result = [
+                    'rows' => array_slice($choices['rows'], $page['offset'], $page['per_page']),
+                    'total' => $choices['total'],
+                ];
+            } else {
+                self::json(404, ['error' => ['code' => 'not_found', 'message' => 'მითითებული მისამართით მონაცემები ვერ მოიძებნა.']]);
+
+                return;
             }
             self::sendCounted($limiter, ['key_id' => 0, 'project_id' => $projectId], $kind, [
                 'data' => $result['rows'],
@@ -153,6 +189,28 @@ final class Http
         $value = carapi_env('CARAPI_CATALOG_ENABLED');
 
         return is_string($value) && in_array(strtolower(trim($value)), ['1', 'true', 'on', 'yes'], true);
+    }
+
+    /** Missing year is null. An unusable year is false and already answered with 422. */
+    public static function yearParam(mixed $value, bool $required): int|false|null
+    {
+        if ($value === null || $value === '') {
+            if ($required) {
+                self::json(422, ['error' => ['code' => 'invalid_parameter', 'message' => 'year უნდა იყოს ოთხნიშნა წელი 1880-დან 2100-მდე.']]);
+
+                return false;
+            }
+
+            return null;
+        }
+        $text = is_int($value) ? (string) $value : (is_string($value) ? $value : '');
+        if (preg_match('/^(18[8-9][0-9]|19[0-9]{2}|20[0-9]{2}|2100)$/', $text) !== 1) {
+            self::json(422, ['error' => ['code' => 'invalid_parameter', 'message' => 'year უნდა იყოს ოთხნიშნა წელი 1880-დან 2100-მდე.']]);
+
+            return false;
+        }
+
+        return (int) $text;
     }
 
     /** @return array{page:int, per_page:int, offset:int}|null */

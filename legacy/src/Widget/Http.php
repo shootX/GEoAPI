@@ -4,13 +4,11 @@ declare(strict_types=1);
 
 namespace Carapi\Widget;
 
-use Carapi\Catalog\CatalogRepository;
-use Carapi\Catalog\Connection as CatalogConnection;
+use App\Access\LegacyGate;
 use Carapi\Catalog\Http as CatalogHttp;
 use Carapi\Platform\Connection as PlatformConnection;
 use Carapi\Platform\Origins;
 use Carapi\Platform\UnavailableException;
-use Carapi\Platform\UsageLimiter;
 use Carapi\Platform\WidgetRepository;
 use PDOException;
 
@@ -28,7 +26,7 @@ final class Http
 
             return;
         }
-        if (!self::enabled()) {
+        if (! self::enabled()) {
             http_response_code(404);
             header('Content-Type: application/json; charset=utf-8');
             echo json_encode(['error' => ['code' => 'not_found', 'message' => 'მითითებული მისამართით მონაცემები ვერ მოიძებნა.']], JSON_UNESCAPED_UNICODE);
@@ -46,7 +44,7 @@ final class Http
         $method = $_SERVER['REQUEST_METHOD'] ?? 'GET';
         try {
             $widget = (new WidgetRepository(PlatformConnection::pdo()))->findByKey($route['key']);
-        } catch (UnavailableException | PDOException) {
+        } catch (UnavailableException|PDOException) {
             CatalogHttp::json(503, ['error' => ['code' => 'unavailable', 'message' => 'სერვისი დროებით მიუწვდომელია. სცადეთ მოთხოვნის ხელახლა გაგზავნა მოგვიანებით.']]);
 
             return;
@@ -57,7 +55,7 @@ final class Http
             return;
         }
         $origin = $_SERVER['HTTP_ORIGIN'] ?? '';
-        if (!is_string($origin) || !Origins::matches($origin, $widget['allowed_origins'])) {
+        if (! is_string($origin) || ! Origins::matches($origin, $widget['allowed_origins'])) {
             CatalogHttp::json(403, ['error' => ['code' => 'forbidden', 'message' => 'მოთხოვნა არ არის დაშვებული. შეამოწმეთ საჯარო API გასაღები, დაშვებული origin და პროექტის მდგომარეობა.']]);
 
             return;
@@ -78,13 +76,13 @@ final class Http
             && $widget['project_status'] === 'active'
             && $widget['user_status'] === 'active'
             && $widget['email_verified_at'] !== null;
-        if (!$open) {
+        if (! $open) {
             CatalogHttp::json(403, ['error' => ['code' => 'forbidden', 'message' => 'მოთხოვნა არ არის დაშვებული. შეამოწმეთ საჯარო API გასაღები, დაშვებული origin და პროექტის მდგომარეობა.']]);
 
             return;
         }
-        if (class_exists(\App\Access\LegacyGate::class)) {
-            $denial = \App\Access\LegacyGate::catalog((int) $widget['project_id']);
+        if (class_exists(LegacyGate::class)) {
+            $denial = LegacyGate::catalog((int) $widget['project_id']);
             if ($denial !== null) {
                 CatalogHttp::json($denial['status'], $denial['body']);
 
@@ -95,6 +93,7 @@ final class Http
         $body = is_array($body) ? $body : [];
         $_GET['page'] = isset($body['page']) ? (string) $body['page'] : null;
         $_GET['per_page'] = isset($body['per_page']) ? (string) $body['per_page'] : null;
+        $_GET['year'] = array_key_exists('year', $body) && is_scalar($body['year']) ? (string) $body['year'] : null;
         CatalogHttp::readForProject((int) $widget['project_id'], $route['kind'], $route['slug'] ?? null, $route['id'] ?? null);
     }
 
@@ -118,6 +117,14 @@ final class Http
         }
         if (preg_match('#^/widget/v1/((?:geoapi_pk_|carapi_pk_)[0-9a-f]{32})/models/([1-9][0-9]{0,18})/generations$#', $path, $m) === 1) {
             return ['key' => $m[1], 'kind' => 'widget:generations', 'id' => $m[2]];
+        }
+        if (preg_match('#^/widget/v1/((?:geoapi_pk_|carapi_pk_)[0-9a-f]{32})/generations/([1-9][0-9]{0,18})/modifications$#', $path, $m) === 1) {
+            return ['key' => $m[1], 'kind' => 'widget:modifications', 'id' => $m[2]];
+        }
+        if (preg_match('#^/widget/v1/((?:geoapi_pk_|carapi_pk_)[0-9a-f]{32})/generations/([^/]+)/modifications$#', $path, $m) === 1) {
+            CatalogHttp::json(422, ['error' => ['code' => 'invalid_parameter', 'message' => 'თაობის id არასწორია. გამოიყენეთ დადებითი მთელი რიცხვი, რომელიც API-ის პასუხშია.']]);
+
+            return ['key' => $m[1], 'kind' => 'invalid'];
         }
         if (preg_match('#^/widget/v1/((?:geoapi_pk_|carapi_pk_)[0-9a-f]{32})/models/([^/]+)/generations$#', $path, $m) === 1) {
             CatalogHttp::json(422, ['error' => ['code' => 'invalid_parameter', 'message' => 'მოდელის id არასწორია. გამოიყენეთ დადებითი მთელი რიცხვი, რომელიც API-ის პასუხშია.']]);

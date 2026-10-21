@@ -91,36 +91,18 @@ final class VehiclePickerRepository
     /** @return array{rows:list<array<string, mixed>>, total:int}|null */
     public function years(string $modelId): ?array
     {
-        $cacheKey = 'years:'.$modelId;
+        $cacheKey = 'years:v2:'.$modelId;
         $cached = $this->recall($cacheKey);
         if ($cached !== null) {
             return $cached;
         }
-        if (! $this->exists('public.models', $modelId)) {
+        $choices = PickerSelection::years($this->pdo, $modelId);
+        if ($choices === null) {
             return null;
         }
-        $stmt = $this->pdo->prepare(<<<'SQL'
-            SELECT DISTINCT y.year::int AS year
-            FROM public.generations g
-            CROSS JOIN LATERAL generate_series(
-                g.year_start,
-                LEAST(
-                    COALESCE(g.year_end, EXTRACT(YEAR FROM CURRENT_DATE)::int),
-                    EXTRACT(YEAR FROM CURRENT_DATE)::int
-                )
-            ) AS y(year)
-            WHERE g.model_id = :id
-              AND g.year_start IS NOT NULL
-              AND g.year_start <= EXTRACT(YEAR FROM CURRENT_DATE)::int
-              AND COALESCE(g.year_end, g.year_start) >= g.year_start
-            ORDER BY year DESC
-        SQL);
-        $stmt->bindValue('id', $modelId);
-        $stmt->execute();
         $rows = [];
-        foreach ($stmt->fetchAll() ?: [] as $row) {
-            $year = (string) $row['year'];
-            $rows[] = ['id' => $year, 'name' => $year];
+        foreach ($choices['rows'] as $row) {
+            $rows[] = ['id' => $row['id'], 'name' => $row['name']];
         }
 
         return $this->store($cacheKey, ['rows' => $rows, 'total' => count($rows)]);
@@ -129,150 +111,32 @@ final class VehiclePickerRepository
     /** @return array{rows:list<array<string, mixed>>, total:int}|null */
     public function generations(string $modelId, int $year, int $limit, int $offset): ?array
     {
-        $cacheKey = 'generations:'.$modelId.':'.$year.':'.$limit.':'.$offset;
+        $cacheKey = 'generations:v2:'.$modelId.':'.$year.':'.$limit.':'.$offset;
         $cached = $this->recall($cacheKey);
         if ($cached !== null) {
             return $cached;
         }
-        if (! $this->exists('public.models', $modelId)) {
+        $choices = PickerSelection::generations($this->pdo, $modelId, $year);
+        if ($choices === null) {
             return null;
         }
-        $filter = <<<'SQL'
-            FROM public.generations g
-            WHERE g.model_id = :id
-              AND g.year_start IS NOT NULL
-              AND g.year_start <= :year_from
-              AND (g.year_end IS NULL OR g.year_end >= :year_to)
-        SQL;
-        $group = <<<'SQL'
-            coalesce(nullif(btrim(g.chassis_code), ''), nullif(btrim(g.name), ''), g.id::text),
-            coalesce(g.year_start, 0),
-            coalesce(g.year_end, 0),
-            coalesce(nullif(btrim(g.market), ''), ''),
-            coalesce(nullif(btrim(g.steering_wheel), ''), ''),
-            coalesce(nullif(btrim(g.body_type), ''), '')
-        SQL;
-        $totalStmt = $this->pdo->prepare('SELECT count(*) FROM (SELECT 1 '.$filter.' GROUP BY '.$group.') grouped');
-        $totalStmt->bindValue('id', $modelId);
-        $totalStmt->bindValue('year_from', $year, PDO::PARAM_INT);
-        $totalStmt->bindValue('year_to', $year, PDO::PARAM_INT);
-        $totalStmt->execute();
-        $stmt = $this->pdo->prepare(<<<SQL
-            SELECT id, name, code, year_start, year_end, market, steering
-            FROM (
-                SELECT DISTINCT ON ($group)
-                       g.id::text AS id,
-                       NULLIF(btrim(g.name), '') AS name,
-                       NULLIF(btrim(g.chassis_code), '') AS code,
-                       g.year_start,
-                       g.year_end,
-                       NULLIF(btrim(g.market), '') AS market,
-                       NULLIF(btrim(g.steering_wheel), '') AS steering
-                $filter
-                ORDER BY $group, g.id
-            ) deduped
-            ORDER BY year_start, name NULLS LAST, id
-            LIMIT :limit OFFSET :offset
-        SQL);
-        $stmt->bindValue('id', $modelId);
-        $stmt->bindValue('year_from', $year, PDO::PARAM_INT);
-        $stmt->bindValue('year_to', $year, PDO::PARAM_INT);
-        $this->bindLimit($stmt, $limit, $offset);
-        $stmt->execute();
-        $rows = [];
-        foreach ($stmt->fetchAll() ?: [] as $row) {
-            $name = self::text($row['name']);
-            $code = self::text($row['code']);
-            $start = self::year($row['year_start']);
-            $end = self::year($row['year_end']);
-            $rows[] = [
-                'id' => (string) $row['id'],
-                'name' => $name,
-                'code' => $code,
-                'year_start' => $start,
-                'year_end' => $end,
-                'market' => self::text($row['market']),
-                'steering' => self::text($row['steering']),
-                'label' => self::join([
-                    $name ?? $code ?? (string) $row['id'],
-                    $name !== null ? $code : null,
-                    self::span($start, $end),
-                    self::text($row['market']),
-                    self::text($row['steering']),
-                ]),
-            ];
-        }
+        $rows = array_slice($choices['rows'], $offset, $limit);
 
-        return $this->store($cacheKey, ['rows' => $rows, 'total' => (int) $totalStmt->fetchColumn()]);
+        return $this->store($cacheKey, ['rows' => $rows, 'total' => $choices['total']]);
     }
 
     /** @return array{rows:list<array<string, mixed>>, total:int}|null */
     public function modifications(string $generationId, int $year, int $limit, int $offset): ?array
     {
-        if (! $this->exists('public.generations', $generationId)) {
+        $choices = PickerSelection::modifications($this->pdo, $generationId, $year);
+        if ($choices === null) {
             return null;
         }
-        $filter = <<<'SQL'
-            FROM public.modifications mod
-            WHERE mod.generation_id = :id
-              AND (mod.year_start IS NULL OR mod.year_start <= :year_from)
-              AND (mod.year_end IS NULL OR mod.year_end >= :year_to)
-        SQL;
-        $totalStmt = $this->pdo->prepare('SELECT count(*) '.$filter);
-        $totalStmt->bindValue('id', $generationId);
-        $totalStmt->bindValue('year_from', $year, PDO::PARAM_INT);
-        $totalStmt->bindValue('year_to', $year, PDO::PARAM_INT);
-        $totalStmt->execute();
-        $stmt = $this->pdo->prepare(<<<SQL
-            SELECT page.id,
-                   page.name,
-                   page.engine_volume_cc,
-                   page.transmission,
-                   page.drive_type,
-                   NULLIF(spec.specs->>'power_hp', '') AS power_hp
-            FROM (
-                SELECT mod.id::text AS id,
-                       btrim(mod.name) AS name,
-                       mod.engine_volume_cc,
-                       NULLIF(btrim(mod.transmission), '') AS transmission,
-                       NULLIF(btrim(mod.drive_type), '') AS drive_type
-                $filter
-                ORDER BY mod.name, mod.id
-                LIMIT :limit OFFSET :offset
-            ) page
-            LEFT JOIN public.modification_specs spec ON spec.modification_id = page.id::bigint
-            ORDER BY page.name, page.id
-        SQL);
-        $stmt->bindValue('id', $generationId);
-        $stmt->bindValue('year_from', $year, PDO::PARAM_INT);
-        $stmt->bindValue('year_to', $year, PDO::PARAM_INT);
-        $this->bindLimit($stmt, $limit, $offset);
-        $stmt->execute();
-        $rows = [];
-        foreach ($stmt->fetchAll() ?: [] as $row) {
-            $name = self::text($row['name']) ?? '';
-            $volume = self::year($row['engine_volume_cc']);
-            $power = self::number($row['power_hp']);
-            $transmission = self::transmission(self::text($row['transmission']));
-            $drive = self::drive(self::text($row['drive_type']));
-            $rows[] = [
-                'id' => (string) $row['id'],
-                'name' => $name,
-                'engine_volume_cc' => $volume,
-                'power_hp' => $power,
-                'transmission' => $transmission,
-                'drive' => $drive,
-                'label' => self::join([
-                    $name,
-                    self::liters($volume),
-                    $power === null ? null : self::trimNumber($power).' hp',
-                    $transmission,
-                    $drive,
-                ]),
-            ];
-        }
 
-        return ['rows' => $rows, 'total' => (int) $totalStmt->fetchColumn()];
+        return [
+            'rows' => array_slice($choices['rows'], $offset, $limit),
+            'total' => $choices['total'],
+        ];
     }
 
     /** @return array<string, mixed>|null */
@@ -320,7 +184,7 @@ final class VehiclePickerRepository
         if (! is_array($row)) {
             return null;
         }
-        $specs = self::jsonObject($row['specs']);
+        $specs = PickerSelection::allowSpecs($row['specs'] ?? null);
         $modStart = self::year($row['year_start']);
         $modEnd = self::year($row['year_end']);
         $genStart = self::year($row['generation_year_start']);
@@ -360,36 +224,32 @@ final class VehiclePickerRepository
             'body_type' => $body,
             'engine' => [
                 'volume_cc' => self::year($row['engine_volume_cc']),
-                'type' => self::specText($specs, 'engine_type'),
+                'type' => null,
             ],
-            'power_hp' => self::specNumber($specs, 'power_hp'),
-            'power_kw' => self::specNumber($specs, 'power_kw'),
-            'torque_nm' => self::specNumber($specs, 'torque_nm'),
-            'fuel' => self::specText($specs, 'fuel_type'),
+            'power_hp' => self::number($specs['power_hp'] ?? null),
+            'power_kw' => null,
+            'torque_nm' => null,
+            'fuel' => self::text($specs['fuel_type'] ?? null),
             'transmission' => self::transmission(self::text($row['transmission'])),
             'drive' => self::drive(self::text($row['drive_type'])),
             'consumption' => [
-                'city_l' => self::specNumber($specs, 'fuel_city_l'),
-                'highway_l' => self::specNumber($specs, 'fuel_highway_l'),
-                'combined_l' => self::specNumber($specs, 'fuel_combined_l'),
+                'city_l' => self::number($specs['fuel_city_l'] ?? null),
+                'highway_l' => self::number($specs['fuel_highway_l'] ?? null),
+                'combined_l' => self::number($specs['fuel_combined_l'] ?? null),
             ],
-            'dimensions_mm' => [
-                'length' => self::specNumber($specs, 'length_mm'),
-                'width' => self::specNumber($specs, 'width_mm'),
-                'height' => self::specNumber($specs, 'height_mm'),
-            ],
-            'weight_kg' => self::specNumber($specs, 'curb_weight_kg'),
-            'seats' => self::specNumber($specs, 'seats'),
-            'tank_l' => self::specNumber($specs, 'tank_l'),
-            'max_speed_kmh' => self::specNumber($specs, 'max_speed_kmh'),
-            'trunk_l' => self::specNumber($specs, 'trunk_l'),
-            'clearance_mm' => self::specNumber($specs, 'clearance_mm'),
-            'front_brakes' => self::specText($specs, 'front_brakes'),
-            'rear_brakes' => self::specText($specs, 'rear_brakes'),
-            'front_suspension' => self::specText($specs, 'front_suspension'),
-            'rear_suspension' => self::specText($specs, 'rear_suspension'),
-            'front_tires' => self::specText($specs, 'front_tires'),
-            'rear_tires' => self::specText($specs, 'rear_tires'),
+            'dimensions_mm' => ['length' => null, 'width' => null, 'height' => null],
+            'weight_kg' => null,
+            'seats' => null,
+            'tank_l' => null,
+            'max_speed_kmh' => null,
+            'trunk_l' => null,
+            'clearance_mm' => null,
+            'front_brakes' => null,
+            'rear_brakes' => null,
+            'front_suspension' => null,
+            'rear_suspension' => null,
+            'front_tires' => null,
+            'rear_tires' => null,
             'has_photo' => $matchesPhoto,
             'photo_matches_generation' => $matchesPhoto,
             'equipment' => $this->equipment($id),
@@ -427,39 +287,10 @@ final class VehiclePickerRepository
         return ['mime' => $mime, 'bytes' => $bytes];
     }
 
-    /** @return array{standard:list<array<string, string|null>>, optional:list<array<string, string|null>>, not_available:list<array<string, string|null>>} */
+    /** @return array{standard:list<array<string, mixed>>, optional:list<array<string, mixed>>, not_available:list<array<string, mixed>>, unknown:list<array<string, mixed>>} */
     private function equipment(string $modificationId): array
     {
-        $stmt = $this->pdo->prepare(<<<'SQL'
-            SELECT NULLIF(btrim(category), '') AS category,
-                   NULLIF(btrim(name), '') AS name,
-                   NULLIF(btrim(status), '') AS status,
-                   NULLIF(btrim(value), '') AS value
-            FROM public.modification_equipment
-            WHERE modification_id = :id
-            ORDER BY category NULLS LAST, name NULLS LAST, id
-        SQL);
-        $stmt->bindValue('id', $modificationId);
-        $stmt->execute();
-        $groups = ['standard' => [], 'optional' => [], 'not_available' => []];
-        foreach ($stmt->fetchAll() ?: [] as $row) {
-            $section = match (self::text($row['status'])) {
-                'included' => 'standard',
-                'option' => 'optional',
-                'not_available' => 'not_available',
-                default => null,
-            };
-            if ($section === null) {
-                continue;
-            }
-            $groups[$section][] = [
-                'section' => self::text($row['category']) ?? 'General',
-                'name' => self::text($row['name']) ?? '',
-                'value' => self::text($row['value']),
-            ];
-        }
-
-        return $groups;
+        return PickerSelection::equipment($this->pdo, $modificationId);
     }
 
     private function exists(string $table, string $id): bool

@@ -9,9 +9,7 @@ use PDOException;
 
 final class CatalogRepository
 {
-    public function __construct(private PDO $pdo)
-    {
-    }
+    public function __construct(private PDO $pdo) {}
 
     /** @return array{rows:list<array<string, mixed>>, total:int} */
     public function brands(int $limit, int $offset): array
@@ -210,7 +208,7 @@ final class CatalogRepository
      */
     public function modifications(string $generationId, int $limit, int $offset): ?array
     {
-        $resolved = $this->pdo->prepare($this->generationGroupSql() . <<<'SQL'
+        $resolved = $this->pdo->prepare($this->generationGroupSql().<<<'SQL'
             SELECT r.id::text AS requested_id, m.public_id::text AS public_id
             FROM requested r
             JOIN members m ON m.id = r.id
@@ -218,11 +216,11 @@ final class CatalogRepository
         $resolved->bindValue('id', $generationId);
         $resolved->execute();
         $identity = $resolved->fetch();
-        if (!is_array($identity) || $identity['requested_id'] !== $identity['public_id']) {
+        if (! is_array($identity) || $identity['requested_id'] !== $identity['public_id']) {
             return null;
         }
 
-        $count = $this->pdo->prepare($this->generationGroupSql() . <<<'SQL'
+        $count = $this->pdo->prepare($this->generationGroupSql().<<<'SQL'
             SELECT count(*)
             FROM public.modifications mod
             WHERE mod.generation_id IN (SELECT id FROM members)
@@ -231,7 +229,7 @@ final class CatalogRepository
         $count->execute();
         $total = (int) $count->fetchColumn();
 
-        $stmt = $this->pdo->prepare($this->generationGroupSql() . <<<'SQL'
+        $stmt = $this->pdo->prepare($this->generationGroupSql().<<<'SQL'
             SELECT mod.id::text AS id,
                    btrim(mod.name) AS name,
                    mod.engine_volume_cc,
@@ -314,7 +312,7 @@ final class CatalogRepository
         $stmt->bindValue('id', $id);
         $stmt->execute();
         $row = $stmt->fetch();
-        if (!is_array($row)) {
+        if (! is_array($row)) {
             return null;
         }
 
@@ -385,43 +383,11 @@ final class CatalogRepository
     }
 
     /** @return array{rows:list<array{id:string,name:string,bodies:list<string>}>, total:int} */
-    public function yearChoices(string $modelId): array
+    public function yearChoices(string $modelId, ?int $currentYear = null): array
     {
-        $stmt = $this->pdo->prepare(<<<'SQL'
-            SELECT y.year::int AS year,
-                   COALESCE(
-                       json_agg(DISTINCT lower(btrim(g.body_type)))
-                           FILTER (WHERE nullif(btrim(g.body_type), '') IS NOT NULL),
-                       '[]'::json
-                   ) AS bodies
-            FROM public.generations g
-            CROSS JOIN LATERAL generate_series(
-                g.year_start,
-                LEAST(
-                    COALESCE(g.year_end, EXTRACT(YEAR FROM CURRENT_DATE)::int),
-                    EXTRACT(YEAR FROM CURRENT_DATE)::int
-                )
-            ) AS y(year)
-            WHERE g.model_id = :id
-              AND g.year_start IS NOT NULL
-              AND g.year_start <= EXTRACT(YEAR FROM CURRENT_DATE)::int
-              AND COALESCE(g.year_end, g.year_start) >= g.year_start
-            GROUP BY y.year
-            ORDER BY y.year DESC
-        SQL);
-        $stmt->bindValue('id', $modelId);
-        $stmt->execute();
-        $rows = [];
-        foreach ($stmt->fetchAll() ?: [] as $row) {
-            $year = (string) $row['year'];
-            $rows[] = [
-                'id' => $year,
-                'name' => $year,
-                'bodies' => self::bodies($row['bodies']),
-            ];
-        }
+        $choices = PickerSelection::years($this->pdo, $modelId, $currentYear);
 
-        return ['rows' => $rows, 'total' => count($rows)];
+        return $choices ?? ['rows' => [], 'total' => 0];
     }
 
     /** @return array<string, int|string> */
@@ -452,8 +418,8 @@ final class CatalogRepository
                 to_char(now() AT TIME ZONE 'UTC', 'YYYY-MM-DD"T"HH24:MI:SS"Z"') AS measured_at
         SQL)->fetch();
 
-        if (!is_array($row)) {
-            throw new UnavailableException();
+        if (! is_array($row)) {
+            throw new UnavailableException;
         }
 
         $out = [];
@@ -480,7 +446,7 @@ final class CatalogRepository
             return (int) $this->pdo->query($sql)->fetchColumn();
         } catch (PDOException) {
             error_log('[catalog] query failed');
-            throw new UnavailableException();
+            throw new UnavailableException;
         }
     }
 
@@ -539,22 +505,6 @@ final class CatalogRepository
         ];
     }
 
-    /** @return list<string> */
-    private static function bodies(mixed $value): array
-    {
-        $order = ['sedan', 'hatchback', 'liftback', 'wagon', 'coupe', 'minivan', 'van', 'pickup'];
-        $bodies = self::stringList($value);
-        $rank = array_flip($order);
-        usort($bodies, static function (string $a, string $b) use ($rank): int {
-            $left = $rank[$a] ?? 100;
-            $right = $rank[$b] ?? 100;
-
-            return $left <=> $right ?: strcmp($a, $b);
-        });
-
-        return array_values(array_unique($bodies));
-    }
-
     private static function text(mixed $value): ?string
     {
         if ($value === null) {
@@ -570,7 +520,7 @@ final class CatalogRepository
         if ($value === null || $value === '') {
             return null;
         }
-        if (!is_numeric($value)) {
+        if (! is_numeric($value)) {
             return null;
         }
 
@@ -589,12 +539,12 @@ final class CatalogRepository
             $decoded = json_decode($value, true);
             $value = is_array($decoded) ? $decoded : null;
         }
-        if (!is_array($value) || !array_is_list($value)) {
+        if (! is_array($value) || ! array_is_list($value)) {
             return [];
         }
         $out = [];
         foreach ($value as $item) {
-            if (!is_string($item) && !is_numeric($item)) {
+            if (! is_string($item) && ! is_numeric($item)) {
                 continue;
             }
             $text = trim((string) $item);

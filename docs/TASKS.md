@@ -90,6 +90,15 @@
 
 - [x] `CatalogApi`, `PublicCatalog`, `ListQuery`, and `PublicSpec` use one route list. List responses keep `data`, `meta`, and `collection`. `limit` stays 1–1000. Sort stays on an allowlist. `Authorization: Bearer geoapi_sk_…` is unchanged.
 - [x] `GET /api/v1/models/{id}/years` expands stored `year_start`/`year_end` on generations and modifications. An open `year_end` stops at the current UTC year. `GET /api/v1/modifications/{id}/specs` returns stored engine, transmission, and L/100km consumption. `GET /api/v1/modifications/{id}/equipment` groups `included` / `option` / `not_available` and puts anything else in `unknown`.
-- [x] MISSING: dimension and performance columns are not stored (`dimensions` and `performance` are null). Photo list routes are not added: `model_photos` is one row per model, and attribution for `photos` / `generations.photo_urls` is not established. The existing `/api/models/{id}/photo` route stays. A separate `/search` route was not added; `GET /api/v1/modifications` remains the search. VIN was not added. The widget still calculates years in its own SQL; WP-05 should use this endpoint.
+- [x] MISSING: dimension and performance columns are not stored (`dimensions` and `performance` are null). Photo list routes are not added: `model_photos` is one row per model, and attribution for `photos` / `generations.photo_urls` is not established. The existing `/api/models/{id}/photo` route stays. A separate `/search` route was not added; `GET /api/v1/modifications` remains the search. VIN was not added. Widget years were still a separate SQL query at the end of WP-04; WP-05 aligns them.
 - [x] Colors stay backward compatible: unverified rows are still listed with `verified: false`.
 - [ ] Photo rights (WP-03) are still unknown.
+
+## 2026-10-21 — WP-05 widget parity
+
+- [x] `<geoapi-filter>` keeps `brand_id`, `model_id`, `year`, `body_type`, and `generation_id`. `modification_id` is filled only after a modification is chosen and is null before that. The same event name, `bubbles`, and `composed` stay.
+- [x] Widget, demo, and picker years use `PickerSelection`, the same bounds as `GET /api/v1/models/{id}/years`: open `year_end` stops at the current UTC year, a start after that year is skipped, and modification spans count. Lists are newest-first. Passing `year` filters generations and modifications. A sibling generation id is not a public id.
+- [x] Picker equipment uses the API groups, including `unknown`, and drops duplicate category/name/status rows. The detail card does not show unverified spec JSON (`length_mm`, `source_url`, torque, dimensions). Those fields stay null.
+- [x] 429 and 503 retry at most twice, capped at 2 seconds, then the error stays. There is no unbounded retry. `credentials` stay `omit`. The script does not contain `geoapi_sk_`.
+- [x] PHPUnit no longer stops at `GET /admin`. The legacy front still exits in production. In tests it returns the status and body. The cached dashboard name is `action.as`.
+- [ ] Photo rights are still unknown, so the widget still does not add a photo list.

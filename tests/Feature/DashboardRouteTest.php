@@ -24,7 +24,13 @@ final class DashboardRouteTest extends TestCase
         $routes = app('router')->getRoutes();
         $routes->refreshNameLookups();
         $compiled = $routes->compile();
-        $names = array_filter(array_column($compiled['attributes'], 'as'));
+        $names = [];
+        foreach ($compiled['attributes'] as $attribute) {
+            $name = $attribute['action']['as'] ?? null;
+            if (is_string($name) && $name !== '') {
+                $names[] = $name;
+            }
+        }
         $this->assertContains('dashboard', $names);
     }
 

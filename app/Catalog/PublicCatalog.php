@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Catalog;
 
 use Carapi\Catalog\CatalogRepository;
+use Carapi\Catalog\PickerSelection;
 use PDO;
 
 /**
@@ -1074,27 +1075,7 @@ final class PublicCatalog
     /** @return list<int> */
     private function expandYears(mixed $start, mixed $end, int $currentYear): array
     {
-        if ($start === null || $start === '' || ! is_numeric($start)) {
-            return [];
-        }
-        $from = (int) $start;
-        if ($from < 1886 || $from > $currentYear) {
-            return [];
-        }
-        if ($end === null || $end === '' || ! is_numeric($end)) {
-            $to = $currentYear;
-        } else {
-            $to = min((int) $end, $currentYear);
-        }
-        if ($to < $from) {
-            return [];
-        }
-        $years = [];
-        for ($year = $from; $year <= $to; $year++) {
-            $years[] = $year;
-        }
-
-        return $years;
+        return PickerSelection::expand($start, $end, $currentYear);
     }
 
     /** @return array<string, mixed> */
@@ -1143,7 +1124,6 @@ final class PublicCatalog
 
         return true;
     }
-
 
     private function table(string $name): string
     {
