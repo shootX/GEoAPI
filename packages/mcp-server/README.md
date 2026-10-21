@@ -24,4 +24,33 @@ A prompt such as "List BMW models and one generation of model 314" calls `geoapi
 
 401 is not retried. 429 and 503 follow the SDK retry. The tool error then has `status`, `code`, `message`, `retryAfter`, and `requestId`. `requestId` is null because the API does not send one.
 
-Start it with `node packages/mcp-server/dist/index.js` after the SDK package has been built. `GEOAPI_BASE_URL` overrides `https://geoapi.ge`.
+## Build
+
+```sh
+cd packages/sdk-js && npm ci && npm run build
+cd ../mcp-server && npm ci && npm run build
+```
+
+`GEOAPI_BASE_URL` overrides `https://geoapi.ge`. Hosts start the server with their own working directory, so always give the **absolute** path to `dist/index.js`.
+
+## Connect from Cursor
+
+`~/.cursor/mcp.json` (or `.cursor/mcp.json` in a project), see `cursor.example.json`:
+
+```json
+{
+  "mcpServers": {
+    "geoapi": {
+      "command": "node",
+      "args": ["/absolute/path/to/GEoAPI/packages/mcp-server/dist/index.js"],
+      "env": { "GEOAPI_API_KEY": "geoapi_sk_…" }
+    }
+  }
+}
+```
+
+## Connect from Claude Desktop
+
+Settings → Developer → Edit Config opens `claude_desktop_config.json` (macOS `~/Library/Application Support/Claude/`, Windows `%APPDATA%\Claude\`). Add the same `mcpServers.geoapi` block as above and restart Claude Desktop.
+
+Use a key from a project made for this purpose, so you can revoke it in the cabinet without affecting your site. The server never prints the key; errors replace any `geoapi_sk_…` text with `[redacted]`, and the server writes nothing to stdout except MCP messages.

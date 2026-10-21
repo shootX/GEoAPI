@@ -17,7 +17,7 @@ const year = z.number().int().min(1886).max(2100).optional();
 const readOnly = { readOnlyHint: true, destructiveHint: false, openWorldHint: true } as const;
 
 function scrub(message: string): string {
-  return message.replace(/geoapi_sk_[A-Za-z0-9_]+/g, "[redacted]");
+  return message.replace(/(?:geoapi|carapi)_sk_[A-Za-z0-9_-]+/g, "[redacted]");
 }
 
 function ok(value: unknown) {
