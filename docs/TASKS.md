@@ -72,3 +72,10 @@
 - [ ] Owner: live PostgreSQL counts and `migrate:status` are still `UNKNOWN`. Do not publish historical row counts as current totals.
 - [ ] Owner: commit `b3ec4558022778b0534d9f233df9294be14689d8` is not on `main` but is still reachable by SHA and added `.env.bak-2026-10-20-1633` plus two session files. Contents were not read here. Rotate anything that file exposed. `.gitignore` now ignores those names; the old commit is still on GitHub.
 - [ ] Owner: confirm the live nginx document root. HEAD deploys with `cd /www/wwwroot/geoapi.ge`. The checkout path in `b746497` was `/www/wwwroot/car.socialsave.cc`. The absolute `.../public` root was not in git history and was not read from the server.
+
+## 2026-10-21 — WP-02 Stripe webhook
+
+- [x] `POST /billing/provider-webhook` checks the raw body against `Stripe-Signature` before `PaymentEvents::record`. The scheme is `v1` HMAC-SHA256 over `timestamp.payload`, with a 300 second tolerance, `hash_equals`, and any matching `v1`. Missing, forged, and expired signatures return 400. An empty `STRIPE_WEBHOOK_SECRET` returns 503. A valid event is stored once; the same event id returns 200 and does not change the row.
+- [x] The handler does not write `api_entitlements` or `api_plans`. The stored summary is only the event type. Logs record a reason code and not the payload, header, or secret.
+- [x] OpenAPI and `/guide` were left unchanged. This route is not documented there.
+- [ ] Owner: set `STRIPE_WEBHOOK_SECRET` on the server only when a paid product is approved. Until then the route stays 503 and must not grant a plan.
