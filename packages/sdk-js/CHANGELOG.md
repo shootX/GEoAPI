@@ -1,5 +1,7 @@
 # Changelog
 
+- `GeoAPIError.retryAfter`; 250 ms × attempt backoff when Retry-After is missing; secret keys are also refused in web workers.
+
 ## 0.1.0
 
 - Typed client for the GeoAPI catalog REST routes. Types come from `openapi.json`, which is a snapshot of `PublicSpec`.

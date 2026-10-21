@@ -127,7 +127,7 @@ test("retries 429 and 503 twice when Retry-After is zero", async () => {
   }
 });
 
-test("a missing Retry-After does not wait and a later 200 is returned", async () => {
+test("a missing Retry-After backs off briefly and a later 200 is returned", async () => {
   let calls = 0;
   const started = Date.now();
   const fetch = async () => {
@@ -230,5 +230,27 @@ test("reads a local HTTP server without calling production", async () => {
     assert.equal(brands.data[0].id, "314");
   } finally {
     server.close();
+  }
+});
+
+test("exposes Retry-After seconds on the final 429 error", async () => {
+  const fetch = async () => jsonResponse(429, { error: { code: "RATE_LIMIT_EXCEEDED", message: "wait" } }, { "Retry-After": "0" });
+  await assert.rejects(client(fetch, { retries: 0 }).brands.list(), (error) => {
+    assert.equal(error.retryAfter, 0);
+    return true;
+  });
+  const notFound = async () => jsonResponse(404, { error: { code: "not_found", message: "x" } }, { "Retry-After": "5" });
+  await assert.rejects(client(notFound).brands.list(), (error) => {
+    assert.equal(error.retryAfter, null);
+    return true;
+  });
+});
+
+test("refuses a secret key in a web worker", () => {
+  globalThis.importScripts = () => {};
+  try {
+    assert.throws(() => new GeoAPI({ apiKey: KEY, fetch: async () => jsonResponse(200, {}) }), GeoAPIError);
+  } finally {
+    delete globalThis.importScripts;
   }
 });

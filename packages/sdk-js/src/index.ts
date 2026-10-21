@@ -37,13 +37,16 @@ export class GeoAPIError extends Error {
   readonly status: number;
   readonly code: string | null;
   readonly requestId: null;
+  /** Seconds from the server's Retry-After on 429/503, otherwise null. */
+  readonly retryAfter: number | null;
 
-  constructor(status: number, code: string | null, message: string) {
+  constructor(status: number, code: string | null, message: string, retryAfter: number | null = null) {
     super(message);
     this.name = "GeoAPIError";
     this.status = status;
     this.code = code;
     this.requestId = null;
+    this.retryAfter = retryAfter;
   }
 }
 
@@ -160,9 +163,20 @@ interface Transport {
   retries: number;
 }
 
-function retryWaitMs(header: string | null): number {
+const BACKOFF_MS = 250;
+
+function retrySeconds(header: string | null): number | null {
   if (header == null || header.trim() === "") {
-    return 0;
+    return null;
+  }
+  const seconds = Number(header);
+  return Number.isFinite(seconds) && seconds >= 0 ? seconds : null;
+}
+
+function retryWaitMs(header: string | null, attempt: number): number {
+  if (header == null || header.trim() === "") {
+    // No hint from the server: short linear backoff instead of an immediate retry.
+    return BACKOFF_MS * attempt;
   }
   const seconds = Number(header);
   if (!Number.isFinite(seconds) || seconds <= 0) {
@@ -255,7 +269,7 @@ async function request<T>(transport: Transport, path: string, query?: object): P
     const text = await response.text();
     if (RETRYABLE.has(response.status) && attempt < transport.retries) {
       attempt += 1;
-      await sleep(retryWaitMs(retryAfter), signal);
+      await sleep(retryWaitMs(retryAfter, attempt), signal);
       continue;
     }
     let code: string | null = null;
@@ -271,7 +285,7 @@ async function request<T>(transport: Transport, path: string, query?: object): P
     } catch {
       message = `HTTP ${response.status}`;
     }
-    throw new GeoAPIError(response.status, code, scrub(message, transport.apiKey));
+    throw new GeoAPIError(response.status, code, scrub(message, transport.apiKey), RETRYABLE.has(response.status) ? retrySeconds(retryAfter) : null);
   }
 }
 
@@ -300,7 +314,9 @@ export class GeoAPI {
   readonly coverage: { get: (query?: CallOptions) => Promise<Coverage> };
 
   constructor(options: GeoAPIOptions) {
-    const browser = (globalThis as { window?: unknown }).window !== undefined;
+    const scope = globalThis as { window?: unknown; document?: unknown; importScripts?: unknown };
+    // Pages and web workers both run untrusted-visible code; a secret key must not be shipped to either.
+    const browser = scope.window !== undefined || scope.document !== undefined || typeof scope.importScripts === "function";
     if (browser && options.apiKey.startsWith("geoapi_sk_")) {
       throw new GeoAPIError(0, null, "A secret key cannot be used in the browser.");
     }
