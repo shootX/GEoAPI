@@ -22,8 +22,12 @@ production-ში სამივე დროშა ჩართულია. �
 ```http
 POST /widget/v1/{publicKey}/brands
 POST /widget/v1/{publicKey}/brands/{slug}/models
+POST /widget/v1/{publicKey}/models/{id}/years
 POST /widget/v1/{publicKey}/models/{id}/generations
+POST /widget/v1/{publicKey}/generations/{id}/modifications
 ```
+
+`years` გამოიყენებს იმავე `year_start` / `year_end` წესს, რასაც `GET /api/v1/models/{id}/years`. ღია `year_end` ჩერდება მიმდინარე UTC წელზე. თაობებისა და მოდიფიკაციების სხეული შეიცავს `year`-ს. `year`-ის გარეშე თაობების სია ძველი, გაუფილტრავი პასუხია.
 
 სხეული JSON-ია: `page`, `per_page`. POST მონაცემს არ ცვლის. `fetch` იყენებს `credentials: "omit"`. პასუხი `Cache-Control: no-store`-ითაა, რომ საერთო კეშმა გაუქმებას და აღრიცხვას არ აუვლოს გვერდი.
 
@@ -36,8 +40,8 @@ POST /widget/v1/{publicKey}/models/{id}/generations
 <script>
   document.querySelector('geoapi-filter').addEventListener('geoapi:change', function (event) {
     var pick = event.detail;
-    // pick.brand_id, pick.model_id, pick.generation_id სტრიქონია ან null
-    // pick.modification_id ამ ვერსიაში null-ია
+    // pick.brand_id, pick.model_id, pick.year, pick.generation_id სტრიქონია ან null
+    // pick.modification_id ივსება მოდიფიკაციის არჩევის შემდეგ და მანამდე null-ია
   });
 </script>
 ```

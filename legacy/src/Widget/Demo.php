@@ -7,6 +7,7 @@ namespace Carapi\Widget;
 use Carapi\Catalog\CatalogRepository;
 use Carapi\Catalog\Connection as CatalogConnection;
 use Carapi\Catalog\Http as CatalogHttp;
+use Carapi\Catalog\PickerSelection;
 use Carapi\Catalog\UnavailableException;
 use Carapi\Platform\Origins;
 use PDOException;
@@ -33,7 +34,7 @@ final class Demo
 
             return;
         }
-        if (!self::sameOrigin()) {
+        if (! self::sameOrigin()) {
             CatalogHttp::json(403, ['error' => ['code' => 'forbidden', 'message' => 'მოთხოვნა არ არის დაშვებული.']]);
 
             return;
@@ -44,7 +45,7 @@ final class Demo
 
             return;
         }
-        if (!$allowed) {
+        if (! $allowed) {
             header('Retry-After: 60');
             CatalogHttp::json(429, ['error' => ['code' => 'RATE_LIMIT_EXCEEDED', 'message' => 'მოთხოვნების ლიმიტი მიღწეულია.']]);
 
@@ -61,14 +62,29 @@ final class Demo
             if ($route['kind'] === 'brands') {
                 $result = $repo->brands($page['per_page'], $page['offset']);
             } elseif ($route['kind'] === 'models') {
-                if (!$repo->brandExists((string) $route['slug'])) {
+                if (! $repo->brandExists((string) $route['slug'])) {
                     CatalogHttp::json(404, ['error' => ['code' => 'not_found', 'message' => 'მითითებული ბრენდი ვერ მოიძებნა.']]);
 
                     return;
                 }
                 $result = $repo->models((string) $route['slug'], $page['per_page'], $page['offset']);
+            } elseif ($route['kind'] === 'modifications') {
+                $year = CatalogHttp::yearParam($body['year'] ?? null, true);
+                if ($year === false) {
+                    return;
+                }
+                $choices = PickerSelection::modifications(CatalogConnection::pdo(), (string) $route['id'], $year);
+                if ($choices === null) {
+                    CatalogHttp::json(404, ['error' => ['code' => 'not_found', 'message' => 'მითითებული თაობა ვერ მოიძებნა.']]);
+
+                    return;
+                }
+                $result = [
+                    'rows' => array_slice($choices['rows'], $page['offset'], $page['per_page']),
+                    'total' => $choices['total'],
+                ];
             } else {
-                if (!$repo->modelExists((string) $route['id'])) {
+                if (! $repo->modelExists((string) $route['id'])) {
                     CatalogHttp::json(404, ['error' => ['code' => 'not_found', 'message' => 'მითითებული მოდელი ვერ მოიძებნა.']]);
 
                     return;
@@ -80,10 +96,27 @@ final class Demo
                         'total' => $choices['total'],
                     ];
                 } else {
-                    $result = $repo->generations((string) $route['id'], $page['per_page'], $page['offset']);
+                    $year = CatalogHttp::yearParam($body['year'] ?? null, false);
+                    if ($year === false) {
+                        return;
+                    }
+                    if ($year === null) {
+                        $result = $repo->generations((string) $route['id'], $page['per_page'], $page['offset']);
+                    } else {
+                        $choices = PickerSelection::generations(CatalogConnection::pdo(), (string) $route['id'], $year);
+                        if ($choices === null) {
+                            CatalogHttp::json(404, ['error' => ['code' => 'not_found', 'message' => 'მითითებული მოდელი ვერ მოიძებნა.']]);
+
+                            return;
+                        }
+                        $result = [
+                            'rows' => array_slice($choices['rows'], $page['offset'], $page['per_page']),
+                            'total' => $choices['total'],
+                        ];
+                    }
                 }
             }
-        } catch (UnavailableException | PDOException) {
+        } catch (UnavailableException|PDOException) {
             CatalogHttp::json(503, ['error' => ['code' => 'unavailable', 'message' => 'სერვისი დროებით მიუწვდომელია. სცადეთ მოთხოვნის ხელახლა გაგზავნა მოგვიანებით.']]);
 
             return;
@@ -119,6 +152,14 @@ final class Demo
         if (preg_match('#^/widget/v1/demo/models/([1-9][0-9]{0,18})/generations$#', $path, $match) === 1) {
             return ['kind' => 'generations', 'id' => $match[1]];
         }
+        if (preg_match('#^/widget/v1/demo/generations/([1-9][0-9]{0,18})/modifications$#', $path, $match) === 1) {
+            return ['kind' => 'modifications', 'id' => $match[1]];
+        }
+        if (preg_match('#^/widget/v1/demo/generations/([^/]+)/modifications$#', $path) === 1) {
+            CatalogHttp::json(422, ['error' => ['code' => 'invalid_parameter', 'message' => 'თაობის id არასწორია. გამოიყენეთ დადებითი მთელი რიცხვი, რომელიც API-ის პასუხშია.']]);
+
+            return ['kind' => 'invalid'];
+        }
         if (preg_match('#^/widget/v1/demo/models/([^/]+)/generations$#', $path) === 1) {
             CatalogHttp::json(422, ['error' => ['code' => 'invalid_parameter', 'message' => 'მოდელის id არასწორია. გამოიყენეთ დადებითი მთელი რიცხვი, რომელიც API-ის პასუხშია.']]);
 
@@ -131,11 +172,11 @@ final class Demo
     private static function sameOrigin(): bool
     {
         $host = $_SERVER['HTTP_HOST'] ?? '';
-        if (!is_string($host) || preg_match('/^[A-Za-z0-9.-]+(?::[0-9]{1,5})?$/', $host) !== 1) {
+        if (! is_string($host) || preg_match('/^[A-Za-z0-9.-]+(?::[0-9]{1,5})?$/', $host) !== 1) {
             return false;
         }
         $https = isset($_SERVER['HTTPS']) && is_string($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== '' && strtolower($_SERVER['HTTPS']) !== 'off';
-        $expected = ($https ? 'https://' : 'http://') . strtolower($host);
+        $expected = ($https ? 'https://' : 'http://').strtolower($host);
         $origin = $_SERVER['HTTP_ORIGIN'] ?? '';
 
         return is_string($origin) && Origins::normalize($origin) === $expected;
@@ -150,16 +191,16 @@ final class Demo
 
     private static function allowIp(string $ip): ?bool
     {
-        $dir = dirname(__DIR__, 2) . '/cache/demo-limit';
-        if (!is_dir($dir) && !mkdir($dir, 0775, true) && !is_dir($dir)) {
+        $dir = dirname(__DIR__, 2).'/cache/demo-limit';
+        if (! is_dir($dir) && ! mkdir($dir, 0775, true) && ! is_dir($dir)) {
             return null;
         }
-        $handle = fopen($dir . '/' . hash('sha256', $ip), 'c+');
+        $handle = fopen($dir.'/'.hash('sha256', $ip), 'c+');
         if ($handle === false) {
             return null;
         }
         try {
-            if (!flock($handle, LOCK_EX)) {
+            if (! flock($handle, LOCK_EX)) {
                 return null;
             }
             $raw = stream_get_contents($handle);

@@ -1,17 +1,17 @@
 (function () {
   var script = document.currentScript;
   var apiBase = script && script.src ? new URL(script.src).origin : '';
-  var LEVELS = ['brand', 'model', 'year', 'body', 'generation'];
+  var LEVELS = ['brand', 'model', 'year', 'body', 'generation', 'modification'];
   var english = (document.documentElement.lang || '').toLowerCase().indexOf('en') === 0;
   var LABELS = english
-    ? { brand: 'Brand', model: 'Model', year: 'Year', body: 'Body', generation: 'Generation' }
-    : { brand: 'ბრენდი', model: 'მოდელი', year: 'გამოშვების წელი', body: 'ძარის ტიპი', generation: 'თაობა' };
+    ? { brand: 'Brand', model: 'Model', year: 'Year', body: 'Body', generation: 'Generation', modification: 'Modification' }
+    : { brand: 'ბრენდი', model: 'მოდელი', year: 'გამოშვების წელი', body: 'ძარის ტიპი', generation: 'თაობა', modification: 'მოდიფიკაცია' };
   var PLACEHOLDER = english
-    ? { brand: 'Choose a brand', model: 'Choose a model', year: 'Choose a year', body: 'Choose a body', generation: 'Choose a generation' }
-    : { brand: 'აირჩიეთ ბრენდი', model: 'აირჩიეთ მოდელი', year: 'აირჩიეთ წელი', body: 'აირჩიეთ ძარის ტიპი', generation: 'აირჩიეთ თაობა' };
+    ? { brand: 'Choose a brand', model: 'Choose a model', year: 'Choose a year', body: 'Choose a body', generation: 'Choose a generation', modification: 'Choose a modification' }
+    : { brand: 'აირჩიეთ ბრენდი', model: 'აირჩიეთ მოდელი', year: 'აირჩიეთ წელი', body: 'აირჩიეთ ძარის ტიპი', generation: 'აირჩიეთ თაობა', modification: 'აირჩიეთ მოდიფიკაცია' };
   var WAIT = english
-    ? { model: 'Choose a brand first', year: 'Choose a model first', body: 'Choose a model first', generation: 'Choose a model first' }
-    : { model: 'ჯერ აირჩიეთ ბრენდი', year: 'ჯერ აირჩიეთ მოდელი', body: 'ჯერ აირჩიეთ მოდელი', generation: 'ჯერ აირჩიეთ მოდელი' };
+    ? { model: 'Choose a brand first', year: 'Choose a model first', body: 'Choose a model first', generation: 'Choose a model first', modification: 'Choose a generation first' }
+    : { model: 'ჯერ აირჩიეთ ბრენდი', year: 'ჯერ აირჩიეთ მოდელი', body: 'ჯერ აირჩიეთ მოდელი', generation: 'ჯერ აირჩიეთ მოდელი', modification: 'ჯერ აირჩიეთ თაობა' };
   var BODY_LABEL = {
     sedan: 'სედანი',
     hatchback: 'ჰეჩბეკი',
@@ -39,15 +39,16 @@
     return out;
   }
 
-  function field(level) {
+  function field(level, uid) {
+    var id = 'geoapi-' + uid + '-' + level;
     return '<div class="field">' +
-      '<label for="geoapi-' + level + '-input">' + LABELS[level] + '</label>' +
+      '<label for="' + id + '-input">' + LABELS[level] + '</label>' +
       '<div class="box">' +
-      '<input id="geoapi-' + level + '-input" data-input="' + level + '" type="text" role="combobox" autocomplete="off" spellcheck="false"' +
-      ' aria-autocomplete="list" aria-expanded="false" aria-controls="geoapi-' + level + '-list">' +
+      '<input id="' + id + '-input" data-input="' + level + '" type="text" role="combobox" autocomplete="off" spellcheck="false"' +
+      ' aria-autocomplete="list" aria-expanded="false" aria-controls="' + id + '-list">' +
       '<button type="button" class="toggle" data-toggle="' + level + '" tabindex="-1" aria-hidden="true">' +
       '<svg width="12" height="12" viewBox="0 0 12 12"><path d="M2 4.5 6 8l4-3.5" fill="none" stroke="currentColor" stroke-width="1.6"/></svg></button>' +
-      '<ul id="geoapi-' + level + '-list" data-list="' + level + '" role="listbox" aria-label="' + LABELS[level] + '" hidden></ul>' +
+      '<ul id="' + id + '-list" data-list="' + level + '" role="listbox" aria-label="' + LABELS[level] + '" hidden></ul>' +
       '</div>' +
       '<select data-level="' + level + '" tabindex="-1" aria-hidden="true"></select>' +
       '</div>';
@@ -57,8 +58,9 @@
     constructor() {
       super();
       this.attachShadow({ mode: 'open' });
-      this.state = { brand: null, model: null, year: null, body: null, generation: null };
-      this.names = { brand: null, model: null, year: null, body: null, generation: null };
+      this.uid = 'w' + Math.random().toString(36).slice(2, 8);
+      this.state = { brand: null, model: null, year: null, body: null, generation: null, modification: null };
+      this.names = { brand: null, model: null, year: null, body: null, generation: null, modification: null };
       this.seq = 0;
       this.shadowRoot.innerHTML = '<style>' +
         ':host{display:block;font:var(--geoapi-font,var(--carapi-font,16px/1.4 sans-serif);color:var(--geoapi-ink,var(--carapi-ink,#141719)}' +
@@ -82,19 +84,21 @@
         'p{margin:8px 0;color:var(--geoapi-muted,var(--carapi-muted,#5c6163)}' +
         '.err{color:#9b2c2c}' +
         '</style>' +
-        LEVELS.map(field).join('') +
+        LEVELS.map((level) => field(level, this.uid)).join('') +
         '<p data-status></p>';
       this.brand = this.shadowRoot.querySelector('[data-level="brand"]');
       this.model = this.shadowRoot.querySelector('[data-level="model"]');
       this.year = this.shadowRoot.querySelector('[data-level="year"]');
       this.body = this.shadowRoot.querySelector('[data-level="body"]');
       this.generation = this.shadowRoot.querySelector('[data-level="generation"]');
+      this.modification = this.shadowRoot.querySelector('[data-level="modification"]');
       this.status = this.shadowRoot.querySelector('[data-status]');
       this.brand.addEventListener('change', () => { this.onBrand(); this.syncAll(); });
       this.model.addEventListener('change', () => { this.onModel(); this.syncAll(); });
       this.year.addEventListener('change', () => { this.onYear(); this.syncAll(); });
       this.body.addEventListener('change', () => { this.onBody(); this.syncAll(); });
       this.generation.addEventListener('change', () => { this.onGeneration(); this.syncAll(); });
+      this.modification.addEventListener('change', () => { this.onModification(); this.syncAll(); });
       this.combos = LEVELS.map((level) => this.combo(level));
     }
 
@@ -104,10 +108,12 @@
       this.resetSelect(this.year, WAIT.year);
       this.resetSelect(this.body, WAIT.body);
       this.resetSelect(this.generation, WAIT.generation);
+      this.resetSelect(this.modification, WAIT.modification);
       this.model.disabled = true;
       this.year.disabled = true;
       this.body.disabled = true;
       this.generation.disabled = true;
+      this.modification.disabled = true;
       this.syncAll();
       this.load('brands', {}, this.brand, PLACEHOLDER.brand);
     }
@@ -129,6 +135,15 @@
       return applied;
     }
 
+    pause(attempt, retryAfter) {
+      var seconds = parseInt(retryAfter || '', 10);
+      if (!seconds || seconds < 1) {
+        seconds = 1;
+      }
+      var delay = Math.min(2000, seconds * 500 * attempt);
+      return new Promise(function (resolve) { setTimeout(resolve, delay); });
+    }
+
     async fetchRows(path, body, select, placeholder) {
       var seq = ++this.seq;
       this.status.textContent = 'იტვირთება…';
@@ -136,19 +151,46 @@
       var rows = [];
       var page = 1;
       var total = 0;
+      var retries = 0;
       try {
-        do {
+        while (page < 1000) {
           var payload = Object.assign({ page: page, per_page: 100 }, body);
-          var response = await fetch(apiBase + this.endpoint(path), {
-            method: 'POST',
-            credentials: 'omit',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(payload)
-          });
+          var response;
+          try {
+            response = await fetch(apiBase + this.endpoint(path), {
+              method: 'POST',
+              credentials: 'omit',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(payload)
+            });
+          } catch (e) {
+            if (seq !== this.seq) {
+              return false;
+            }
+            if (retries < 2) {
+              retries += 1;
+              await this.pause(retries);
+              if (seq !== this.seq) {
+                return false;
+              }
+              continue;
+            }
+            this.status.textContent = 'ქსელის შეცდომა. სერვერთან დაკავშირება ვერ მოხერხდა. შეამოწმეთ ინტერნეტკავშირი და სცადეთ ხელახლა.';
+            this.status.className = 'err';
+            return false;
+          }
           if (seq !== this.seq) {
             return false;
           }
           if (response.status === 429 || response.status === 503) {
+            if (retries < 2) {
+              retries += 1;
+              await this.pause(retries, response.headers.get('Retry-After'));
+              if (seq !== this.seq) {
+                return false;
+              }
+              continue;
+            }
             var retry = response.headers.get('Retry-After') || '';
             this.status.textContent = response.status === 429
               ? 'მოთხოვნების ლიმიტი მიღწეულია. ლიმიტი ამოიწურა. სცადეთ ' + (retry || 'მოგვიანებით') + ' წამში.'
@@ -165,7 +207,11 @@
           rows = rows.concat(json.data || []);
           total = json.meta ? json.meta.total : rows.length;
           page += 1;
-        } while (rows.length < total && page < 1000);
+          if (rows.length >= total) {
+            break;
+          }
+          // Retries `continue` back to the top; the exit test lives here, not in a do/while condition.
+        }
       } catch (e) {
         this.status.textContent = 'ქსელის შეცდომა. სერვერთან დაკავშირება ვერ მოხერხდა. შეამოწმეთ ინტერნეტკავშირი და სცადეთ ხელახლა.';
         this.status.className = 'err';
@@ -195,17 +241,21 @@
       this.state.year = null;
       this.state.body = null;
       this.state.generation = null;
+      this.state.modification = null;
       this.names.model = null;
       this.names.year = null;
       this.names.body = null;
       this.names.generation = null;
+      this.names.modification = null;
       this.resetSelect(this.model, PLACEHOLDER.model);
       this.resetSelect(this.year, WAIT.year);
       this.resetSelect(this.body, WAIT.body);
       this.resetSelect(this.generation, WAIT.generation);
+      this.resetSelect(this.modification, WAIT.modification);
       this.year.disabled = true;
       this.body.disabled = true;
       this.generation.disabled = true;
+      this.modification.disabled = true;
       this.emit();
       if (!this.state.brand) {
         this.model.disabled = true;
@@ -243,14 +293,18 @@
       this.state.year = null;
       this.state.body = null;
       this.state.generation = null;
+      this.state.modification = null;
       this.names.year = null;
       this.names.body = null;
       this.names.generation = null;
+      this.names.modification = null;
       this.resetSelect(this.year, PLACEHOLDER.year);
       this.resetSelect(this.body, WAIT.body);
       this.resetSelect(this.generation, WAIT.generation);
+      this.resetSelect(this.modification, WAIT.modification);
       this.body.disabled = true;
       this.generation.disabled = true;
+      this.modification.disabled = true;
       this.emit();
       if (!this.state.model) {
         this.year.disabled = true;
@@ -272,14 +326,18 @@
       this.names.year = this.state.year ? option.dataset.name : null;
       this.state.body = null;
       this.state.generation = null;
+      this.state.modification = null;
       this.names.body = null;
       this.names.generation = null;
+      this.names.modification = null;
       this.fillBodies(option);
       this.resetSelect(this.generation, this.state.model ? PLACEHOLDER.generation : WAIT.generation);
+      this.resetSelect(this.modification, WAIT.modification);
       this.generation.disabled = true;
+      this.modification.disabled = true;
       this.emit();
-      if (this.state.model) {
-        this.load('models/' + encodeURIComponent(this.state.model) + '/generations', {}, this.generation, PLACEHOLDER.generation);
+      if (this.state.model && this.state.year) {
+        this.load('models/' + encodeURIComponent(this.state.model) + '/generations', { year: this.state.year }, this.generation, PLACEHOLDER.generation);
       }
     }
 
@@ -287,6 +345,26 @@
       var option = this.generation.selectedOptions[0];
       this.state.generation = this.generation.value || null;
       this.names.generation = this.state.generation ? option.dataset.name : null;
+      this.state.modification = null;
+      this.names.modification = null;
+      this.resetSelect(this.modification, this.state.generation ? PLACEHOLDER.modification : WAIT.modification);
+      this.modification.disabled = true;
+      this.emit();
+      if (!this.state.generation || !this.state.year) {
+        return;
+      }
+      this.load('generations/' + encodeURIComponent(this.state.generation) + '/modifications', { year: this.state.year }, this.modification, PLACEHOLDER.modification).then((applied) => {
+        if (!applied || this.modification.options.length > 1) {
+          return;
+        }
+        this.status.textContent = 'ამ თაობისა და წლისთვის მოდიფიკაციები ჯერ არ არის.';
+      });
+    }
+
+    onModification() {
+      var option = this.modification.selectedOptions[0];
+      this.state.modification = this.modification.value || null;
+      this.names.modification = this.state.modification ? option.dataset.name : null;
       this.emit();
     }
 
@@ -332,12 +410,13 @@
         year: this.state.year,
         body_type: this.state.body,
         generation_id: this.state.generation,
-        modification_id: null,
+        modification_id: this.state.modification,
         brand_name: this.names.brand,
         model_name: this.names.model,
         year_name: this.names.year,
         body_name: this.names.body,
-        generation_name: this.names.generation
+        generation_name: this.names.generation,
+        modification_name: this.names.modification
       };
       var self = this;
       ['geoapi:change', 'carapi:change'].forEach(function (name) {
@@ -453,7 +532,7 @@
       }
       ranked.forEach((entry, index) => {
         var li = document.createElement('li');
-        li.id = 'geoapi-' + combo.level + '-opt-' + index;
+        li.id = 'geoapi-' + this.uid + '-' + combo.level + '-opt-' + index;
         li.setAttribute('role', 'option');
         li.dataset.index = String(index);
         li.setAttribute('aria-selected', entry.row.value === combo.select.value ? 'true' : 'false');
@@ -491,7 +570,7 @@
         combo.input.removeAttribute('aria-activedescendant');
         return;
       }
-      var li = combo.list.querySelector('#geoapi-' + combo.level + '-opt-' + index);
+      var li = combo.list.querySelector('#geoapi-' + this.uid + '-' + combo.level + '-opt-' + index);
       if (li) {
         li.classList.add('active');
         combo.input.setAttribute('aria-activedescendant', li.id);

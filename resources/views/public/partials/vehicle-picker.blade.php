@@ -46,6 +46,7 @@
             <details><summary>{{ __('Standard') }}</summary><div data-eq="standard"></div></details>
             <details><summary>{{ __('Optional') }}</summary><div data-eq="optional"></div></details>
             <details><summary>{{ __('Not included') }}</summary><div data-eq="not_available"></div></details>
+            <details><summary>{{ __('Unknown') }}</summary><div data-eq="unknown"></div></details>
         </div>
     </div>
 </div>

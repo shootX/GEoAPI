@@ -319,7 +319,7 @@
   }
 
   function showEquipment(groups) {
-    ['standard', 'optional', 'not_available'].forEach(function (key) {
+    ['standard', 'optional', 'not_available', 'unknown'].forEach(function (key) {
       var host = root.querySelector('[data-eq="' + key + '"]');
       host.innerHTML = '';
       var items = (groups && groups[key]) || [];
