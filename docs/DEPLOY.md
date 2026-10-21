@@ -9,6 +9,8 @@ A push to `main` runs `.github/workflows/deploy.yml`.
 
 The workflow does not create, edit, or replace `.env`. It does not change `APP_DEBUG` or `MAIL_*`.
 
+Rollback steps, and the fact that a restore was not executed from this repository, are in `docs/ROLLBACK.md`. Do not reorder the remote commands above to perform a rollback.
+
 Remote commands, in order:
 
 ```sh

@@ -44,6 +44,11 @@ final class BogCallbackController extends Controller
         }
 
         $eventId = $bogOrderId.':'.$status;
+        if ($status === 'refunded_partially') {
+            $partialUnits = is_array($body['purchase_units'] ?? null) ? $body['purchase_units'] : [];
+            $partialRaw = $partialUnits['refund_amount'] ?? null;
+            $eventId .= ':'.(is_numeric($partialRaw) ? number_format((float) $partialRaw, 2, '.', '') : 'invalid');
+        }
         $result = DB::transaction(function () use ($eventId, $status, $externalId, $body, $bogOrderId): string {
             $fresh = PaymentEvents::record('bog', $eventId, 'order_payment', [
                 'status' => $status,
@@ -76,6 +81,41 @@ final class BogCallbackController extends Controller
                 return 'granted';
             }
             if ($status === 'refunded' || $status === 'refunded_partially') {
+                $units = is_array($body['purchase_units'] ?? null) ? $body['purchase_units'] : [];
+                $currency = $units['currency_code'] ?? 'GEL';
+                if ($currency !== 'GEL') {
+                    Log::warning('bog.callback.mismatch', ['order' => $externalId]);
+
+                    return 'mismatch';
+                }
+                $refundRaw = $units['refund_amount'] ?? null;
+                if ($status === 'refunded_partially') {
+                    if (! is_numeric($refundRaw)) {
+                        Log::warning('bog.callback.mismatch', ['order' => $externalId]);
+
+                        return 'mismatch';
+                    }
+                    $amount = number_format((float) $refundRaw, 2, '.', '');
+                    if (bccomp($amount, '0.00', 2) !== 1 || ! Entitlements::recordPartialRefund($externalId, $amount)) {
+                        Log::warning('bog.callback.mismatch', ['order' => $externalId]);
+
+                        return 'mismatch';
+                    }
+
+                    return 'partial';
+                }
+                if ($refundRaw !== null && $refundRaw !== '') {
+                    $amount = is_numeric($refundRaw) ? number_format((float) $refundRaw, 2, '.', '') : '';
+                    $expected = number_format((float) $order->gel_amount, 2, '.', '');
+                    if ($amount === '' || bccomp($amount, $expected, 2) !== 0) {
+                        Log::warning('bog.callback.mismatch', ['order' => $externalId]);
+
+                        return 'mismatch';
+                    }
+                    Entitlements::refund($externalId, $amount);
+
+                    return 'refunded';
+                }
                 Entitlements::refund($externalId);
 
                 return 'refunded';

@@ -1,5 +1,6 @@
 <?php
 
+use App\Support\SessionSecure;
 use Illuminate\Support\Str;
 
 return [
@@ -169,7 +170,7 @@ return [
     |
     */
 
-    'secure' => env('SESSION_SECURE_COOKIE'),
+    'secure' => SessionSecure::resolve(env('SESSION_SECURE_COOKIE'), env('APP_ENV')),
 
     /*
     |--------------------------------------------------------------------------

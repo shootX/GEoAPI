@@ -7,6 +7,7 @@ namespace Tests\Unit;
 use App\Billing\InvoicePdf;
 use App\Billing\NbgRate;
 use App\Billing\Plans;
+use App\Billing\TrueTypeFont;
 use PHPUnit\Framework\TestCase;
 
 final class BillingMathTest extends TestCase
@@ -57,18 +58,55 @@ final class BillingMathTest extends TestCase
             'rate_date' => '2026-10-21',
         ]);
 
+        $text = InvoicePdf::plainText($pdf);
         $this->assertStringStartsWith('%PDF', $pdf);
-        $this->assertStringContainsString('Test LLC', $pdf);
-        $this->assertStringContainsString('405123456', $pdf);
-        $this->assertStringContainsString('Tbilisi Rustaveli 1', $pdf);
-        $this->assertStringContainsString('VAT payer: yes', $pdf);
-        $this->assertStringContainsString('Prices include VAT', $pdf);
+        $this->assertStringContainsString('Test LLC', $text);
+        $this->assertStringContainsString('405123456', $text);
+        $this->assertStringContainsString('Tbilisi Rustaveli 1', $text);
+        $this->assertStringContainsString('VAT payer: yes', $text);
+        $this->assertStringContainsString('Prices include VAT 18%: VAT GEL 24.30 of GEL 159.30', $text);
+        $this->assertStringContainsString('/BaseFont /FiraGO', $pdf);
+        $this->assertStringContainsString('/FontFile2 9 0 R', $pdf);
+    }
+
+    public function test_invoice_pdf_embeds_firago_and_round_trips_a_georgian_name(): void
+    {
+        $name = 'ნინო ბერიძე';
+        $font = TrueTypeFont::load();
+        foreach (mb_str_split($name) as $char) {
+            $codepoint = mb_ord($char);
+            $this->assertIsInt($codepoint);
+            $this->assertGreaterThan(0, $font->glyph($codepoint));
+        }
+
+        $pdf = InvoicePdf::render([
+            'kind' => 'legal',
+            'name' => $name,
+            'company_name' => 'შპს ტესტი',
+            'company_code' => '405123456',
+            'company_address' => 'თბილისი',
+            'vat_payer' => true,
+        ], [
+            'number' => 'GEO-20261021-1',
+            'plan' => 'basic',
+            'usd' => '59.00',
+            'gel' => '159.30',
+            'rate' => '2.7000',
+            'rate_date' => '2026-10-21',
+        ]);
+
+        $text = InvoicePdf::plainText($pdf);
+        $this->assertStringContainsString($name, $text);
+        $this->assertStringContainsString('შპს ტესტი', $text);
+        $this->assertStringContainsString('თბილისი', $text);
+        $this->assertStringContainsString('/Length1 '.strlen($font->bytes()), $pdf);
+        $this->assertStringNotContainsString('endstream', $font->bytes());
     }
 
     public function test_vat_contained_in_an_inclusive_amount(): void
     {
-        $this->assertSame('18.00', \App\Billing\InvoicePdf::vatIncluded('118.00'));
-        $this->assertSame('24.30', \App\Billing\InvoicePdf::vatIncluded('159.30'));
-        $this->assertSame('0.00', \App\Billing\InvoicePdf::vatIncluded('0.00'));
+        $this->assertSame('18.00', InvoicePdf::vatIncluded('118.00'));
+        $this->assertSame('24.30', InvoicePdf::vatIncluded('159.30'));
+        $this->assertSame('0.00', InvoicePdf::vatIncluded('0.00'));
     }
 }

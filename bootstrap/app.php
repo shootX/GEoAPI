@@ -6,6 +6,7 @@ use App\Http\Middleware\ComingSoonGate;
 use App\Http\Middleware\EnsureAdmin;
 use App\Http\Middleware\EnsureAdminPanel;
 use App\Http\Middleware\EnsureInternalDocs;
+use App\Http\Middleware\RequestId;
 use App\Http\Middleware\SecurityHeaders;
 use Electrik\Http\Middleware\BindTeamFromAccessToken;
 use Electrik\Http\Middleware\SetLocale;
@@ -21,6 +22,7 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware): void {
 
+        $middleware->append(RequestId::class);
         $middleware->encryptCookies(except: [
             'geoapi_platform',
             'carapi_platform',

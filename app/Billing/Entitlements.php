@@ -9,7 +9,8 @@ use Illuminate\Support\Str;
 use PDOException;
 
 /**
- * A paid callback grants one project. A refund restores the quota stored on the order.
+ * A paid callback grants one project. A full refund restores the quota stored on the order.
+ * A partial refund records refunded_gel and leaves the paid plan in place.
  * Expiry drops that project to the free monthly cap and keeps catalog access.
  */
 final class Entitlements
@@ -126,7 +127,7 @@ final class Entitlements
         ]);
     }
 
-    public static function refund(string $publicId): void
+    public static function refund(string $publicId, ?string $amount = null): void
     {
         $order = DB::table('billing_orders')->where('public_id', $publicId)->first();
         if ($order === null || (string) $order->status === 'refunded') {
@@ -152,15 +153,56 @@ final class Entitlements
                 }
             }
         }
+        $recorded = $amount ?? self::money($order->gel_amount);
         DB::table('billing_orders')->where('id', $order->id)->update([
             'status' => 'refunded',
+            'refunded_gel' => $recorded,
             'updated_at' => now(),
         ]);
         AuditLog::write((int) $order->user_id, 'refund', 'order', (string) $order->public_id, [
             'plan' => (string) $order->plan_code,
             'project_id' => (int) $order->project_id,
             'restored_quota' => $previous['monthly_quota'] ?? null,
+            'refunded_gel' => $recorded,
         ]);
+    }
+
+    /**
+     * Record a partial refund total without restoring the paid plan.
+     * The order stays paid when it was paid, so a later completed callback cannot grant twice.
+     */
+    public static function recordPartialRefund(string $publicId, string $amount): bool
+    {
+        $order = DB::table('billing_orders')->where('public_id', $publicId)->first();
+        if ($order === null) {
+            return false;
+        }
+        if ((string) $order->status === 'refunded') {
+            return true;
+        }
+        // BOG purchase_units.refund_amount is the order's refunded total so far, not the increment.
+        // Keep the largest total seen so replays and out-of-order callbacks never double count.
+        $gel = self::money($order->gel_amount);
+        $current = self::money($order->refunded_gel ?? '0');
+        if (bccomp($amount, '0.00', 2) !== 1 || bccomp($amount, $gel, 2) === 1) {
+            return false;
+        }
+        if (bccomp($amount, $current, 2) !== 1) {
+            return true;
+        }
+        $next = $amount;
+        DB::table('billing_orders')->where('id', $order->id)->update([
+            'refunded_gel' => $next,
+            'updated_at' => now(),
+        ]);
+        AuditLog::write((int) $order->user_id, 'partial_refund', 'order', (string) $order->public_id, [
+            'amount' => $amount,
+            'refunded_gel' => $next,
+            'plan' => (string) $order->plan_code,
+            'project_id' => (int) $order->project_id,
+        ]);
+
+        return true;
     }
 
     public static function expireDue(): int
@@ -360,6 +402,15 @@ final class Entitlements
     private static function truthy(mixed $value): bool
     {
         return $value === true || $value === 1 || $value === '1' || $value === 't' || $value === 'true';
+    }
+
+    private static function money(mixed $value): string
+    {
+        if (! is_numeric($value)) {
+            return '0.00';
+        }
+
+        return number_format((float) $value, 2, '.', '');
     }
 
     private static function rateString(mixed $rate): string
