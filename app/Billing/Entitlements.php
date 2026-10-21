@@ -168,7 +168,7 @@ final class Entitlements
     }
 
     /**
-     * Record a partial refund without restoring the paid plan.
+     * Record a partial refund total without restoring the paid plan.
      * The order stays paid when it was paid, so a later completed callback cannot grant twice.
      */
     public static function recordPartialRefund(string $publicId, string $amount): bool
@@ -180,11 +180,17 @@ final class Entitlements
         if ((string) $order->status === 'refunded') {
             return true;
         }
+        // BOG purchase_units.refund_amount is the order's refunded total so far, not the increment.
+        // Keep the largest total seen so replays and out-of-order callbacks never double count.
         $gel = self::money($order->gel_amount);
-        $next = bcadd(self::money($order->refunded_gel ?? '0'), $amount, 2);
-        if (bccomp($next, '0.00', 2) !== 1 || bccomp($next, $gel, 2) === 1) {
+        $current = self::money($order->refunded_gel ?? '0');
+        if (bccomp($amount, '0.00', 2) !== 1 || bccomp($amount, $gel, 2) === 1) {
             return false;
         }
+        if (bccomp($amount, $current, 2) !== 1) {
+            return true;
+        }
+        $next = $amount;
         DB::table('billing_orders')->where('id', $order->id)->update([
             'refunded_gel' => $next,
             'updated_at' => now(),

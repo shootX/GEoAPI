@@ -195,7 +195,8 @@ final class BogBillingTest extends TestCase
         $this->postRaw($repeat, $this->sign($repeat))->assertOk()->assertJsonPath('duplicate', true);
         $this->assertSame('10.00', number_format((float) DB::table('billing_orders')->where('public_id', $publicId)->value('refunded_gel'), 2, '.', ''));
 
-        $second = $this->callbackBody($publicId, 'bog-partial', 'refunded_partially', null, '5.50');
+        // refund_amount is cumulative: a second 5.50 refund arrives as 15.50.
+        $second = $this->callbackBody($publicId, 'bog-partial', 'refunded_partially', null, '15.50');
         $this->postRaw($second, $this->sign($second))->assertOk()->assertJsonPath('duplicate', false);
         $this->assertSame('15.50', number_format((float) DB::table('billing_orders')->where('public_id', $publicId)->value('refunded_gel'), 2, '.', ''));
         $this->assertSame(2000, (int) DB::table('platform.project_limits')->where('project_id', 7)->value('monthly_quota'));
@@ -209,7 +210,10 @@ final class BogBillingTest extends TestCase
         $audit = json_encode(DB::table('billing_audit')->where('action', 'partial_refund')->get());
         $this->assertIsString($audit);
         $this->assertStringContainsString('10.00', $audit);
-        $this->assertStringContainsString('5.50', $audit);
+        $this->assertStringContainsString('15.50', $audit);
+        $stale = $this->callbackBody($publicId, 'bog-partial', 'refunded_partially', null, '12.00');
+        $this->postRaw($stale, $this->sign($stale))->assertOk();
+        $this->assertSame('15.50', number_format((float) DB::table('billing_orders')->where('public_id', $publicId)->value('refunded_gel'), 2, '.', ''));
         $this->assertStringNotContainsString('sandbox-secret-value', $audit);
 
         $full = $this->callbackBody($publicId, 'bog-partial', 'refunded');

@@ -42,6 +42,38 @@ final class TrueTypeFont
         return $this->bytes;
     }
 
+    /** Advance width of a glyph in PDF text space units (1000 per em). */
+    public function width(int $glyph): int
+    {
+        $head = self::table($this->bytes, 'head');
+        $hhea = self::table($this->bytes, 'hhea');
+        $hmtx = self::table($this->bytes, 'hmtx');
+        if ($head === null || $hhea === null || $hmtx === null) {
+            return 500;
+        }
+        $unitsPerEm = self::u16($this->bytes, $head + 18);
+        $metrics = self::u16($this->bytes, $hhea + 34);
+        if ($unitsPerEm < 1 || $metrics < 1) {
+            return 500;
+        }
+        $index = min($glyph, $metrics - 1);
+
+        return (int) round(self::u16($this->bytes, $hmtx + ($index * 4)) * 1000 / $unitsPerEm);
+    }
+
+    private static function table(string $bytes, string $tag): ?int
+    {
+        $tables = self::u16($bytes, 4);
+        for ($i = 0; $i < $tables; $i++) {
+            $record = 12 + ($i * 16);
+            if (substr($bytes, $record, 4) === $tag) {
+                return self::u32($bytes, $record + 8);
+            }
+        }
+
+        return null;
+    }
+
     public function glyph(int $codepoint): int
     {
         return $this->glyphs[$codepoint] ?? 0;

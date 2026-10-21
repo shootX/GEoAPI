@@ -43,13 +43,18 @@ final class InvoicePdf
         $stream = implode("\n", $commands);
         $cmap = self::toUnicode($used);
         $ttf = $font->bytes();
+        $widths = '';
+        ksort($used);
+        foreach (array_keys($used) as $glyph) {
+            $widths .= $glyph.' ['.$font->width($glyph).'] ';
+        }
         $objects = [
             '1 0 obj << /Type /Catalog /Pages 2 0 R >> endobj',
             '2 0 obj << /Type /Pages /Kids [3 0 R] /Count 1 >> endobj',
             '3 0 obj << /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Contents 4 0 R /Resources << /Font << /F1 5 0 R >> >> >> endobj',
             '4 0 obj << /Length '.strlen($stream).' >> stream'."\n".$stream."\n".'endstream endobj',
             '5 0 obj << /Type /Font /Subtype /Type0 /BaseFont /FiraGO /Encoding /Identity-H /DescendantFonts [6 0 R] /ToUnicode 8 0 R >> endobj',
-            '6 0 obj << /Type /Font /Subtype /CIDFontType2 /BaseFont /FiraGO /CIDSystemInfo << /Registry (Adobe) /Ordering (Identity) /Supplement 0 >> /FontDescriptor 7 0 R /CIDToGIDMap /Identity /DW 500 >> endobj',
+            '6 0 obj << /Type /Font /Subtype /CIDFontType2 /BaseFont /FiraGO /CIDSystemInfo << /Registry (Adobe) /Ordering (Identity) /Supplement 0 >> /FontDescriptor 7 0 R /CIDToGIDMap /Identity /DW 500 /W ['.trim($widths).'] >> endobj',
             '7 0 obj << /Type /FontDescriptor /FontName /FiraGO /Flags 32 /FontBBox [-200 -300 1400 1100] /ItalicAngle 0 /Ascent 800 /Descent -200 /CapHeight 700 /StemV 80 /FontFile2 9 0 R >> endobj',
             '8 0 obj << /Length '.strlen($cmap).' >> stream'."\n".$cmap."\n".'endstream endobj',
             '9 0 obj << /Length '.strlen($ttf).' /Length1 '.strlen($ttf).' >> stream'."\n".$ttf."\n".'endstream endobj',
