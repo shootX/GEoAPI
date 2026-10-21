@@ -10,28 +10,50 @@ final class UsageLimiter
 
     public static function fromEnv(): self
     {
-        if (self::memoryEnabled()) {
-            return new self(MemoryUsageStore::shared());
+        if (self::testing()) {
+            $sqlite = self::sqlitePath();
+            if ($sqlite !== null) {
+                return new self(new SqliteUsageStore($sqlite));
+            }
+            if (self::memoryFlag()) {
+                return new self(MemoryUsageStore::shared());
+            }
         }
 
         return new self(new PostgresUsageStore(Connection::pdo()));
     }
 
-    private static function memoryEnabled(): bool
+    private static function testing(): bool
     {
         if (! function_exists('app')) {
             return false;
         }
         try {
-            if (! app()->environment('testing')) {
-                return false;
-            }
+            return app()->environment('testing');
         } catch (\Throwable) {
             return false;
         }
+    }
+
+    private static function memoryFlag(): bool
+    {
         $flag = carapi_env('CARAPI_USAGE_MEMORY');
 
         return is_string($flag) && in_array(strtolower(trim($flag)), ['1', 'true', 'on', 'yes'], true);
+    }
+
+    private static function sqlitePath(): ?string
+    {
+        $path = carapi_env('CARAPI_USAGE_SQLITE');
+        if (! is_string($path)) {
+            return null;
+        }
+        $path = trim($path);
+        if ($path === '' || str_contains($path, "\0") || str_contains($path, '://')) {
+            return null;
+        }
+
+        return $path;
     }
 
     public static function now(): int
@@ -90,6 +112,9 @@ final class UsageLimiter
         }
         if ($this->store instanceof MemoryUsageStore) {
             return $this->store->perMinute;
+        }
+        if ($this->store instanceof SqliteUsageStore) {
+            return $this->store->perMinute($projectId);
         }
 
         throw new UnavailableException;

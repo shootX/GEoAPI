@@ -30,7 +30,7 @@ final class Access
             }
             throw new DeniedException(401);
         }
-        if (! self::platformReady()) {
+        if (! PlatformConnection::active() && ! self::platformReady()) {
             throw new UnavailableException;
         }
         try {

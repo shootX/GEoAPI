@@ -20,11 +20,17 @@ final class MemoryUsageStore implements UsageStore
     /** @var array<string, int> */
     private array $days = [];
 
-    public int $perMinute = 60;
+    public ?int $perMinute = 60;
 
     public int $perDay = 2000;
 
     public int $monthlyQuota = 10000;
+
+    /** When true, a successful read must not become an unmetered 200. */
+    public bool $failCommit = false;
+
+    /** @var array<string, array<string, int>> */
+    private array $routes = [];
 
     public static function shared(): self
     {
@@ -67,6 +73,9 @@ final class MemoryUsageStore implements UsageStore
 
     public function commitSuccess(int $projectId, string $route, int $now): array
     {
+        if ($this->failCommit) {
+            throw new UnavailableException;
+        }
         $monthKey = $this->monthKey($projectId, $now);
         $used = $this->months[$monthKey] ?? 0;
         if ($used >= $this->monthlyQuota) {
@@ -80,6 +89,8 @@ final class MemoryUsageStore implements UsageStore
         $this->months[$monthKey] = $used + 1;
         $this->days[$dayKey] = $dayUsed;
         $used = $this->months[$monthKey];
+        $routeKey = $projectId.'|'.gmdate('Y-m-d', $now);
+        $this->routes[$routeKey][$route] = ($this->routes[$routeKey][$route] ?? 0) + 1;
 
         return [
             'ok' => true,
@@ -95,15 +106,32 @@ final class MemoryUsageStore implements UsageStore
     {
         $month = $this->previewMonth($projectId, $now);
 
+        $today = gmmktime(0, 0, 0, (int) gmdate('n', $now), (int) gmdate('j', $now), (int) gmdate('Y', $now));
+        $start = $today - (29 * 86400);
+        $days = [];
+        $byRoute = [];
+        for ($i = 0; $i < 30; $i++) {
+            $day = gmdate('Y-m-d', $start + ($i * 86400));
+            $bucket = $this->routes[$projectId.'|'.$day] ?? [];
+            $days[] = ['day' => $day, 'used' => array_sum($bucket)];
+            foreach ($bucket as $name => $count) {
+                $byRoute[$name] = ($byRoute[$name] ?? 0) + $count;
+            }
+        }
+        $routes = [];
+        foreach ($byRoute as $name => $count) {
+            $routes[] = ['route' => $name, 'used' => $count];
+        }
+
         return [
             'limit' => $month['limit'],
             'used' => $month['used'],
             'remaining' => $month['remaining'],
             'reset_at' => gmdate('Y-m-d\TH:i:s\Z', $month['reset_at']),
-            'per_minute' => $this->perMinute,
+            'per_minute' => $this->perMinute ?? 0,
             'per_day' => $this->perDay,
-            'days' => [],
-            'routes' => [],
+            'days' => $days,
+            'routes' => $routes,
         ];
     }
 

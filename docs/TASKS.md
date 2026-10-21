@@ -102,3 +102,12 @@
 - [x] 429 and 503 retry at most twice, capped at 2 seconds, then the error stays. There is no unbounded retry. `credentials` stay `omit`. The script does not contain `geoapi_sk_`.
 - [x] PHPUnit no longer stops at `GET /admin`. The legacy front still exits in production. In tests it returns the status and body. The cached dashboard name is `action.as`.
 - [ ] Photo rights are still unknown, so the widget still does not add a photo list.
+
+## 2026-10-21 — WP-06 projects, keys, and quota
+
+- [x] A project is visible only to its owner. Another user's id is not selected, revoked, or issued a key. The secret is the SHA-256 hash in `platform.api_keys`. The full `geoapi_sk_` value is rendered on the create response and is absent from the next cabinet page.
+- [x] Guest, revoked, and expired keys are 401 with `WWW-Authenticate: Bearer` and no quota headers. A disabled project, suspended owner, or unverified email is 403. Sanctum `cars:read` or `*` plus `X-CARAPI-PROJECT` must name that user's active project. A session is not a catalog credential. `geoapi_pk_` is not a catalog bearer. A secret key ignores `X-CARAPI-PROJECT` and meters its own project.
+- [x] Free limits stay 60/minute, 2,000 successful/day when `per_day` exists, and 10,000 successful/month. A new key does not reset the counter. UTC minute, day, and month windows are calendar boundaries. Success sends `X-RateLimit-*` and `X-Quota-*`. 429 sends `Retry-After`. A missing limit or a failed meter is 503 with no catalog body.
+- [x] Widget and catalog share the project counter. A widget request with no matching `Origin` is 403 and spends nothing. Sending an allowed `Origin` is not proof of a browser; `docs/WIDGET_INTEGRATION.md` already says a non-browser client can spoof it.
+- [x] Six overlapping requests with one unit left return one 200 and five `MONTHLY_QUOTA_EXCEEDED`. The stored count is 1. Stats are by UTC day and route. `platform.daily_usage` has no key column, so usage is not split by key. Error JSON stays `error.code` and `error.message`. Logs from this path do not include the key.
+- [ ] Pro is not for sale. Photo rights are still unknown. VIN was not added.
