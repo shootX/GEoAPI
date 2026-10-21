@@ -39,9 +39,34 @@ jobs:
           php artisan key:generate --force
           vendor/bin/phpunit
 
+  sdk:
+    name: SDK (Node ${{ matrix.node }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        node: ["20", "22"]
+    steps:
+      - name: Check out
+        uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node }}
+          cache: npm
+          cache-dependency-path: packages/sdk-js/package-lock.json
+
+      - name: Test and build the SDK
+        working-directory: packages/sdk-js
+        run: |
+          npm ci
+          npm test
+          npm run build
+
   deploy:
     name: Deploy
-    needs: test
+    needs: [test, sdk]
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     concurrency:

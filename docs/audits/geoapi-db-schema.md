@@ -65,7 +65,7 @@
 | `platform.project_limits` | `project_id`, `per_minute`, `monthly_quota`, არასავალდებულო `per_day` | `ProjectRepository.php:148-154`, parity migration `:116` |
 | `platform.widgets` | `project_id`, `public_key`, `enabled`, `allowed_origins`, `updated_at` | `WidgetRepository.php:26-125` |
 
-`per_day` default 2000 მხოლოდ მაშინ იწერება, როცა სვეტი არსებობს (`ProjectRepository.php:148-154`). თუ სვეტი არ არის, `PostgresUsageStore.php:222-240` დღიურ ლიმიტს არ ამოწმებს და 503-ს არ აბრუნებს. სვეტი პროდაქშენში არსებობს თუ არა — `UNKNOWN`. სანამ ეს `UNKNOWN`-ია, დღიური კაპი 2000 პროდაქშენის ფაქტად არ ჩაიწეროს.
+`per_day` default 2000 მხოლოდ მაშინ იწერება, როცა სვეტი არსებობს (`ProjectRepository.php:148-154`). თუ სვეტი არ არის, `PostgresUsageStore.php:222-240` დღიურ ლიმიტს არ ამოწმებს და 503-ს არ აბრუნებს. სვეტი პროდაქშენში არსებობს თუ არა — `UNKNOWN`. სანამ ეს `UNKNOWN`-ია, დღიური კაპი 2000 პროდაქშენის ფაქტად არ ჩაიწეროს. 2026-10-21, მფლობელის დაზუსტება: დღიური ზღვარი პროდაქშენში ამჟამად არ მოქმედებს. ეს ახალი სქემის გაზომვა არ არის.
 
 `docs/TASKS.md:58` მფლობელს სთხოვს `php artisan migrate --force`-ს `/www/wwwroot/geoapi.ge`-დან კატალოგის მფლობელით. ეს ბრძანება ამ აუდიტში არ გაშვებულა.
 

@@ -18,22 +18,18 @@
         : 'GeoAPI-ის ავტორიზაცია, მისამართები, ვიჯეტი და შეცდომის კოდები.',
 ])
     <div class="guide-layout">
-    <aside class="guide-toc" aria-label="{{ __('On this page') }}">
+    <aside class="guide-toc guide-toc-desktop" aria-label="{{ __('On this page') }}">
         <strong>{{ __('On this page') }}</strong>
-        @foreach ($before as $id)
-            <a href="#{{ $id }}">{{ $pageById[$id]['title'] }}</a>
-        @endforeach
-        @foreach ($sections as $index => $section)
-            <a href="#guide-{{ $index }}">{{ $section['title'] }}</a>
-        @endforeach
-        @foreach ($between as $id)
-            <a href="#{{ $id }}">{{ $pageById[$id]['title'] }}</a>
-        @endforeach
-        <a href="#guide-widget">{{ __('Widget') }}</a>
-        @foreach ($after as $id)
-            <a href="#{{ $id }}">{{ $pageById[$id]['title'] }}</a>
-        @endforeach
+        <nav class="guide-toc-links">
+            @include('public.partials.guide-toc-links')
+        </nav>
     </aside>
+    <details class="guide-toc guide-toc-mobile">
+        <summary>{{ __('On this page') }}</summary>
+        <nav class="guide-toc-links" aria-label="{{ __('On this page') }}">
+            @include('public.partials.guide-toc-links')
+        </nav>
+    </details>
     <div>
     <div class="max-w-3xl">
         <h1 class="text-3xl font-extrabold leading-tight">{{ __('Documentation') }}</h1>

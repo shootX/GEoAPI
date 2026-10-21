@@ -119,3 +119,11 @@
 - [x] Colors are documented as every stored row, with `verified: false` when the photo was not confirmed. `/fuel` documents the same filters the code accepts, including `body`, `drive`, and `transmission`. Sort allowlists come from `CatalogApi`.
 - [x] Guide samples are cURL, JavaScript, Node, Python, and PHP against `https://geoapi.ge`. The placeholder is `geoapi_sk_…`. Postman uses `{{token}}` and does not contain a real key. The published example for each route returns 200 in the test catalog and matches the response schema.
 - [ ] Pro is not for sale. The WP-11 prices are not the running limits. Photo rights are still unknown. VIN was not added.
+
+## 2026-10-21 — WP-08 TypeScript SDK
+
+- [x] `packages/sdk-js` is `@geoapi/sdk` 0.1.0, private, Node 20 or newer. It calls the REST API. Types are generated from `packages/sdk-js/openapi.json`, and that file matches `PublicSpec::document()`. The package is not on the public npm registry. MCP and CLI stay unpublished.
+- [x] `GeoAPI` exposes every catalog route, including `brands.list`, `models.byBrand`, `generations.byModel`, `modifications.list`, and `modifications.get`. It retries 429 and 503 at most twice, caps `Retry-After` at 2 seconds, and does not retry 400, 401, 403, 404, 405, or 422. `GeoAPIError.requestId` is null. A `geoapi_sk_` key throws before a request when `window` is defined.
+- [x] CI runs the SDK on Node 20 and Node 22. Deploy waits for PHPUnit and the SDK job. A pull request still skips Deploy. The root Vite `npm ci` is unchanged.
+- [x] Authentication is documented before the method check: POST without an accepted key is 401, and 405 is returned only after the key is accepted. The 2 000/UTC day cap is documented as inactive in production. No new production query was run. `/guide` keeps the contents list open on a wide screen and collapses it behind "On this page" at 980px and below.
+- [ ] Staging smoke was not run. There is no staging token, and this package was not published. Photo rights and VIN stay out. WP-09 was not started.
