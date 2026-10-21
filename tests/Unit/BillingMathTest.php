@@ -64,4 +64,11 @@ final class BillingMathTest extends TestCase
         $this->assertStringContainsString('VAT payer: yes', $pdf);
         $this->assertStringContainsString('Prices include VAT', $pdf);
     }
+
+    public function test_vat_contained_in_an_inclusive_amount(): void
+    {
+        $this->assertSame('18.00', \App\Billing\InvoicePdf::vatIncluded('118.00'));
+        $this->assertSame('24.30', \App\Billing\InvoicePdf::vatIncluded('159.30'));
+        $this->assertSame('0.00', \App\Billing\InvoicePdf::vatIncluded('0.00'));
+    }
 }

@@ -148,8 +148,21 @@ final class BogBillingTest extends TestCase
         $this->assertStringContainsString('405123456', $pdf);
         $this->assertStringContainsString('Tbilisi Rustaveli 1', $pdf);
         $this->assertStringContainsString('VAT payer: yes', $pdf);
+        $this->assertStringContainsString('Prices include VAT 18%: VAT GEL', $pdf);
         $this->assertStringNotContainsString('sandbox-secret-value', $pdf);
         $this->assertStringNotContainsString('sandbox-secret-value', json_encode(DB::table('billing_audit')->get()));
+    }
+
+    public function test_a_signed_callback_with_a_different_amount_does_not_grant(): void
+    {
+        $user = $this->owner();
+        $this->limits(7, 10000, null, false, null);
+        $publicId = $this->pendingOrder($user, 'basic');
+        $body = $this->callbackBody($publicId, 'bog-9', 'completed', '1.00');
+
+        $this->postRaw($body, $this->sign($body))->assertOk();
+        $this->assertSame(10000, (int) DB::table('platform.project_limits')->where('project_id', 7)->value('monthly_quota'));
+        $this->assertSame('pending', DB::table('billing_orders')->where('public_id', $publicId)->value('status'));
     }
 
     public function test_a_bad_signature_stores_nothing_and_a_refund_before_payment_does_not_grant(): void
@@ -247,6 +260,17 @@ final class BogBillingTest extends TestCase
 
         DB::table('billing_rates')->delete();
         $this->artisan('billing:nbg-rate')->assertFailed();
+    }
+
+    public function test_registration_rejects_an_identification_code_that_is_not_9_or_11_digits(): void
+    {
+        foreach (['12345', '4051234567', '40512345a', '405123456789'] as $code) {
+            Livewire::test(Register::class)
+                ->set('buyer_kind', 'legal')
+                ->set('company_code', $code)
+                ->call('register')
+                ->assertHasErrors(['company_code' => 'regex']);
+        }
     }
 
     public function test_registration_stores_legal_entity_fields(): void
@@ -374,8 +398,10 @@ final class BogBillingTest extends TestCase
         ]);
     }
 
-    private function callbackBody(string $publicId, string $bogId, string $status): string
+    private function callbackBody(string $publicId, string $bogId, string $status, ?string $amount = null): string
     {
+        $amount ??= number_format((float) DB::table('billing_orders')->where('public_id', $publicId)->value('gel_amount'), 2, '.', '');
+
         return json_encode([
             'event' => 'order_payment',
             'zoned_request_time' => '2026-10-21T12:00:00.000000Z',
@@ -383,6 +409,7 @@ final class BogBillingTest extends TestCase
                 'order_id' => $bogId,
                 'external_order_id' => $publicId,
                 'order_status' => ['key' => $status, 'value' => $status],
+                'purchase_units' => ['request_amount' => $amount, 'transfer_amount' => $amount, 'currency_code' => 'GEL'],
             ],
         ], JSON_UNESCAPED_SLASHES);
     }

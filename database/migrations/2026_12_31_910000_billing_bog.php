@@ -160,12 +160,26 @@ return new class extends Migration
 
     private function platform(): void
     {
+        $statements = [
+            'ALTER TABLE platform.users ADD COLUMN IF NOT EXISTS grandfathered boolean NOT NULL DEFAULT true',
+            'ALTER TABLE platform.users ALTER COLUMN grandfathered SET DEFAULT false',
+            'ALTER TABLE platform.project_limits ADD COLUMN IF NOT EXISTS plan_code text',
+            'ALTER TABLE platform.project_limits ADD COLUMN IF NOT EXISTS plan_ends_at timestamptz',
+            'ALTER TABLE platform.project_limits ADD COLUMN IF NOT EXISTS unlimited_month boolean NOT NULL DEFAULT false',
+        ];
+        // Production keeps the platform schema in the same database: use that connection, no extra credentials.
+        if (DB::connection()->getDriverName() === 'pgsql'
+            && DB::selectOne("SELECT 1 AS ok FROM information_schema.schemata WHERE schema_name = 'platform'") !== null) {
+            foreach ($statements as $sql) {
+                DB::statement($sql);
+            }
+
+            return;
+        }
         $pdo = $this->platformPdo();
-        $pdo->exec('ALTER TABLE platform.users ADD COLUMN IF NOT EXISTS grandfathered boolean NOT NULL DEFAULT true');
-        $pdo->exec('ALTER TABLE platform.users ALTER COLUMN grandfathered SET DEFAULT false');
-        $pdo->exec('ALTER TABLE platform.project_limits ADD COLUMN IF NOT EXISTS plan_code text');
-        $pdo->exec('ALTER TABLE platform.project_limits ADD COLUMN IF NOT EXISTS plan_ends_at timestamptz');
-        $pdo->exec('ALTER TABLE platform.project_limits ADD COLUMN IF NOT EXISTS unlimited_month boolean NOT NULL DEFAULT false');
+        foreach ($statements as $sql) {
+            $pdo->exec($sql);
+        }
     }
 
     private function platformPdo(): PDO

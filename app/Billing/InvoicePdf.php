@@ -27,7 +27,7 @@ final class InvoicePdf
             'USD '.$invoice['usd'],
             'GEL '.$invoice['gel'],
             'NBG rate '.$invoice['rate'].' on '.$invoice['rate_date'],
-            'Prices include VAT',
+            'Prices include VAT 18%: VAT GEL '.self::vatIncluded($invoice['gel']).' of GEL '.$invoice['gel'],
         ];
         $commands = ['BT', '/F1 11 Tf', '50 760 Td'];
         foreach ($lines as $index => $line) {
@@ -61,6 +61,18 @@ final class InvoicePdf
         $pdf .= "startxref\n".$xref."\n%%EOF";
 
         return $pdf;
+    }
+
+    /** VAT contained in a VAT-inclusive GEL amount: total * 18 / 118, rounded half up to the tetri. */
+    public static function vatIncluded(string $gel): string
+    {
+        if (! preg_match('/^(\d+)\.(\d{2})$/', $gel, $m)) {
+            return '0.00';
+        }
+        $tetri = ((int) $m[1]) * 100 + (int) $m[2];
+        $vat = intdiv($tetri * 18 * 2 + 118, 118 * 2);
+
+        return Plans::formatTetri($vat);
     }
 
     private static function literal(string $value): string

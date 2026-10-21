@@ -45,7 +45,8 @@ final class Register extends \Electrik\Livewire\Auth\Register
             'accept_terms' => ['accepted'],
             'buyer_kind' => ['required', 'in:individual,legal'],
             'company_name' => ['required_if:buyer_kind,legal', 'nullable', 'string', 'max:255'],
-            'company_code' => ['required_if:buyer_kind,legal', 'nullable', 'string', 'max:32'],
+            // Georgian identification code: 9 digits for a legal entity, 11 for an individual entrepreneur.
+            'company_code' => ['required_if:buyer_kind,legal', 'nullable', 'string', 'regex:/^(\d{9}|\d{11})$/'],
             'company_address' => ['required_if:buyer_kind,legal', 'nullable', 'string', 'max:500'],
             'vat_payer' => ['boolean'],
         ]);

@@ -44,7 +44,7 @@ final class BogCallbackController extends Controller
         }
 
         $eventId = $bogOrderId.':'.$status;
-        $result = DB::transaction(function () use ($eventId, $status, $externalId): string {
+        $result = DB::transaction(function () use ($eventId, $status, $externalId, $body, $bogOrderId): string {
             $fresh = PaymentEvents::record('bog', $eventId, 'order_payment', [
                 'status' => $status,
                 'order' => is_string($externalId) ? $externalId : null,
@@ -60,6 +60,17 @@ final class BogCallbackController extends Controller
                 return 'unknown';
             }
             if ($status === 'completed') {
+                // The signed body must describe this order: same BOG id and the GEL amount we asked for.
+                $units = is_array($body['purchase_units'] ?? null) ? $body['purchase_units'] : [];
+                $paid = $units['request_amount'] ?? $units['transfer_amount'] ?? null;
+                $currency = $units['currency_code'] ?? 'GEL';
+                $sameOrder = $order->bog_order_id === null || (string) $order->bog_order_id === $bogOrderId;
+                $sameAmount = is_numeric($paid) && bccomp(number_format((float) $paid, 2, '.', ''), (string) $order->gel_amount, 2) === 0;
+                if (! $sameOrder || ! $sameAmount || $currency !== 'GEL') {
+                    Log::warning('bog.callback.mismatch', ['order' => $externalId]);
+
+                    return 'mismatch';
+                }
                 Entitlements::grant($externalId);
 
                 return 'granted';
