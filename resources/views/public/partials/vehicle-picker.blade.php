@@ -38,7 +38,7 @@
                 <p id="vp-flag-note" hidden></p>
             </div>
             <div class="vp-body">
-                <h2 id="vp-title">ავტომობილი</h2>
+                <h2 id="vp-title">{{ app()->getLocale() === 'en' ? 'Vehicle' : 'ავტომობილი' }}</h2>
                 <dl id="vp-specs"></dl>
             </div>
         </div>
@@ -188,4 +188,4 @@
     ],
     'values' => $specValues,
 ], JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_AMP | JSON_HEX_QUOT) !!}</script>
-<script src="/assets/vehicle-picker.js?v=20261022e"></script>
+<script src="/assets/vehicle-picker.js?v=20261022f"></script>

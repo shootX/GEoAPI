@@ -412,8 +412,8 @@
       sum.textContent = sum.getAttribute('data-base') + ' (' + n + ')';
       d.open = key === 'standard' && n > 0;
     });
-    var photoMatches = data.photo_matches_generation === true;
-    if (photoMatches && data.model && data.model.id && data.generation && data.generation.id) {
+    var photoMatches = data.photo_matches_generation === true || data.has_photo === true;
+    if (photoMatches && data.model && data.model.id) {
       empty.hidden = true;
       photo.hidden = false;
       photo.alt = brandName + ' ' + modelName;
@@ -424,7 +424,7 @@
         resetFlag();
       };
       setShield(true);
-      photo.src = '/api/models/' + encodeURIComponent(data.model.id) + '/photo?generation=' + encodeURIComponent(data.generation.id) + '&v=20261020s';
+      photo.src = '/api/models/' + encodeURIComponent(data.model.id) + '/photo?generation=' + encodeURIComponent((data.generation && data.generation.id) || '') + '&v=20261022f';
       if (flag) {
         flag.hidden = false;
         flag.disabled = false;
