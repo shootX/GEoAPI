@@ -164,3 +164,8 @@
 - [x] `GET /ready` runs `SELECT 1` and returns `{"ok":true}` or `{"ok":false}` with no SQL and no exception text. `X-Request-Id` is accepted when it matches `^[A-Za-z0-9._-]{1,64}$` and is otherwise a new UUID. The log context stores that id and does not store the body. An unset `SESSION_SECURE_COOKIE` is Secure only when `APP_ENV` is `production`.
 - [x] `docs/ROLLBACK.md` is the rollback checklist. A restore was not executed. No production `EXPLAIN` was run and no index was added. A p95 baseline was not measured. CSRF exemptions for login, register, and account were left in place. Webhook exemptions stay. `APP_DEBUG` was not changed.
 - [ ] Photo rights are still unknown. VIN was not added. Production smoke and a proven restore were not run from this change.
+
+## 2026-10-22 — Audit follow-up: CSRF
+
+- [x] Laravel CSRF exemptions narrowed to the legacy platform paths, which check their own session `_csrf` and answer 419. `admin/*` and `account/*` were removed, so `/admin/blog`, `/admin/coming-soon` and `/account/*` now go through Laravel's check (their forms already send `@csrf`).
+- [x] `tests/Feature/CsrfProtectionTest.php`: POST without a token gets 419, with a token passes.

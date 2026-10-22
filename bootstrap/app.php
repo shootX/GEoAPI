@@ -38,11 +38,18 @@ return Application::configure(basePath: dirname(__DIR__))
             'login',
             'register',
             'logout',
+            // Legacy platform pages check their own session `_csrf` token
+            // (Carapi\Platform\Http) and answer 419 without it. Laravel pages
+            // under /admin/blog, /admin/coming-soon and /account/* use @csrf.
             'account',
-            'account/*',
+            'account/projects/*',
             'admin',
-            'admin/*',
-            'email/*',
+            'admin/users',
+            'admin/users/*',
+            'admin/projects',
+            'admin/projects/*',
+            'email/verify',
+            'email/verification/resend',
             'forgot-password',
             'reset-password',
             'api/*',
