@@ -48,7 +48,7 @@ final class Billing extends Component
 
             return null;
         }
-        $rate = NbgRate::latest();
+        $rate = NbgRate::latestOrFetch();
         if ($rate === null) {
             $this->addError('checkout', 'the rate is unavailable');
 
@@ -86,9 +86,18 @@ final class Billing extends Component
     {
         $rate = null;
         try {
-            $rate = NbgRate::latest();
-        } catch (PDOException) {
+            // Last stored NBG rate (any date). Only when none was ever stored, try one live fetch.
+            $rate = NbgRate::latestOrFetch();
+        } catch (\Throwable) {
             $rate = null;
+        }
+        $currentPlan = null;
+        if ($this->projectId !== null) {
+            try {
+                $currentPlan = Entitlements::currentPlan((int) $this->projectId);
+            } catch (\Throwable) {
+                $currentPlan = null;
+            }
         }
         $orders = [];
         $user = auth()->user();
@@ -101,6 +110,7 @@ final class Billing extends Component
             'configured' => BogClient::configured() || MockPay::enabled(),
             'mock' => MockPay::enabled(),
             'rate' => $rate,
+            'currentPlan' => $currentPlan,
             'orders' => $orders,
             'notice' => request()->query('paid'),
         ]);
@@ -128,8 +138,9 @@ final class Billing extends Component
     private function projects(): array
     {
         $user = auth()->user();
+        $demo = filter_var(env('CARAPI_CABINET_DEMO', false), FILTER_VALIDATE_BOOL);
         if (! $user instanceof User || $user->legacy_platform_user_id === null) {
-            return [];
+            return $demo && $user instanceof User ? [['id' => 1, 'name' => 'დემო პროექტი']] : [];
         }
         // Same source as the cabinet (legacy platform PDO), not Laravel's default connection,
         // which may point at a different database/search_path than platform.projects.
@@ -137,12 +148,15 @@ final class Billing extends Component
             $rows = (new \Carapi\Platform\ProjectRepository(\Carapi\Platform\Connection::pdo()))->forUser((int) $user->legacy_platform_user_id);
         } catch (\Throwable $e) {
             \Illuminate\Support\Facades\Log::error('billing.projects failed', ['user' => $user->id, 'error' => $e->getMessage()]);
-
-            return [];
+            $rows = [];
         }
         $projects = [];
         foreach ($rows as $row) {
             $projects[] = ['id' => (int) $row['id'], 'name' => (string) $row['name']];
+        }
+        if ($projects === [] && $demo) {
+            // Local demo cabinet (never set on prod): same demo project the overview shows.
+            $projects[] = ['id' => 1, 'name' => 'დემო პროექტი'];
         }
 
         return $projects;

@@ -7,10 +7,12 @@
     <x-ga.panel-side active="billing" />
     <div class="main">
         <header class="top">
+            <button class="btn menu" id="menu" type="button" aria-expanded="false" aria-controls="side" aria-label="{{ __('Menu') }}" onclick="var s=document.getElementById('side');var o=s.classList.toggle('open');this.setAttribute('aria-expanded',o?'true':'false')"><x-ga.icon name="menu" :size="20" /></button>
             <a class="mlogo" href="{{ url('/') }}"><img src="{{ asset('assets/brand/geoapi-lockup-light.svg') }}" alt="geoapi.ge" height="22" width="69"></a>
             <h1>{{ $en ? 'Test payment' : 'სატესტო გადახდა' }} <span class="bd bd-wa">TEST</span></h1>
         </header>
         <div class="content" style="max-width:640px">
+            <h1 class="mh">{{ $en ? 'Test payment' : 'სატესტო გადახდა' }} <span class="bd bd-wa">TEST</span></h1>
             <div class="al al-wa" data-code="test payment page"><x-ga.icon name="warn" :size="18" /><div>{{ $en ? 'This is a TEST payment page. The bank is not connected: no card details are collected and no money is charged.' : 'ეს არის სატესტო გადახდის გვერდი. ბანკი არ არის მიერთებული: ბარათის მონაცემები არ გროვდება და თანხა არ ჩამოიჭრება.' }}</div></div>
             <section class="panel">
                 <div class="ph"><h2>{{ $en ? 'Order' : 'შეკვეთა' }}</h2><span class="bd bd-wa">provider: mock</span></div>

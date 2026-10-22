@@ -6,6 +6,11 @@
             $current = $p['name'];
         }
     }
+    $statusLabel = $en
+        ? ['paid' => 'paid', 'pending' => 'pending', 'failed' => 'failed', 'expired' => 'expired', 'refunded' => 'refunded', 'partial' => 'partly refunded']
+        : ['paid' => 'გადახდილი', 'pending' => 'მოლოდინში', 'failed' => 'წარუმატებელი', 'expired' => 'ვადაგასული', 'refunded' => 'დაბრუნებული', 'partial' => 'ნაწილობრივ დაბრუნებული'];
+    $currentBadge = '<span class="bd bd-ok" data-code="current">'.e($en ? 'Current' : 'მიმდინარე').'</span>';
+    $currentBtn = '<button type="button" class="btn" disabled data-code="current-plan">'.e($en ? 'Current plan' : 'მიმდინარე გეგმა').'</button>';
     $statusTone = ['paid' => 'ok', 'pending' => 'wa', 'failed' => 'er', 'expired' => 'ne', 'refunded' => 'ne', 'partial' => 'wa'];
 @endphp
 <div>
@@ -18,6 +23,7 @@
             <div class="who"><span class="seg hide-m" style="padding:3px"><a href="{{ route('locale.switch', 'ka') }}" class="{{ $en ? '' : 'on' }}">KA</a><a href="{{ route('locale.switch', 'en') }}" class="{{ $en ? 'on' : '' }}">EN</a></span></div>
         </header>
         <div class="content">
+            <h1 class="mh">{{ $en ? 'Billing' : 'ბილინგი' }}</h1>
             <p class="muted">{{ $en ? 'Prices are in USD and include VAT. A year costs 12% less than 12 months. GEL is shown at the National Bank rate.' : 'ფასი დოლარშია და დღგ-ს შეიცავს. წელიწადი 12 თვის ფასზე 12%-ით ნაკლებია. ლარი ნაჩვენებია ეროვნული ბანკის კურსით.' }}</p>
 
             @if (session('billing'))
@@ -54,17 +60,21 @@
                         </select>
                     </label>
                     @if ($rate)
-                        <span class="muted">{{ $en ? 'National Bank rate' : 'ეროვნული ბანკის კურსი' }}: 1 USD = {{ $rate['rate'] }} GEL, {{ $en ? 'date' : 'თარიღი' }} {{ $rate['rated_on'] }}.</span>
+                        <span class="muted">{{ $en ? 'National Bank rate' : 'ეროვნული ბანკის კურსი' }}: 1 USD = {{ number_format((float) $rate['rate'], 4, '.', '') }} GEL, {{ $en ? 'date' : 'თარიღი' }} {{ $rate['rated_on'] }}.</span>
                     @endif
                 </div>
 
                 <div class="bill-plans">
                     <article class="plan">
-                        <h2>Free</h2>
+                        <div class="row" style="justify-content:space-between"><h2>Free</h2>@if ($currentPlan === 'free'){!! $currentBadge !!}@endif</div>
                         <p class="price">$0</p>
                         <p class="muted">{{ $en ? '100 successful requests a month. 0 USD.' : '100 წარმატებული მოთხოვნა თვეში. 0 USD.' }}</p>
                         <p class="xs mut">{{ $en ? 'Choosing it lowers this project\'s monthly limit to 100, even if it has 10 000 now.' : 'არჩევა ამ პროექტის თვიურ ზღვარს 100-მდე დაწევს, მათ შორის მაშინაც, თუ ახლა 10 000 აქვს.' }}</p>
+                        @if ($currentPlan === 'free')
+                        {!! $currentBtn !!}
+                        @else
                         <button type="button" class="btn" wire:click="chooseFree" wire:confirm="{{ $en ? 'Switch this project to Free (100 a month)?' : 'ამ პროექტს Free გეგმაზე (თვეში 100) გადაიყვანთ?' }}">{{ $en ? 'Choose Free' : 'უფასო გეგმის არჩევა' }}</button>
+                        @endif
                     </article>
                     @foreach (['basic' => 'Basic', 'premium' => 'Premium'] as $code => $label)
                         @php
@@ -74,16 +84,21 @@
                             $yearUsd = number_format($yearCents / 100, 2, '.', '');
                             $monthGel = $rate ? \App\Billing\Plans::formatTetri(\App\Billing\Plans::gelTetri($monthCents, $rate['rate'], $rate['quantity'])) : null;
                             $yearGel = $rate ? \App\Billing\Plans::formatTetri(\App\Billing\Plans::gelTetri($yearCents, $rate['rate'], $rate['quantity'])) : null;
-                            $off = ! $configured || $rate === null;
+                            $off = ! $configured;
+                            $isCurrent = $currentPlan === $code;
                         @endphp
-                        <article class="plan {{ $code === 'basic' ? 'now' : '' }}">
-                            <div class="row" style="justify-content:space-between"><h2>{{ $label }}</h2>@if ($code === 'basic')<span class="bd bd-ac">{{ $en ? 'Recommended' : 'რეკომენდებული' }}</span>@endif</div>
+                        <article class="plan {{ $isCurrent ? 'now' : '' }}">
+                            <div class="row" style="justify-content:space-between"><h2>{{ $label }}</h2>@if ($isCurrent){!! $currentBadge !!}@elseif ($code === 'basic')<span class="bd bd-ac">{{ $en ? 'Recommended' : 'რეკომენდებული' }}</span>@endif</div>
                             <p class="price">${{ rtrim(rtrim($monthUsd, '0'), '.') }} <span class="muted">/ {{ $en ? 'month' : 'თვე' }}</span></p>
                             <p class="muted">@if ($code === 'premium') {{ $en ? 'Unlimited successful requests a month.' : 'შეუზღუდავი წარმატებული მოთხოვნა თვეში.' }} @else {{ $en ? '2 000 successful requests a month.' : '2 000 წარმატებული მოთხოვნა თვეში.' }} @endif</p>
                             <p class="xs mut">{{ $en ? 'Month' : 'თვე' }}: {{ $monthUsd }} USD @if ($monthGel) / {{ $monthGel }} GEL @endif<br>{{ $en ? 'Year' : 'წელი' }}: {{ $yearUsd }} USD @if ($yearGel) / {{ $yearGel }} GEL @endif · −12%</p>
                             <div class="row">
+                                @if ($isCurrent)
+                                {!! $currentBtn !!}
+                                @else
                                 <button type="button" class="btn pine" wire:click="checkout('{{ $code }}', 'month')" @if ($off) disabled @endif>{{ $en ? 'Pay · month' : 'გადახდა · თვე' }}</button>
                                 <button type="button" class="btn" wire:click="checkout('{{ $code }}', 'year')" @if ($off) disabled @endif>{{ $en ? 'Pay · year' : 'გადახდა · წელი' }}</button>
+                                @endif
                             </div>
                         </article>
                     @endforeach
@@ -103,7 +118,7 @@
                             <thead><tr><th>{{ $en ? 'Plan' : 'გეგმა' }}</th><th>{{ $en ? 'Status' : 'სტატუსი' }}</th><th style="text-align:right">GEL</th></tr></thead>
                             <tbody>
                                 @foreach ($orders as $order)
-                                    <tr><td class="mono">{{ $order->plan_code }}@if (\App\Billing\MockPay::isMock($order)) <span class="bd bd-wa">TEST</span>@endif</td><td><span class="bd bd-{{ $statusTone[$order->status] ?? 'ne' }}"><i></i>{{ $order->status }}</span></td><td style="text-align:right" class="mono">{{ $order->gel_amount }} GEL</td></tr>
+                                    <tr><td class="mono">{{ $order->plan_code }}@if (\App\Billing\MockPay::isMock($order)) <span class="bd bd-wa">TEST</span>@endif</td><td><span class="bd bd-{{ $statusTone[$order->status] ?? 'ne' }}"><i></i>{{ $statusLabel[$order->status] ?? $order->status }}</span></td><td style="text-align:right" class="mono">{{ $order->gel_amount }} GEL</td></tr>
                                 @endforeach
                             </tbody>
                         </table>

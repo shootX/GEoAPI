@@ -95,6 +95,22 @@ final class NbgRate
     }
 
     /**
+     * Last stored rate (any date). If none was ever stored, try one live NBG fetch at most every 10 minutes.
+     *
+     * @return array{code:string, rate:string, quantity:int, rated_on:string}|null
+     */
+    public static function latestOrFetch(): ?array
+    {
+        $latest = self::latest();
+        if ($latest !== null || app()->runningUnitTests() || ! \Illuminate\Support\Facades\Cache::add('nbg.fetch.on-demand', 1, 600)) {
+            return $latest;
+        }
+        $fresh = self::refresh();
+
+        return $fresh === null ? null : array_diff_key($fresh, ['fetched' => true]);
+    }
+
+    /**
      * Fetch the public JSON. On failure, keep the last stored rate and return it.
      *
      * @return array{code:string, rate:string, quantity:int, rated_on:string, fetched:bool}|null

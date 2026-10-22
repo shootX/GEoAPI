@@ -171,6 +171,23 @@ final class BogBillingTest extends TestCase
         $this->assertFalse((bool) DB::table('platform.project_limits')->where('project_id', $id)->value('unlimited_month'));
     }
 
+    public function test_current_plan_is_marked_and_statuses_are_georgian(): void
+    {
+        $this->rate();
+        $user = $this->owner();
+        $this->limits(7, 2000, 'basic', false, null);
+        $publicId = $this->pendingOrder($user, 'basic');
+
+        Livewire::actingAs($user)->test(Billing::class)
+            ->set('projectId', 7)
+            ->assertSee('data-code="current"', false)
+            ->assertSee('მიმდინარე გეგმა')
+            ->assertDontSee('რეკომენდებული')
+            ->assertSee('მოლოდინში')
+            ->assertSeeHtml('wire:click="checkout(\'premium\', \'month\')"');
+        $this->assertNotNull($publicId);
+    }
+
     public function test_a_paid_checkout_waits_for_the_signed_callback(): void
     {
         $this->rate();
