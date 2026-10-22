@@ -21,11 +21,16 @@ use Illuminate\Auth\Events\Verified;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
+use Laravel\Cashier\Cashier;
 use Livewire\Livewire;
 
 class AppServiceProvider extends ServiceProvider
 {
-    public function register(): void {}
+    public function register(): void
+    {
+        // GeoAPI bills through BOG. Cashier's Stripe webhook accepted unsigned events (QA GEO-QA-006).
+        Cashier::ignoreRoutes();
+    }
 
     public function boot(): void
     {

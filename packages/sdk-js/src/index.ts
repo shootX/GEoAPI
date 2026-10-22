@@ -317,12 +317,17 @@ export class GeoAPI {
     const scope = globalThis as { window?: unknown; document?: unknown; importScripts?: unknown };
     // Pages and web workers both run untrusted-visible code; a secret key must not be shipped to either.
     const browser = scope.window !== undefined || scope.document !== undefined || typeof scope.importScripts === "function";
-    if (browser && options.apiKey.startsWith("geoapi_sk_")) {
+    // carapi_sk_ is the legacy prefix of the same secret key.
+    if (browser && /^(geoapi|carapi)_sk_/.test(options.apiKey)) {
       throw new GeoAPIError(0, null, "A secret key cannot be used in the browser.");
+    }
+    const baseUrl = (options.baseUrl ?? "https://geoapi.ge").replace(/\/+$/, "");
+    if (!secureBaseUrl(baseUrl)) {
+      throw new GeoAPIError(0, null, "baseUrl must use https (http only for localhost).");
     }
     const transport: Transport = {
       apiKey: options.apiKey,
-      baseUrl: (options.baseUrl ?? "https://geoapi.ge").replace(/\/+$/, ""),
+      baseUrl,
       timeout: options.timeout ?? 30_000,
       fetch: options.fetch ?? globalThis.fetch.bind(globalThis),
       retries: options.retries ?? 2,
@@ -347,4 +352,18 @@ export class GeoAPI {
     this.colors = { list: (query) => send("/api/v1/colors", query) };
     this.coverage = { get: (query) => send("/api/v1/coverage", query) };
   }
+}
+
+/** The key travels in the Authorization header, so plain http is only allowed to this machine. */
+function secureBaseUrl(value: string): boolean {
+  let url: URL;
+  try {
+    url = new URL(value);
+  } catch {
+    return false;
+  }
+  if (url.protocol === "https:") {
+    return true;
+  }
+  return url.protocol === "http:" && ["localhost", "127.0.0.1", "[::1]"].includes(url.hostname);
 }

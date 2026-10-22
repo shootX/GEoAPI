@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Http\Controllers;
 
 use App\Billing\BogSignature;
+use App\Billing\CallbackMismatch;
 use App\Billing\Entitlements;
 use App\Billing\PaymentEvents;
 use Illuminate\Http\JsonResponse;
@@ -56,7 +57,7 @@ final class BogCallbackController extends Controller
                 ? ':id:'.$refundId
                 : ':'.(is_numeric($partialRaw) ? number_format((float) $partialRaw, 2, '.', '') : 'invalid');
         }
-        $result = DB::transaction(function () use ($eventId, $status, $externalId, $body, $bogOrderId, $refundId): string {
+        $apply = function () use ($eventId, $status, $externalId, $body, $bogOrderId, $refundId): string {
             $fresh = PaymentEvents::record('bog', $eventId, 'order_payment', [
                 'status' => $status,
                 'order' => is_string($externalId) ? $externalId : null,
@@ -132,7 +133,22 @@ final class BogCallbackController extends Controller
             }
 
             return 'recorded';
-        });
+        };
+
+        try {
+            $result = DB::transaction(static function () use ($apply): string {
+                $result = $apply();
+                if ($result === 'mismatch') {
+                    // Roll back the event row as well: a body that does not match the order must not mark
+                    // order:status as handled, or the correct callback is later dropped as a duplicate (GEO-QA-007).
+                    throw new CallbackMismatch;
+                }
+
+                return $result;
+            });
+        } catch (CallbackMismatch) {
+            return response()->json(['ok' => false, 'error' => ['code' => 'mismatch', 'message' => 'შეტყობინება შეკვეთას არ ემთხვევა.']]);
+        }
 
         return response()->json(['ok' => true, 'duplicate' => $result === 'duplicate']);
     }

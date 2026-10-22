@@ -1,6 +1,7 @@
 @props(['title', 'text', 'path', 'response', 'anchor' => null, 'example' => null])
 @php
     $samples = \App\Catalog\PublicSpec::codeSamples($example ?? $path);
+    $uid = 'cs-'.\Illuminate\Support\Str::lower(\Illuminate\Support\Str::random(8));
 @endphp
 <section @if ($anchor) id="{{ $anchor }}" @endif class="doc-sec">
     <div class="doc-text">
@@ -13,18 +14,18 @@
     </div>
     <div class="col" style="gap:12px;min-width:0">
         <div class="code" data-code>
-            <div class="ch" role="tablist">
+            <div class="ch" role="tablist" aria-label="{{ __('Code sample') }}">
                 @foreach ($samples as $label => $sample)
-                    <button type="button" data-code-tab="{{ $label }}" aria-selected="{{ $loop->first ? 'true' : 'false' }}">{{ $label }}</button>
+                    <button type="button" role="tab" id="{{ $uid }}-t{{ $loop->index }}" aria-controls="{{ $uid }}-p{{ $loop->index }}" data-code-tab="{{ $label }}" aria-selected="{{ $loop->first ? 'true' : 'false' }}">{{ $label }}</button>
                 @endforeach
             </div>
             @foreach ($samples as $label => $sample)
-                <pre data-code-panel="{{ $label }}" @if (! $loop->first) hidden @endif>{{ $sample }}</pre>
+                <pre role="tabpanel" id="{{ $uid }}-p{{ $loop->index }}" aria-labelledby="{{ $uid }}-t{{ $loop->index }}" tabindex="0" data-code-panel="{{ $label }}" @if (! $loop->first) hidden @endif>{{ $sample }}</pre>
             @endforeach
         </div>
         <div class="code">
             <div class="ch"><span class="on">200</span><span style="margin-left:auto">{{ __('Response') }}</span></div>
-            <pre style="max-height:420px;overflow:auto">{{ trim($response) }}</pre>
+            <pre tabindex="0" style="max-height:420px;overflow:auto">{{ trim($response) }}</pre>
         </div>
     </div>
 </section>

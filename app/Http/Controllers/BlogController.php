@@ -4,14 +4,13 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers;
 
+use App\Access\AdminAccess;
 use App\Models\BlogCategory;
 use App\Models\BlogPost;
 use App\Models\BlogTag;
 use App\Models\User;
-use Electrik\Support\Operators;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
 final class BlogController extends Controller
@@ -103,18 +102,7 @@ final class BlogController extends Controller
     private function admin(): bool
     {
         $user = auth()->user();
-        if (! $user instanceof User) {
-            return false;
-        }
-        if (Operators::check($user)) {
-            return true;
-        }
 
-        return DB::table('model_has_roles')
-            ->join('roles', 'roles.id', '=', 'model_has_roles.role_id')
-            ->where('model_has_roles.model_type', $user->getMorphClass())
-            ->where('model_has_roles.model_id', $user->getKey())
-            ->where('roles.name', 'admin')
-            ->exists();
+        return $user instanceof User && AdminAccess::allows($user);
     }
 }

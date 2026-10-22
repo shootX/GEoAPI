@@ -79,7 +79,7 @@ final class PublicSpec
 
         return [
             'curl' => "curl {$url} \\\n  -H \"Authorization: Bearer geoapi_sk_…\"",
-            'JavaScript' => "const response = await fetch({$encoded}, {\n  headers: { Authorization: 'Bearer geoapi_sk_…' },\n});\nconst data = await response.json();",
+            'JavaScript' => "// Server-side only: a geoapi_sk_ key must never reach the browser. In a web page use the widget (geoapi_pk_).\nconst response = await fetch({$encoded}, {\n  headers: { Authorization: 'Bearer geoapi_sk_…' },\n});\nconst data = await response.json();",
             'Node' => "const response = await fetch({$encoded}, {\n  headers: { Authorization: 'Bearer geoapi_sk_…' },\n});\nconsole.log(await response.json());",
             'Python' => "import urllib.request\nrequest = urllib.request.Request({$encoded}, headers={'Authorization': 'Bearer geoapi_sk_…'})\nprint(urllib.request.urlopen(request).read().decode())",
             'PHP' => "\$ch = curl_init({$encoded});\ncurl_setopt_array(\$ch, [\n    CURLOPT_HTTPHEADER => ['Authorization: Bearer geoapi_sk_…'],\n    CURLOPT_RETURNTRANSFER => true,\n]);\necho curl_exec(\$ch);",
@@ -126,7 +126,7 @@ final class PublicSpec
                 ] : [
                     'შექმენით ანგარიში და პროექტი. საიდუმლო geoapi_sk_ ერთხელ ჩანს შექმნის პასუხში. შეინახეთ ის სერვერზე. შემდეგი კაბინეტის გვერდი მას აღარ აჩვენებს.',
                     'გამოიძახეთ GET /api/v1/brands, შემდეგ GET /api/v1/brands/{slug}/models, შემდეგ GET /api/v1/models/{id}/years ან /generations, შემდეგ მოდიფიკაციები. slug და id წინა პასუხიდან ჩასვით.',
-                    'ბრაუზერის ჩასმა იყენებს საჯარო გასაღებს geoapi_pk_. საიდუმლო გასაღები იქ არ დებს. TypeScript SDK არის packages/sdk-js ამ რეპოზიტორიაში. MCP სერვერი არის packages/mcp-server ამ რეპოზიტორიაში. CLI არის packages/cli ამ რეპოზიტორიაში და საჯარო npm რეესტრში გამოქვეყნებული არ არის.',
+                    'ბრაუზერის ჩასმა იყენებს საჯარო გასაღებს geoapi_pk_. საიდუმლო გასაღები იქ არ უნდა ჩადოთ. TypeScript SDK არის packages/sdk-js ამ რეპოზიტორიაში. MCP სერვერი არის packages/mcp-server ამ რეპოზიტორიაში. CLI არის packages/cli ამ რეპოზიტორიაში და საჯარო npm რეესტრში გამოქვეყნებული არ არის.',
                 ],
             ],
             [

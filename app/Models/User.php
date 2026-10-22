@@ -9,6 +9,7 @@ use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Validation\ValidationException;
 use Lab404\Impersonate\Models\Impersonate;
 use Laravel\Passkeys\Contracts\PasskeyUser;
 use Laravel\Passkeys\PasskeyAuthenticatable;
@@ -55,6 +56,25 @@ class User extends Authenticatable implements ExportsPersonalData, MustVerifyEma
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
+    }
+
+    protected static function booted(): void
+    {
+        // One account per mailbox, whatever the letter case: OPS@… must not sit beside ops@….
+        static::saving(function (User $user): void {
+            if (! $user->isDirty('email')) {
+                return;
+            }
+            $taken = static::query()
+                ->whereRaw('lower(email) = ?', [mb_strtolower(trim((string) $user->email))])
+                ->when($user->exists, fn ($query) => $query->whereKeyNot($user->getKey()))
+                ->exists();
+            if ($taken) {
+                throw ValidationException::withMessages([
+                    'email' => __('This email is already registered. Sign in or reset your password.'),
+                ]);
+            }
+        });
     }
 
     public function sendEmailVerificationNotification(): void

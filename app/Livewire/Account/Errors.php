@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Livewire\Account;
 
+use App\Access\AdminAccess;
 use App\Models\User;
-use Electrik\Support\Operators;
 use Illuminate\Support\Facades\DB;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Title;
@@ -29,22 +29,7 @@ final class Errors extends Component
 
     public static function visible(mixed $user): bool
     {
-        if (! $user instanceof User) {
-            return false;
-        }
-
-        $admin = DB::table('model_has_roles')
-            ->join('roles', 'roles.id', '=', 'model_has_roles.role_id')
-            ->where('model_has_roles.model_type', $user->getMorphClass())
-            ->where('model_has_roles.model_id', $user->getKey())
-            ->where('roles.name', 'admin')
-            ->exists();
-
-        if ($admin) {
-            return true;
-        }
-
-        return in_array(mb_strtolower((string) $user->email), Operators::emails(), true);
+        return $user instanceof User && AdminAccess::allows($user);
     }
 
     /** @return list<array{body: string, at: string}> */

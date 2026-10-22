@@ -27,8 +27,6 @@ final class DemoWatermark
         $shadow = imagecolorallocatealpha($image, 20, 16, 28, 78);
         $ink = imagecolorallocatealpha($image, 255, 255, 255, 62);
         if ($shadow === false || $ink === false) {
-            imagedestroy($image);
-
             return null;
         }
         $box = imagettfbbox($size, -28, self::FONT, self::TEXT);
@@ -46,7 +44,6 @@ final class DemoWatermark
         ob_start();
         $written = imagejpeg($image, null, 82);
         $marked = ob_get_clean();
-        imagedestroy($image);
         if ($written !== true || ! is_string($marked) || $marked === '') {
             return null;
         }

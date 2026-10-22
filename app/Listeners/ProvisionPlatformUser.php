@@ -32,6 +32,13 @@ final class ProvisionPlatformUser
         $last = trim(implode(' ', array_slice($parts, 1)));
         $repo = new UserRepository(Connection::pdo());
         $existing = $repo->findByEmail($user->email);
+        if ($existing !== null && ! $user->hasVerifiedEmail()) {
+            // An unproven claim on someone else's platform account: registration validation refuses
+            // this, so reaching it means a race or a new entry point. Never link it.
+            report(new \RuntimeException('Registration matched an existing platform user; not linked.'));
+
+            return;
+        }
         if ($existing === null) {
             $repo->insert([
                 'first_name' => $first,

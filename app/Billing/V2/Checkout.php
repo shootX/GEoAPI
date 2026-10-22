@@ -190,12 +190,12 @@ final class Checkout
         $spec = Catalog::plans()[$plan];
         $now = Workspace::stamp();
         if ($sub !== null && Flag::is($sub->shared_quota) && ! Flag::is($sub->legacy_preserved) && Catalog::rank($plan) > Catalog::rank((string) $sub->plan_code)) {
+            // A paid upgrade always buys a full month (or year) from now; it never inherits a shorter
+            // remaining term, e.g. 5 days left on Free (QA GEO-QA-004). Usage in the current period is kept.
             $term = (string) $sub->term_end;
-            if ($interval === 'year') {
-                $extended = Workspace::plusYear($now);
-                if ($extended > $term) {
-                    $term = $extended;
-                }
+            $extended = $interval === 'year' ? Workspace::plusYear($now) : Workspace::plusMonth($now);
+            if ($extended > $term) {
+                $term = $extended;
             }
             DB::table('billing_workspace_subscriptions')->where('id', $sub->id)->update([
                 'plan_code' => $plan,
@@ -267,9 +267,9 @@ final class Checkout
 
     private static function grantExtra(int $workspaceId, int $orderId): void
     {
-        $sub = Workspace::subscription($workspaceId);
         $now = Workspace::stamp();
-        $end = $sub !== null && (string) $sub->period_end > $now ? (string) $sub->period_end : Workspace::plusMonth($now);
+        // "$5 / month": the add-on lasts a month from payment, not until the current period ends (QA GEO-QA-009).
+        $end = Workspace::plusMonth($now);
         DB::table('billing_project_addons')->insert([
             'workspace_id' => $workspaceId,
             'billing_order_id' => $orderId,

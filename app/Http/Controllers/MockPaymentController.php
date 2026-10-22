@@ -45,7 +45,7 @@ final class MockPaymentController
 
     private function order(Request $request, string $publicId): object
     {
-        abort_unless(MockPay::enabled(), 404);
+        abort_unless(MockPay::allowedFor($request->user()), 404);
         $row = DB::table('billing_orders')->where('public_id', $publicId)->first();
         abort_if($row === null || ! MockPay::isMock($row), 404);
         abort_unless((int) $row->user_id === (int) $request->user()->id, 403);

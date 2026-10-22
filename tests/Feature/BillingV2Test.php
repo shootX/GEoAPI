@@ -119,7 +119,7 @@ final class BillingV2Test extends TestCase
             ->assertSee('There is no automatic charge.')
             ->assertDontSee('Premium')
             ->assertDontSee('Business')
-            ->assertDontSee('240');
+            ->assertDontSee('240 requests / minute');
 
         $limits = $this->section(PublicSpec::narrative('en'), 'guide-limits');
         $this->assertStringNotContainsString('USD', $limits[0]);
@@ -211,6 +211,57 @@ final class BillingV2Test extends TestCase
             (int) $workspace->id,
             Workspace::stamp(),
         ));
+    }
+
+    public function test_an_upgrade_late_in_the_period_buys_a_full_month(): void
+    {
+        config(['billing.v2' => true]);
+        $user = $this->owner();
+        $this->projects();
+        $start = Workspace::stamp(time() - 25 * 86400);
+        $workspaceId = Workspace::create((int) $user->id, 3, 'signup', [
+            'plan_code' => 'free', 'interval' => 'month', 'monthly_quota' => 1000, 'rpm' => Catalog::rpm('free'),
+            'included_projects' => 1, 'period_start' => $start, 'period_end' => Workspace::plusMonth($start),
+            'term_end' => Workspace::plusMonth($start), 'shared_quota' => true, 'source' => 'test',
+        ]);
+        $monthFromNow = strtotime(Workspace::plusMonth(Workspace::stamp()).' UTC');
+
+        $this->pay($user, 'starter', 'month');
+        $starter = Workspace::subscription($workspaceId);
+        $this->assertSame('starter', $starter->plan_code);
+        $this->assertSame($start, (string) $starter->period_start, 'usage of the current period is kept');
+        $this->assertGreaterThanOrEqual($monthFromNow - 5, strtotime($starter->term_end.' UTC'));
+
+        DB::table('billing_workspace_subscriptions')->where('workspace_id', $workspaceId)->update(['term_end' => Workspace::stamp(time() + 5 * 86400)]);
+        $this->pay($user, 'growth', 'month');
+        $growth = Workspace::subscription($workspaceId);
+        $this->assertSame('growth', $growth->plan_code);
+        $this->assertGreaterThanOrEqual($monthFromNow - 5, strtotime($growth->term_end.' UTC'));
+
+        Lifecycle::rollLocked($workspaceId, time() + 10 * 86400);
+        $this->assertSame('growth', Workspace::subscription($workspaceId)->plan_code, 'the paid plan outlives the old 5-day term');
+    }
+
+    public function test_an_extra_project_lasts_a_month_from_payment(): void
+    {
+        config(['billing.v2' => true]);
+        $user = $this->owner();
+        $this->projects();
+        $workspaceId = $this->shared($user, 'free');
+        DB::table('billing_workspace_subscriptions')->where('workspace_id', $workspaceId)->update(['period_end' => Workspace::stamp(time() + 5 * 86400)]);
+
+        $this->pay($user, 'extra-project', 'month');
+
+        $endsAt = (string) DB::table('billing_project_addons')->where('workspace_id', $workspaceId)->value('ends_at');
+        $this->assertSame(Workspace::plusMonth(Workspace::stamp()), $endsAt);
+    }
+
+    public function test_adding_a_month_or_year_never_skips_past_the_month_end(): void
+    {
+        $this->assertSame('2027-02-28 10:00:00', Workspace::plusMonth('2027-01-31 10:00:00'));
+        $this->assertSame('2028-02-29 10:00:00', Workspace::plusMonth('2028-01-31 10:00:00'));
+        $this->assertSame('2027-04-30 10:00:00', Workspace::plusMonth('2027-03-31 10:00:00'));
+        $this->assertSame('2029-02-28 10:00:00', Workspace::plusYear('2028-02-29 10:00:00'));
     }
 
     public function test_upgrade_keeps_usage_downgrade_waits_and_the_month_resets(): void

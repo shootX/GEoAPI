@@ -284,11 +284,11 @@ final class Workspace
 
     public static function plusMonth(string $from): string
     {
-        return CarbonImmutable::parse($from, 'UTC')->addMonth()->utc()->format('Y-m-d H:i:s');
+        return CarbonImmutable::parse($from, 'UTC')->addMonthNoOverflow()->utc()->format('Y-m-d H:i:s');
     }
 
     public static function plusYear(string $from): string
     {
-        return CarbonImmutable::parse($from, 'UTC')->addYear()->utc()->format('Y-m-d H:i:s');
+        return CarbonImmutable::parse($from, 'UTC')->addYearNoOverflow()->utc()->format('Y-m-d H:i:s');
     }
 }

@@ -61,6 +61,12 @@ final class CatalogApi
             }
         }
 
+        // After auth (a keyless POST stays 401, as documented) but before the project counter is hit.
+        $method = $_SERVER['REQUEST_METHOD'] ?? 'GET';
+        if ($method !== 'GET') {
+            return $this->error(405, 'method_not_allowed', 'ეს HTTP მეთოდი დაუშვებელია. გამოიყენეთ GET.', ['Allow' => 'GET']);
+        }
+
         try {
             $projectHit = $limiter->hitProject($access['project_id'], $now);
             $preview = $projectHit['missing'] ? null : $limiter->previewMonth($access['project_id'], $now);
@@ -84,10 +90,6 @@ final class CatalogApi
             return $this->limited('DAILY_QUOTA_EXCEEDED', max(1, $day['reset_at'] - $now), $day['limit'], 0, $day['reset_at']);
         }
 
-        $method = $_SERVER['REQUEST_METHOD'] ?? 'GET';
-        if ($method !== 'GET') {
-            return $this->error(405, 'method_not_allowed', 'ეს HTTP მეთოდი დაუშვებელია. გამოიყენეთ GET.', ['Allow' => 'GET']);
-        }
 
         $route = $this->route($path);
         if ($route === null) {

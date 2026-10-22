@@ -65,7 +65,7 @@ final class Billing extends Component
 
             return null;
         }
-        $mock = MockPay::enabled();
+        $mock = MockPay::allowedFor(auth()->user());
         if (! $mock && ! BogClient::configured()) {
             $this->addError('checkout', 'payments not configured');
 
@@ -141,7 +141,7 @@ final class Billing extends Component
 
             return null;
         }
-        $mock = MockPay::enabled();
+        $mock = MockPay::allowedFor(auth()->user());
         if (! $mock && ! BogClient::configured()) {
             $this->addError('checkout', 'payments not configured');
 
@@ -218,8 +218,8 @@ final class Billing extends Component
 
         return view('livewire.account.billing', [
             'projects' => $this->projects(),
-            'configured' => BogClient::configured() || MockPay::enabled(),
-            'mock' => MockPay::enabled(),
+            'configured' => BogClient::configured() || MockPay::allowedFor(auth()->user()),
+            'mock' => MockPay::allowedFor(auth()->user()),
             'rate' => $rate,
             'currentPlan' => $currentPlan,
             'orders' => $orders,
