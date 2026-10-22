@@ -179,3 +179,8 @@
 ## 2026-10-22 — Restore test
 
 - [x] Latest daily dump restored into scratch `carbase_restore_test` in 163 s; row counts match except tables that grew after the dump. Scratch DB dropped. Details in `docs/ROLLBACK.md`.
+
+## 2026-10-22 — Performance baseline
+
+- [x] Light load test (20 concurrent, 60 s) on public endpoints: p95 about 2.0 s remote, ~13 rps ceiling, no 5xx. See `docs/PERFORMANCE.md`.
+- [ ] Authenticated `/api/v1` load test, FPM tuning, monitoring.
