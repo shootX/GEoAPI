@@ -146,3 +146,4 @@ Existing access is kept by a new column, not by rewriting quotas. On PostgreSQL 
 ## 2026-10-22
 
 - CSRF: legacy platform pages use their own `_csrf`; Laravel pages must not be added to the exemption list.
+- Photo rights: cleared by owner 2026-10-22 (owner-generated images).
