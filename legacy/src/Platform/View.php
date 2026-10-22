@@ -1474,42 +1474,70 @@ JS;
     {
         header('Content-Type: text/html; charset=utf-8');
         header('Cache-Control: no-store');
-        $nav = '';
-        $tabs = '';
-        $context = '';
-        if ($project === null) {
-            $context = '<p class="side-k">პროექტები</p>';
-            foreach ($projects as $item) {
-                $nav .= '<a href="/account/projects/' . (int) $item['id'] . '">' . self::e((string) $item['name']) . '</a>';
-            }
-        } else {
-            $base = '/account/projects/' . (int) $project['id'];
-            $context = '<a class="back" href="/account">ყველა პროექტი</a><p class="side-name">' . self::e((string) $project['name']) . '</p>';
-            $items = [
-                'overview' => [$base . '#overview', 'პროექტის პარამეტრები'],
-                'keys' => [$base . '#keys', 'API გასაღებები'],
-                'playground' => [$base . '/playground', 'Playground'],
-                'explorer' => [$base . '/explorer', 'Vehicle Explorer'],
-                'domains' => [$base . '#domains', 'დაშვებული დომენები'],
-                'usage' => [$base . '#usage', 'მოხმარების სტატისტიკა'],
-                'style' => [$base . '#style', 'ვიჯეტის ჩასმა'],
-            ];
-            foreach ($items as $key => [$href, $label]) {
-                $on = $active === $key ? ' class="on"' : '';
-                $nav .= '<a href="' . $href . '"' . $on . '>' . self::e($label) . '</a>';
-                $tabs .= '<a href="' . $href . '"' . $on . '>' . self::e($label) . '</a>';
+        $icon = static fn (string $d): string => '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' . $d . '</svg>';
+        $ic = [
+            'home' => '<path d="M3 10.5 12 3l9 7.5V21H3z"/>',
+            'fold' => '<path d="M3 6.5A1.5 1.5 0 0 1 4.5 5H10l2 2h7.5A1.5 1.5 0 0 1 21 8.5v10a1.5 1.5 0 0 1-1.5 1.5h-15A1.5 1.5 0 0 1 3 18.5z"/>',
+            'bar' => '<path d="M5 20V10M12 20V4M19 20v-7"/>',
+            'key' => '<circle cx="8" cy="15" r="4"/><path d="m11 12 9-9M17 6l3 3"/>',
+            'card' => '<rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 10h18"/>',
+            'user' => '<circle cx="12" cy="8" r="4"/><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"/>',
+            'doc' => '<path d="M6 3h8l4 4v14H6z"/><path d="M14 3v4h4M9 13h6M9 17h6"/>',
+            'menu' => '<path d="M4 7h16M4 12h16M4 17h16"/>',
+        ];
+        $css = '';
+        $manifest = dirname(__DIR__, 3) . '/public/build/manifest.json';
+        if (is_file($manifest)) {
+            $data = json_decode((string) file_get_contents($manifest), true);
+            $file = is_array($data) ? ($data['resources/css/app.css']['file'] ?? null) : null;
+            if (is_string($file)) {
+                $css = '<link rel="stylesheet" href="/build/' . self::e($file) . '">';
             }
         }
-        echo SiteChrome::start($title);
-        echo '<div class="db" id="content"><aside class="sb"><div class="lg">' . SiteChrome::logo('/account') . '</div>'
-            . $context . '<nav>' . $nav . '</nav><div class="bt"><div class="who"><b>' . self::e($who) . '</b><span>' . self::e($email) . '</span></div>'
-            . '<a href="/guide">დოკუმენტაცია</a><div class="bt-row"><form method="post" action="/logout"><input type="hidden" name="_csrf" value="'
-            . self::e(Session::csrf()) . '"><button type="submit">გასვლა</button></form>' . SiteChrome::themeButton()
-            . '</div></div></aside><main><div class="mtop">' . SiteChrome::logo('/account')
-            . '<a class="btn btn-g" href="/account">პროექტები</a></div>' . ($tabs === '' ? '' : '<div class="mtabs">' . $tabs . '</div>')
-            . '<div class="mn">' . $main . '</div></main></div>';
-        echo '<script src="/assets/site.js?v=20261018f"></script>';
-        echo SiteChrome::end();
+        $name = $project === null ? '' : (string) $project['name'];
+        $initial = $name === '' ? 'G' : mb_strtoupper(mb_substr($name, 0, 1));
+        $state = $project === null ? '' : ((string) ($project['status'] ?? 'active') === 'active' ? 'აქტიური' : 'გამორთული');
+        $navItems = [
+            ['/account#overview', 'home', 'მიმოხილვა', false],
+            ['/account#projects', 'fold', 'პროექტები', true],
+            ['/account#usage', 'bar', 'მოხმარება', false],
+            ['/account#keys', 'key', 'API გასაღებები', false],
+            ['/account/billing', 'card', 'ბილინგი', false],
+        ];
+        $nav = '';
+        foreach ($navItems as [$href, $i, $label, $on]) {
+            $nav .= '<a href="' . $href . '"' . ($on ? ' aria-current="page"' : '') . '>' . $icon($ic[$i]) . '<span>' . self::e($label) . '</span></a>';
+        }
+        $nav .= '<div class="gr">ანგარიში</div><a href="/account#settings">' . $icon($ic['user']) . '<span>პარამეტრები</span></a><a href="/guide">' . $icon($ic['doc']) . '<span style="flex:1">დოკუმენტაცია</span></a>';
+        $tabs = '';
+        $crumb = '<a href="/account#projects">პროექტები</a>';
+        if ($project !== null) {
+            $base = '/account/projects/' . (int) $project['id'];
+            $crumb .= '<span>›</span><b>' . self::e($name) . '</b>';
+            $tabItems = [
+                'keys' => [$base, 'მიმოხილვა'],
+                'playground' => [$base . '/playground', 'Playground'],
+                'explorer' => [$base . '/explorer', 'Explorer'],
+                'preview' => [$base . '/preview', 'ვიჯეტის preview'],
+            ];
+            foreach ($tabItems as $key => [$href, $label]) {
+                $on = $active === $key || ($key === 'keys' && in_array($active, ['overview', 'domains', 'usage', 'style'], true));
+                $tabs .= '<a href="' . $href . '"' . ($on ? ' aria-current="page"' : '') . '>' . self::e($label) . '</a>';
+            }
+            $tabs = '<nav class="ptabs" aria-label="პროექტი">' . $tabs . '</nav>';
+        }
+        $whoInitial = $who === '' ? 'G' : mb_strtoupper(mb_substr($who, 0, 1));
+        echo '<!doctype html><html lang="ka"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="robots" content="noindex">'
+            . '<title>' . self::e($title) . ' — GeoAPI</title><link rel="icon" href="/favicon.ico" sizes="any"><link rel="icon" href="/assets/brand/favicon.svg" type="image/svg+xml">'
+            . '<link rel="stylesheet" href="/assets/cabinet.css?v=20261022gc">' . $css . '</head><body class="cab ga">';
+        echo '<div class="app"><aside class="side" id="side"><a class="logo" href="/"><img src="/assets/brand/geoapi-lockup-light.svg" alt="geoapi.ge" height="26"></a>'
+            . ($project === null ? '' : '<div class="proj"><span class="av">' . self::e($initial) . '</span><div style="flex:1;min-width:0;line-height:1.25"><div class="pn">' . self::e($name) . '</div><div class="xs mut">' . self::e($state) . '</div></div></div>')
+            . '<nav class="nav" aria-label="პანელი">' . $nav . '</nav>'
+            . '<div class="me"><span class="av round">' . self::e($whoInitial) . '</span><div style="min-width:0;line-height:1.3"><div class="pn">' . self::e($who) . '</div><div class="xs mut" style="overflow:hidden;text-overflow:ellipsis">' . self::e($email) . '</div></div></div></aside>';
+        echo '<div class="main" id="content"><header class="top"><button class="btn menu" id="menu" type="button" aria-expanded="false" aria-controls="side" aria-label="მენიუ" onclick="var s=document.getElementById(\'side\');var o=s.classList.toggle(\'open\');this.setAttribute(\'aria-expanded\',o?\'true\':\'false\')">' . $icon($ic['menu']) . '</button>'
+            . '<div class="crumb">' . $crumb . '</div><div class="who"><a class="hide-m" href="/guide" style="color:var(--ac);font-weight:500">დოკუმენტაცია</a></div></header>'
+            . '<div class="content lgc">' . ($project === null ? '' : '<div class="ph"><div><h2 class="h">' . self::e($name) . '</h2><p class="mono xs mut">' . self::e((string) ($project['website_url'] ?? '') ?: '—') . '</p></div><span class="bd ' . ($state === 'აქტიური' ? 'bd-ok' : 'bd-ne') . '"><i></i>' . self::e($state) . '</span></div>') . $tabs . $main . '</div></div></div>';
+        echo '<script src="/assets/site.js?v=20261018f"></script></body></html>';
     }
 
     /** @param array<string, mixed>|null $widget @param array<string, string> $errors */

@@ -254,6 +254,7 @@
         hook();
         var initial = (location.hash || '').replace('#', '');
         if (initial) show(initial);
+        window.addEventListener('hashchange', function () { show((location.hash || '').replace('#', '') || 'overview'); });
         menu.addEventListener('click', function () {
             const open = side.classList.toggle('open');
             menu.setAttribute('aria-expanded', open ? 'true' : 'false');
