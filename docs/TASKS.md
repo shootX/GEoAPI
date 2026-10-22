@@ -215,3 +215,7 @@
 - Plan label: Free only at limit 100, Basic 2000, Premium unlimited, else grey Legacy (no mini-plan selected). Dashboard header CTA "ახალი გასაღები".
 - cabinet.css drawer shadow only when open. admin.css on --ga-* tokens, ink sidebar, ADMIN badge.
 - Home stats strip always shown (— for missing), hero code overflow-x, lockup width fixed (no phantom left gap on mobile), register links accent without underline, pricing ≈ — ₾ when rate missing.
+
+## 2026-10-22 — P7 panel pages
+- SPA screens: projects list, new project (create()), usage (30-day chart + day table), keys table, settings (profile read-only + links to Electrik profile/security), empty state + unverified banner. Hash routing + hashchange; screen kept after Livewire commits.
+- Legacy project/playground/explorer pages now render in the cabinet shell (sidebar, breadcrumb, tabs) with cabinet.css .lgc styles.

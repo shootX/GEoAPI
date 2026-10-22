@@ -9,6 +9,9 @@
     $plan = ! empty($unlimited) ? 'Premium' : ((int) $limit === 2000 ? 'Basic' : ((int) $limit === 100 ? 'Free' : 'Legacy'));
     $planBd = $plan === 'Legacy' ? 'bd-ne' : ($plan === 'Free' ? 'bd-out' : 'bd-ac');
     $who = (string) ($project['name'] ?? ($en ? 'Project' : 'პროექტი'));
+    $me = auth()->user();
+    $verified = $me === null || $me->email_verified_at !== null || ! empty($demo);
+    $dayFmt = fn ($v) => $v ? substr((string) $v, 0, 10) : '—';
 @endphp
 <div>
 <div class="app">
@@ -23,7 +26,13 @@
             @if ($unavailable)
                 <p class="banner">{{ $en ? 'The project database is temporarily unavailable.' : 'პროექტების ბაზა დროებით მიუწვდომელია.' }}</p>
             @endif
+            @unless ($verified)
+                <div class="al al-wa"><x-ga.icon name="mail" :size="18" /><div><b>{{ $en ? 'Confirm your email' : 'დაადასტურეთ ელფოსტა' }}</b><p class="xs">{{ $en ? 'Secret keys stay blocked (403) until '.$me->email.' is confirmed.' : 'საიდუმლო გასაღების შექმნა დაბლოკილია (403), სანამ '.$me->email.'-ს არ დაადასტურებთ.' }}</p></div></div>
+            @endunless
             <section class="screen active" id="overview">
+                @if (! $unavailable && $project === null)
+                    <div class="panel empty"><span class="ic"><x-ga.icon name="fold" :size="22" /></span><h2>{{ $en ? 'Create your first project' : 'ჯერ შექმენით პროექტი' }}</h2><p class="muted">{{ $en ? 'A project has its own keys, limits and plan. Free — 100 requests a month.' : 'პროექტს ექნება საკუთარი გასაღებები, ლიმიტი და გეგმა. Free — 100 მოთხოვნა თვეში.' }}</p><button class="btn pine" type="button" data-go="new"><x-ga.icon name="plus" :size="16" />{{ $en ? 'New project' : 'ახალი პროექტი' }}</button></div>
+                @endif
                 <div class="tiles">
                     <article class="tile"><span>{{ $en ? 'Used this month' : 'გამოყენებული თვეში' }}</span><b>{{ $fmt($used) }}</b></article>
                     <article class="tile"><span>{{ $en ? 'Remaining' : 'დარჩენილი' }}</span><b>{{ $fmt($remaining) }}</b></article>
@@ -72,39 +81,29 @@
                     <button class="btn pine" type="submit">{{ $en ? 'Create' : 'შექმნა' }}</button>
                 </form>
                 @error('key_name') <p class="err">{{ $message }}</p> @enderror
-                <div class="keys">
-                    @if (is_array($widget) && ! empty($widget['public_key']))
-                        <article class="key">
-                            <div class="key-row"><strong>{{ $en ? 'Widget' : 'ვიჯეტი' }}</strong><span class="pill">{{ $en ? 'Public' : 'საჯარო' }}</span><span class="pill">{{ $en ? 'Active' : 'აქტიური' }}</span></div>
-                            <code>{{ $widget['public_key'] }}</code>
-                            <div class="key-row"><button class="btn copy" type="button" data-copy="{{ $widget['public_key'] }}">{{ $en ? 'Copy' : 'კოპირება' }}</button><button class="btn" type="button">{{ $en ? 'Revoke' : 'გაუქმება' }}</button></div>
-                        </article>
-                    @endif
-                    @foreach ($keys as $key)
-                        @php
-                            $off = ($key['revoked_at'] ?? null) !== null;
-                            $secret = (string) ($key['demo_value'] ?? ('geoapi_sk_'.($key['key_selector'] ?? '')));
-                            $masked = mb_substr($secret, 0, 12).'••••••••';
-                        @endphp
-                        <article class="key">
-                            <div class="key-row">
-                                <strong>{{ $key['name'] }}</strong>
-                                <span class="pill">{{ $en ? 'Secret' : 'საიდუმლო' }}</span>
-                                <span class="pill {{ $off ? 'off' : '' }}">{{ $off ? ($en ? 'Revoked' : 'გაუქმებული') : ($en ? 'Active' : 'აქტიური') }}</span>
-                            </div>
-                            <code>{{ $masked }}</code>
-                            @unless ($off)
-                                <div class="key-row">
-                                    <button class="btn copy" type="button" data-copy="{{ $secret }}">{{ $en ? 'Copy' : 'კოპირება' }}</button>
-                                    @if (empty($demo))
-                                        <button class="btn" type="button" wire:click="revokeKey({{ (int) $key['id'] }})">{{ $en ? 'Revoke' : 'გაუქმება' }}</button>
-                                    @else
-                                        <button class="btn" type="button">{{ $en ? 'Revoke' : 'გაუქმება' }}</button>
-                                    @endif
-                                </div>
+                <div class="panel flush">
+                    <div class="ph"><h2>{{ $en ? 'API keys' : 'API გასაღებები' }}</h2><span class="bd bd-out">{{ count($keys) + (is_array($widget) && ! empty($widget['public_key']) ? 1 : 0) }}</span></div>
+                    <div class="tw"><table>
+                        <thead><tr><th>{{ $en ? 'Name' : 'სახელი' }}</th><th>{{ $en ? 'Key' : 'გასაღები' }}</th><th>{{ $en ? 'Last used' : 'ბოლო გამოყენება' }}</th><th>{{ $en ? 'Expires' : 'ვადა' }}</th><th>{{ $en ? 'Status' : 'სტატუსი' }}</th><th></th></tr></thead>
+                        <tbody>
+                        @if (is_array($widget) && ! empty($widget['public_key']))
+                            <tr><td><b>{{ $en ? 'Widget' : 'ვიჯეტი' }}</b><div class="xs mut">{{ $en ? 'public' : 'საჯარო' }}</div></td><td class="mono">{{ mb_substr($widget['public_key'], 0, 16) }}…</td><td>—</td><td>—</td><td><span class="bd bd-ok">{{ $en ? 'Active' : 'აქტიური' }}</span></td><td><button class="btn sm copy" type="button" data-copy="{{ $widget['public_key'] }}"><x-ga.icon name="copy" :size="14" /></button></td></tr>
+                        @endif
+                        @forelse ($keys as $key)
+                            @php
+                                $off = ($key['revoked_at'] ?? null) !== null;
+                                $secret = (string) ($key['demo_value'] ?? ('geoapi_sk_'.($key['key_selector'] ?? '')));
+                            @endphp
+                            <tr class="{{ $off ? 'dim' : '' }}"><td><b>{{ $key['name'] }}</b><div class="xs mut">{{ $en ? 'secret' : 'საიდუმლო' }}</div></td><td class="mono">{{ mb_substr($secret, 0, 18) }}…</td><td>{{ $dayFmt($key['last_used_at'] ?? null) }}</td><td>{{ $dayFmt($key['expires_at'] ?? null) }}</td>
+                                <td>@if ($off)<span class="bd bd-er">{{ $en ? 'Revoked' : 'გაუქმებული' }}</span>@else<span class="bd bd-ok">{{ $en ? 'Active' : 'აქტიური' }}</span>@endif</td>
+                                <td>@unless ($off)@if (empty($demo))<button class="lnk-er" type="button" wire:click="revokeKey({{ (int) $key['id'] }})" wire:confirm="{{ $en ? 'Revoke this key?' : 'გავაუქმოთ გასაღები?' }}">{{ $en ? 'Revoke' : 'გაუქმება' }}</button>@else<span class="lnk-er">{{ $en ? 'Revoke' : 'გაუქმება' }}</span>@endif @endunless</td></tr>
+                        @empty
+                            @unless (is_array($widget) && ! empty($widget['public_key']))
+                                <tr><td colspan="6" class="mut" style="text-align:center;height:64px">{{ $en ? 'No keys yet.' : 'გასაღები ჯერ არ არის.' }}</td></tr>
                             @endunless
-                        </article>
-                    @endforeach
+                        @endforelse
+                        </tbody>
+                    </table></div>
                 </div>
             </section>
 
@@ -130,6 +129,72 @@
                     <p class="muted">{{ $en ? 'The plan applies to this project. Prices include VAT; a year is 12% cheaper.' : 'გეგმა მოქმედებს ამ პროექტზე. ფასი დღგ-ს შეიცავს; წლიური 12%-ით იაფია.' }}</p>
                     <a class="btn pine" href="{{ route('account.billing') }}">{{ $en ? 'Change the plan' : 'გეგმის შეცვლა' }}</a>
                 </div>
+            </section>
+
+            <section class="screen" id="projects">
+                <div class="ph"><div><h2 class="h">{{ $en ? 'Projects' : 'პროექტები' }}</h2><p class="muted">{{ $en ? 'Each project has its own keys, limits and plan' : 'თითოეულ პროექტს აქვს საკუთარი გასაღებები, ლიმიტი და გეგმა' }}</p></div><button class="btn pine" type="button" data-go="new"><x-ga.icon name="plus" :size="16" />{{ $en ? 'New project' : 'ახალი პროექტი' }}</button></div>
+                <div class="panel flush"><div class="tw"><table>
+                    <thead><tr><th>{{ $en ? 'Project' : 'პროექტი' }}</th><th>{{ $en ? 'Status' : 'სტატუსი' }}</th><th>{{ $en ? 'Created' : 'შექმნა' }}</th><th></th></tr></thead>
+                    <tbody>
+                    @forelse ($projects as $row)
+                        @php $rowName = (string) ($row['name'] ?? ''); $on = ($row['status'] ?? 'active') === 'active'; @endphp
+                        <tr><td><div class="row" style="flex-wrap:nowrap"><span class="av">{{ mb_strtoupper(mb_substr($rowName, 0, 1)) }}</span><div style="min-width:0"><b>{{ $rowName }}</b>@if ((int) $row['id'] === (int) ($project['id'] ?? 0)) <span class="bd bd-ac">{{ $en ? 'selected' : 'არჩეული' }}</span>@endif<div class="xs mut mono">{{ $row['website_url'] ?? '' ?: '—' }}</div></div></div></td>
+                            <td>@if ($on)<span class="bd bd-ok">{{ $en ? 'Active' : 'აქტიური' }}</span>@else<span class="bd bd-out">{{ $en ? 'Disabled' : 'გამორთული' }}</span>@endif</td>
+                            <td class="mono xs">{{ $dayFmt($row['created_at'] ?? null) }}</td>
+                            <td style="text-align:right;white-space:nowrap">@if (empty($demo))<button class="btn sm" type="button" wire:click="selectProject({{ (int) $row['id'] }})" data-go="overview">{{ $en ? 'Select' : 'არჩევა' }}</button> <a class="btn sm" href="{{ url('/account/projects/'.(int) $row['id']) }}">{{ $en ? 'Open' : 'გახსნა' }} <x-ga.icon name="chev" :size="14" /></a>@endif</td></tr>
+                    @empty
+                        <tr><td colspan="4"><div class="empty"><span class="ic"><x-ga.icon name="fold" :size="22" /></span><h2>{{ $en ? 'No projects yet' : 'პროექტი ჯერ არ გაქვთ' }}</h2><button class="btn pine" type="button" data-go="new"><x-ga.icon name="plus" :size="16" />{{ $en ? 'New project' : 'ახალი პროექტი' }}</button></div></td></tr>
+                    @endforelse
+                    </tbody>
+                </table></div></div>
+            </section>
+
+            <section class="screen" id="new">
+                <div><h2 class="h">{{ $en ? 'New project' : 'ახალი პროექტი' }}</h2><p class="muted">{{ $en ? 'A project starts on Free — 100 successful requests a month.' : 'პროექტი იწყება Free გეგმით — 100 წარმატებული მოთხოვნა თვეში.' }}</p></div>
+                <form class="panel form-n" wire:submit="create">
+                    <label>{{ $en ? 'Project name' : 'პროექტის სახელი' }}<input wire:model="name" required minlength="2" maxlength="120" placeholder="autopass-web"></label>
+                    @error('name') <p class="err">{{ $message }}</p> @enderror
+                    <label>{{ $en ? 'Website' : 'საიტის მისამართი' }} <span class="xs mut">{{ $en ? 'optional' : 'არასავალდებულო' }}</span><input wire:model="website_url" class="mono" placeholder="https://example.com"></label>
+                    @error('website_url') <p class="err">{{ $message }}</p> @enderror
+                    <div class="row" style="justify-content:flex-end"><button class="btn" type="button" data-go="projects">{{ $en ? 'Cancel' : 'გაუქმება' }}</button><button class="btn pine" type="submit" @if (! empty($demo)) disabled @endif><span wire:loading.remove wire:target="create">{{ $en ? 'Create project' : 'პროექტის შექმნა' }}</span><span wire:loading wire:target="create">…</span></button></div>
+                </form>
+            </section>
+
+            <section class="screen" id="usage">
+                <div class="tiles">
+                    <article class="tile"><span>{{ $en ? 'This month' : 'ამ თვეში' }}</span><b>{{ $fmt($used) }}</b></article>
+                    <article class="tile"><span>{{ $en ? 'Limit' : 'ლიმიტი' }}</span><b>{{ ! empty($unlimited) ? '∞' : $fmt($limit) }}</b></article>
+                    <article class="tile"><span>{{ $en ? 'Remaining' : 'დარჩენილი' }}</span><b>{{ ! empty($unlimited) ? '∞' : $fmt($remaining) }}</b></article>
+                    <article class="tile"><span>{{ $en ? 'Per minute' : 'წუთში' }}</span><b>{{ $perMinute }}</b></article>
+                </div>
+                <section class="panel">
+                    <h2>{{ $en ? 'Successful requests, last 30 UTC days' : 'წარმატებული მოთხოვნები, ბოლო 30 UTC დღე' }}</h2>
+                    <svg class="chart" viewBox="0 0 600 180" preserveAspectRatio="none" role="img" aria-label="30 days">
+                        @foreach ([20, 70, 120] as $y)<line x1="0" x2="600" y1="{{ $y }}" y2="{{ $y }}" stroke="#E4E3EE" stroke-dasharray="3 4"></line>@endforeach
+                        @foreach ($days as $index => $day)
+                            @php $h = max(4, (int) round(((int) $day['used'] / $max) * 150)); @endphp
+                            <rect x="{{ 3 + $index * 20 }}" y="{{ 165 - $h }}" width="14" height="{{ $h }}" rx="3"><title>{{ $day['day'] }}: {{ $day['used'] }}</title></rect>
+                        @endforeach
+                    </svg>
+                    <p class="xs mut" style="margin-top:8px">{{ $en ? 'HTTP 200 only · widget and API share one counter · resets on the 1st (UTC)' : 'მხოლოდ HTTP 200 · ვიჯეტი და API ერთ მრიცხველზე · ნულდება თვის 1-ს (UTC)' }}</p>
+                </section>
+                <div class="panel flush"><div class="ph"><h2>{{ $en ? 'By day' : 'დღეების მიხედვით' }}</h2></div><div class="tw" style="max-height:360px;overflow:auto"><table>
+                    <thead><tr><th>{{ $en ? 'Day (UTC)' : 'დღე (UTC)' }}</th><th style="text-align:right">{{ $en ? 'Requests' : 'მოთხოვნები' }}</th><th style="width:45%"></th></tr></thead>
+                    <tbody>@foreach (array_reverse($days) as $day)<tr><td class="mono xs">{{ $day['day'] ?: '—' }}</td><td class="mono" style="text-align:right">{{ $fmt((int) $day['used']) }}</td><td><div class="quota"><span style="width:{{ round(((int) $day['used'] / $max) * 100) }}%"></span></div></td></tr>@endforeach</tbody>
+                </table></div></div>
+            </section>
+
+            <section class="screen" id="settings">
+                <div class="set-row"><div><h2>{{ $en ? 'Profile' : 'პროფილი' }}</h2><p class="xs mut">{{ $en ? 'Name and email' : 'სახელი და ელფოსტა' }}</p></div>
+                    <div class="panel form-n">
+                        <label>{{ $en ? 'Name' : 'სახელი' }}<input value="{{ $me?->name }}" readonly></label>
+                        <label><span>{{ $en ? 'Email' : 'ელფოსტა' }} @if ($verified)<span class="bd bd-ok">{{ $en ? 'verified' : 'დადასტურებული' }}</span>@else<span class="bd bd-wa">{{ $en ? 'not verified' : 'დაუდასტურებელი' }}</span>@endif</span><input value="{{ $me?->email }}" readonly></label>
+                        @if (\Illuminate\Support\Facades\Route::has('settings.profile'))<div class="row" style="justify-content:flex-end"><a class="btn pine" href="{{ route('settings.profile') }}">{{ $en ? 'Edit profile' : 'პროფილის შეცვლა' }}</a></div>@endif
+                    </div></div>
+                <div class="set-row"><div><h2>{{ $en ? 'Security' : 'უსაფრთხოება' }}</h2><p class="xs mut">{{ $en ? 'Password, 2FA, sessions' : 'პაროლი, 2FA, სესიები' }}</p></div>
+                    <div class="panel row" style="justify-content:space-between"><div class="row"><span class="ic"><x-ga.icon name="lock" :size="18" /></span><div><b>{{ $en ? 'Password and two-factor' : 'პაროლი და ორსაფეხურიანი ავთენტიფიკაცია' }}</b><p class="xs mut">{{ $en ? 'Password at least 15 characters · TOTP app' : 'პაროლი მინიმუმ 15 სიმბოლო · TOTP აპი' }}</p></div></div>
+                        @if (\Illuminate\Support\Facades\Route::has('settings.security'))<a class="btn" href="{{ route('settings.security') }}">{{ $en ? 'Open' : 'გახსნა' }}</a>@endif</div></div>
+                <form method="post" action="{{ url('/logout') }}" class="row" style="justify-content:flex-end">@csrf<button class="btn" type="submit">{{ $en ? 'Log out' : 'გასვლა' }}</button></form>
             </section>
 
             <section class="screen" id="catalog">
@@ -159,23 +224,37 @@
 </aside>
 <script>
     (function () {
-        const titles = { overview: @json($en ? 'Overview' : 'მიმოხილვა'), keys: @json($en ? 'API keys' : 'API გასაღებები'), plan: @json($en ? 'Plan' : 'გეგმა'), catalog: @json($en ? 'Catalog' : 'კატალოგი') };
+        const titles = { overview: @json($en ? 'Overview' : 'მიმოხილვა'), projects: @json($en ? 'Projects' : 'პროექტები'), new: @json($en ? 'New project' : 'ახალი პროექტი'), usage: @json($en ? 'Usage' : 'მოხმარება'), keys: @json($en ? 'API keys' : 'API გასაღებები'), plan: @json($en ? 'Plan' : 'გეგმა'), catalog: @json($en ? 'Catalog' : 'კატალოგი'), settings: @json($en ? 'Settings' : 'პარამეტრები') };
+        var current = 'overview';
         const side = document.getElementById('side');
         const menu = document.getElementById('menu');
-        document.querySelectorAll('.nav button').forEach(function (button) {
-            button.addEventListener('click', function () {
-                document.querySelectorAll('.nav button').forEach(function (item) { item.removeAttribute('aria-current'); });
-                document.querySelectorAll('.screen').forEach(function (screen) { screen.classList.remove('active'); });
-                button.setAttribute('aria-current', 'page');
-                document.getElementById(button.dataset.screen).classList.add('active');
-                document.getElementById('title').textContent = titles[button.dataset.screen];
-                side.classList.remove('open');
-                menu.setAttribute('aria-expanded', 'false');
-            });
+        function show(name) {
+            if (!document.getElementById(name)) return;
+            current = name;
+            document.querySelectorAll('.nav button').forEach(function (item) { item.toggleAttribute('aria-current', item.dataset.screen === (name === 'new' ? 'projects' : name)); if (item.hasAttribute('aria-current')) item.setAttribute('aria-current', 'page'); });
+            document.querySelectorAll('.screen').forEach(function (screen) { screen.classList.toggle('active', screen.id === name); });
+            document.getElementById('title').textContent = titles[name] || '';
+            side.classList.remove('open');
+            menu.setAttribute('aria-expanded', 'false');
+        }
+        document.addEventListener('click', function (event) {
+            var el = event.target.closest('.nav button[data-screen], [data-go]');
+            if (!el) return;
+            show(el.dataset.screen || el.dataset.go);
+            if (history.replaceState) history.replaceState(null, '', '#' + current);
         });
+        var hooked = false;
+        function hook() {
+            if (hooked || !window.Livewire || !Livewire.hook) return;
+            hooked = true;
+            Livewire.hook('commit', function (c) { c.succeed(function () { queueMicrotask(function () { show(current); }); }); });
+            Livewire.on('screen', function (e) { var n = (e && e.name) || (Array.isArray(e) && e[0] && e[0].name); if (n) current = n; });
+        }
+        document.addEventListener('livewire:init', hook);
+        hook();
         var initial = (location.hash || '').replace('#', '');
-        var initialButton = initial ? document.querySelector('.nav button[data-screen="' + initial + '"]') : null;
-        if (initialButton) initialButton.click();
+        if (initial) show(initial);
+        window.addEventListener('hashchange', function () { show((location.hash || '').replace('#', '') || 'overview'); });
         menu.addEventListener('click', function () {
             const open = side.classList.toggle('open');
             menu.setAttribute('aria-expanded', open ? 'true' : 'false');

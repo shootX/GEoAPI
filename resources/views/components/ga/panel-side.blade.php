@@ -5,8 +5,10 @@
     $initials = $user ? mb_strtoupper(mb_substr((string) $user->name, 0, 1)) : 'G';
     $items = [
         ['overview', 'home', $en ? 'Overview' : 'მიმოხილვა'],
+        ['projects', 'fold', $en ? 'Projects' : 'პროექტები'],
+        ['usage', 'bar', $en ? 'Usage' : 'მოხმარება'],
         ['keys', 'key', $en ? 'API keys' : 'API გასაღებები'],
-        ['plan', 'bar', $en ? 'Plan' : 'გეგმა'],
+        ['plan', 'box', $en ? 'Plan' : 'გეგმა'],
         ['catalog', 'db', $en ? 'Catalog' : 'კატალოგი'],
     ];
 @endphp
@@ -25,7 +27,11 @@
         @endforeach
         <a href="{{ route('account.billing') }}" @if ($active === 'billing') aria-current="page" @endif><x-ga.icon name="card" :size="18" /><span>{{ $en ? 'Billing' : 'ბილინგი' }}</span></a>
         <div class="gr">{{ $en ? 'ACCOUNT' : 'ანგარიში' }}</div>
-        <a href="{{ \Illuminate\Support\Facades\Route::has('settings.profile') ? route('settings.profile') : url('/account') }}"><x-ga.icon name="user" :size="18" /><span>{{ $en ? 'Settings' : 'პარამეტრები' }}</span></a>
+        @if ($spa)
+            <button type="button" data-screen="settings"><x-ga.icon name="user" :size="18" /><span>{{ $en ? 'Settings' : 'პარამეტრები' }}</span></button>
+        @else
+            <a href="{{ route('account.home') }}#settings"><x-ga.icon name="user" :size="18" /><span>{{ $en ? 'Settings' : 'პარამეტრები' }}</span></a>
+        @endif
         <a href="{{ url('/guide') }}"><x-ga.icon name="doc" :size="18" /><span style="flex:1">{{ $en ? 'Documentation' : 'დოკუმენტაცია' }}</span><x-ga.icon name="ext" :size="12" /></a>
     </nav>
     @if ($user)

@@ -56,6 +56,7 @@ final class Projects extends Component
         $id = (new ProjectRepository(Connection::pdo()))->insert($legacyId, $name, $website === '' ? null : $website);
         $this->projectId = $id;
         $this->reset('name', 'website_url');
+        $this->dispatch('screen', name: 'projects');
     }
 
     public function selectProject(int $id): void
