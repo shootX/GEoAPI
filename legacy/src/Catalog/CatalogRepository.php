@@ -455,8 +455,8 @@ final class CatalogRepository
     {
         try {
             return (int) $this->pdo->query($sql)->fetchColumn();
-        } catch (PDOException) {
-            error_log('[catalog] query failed');
+        } catch (PDOException $e) {
+            error_log('[catalog] query failed: SQLSTATE '.$e->getCode());
             throw new UnavailableException;
         }
     }

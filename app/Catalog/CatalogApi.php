@@ -103,8 +103,9 @@ final class CatalogApi
         try {
             $catalog = new PublicCatalog(Connection::pdo());
             $result = $this->query($catalog, $route);
-        } catch (UnavailableException|PDOException) {
-            error_log('[catalog] query failed');
+        } catch (UnavailableException|PDOException $e) {
+            // SQLSTATE only: the driver message can carry query values.
+            error_log('[catalog] query failed: '.($e instanceof PDOException ? 'SQLSTATE '.$e->getCode() : 'unavailable'));
 
             return $this->unavailable();
         }

@@ -43,7 +43,7 @@ final class UserRepository
             if ($e->getCode() === '23505') {
                 return ['ok' => false, 'duplicate' => true];
             }
-            error_log('[platform] query failed');
+            error_log('[platform] query failed: SQLSTATE '.$e->getCode());
             throw new UnavailableException();
         }
 
