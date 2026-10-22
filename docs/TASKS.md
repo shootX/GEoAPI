@@ -204,3 +204,6 @@
 - [x] Overview: KPI tiles, 30-day chart + plan card (Free/Basic/Premium from project quota), plan screen no longer shows the stale "Pro — soon".
 - [x] Billing (`/account/billing`) moved into the cabinet layout; plan cards with „გადახდა · თვე / წელი“ (BOG, sandbox unchanged), order status badges, Free switch asks for confirmation.
 - [ ] Legacy project/playground/explorer pages (`Platform\Http` views), usage page (Proposed), settings (Electrik) and states screens are not yet ported to the new design.
+
+## 2026-10-22 — P5 admin palette
+- Legacy admin.css recolored to Indigo tokens + FiraGO (self-hosted /assets/fonts/firago). Full admin handoff layouts (14 screens) not yet rebuilt.

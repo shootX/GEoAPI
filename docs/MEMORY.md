@@ -157,3 +157,6 @@ Existing access is kept by a new column, not by rewriting quotas. On PostgreSQL 
 - Tokens: `--ga-*` in `app.css`; slate/Electrik variable names kept and mapped to Indigo.
 - Auth pages use `components.layouts.auth`; Electrik forgot/reset/verify are overridden in `resources/views/vendor/electrik/livewire/auth/`.
 - Integrations is Proposed: do not link it until SDK/MCP/CLI pages ship.
+
+## 2026-10-22 — P5 admin palette
+- Legacy admin.css recolored to Indigo tokens + FiraGO (self-hosted /assets/fonts/firago). Full admin handoff layouts (14 screens) not yet rebuilt.
