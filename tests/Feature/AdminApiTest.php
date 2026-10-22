@@ -216,6 +216,17 @@ final class AdminApiTest extends TestCase
             ->assertJsonPath('error.code', 'forbidden');
     }
 
+    public function test_a_plan_price_cannot_be_set_in_another_currency(): void
+    {
+        $token = $this->adminToken();
+        $id = (int) DB::table('api_plans')->where('code', 'basic')->value('id');
+
+        $this->withHeader('Authorization', 'Bearer '.$token)
+            ->patchJson('/api/admin/plans/'.$id, ['currency' => 'USD'])
+            ->assertStatus(422);
+        $this->assertSame('GEL', DB::table('api_plans')->where('id', $id)->value('currency'));
+    }
+
     private function adminToken(): string
     {
         $user = User::factory()->create([
