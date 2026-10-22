@@ -7,7 +7,7 @@ namespace App\Billing;
 use InvalidArgumentException;
 
 /**
- * Commercial plans. USD cents are the list price. GEL is applied later with the NBG rate.
+ * Commercial plans. Prices are in GEL tetri (1 ₾ = 100 tetri); there is no other currency.
  * A year is 12% below twelve monthly prices. The listed price includes VAT.
  */
 final class Plans
@@ -21,13 +21,13 @@ final class Plans
     /** @var list<string> */
     public const PAID = ['basic', 'premium', 'basic-year', 'premium-year'];
 
-    /** @return array<string, array{quota:int, unlimited:bool, usd_cents:int}> */
+    /** @return array<string, array{quota:int, unlimited:bool, tetri:int}> */
     public static function catalog(): array
     {
         return [
-            self::FREE => ['quota' => 100, 'unlimited' => false, 'usd_cents' => 0],
-            self::BASIC => ['quota' => 2000, 'unlimited' => false, 'usd_cents' => 5900],
-            self::PREMIUM => ['quota' => 0, 'unlimited' => true, 'usd_cents' => 9900],
+            self::FREE => ['quota' => 100, 'unlimited' => false, 'tetri' => 0],
+            self::BASIC => ['quota' => 2000, 'unlimited' => false, 'tetri' => 15900],
+            self::PREMIUM => ['quota' => 0, 'unlimited' => true, 'tetri' => 26700],
         ];
     }
 
@@ -44,10 +44,10 @@ final class Plans
         return $interval === 'year' ? $plan.'-year' : $plan;
     }
 
-    public static function usdCents(string $plan, string $interval): int
+    public static function tetri(string $plan, string $interval): int
     {
         self::assertPlan($plan);
-        $monthly = self::catalog()[$plan]['usd_cents'];
+        $monthly = self::catalog()[$plan]['tetri'];
         if ($plan === self::FREE || $interval === 'month') {
             return $monthly;
         }
@@ -78,27 +78,6 @@ final class Plans
         return $plan;
     }
 
-    /**
-     * GEL tetri for a USD cent amount. rate is GEL per `quantity` USD.
-     */
-    public static function gelTetri(int $usdCents, string $rate, int $quantity): int
-    {
-        if ($usdCents < 0 || $quantity < 1 || ! preg_match('/^\d+(\.\d+)?$/', $rate)) {
-            throw new InvalidArgumentException('rate');
-        }
-        $product = bcmul((string) $usdCents, $rate, 8);
-        $divided = bcdiv($product, (string) $quantity, 8);
-        $negative = str_starts_with($divided, '-');
-        $absolute = ltrim($divided, '-');
-        [$whole, $fraction] = array_pad(explode('.', $absolute, 2), 2, '0');
-        $tetri = (int) $whole;
-        if (isset($fraction[0]) && $fraction[0] >= '5') {
-            $tetri++;
-        }
-
-        return $negative ? -$tetri : $tetri;
-    }
-
     public static function formatTetri(int $tetri): string
     {
         $sign = $tetri < 0 ? '-' : '';
@@ -108,20 +87,9 @@ final class Plans
     }
 
     /** Customer-facing price in GEL. The bank is charged this amount. */
-    public static function lari(int $usdCents): string
+    public static function lari(int $tetri): string
     {
-        if ($usdCents === 0) {
-            return '0 ₾';
-        }
-        try {
-            $rate = NbgRate::latest();
-        } catch (\Throwable) {
-            return '—';
-        }
-        if ($rate === null) {
-            return '—';
-        }
-        $formatted = self::formatTetri(self::gelTetri($usdCents, $rate['rate'], $rate['quantity']));
+        $formatted = self::formatTetri($tetri);
         if (str_ends_with($formatted, '.00')) {
             $formatted = substr($formatted, 0, -3);
         }

@@ -5,8 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>GeoAPI Admin API</title>
     <link rel="stylesheet" href="/assets/fonts/fonts.css">
-    <link rel="stylesheet" href="https://unpkg.com/swagger-ui-dist@5.17.14/swagger-ui.css">
-    <style>
+    <link rel="stylesheet" href="{{ asset('vendor/swagger-ui/swagger-ui.css') }}?v=5.17.14">
+    <style @nonce>
         body { margin: 0; font-family: "Noto Sans Georgian", "FiraGO", system-ui, sans-serif; background: #f4faf7; color: #091413; }
         header { padding: 16px 24px; border-bottom: 1px solid #1e3a30; background: #091413; color: #f4faf7; }
         header p { margin: 4px 0 0; color: #B0E4CC; }
@@ -30,8 +30,8 @@
         </ul>
     </section>
     <div id="swagger-ui"></div>
-    <script src="https://unpkg.com/swagger-ui-dist@5.17.14/swagger-ui-bundle.js"></script>
-    <script>
+    <script src="{{ asset('vendor/swagger-ui/swagger-ui-bundle.js') }}?v=5.17.14"></script>
+    <script @nonce>
         window.ui = SwaggerUIBundle({
             url: @json($specUrl),
             dom_id: '#swagger-ui',

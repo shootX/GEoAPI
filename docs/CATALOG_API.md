@@ -8,7 +8,7 @@ production-ში `CARAPI_CATALOG_ENABLED=1`. მარშრუტები ი
 
 - კოდი: Laravel 12. მარშრუტი `routes/product.php` → `App\Http\Controllers\Api\V1\CatalogController` → `App\Catalog\CatalogApi` / `PublicCatalog`. ძველი `src/` ახლა `legacy/src/`-შია (ვიჯეტის picker და კაბინეტი).
 - მარშრუტები: `/api/v1/brands`, `/brands/{slug}/models`, `/models/{id}/years`, `/models/{id}/generations`, `/generations/{id}/modifications`, `/modifications`, `/modifications/{id}`, `/modifications/{id}/specs`, `/modifications/{id}/equipment`, `/engines`, `/bodies`, `/fuel`, `/colors`, `/coverage`. სრული კონტრაქტი: `GET /api/v1/openapi.json`, Postman: `/api/v1/postman.json`, დოკუმენტაცია: `/api/v1/docs`.
-- ავტორიზაცია: `Authorization: Bearer geoapi_sk_…`. ლიმიტები და პლანები: `docs/USAGE_AND_LIMITS.md`, ბილინგი WP-11/WP-12 (`docs/TASKS.md`).
+- ავტორიზაცია: `Authorization: Bearer geoapi_sk_…`. ლიმიტები და პლანები: `docs/USAGE_AND_LIMITS.md`.
 - ფოტო: `GET /api/models/{id}/photo?generation={id}` (verified ფოტოები; უფლებები დადასტურებულია 2026-10-22).
 - ტესტები: `tests/Feature/PublicApiV1Test.php`, `PublicApiContractTest.php` (SQLite, `SeedsPublicCatalog`); CI: PHPUnit + SDK/MCP/CLI Node 20/22.
 - გარემო: Laravel `.env` იკითხება `config/`-ის გავლით; ქვემოთ მოცემული `CARAPI_*` ცვლადები ისევ მოქმედებს კატალოგის კავშირზე.
@@ -54,7 +54,7 @@ PHP-FPM-ის პულში `env[CARAPI_CATALOG_ENABLED] = 1`. გასა�
 
 `PUBLIC`-ს `carbase`-ზე აქვს `CONNECT` და `TEMP`, ამიტომ როლსაც აქვს `TEMP`. ეს ცხრილის ჩაწერა არ არის. `PUBLIC` არც ერთ მომხმარებლის ცხრილს არ კითხულობს. საერთო უფლება არ გაუქმებულა, რომ სხვა ბაზების კავშირი არ გაწყდეს. როლს სხვა ბაზის ცხრილის `SELECT` არა აქვს.
 
-ისტორიულად პაროლი საერთო PHP-FPM პულში არ ჩაწერილა. ახლა GeoAPI-ს ცალკე პული აქვს (`docs/DEPLOYMENT.md`). პაროლი კვლავ public/-ისა და Git-ის გარეთაა. production-ში API ჩართულია და გასაღებს ითხოვს.
+ისტორიულად პაროლი საერთო PHP-FPM პულში არ ჩაწერილა. ახლა GeoAPI-ს ცალკე პული აქვს. პაროლი კვლავ public/-ისა და Git-ის გარეთაა. production-ში API ჩართულია და გასაღებს ითხოვს.
 
 შემოწმება ახალი როლით: `tests/catalog_api_test.php` გავიდა, `current_user` იყო `carapi_catalog_reader`, შედეგი დაემთხვა SQL-ს, SQLite არ შეიქმნა, `DromResolver` არ ჩაიტვირთა. ჩაწერის პრაქტიკული უარყოფა შემოწმდა ცალკე სატესტო ბაზაზე, `carbase` არ შეცვლილა.
 

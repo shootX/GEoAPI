@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Billing\V2;
 
+use App\Billing\Plans;
 use Illuminate\Database\QueryException;
 use Illuminate\Support\Facades\DB;
 
@@ -57,7 +58,7 @@ final class Gate
         }
         $en = function_exists('app') && app()->getLocale() === 'en';
 
-        $price = \App\Billing\Plans::lari(\App\Billing\V2\Catalog::EXTRA_PROJECT_CENTS);
+        $price = Plans::lari(Catalog::EXTRA_PROJECT_TETRI);
 
         return $en
             ? 'This workspace has no free project slot. An extra active project is '.$price.' a month.'

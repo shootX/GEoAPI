@@ -7,7 +7,7 @@
     <x-ga.panel-side active="billing" />
     <div class="main">
         <header class="top">
-            <button class="btn menu" id="menu" type="button" aria-expanded="false" aria-controls="side" aria-label="{{ __('Menu') }}" onclick="var s=document.getElementById('side');var o=s.classList.toggle('open');this.setAttribute('aria-expanded',o?'true':'false')"><x-ga.icon name="menu" :size="20" /></button>
+            <button class="btn menu" id="menu" type="button" aria-expanded="false" aria-controls="side" aria-label="{{ __('Menu') }}" data-menu-toggle><x-ga.icon name="menu" :size="20" /></button>
             <a class="mlogo" href="{{ url('/') }}"><img src="{{ asset('assets/brand/geoapi-lockup-light.svg') }}" alt="geoapi.ge" height="22" width="69"></a>
             <h1>{{ $en ? 'Test payment' : 'სატესტო გადახდა' }} <span class="bd bd-wa">TEST</span></h1>
         </header>

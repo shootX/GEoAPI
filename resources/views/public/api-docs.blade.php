@@ -14,8 +14,10 @@
         <p class="sm" style="margin-top:12px;color:var(--ac)"><a href="{{ url('/api/v1/openapi.json') }}">openapi.json</a> · <a href="{{ url('/api/v1/postman.json') }}">Postman</a> · <a href="{{ url('/guide') }}">{{ $en ? 'Guide' : 'გზამკვლევი' }}</a></p>
     </div>
     <div id="redoc" style="margin-top:32px;border:1px solid var(--line);border-radius:14px;overflow:hidden"></div>
-    <script src="https://cdn.redoc.ly/redoc/latest/bundles/redoc.standalone.js"></script>
-    <script>
+    {{-- Redoc's footer logo is hot-linked from its CDN; img-src does not allow it. --}}
+    <style @nonce>#redoc a[href*="redocly.com"] img { display: none; }</style>
+    <script src="{{ asset('vendor/redoc/redoc.standalone.js') }}?v=2.5.4"></script>
+    <script @nonce>
         Redoc.init({{ \Illuminate\Support\Js::from(url('/api/v1/openapi.json')) }}, {
             theme: {
                 colors: { primary: { main: '#4338CA' }, text: { primary: '#0F0E2A', secondary: '#4A4866' }, border: { dark: '#C9C7DA', light: '#E4E3EE' } },

@@ -423,8 +423,8 @@ final class View
 
     private static function css(): string
     {
-        return <<<'CSS'
-<style>
+        return '<style' . \Carapi\Csp::attr() . '>' . <<<'CSS'
+
   :root{--bg:#f9fafa;--ink:#141719;--muted:#5c6163;--navy:#193f68;--navy-h:#4f81b7;--line:#e1e4e5;--card:#fff}
   *{box-sizing:border-box}
   body{margin:0;font:16px/1.6 "Noto Sans Georgian",Roboto,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:var(--bg);color:var(--ink)}

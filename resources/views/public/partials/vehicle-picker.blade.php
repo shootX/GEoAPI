@@ -51,7 +51,7 @@
         </div>
     </div>
 </div>
-<style>
+<style @nonce>
     #vehicle-picker { margin-top: 1.75rem; }
     #vehicle-picker:has(.open) { position: relative; z-index: 30; }
     #vehicle-picker .vp-bar { position: relative; display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); border: 1px solid var(--slate-border); border-radius: 0.75rem; background: var(--slate-card); }

@@ -8,10 +8,10 @@
         'free' => ['name' => 'Free', 'month' => 0, 'year' => 0, 'quota' => $en ? '100 successful requests / month' : '100 წარმატებული მოთხოვნა / თვე',
             'features' => $en ? ['REST API and widget', '60 requests / minute', 'All endpoints'] : ['REST API და ვიჯეტი', '60 მოთხოვნა / წუთი', 'ყველა endpoint'],
             'cta' => $en ? 'Start free' : 'დაიწყე უფასოდ', 'href' => route('register')],
-        'basic' => ['name' => 'Basic', 'month' => \App\Billing\Plans::usdCents('basic', 'month'), 'year' => \App\Billing\Plans::usdCents('basic', 'year'), 'quota' => $en ? '2 000 successful requests / month' : '2 000 წარმატებული მოთხოვნა / თვე',
+        'basic' => ['name' => 'Basic', 'month' => \App\Billing\Plans::tetri('basic', 'month'), 'year' => \App\Billing\Plans::tetri('basic', 'year'), 'quota' => $en ? '2 000 successful requests / month' : '2 000 წარმატებული მოთხოვნა / თვე',
             'features' => $en ? ['Everything in Free', '60 requests / minute', 'PDF invoice'] : ['ყველაფერი Free-დან', '60 მოთხოვნა / წუთი', 'ინვოისი PDF'],
             'cta' => $en ? 'Pay' : 'გადახდა', 'href' => url('/account/billing'), 'hi' => true],
-        'premium' => ['name' => 'Premium', 'month' => \App\Billing\Plans::usdCents('premium', 'month'), 'year' => \App\Billing\Plans::usdCents('premium', 'year'), 'quota' => $en ? 'Unlimited requests' : 'შეუზღუდავი მოთხოვნები',
+        'premium' => ['name' => 'Premium', 'month' => \App\Billing\Plans::tetri('premium', 'month'), 'year' => \App\Billing\Plans::tetri('premium', 'year'), 'quota' => $en ? 'Unlimited requests' : 'შეუზღუდავი მოთხოვნები',
             'features' => $en ? ['Everything in Basic', '60 requests / minute', 'PDF invoice'] : ['ყველაფერი Basic-დან', '60 მოთხოვნა / წუთი', 'ინვოისი PDF'],
             'cta' => $en ? 'Pay' : 'გადახდა', 'href' => url('/account/billing')],
     ];
@@ -101,7 +101,7 @@
         @endforeach
     </div>
 </section>
-<script>
+<script @nonce>
     document.addEventListener('click', function (event) {
         var button = event.target.closest('[data-period]');
         if (!button) return;

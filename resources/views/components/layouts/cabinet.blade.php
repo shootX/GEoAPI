@@ -16,5 +16,6 @@
 <body class="cab ga">
     {{ $slot }}
     @livewireScripts
+    <script src="{{ asset('assets/menu.js') }}?v=1" defer></script>
 </body>
 </html>

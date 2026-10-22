@@ -13,11 +13,8 @@ use InvalidArgumentException;
 
 final class Checkout
 {
-    /**
-     * @param  array{code:string, rate:string, quantity:int, rated_on:string}  $rate
-     * @param  array<string, mixed>  $buyer
-     */
-    public static function open(int $actorUserId, int $legacyUserId, int $projectId, string $product, string $interval, array $rate, array $buyer): string
+    /** @param  array<string, mixed>  $buyer */
+    public static function open(int $actorUserId, int $legacyUserId, int $projectId, string $product, string $interval, array $buyer): string
     {
         if (! Workspace::ownsProject($legacyUserId, $projectId)) {
             throw new InvalidArgumentException('project');
@@ -42,8 +39,7 @@ final class Checkout
             }
         }
         $code = Catalog::code($product, $interval);
-        $cents = Catalog::usdCents($product, $interval);
-        $tetri = Plans::gelTetri($cents, $rate['rate'], $rate['quantity']);
+        $tetri = Catalog::tetri($product, $interval);
         $publicId = (string) Str::uuid();
         $now = now();
         DB::table('billing_orders')->insert([
@@ -53,11 +49,12 @@ final class Checkout
             'project_id' => $projectId,
             'plan_code' => $code,
             'interval' => $interval,
-            'usd_cents' => $cents,
+            // GEL only. usd_cents/rate* are NOT NULL legacy columns the app role cannot ALTER.
+            'usd_cents' => 0,
             'gel_amount' => Plans::formatTetri($tetri),
-            'rate' => $rate['rate'],
-            'rate_quantity' => $rate['quantity'],
-            'rate_date' => $rate['rated_on'],
+            'rate' => '1',
+            'rate_quantity' => 1,
+            'rate_date' => $now->toDateString(),
             'buyer' => json_encode($buyer, JSON_UNESCAPED_UNICODE),
             'previous' => json_encode(self::snapshot($legacyUserId), JSON_UNESCAPED_UNICODE),
             'status' => 'pending',
@@ -68,7 +65,7 @@ final class Checkout
         AuditLog::write($actorUserId, 'checkout', 'order', $publicId, [
             'plan' => $code,
             'project_id' => $projectId,
-            'usd_cents' => $cents,
+            'gel' => Plans::formatTetri($tetri),
         ]);
 
         return $publicId;
@@ -268,7 +265,7 @@ final class Checkout
     private static function grantExtra(int $workspaceId, int $orderId): void
     {
         $now = Workspace::stamp();
-        // "$5 / month": the add-on lasts a month from payment, not until the current period ends (QA GEO-QA-009).
+        // "Per month": the add-on lasts a month from payment, not until the current period ends (QA GEO-QA-009).
         $end = Workspace::plusMonth($now);
         DB::table('billing_project_addons')->insert([
             'workspace_id' => $workspaceId,

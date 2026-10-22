@@ -8,7 +8,6 @@ use App\Billing\BillingNotConfigured;
 use App\Billing\BogClient;
 use App\Billing\Entitlements;
 use App\Billing\MockPay;
-use App\Billing\NbgRate;
 use App\Billing\Plans;
 use App\Billing\V2\Catalog;
 use App\Billing\V2\Checkout;
@@ -71,15 +70,9 @@ final class Billing extends Component
 
             return null;
         }
-        $rate = NbgRate::latestOrFetch();
-        if ($rate === null) {
-            $this->addError('checkout', 'the rate is unavailable');
-
-            return null;
-        }
         [$user, $projectId] = $this->ownedProject();
         $buyer = $this->buyer($user);
-        $publicId = Entitlements::openOrder((int) $user->id, (int) $user->legacy_platform_user_id, $projectId, $plan, $interval, $rate, $buyer);
+        $publicId = Entitlements::openOrder((int) $user->id, (int) $user->legacy_platform_user_id, $projectId, $plan, $interval, $buyer);
         if ($mock) {
             DB::table('billing_orders')->where('public_id', $publicId)->update(['bog_order_id' => MockPay::flag($publicId)]);
 
@@ -88,7 +81,7 @@ final class Billing extends Component
         try {
             $created = BogClient::createOrder(
                 $publicId,
-                $this->gel($plan, $interval, $rate),
+                Plans::formatTetri(Plans::tetri($plan, $interval)),
                 Plans::code($plan, $interval),
                 route('billing.bog.callback'),
                 route('account.billing', ['paid' => 'return']),
@@ -147,15 +140,9 @@ final class Billing extends Component
 
             return null;
         }
-        $rate = NbgRate::latestOrFetch();
-        if ($rate === null) {
-            $this->addError('checkout', 'the rate is unavailable');
-
-            return null;
-        }
         [$user, $projectId] = $this->ownedProject();
         try {
-            $publicId = Checkout::open((int) $user->id, (int) $user->legacy_platform_user_id, $projectId, $plan, $interval, $rate, $this->buyer($user));
+            $publicId = Checkout::open((int) $user->id, (int) $user->legacy_platform_user_id, $projectId, $plan, $interval, $this->buyer($user));
         } catch (InvalidArgumentException) {
             abort(404);
         }
@@ -167,7 +154,7 @@ final class Billing extends Component
         try {
             $created = BogClient::createOrder(
                 $publicId,
-                Plans::formatTetri(Plans::gelTetri(Catalog::usdCents($plan, $interval), $rate['rate'], $rate['quantity'])),
+                Plans::formatTetri(Catalog::tetri($plan, $interval)),
                 Catalog::code($plan, $interval),
                 route('billing.bog.callback'),
                 route('account.billing', ['paid' => 'return']),
@@ -186,13 +173,6 @@ final class Billing extends Component
 
     public function render()
     {
-        $rate = null;
-        try {
-            // Last stored NBG rate (any date). Only when none was ever stored, try one live fetch.
-            $rate = NbgRate::latestOrFetch();
-        } catch (\Throwable) {
-            $rate = null;
-        }
         $currentPlan = null;
         if ($this->projectId !== null) {
             try {
@@ -220,7 +200,6 @@ final class Billing extends Component
             'projects' => $this->projects(),
             'configured' => BogClient::configured() || MockPay::allowedFor(auth()->user()),
             'mock' => MockPay::allowedFor(auth()->user()),
-            'rate' => $rate,
             'currentPlan' => $currentPlan,
             'orders' => $orders,
             'notice' => request()->query('paid'),
@@ -285,13 +264,5 @@ final class Billing extends Component
             'company_address' => (string) ($user->company_address ?? ''),
             'vat_payer' => (bool) ($user->vat_payer ?? false),
         ];
-    }
-
-    /** @param  array{code:string, rate:string, quantity:int, rated_on:string}  $rate */
-    private function gel(string $plan, string $interval, array $rate): string
-    {
-        $tetri = Plans::gelTetri(Plans::usdCents($plan, $interval), $rate['rate'], $rate['quantity']);
-
-        return Plans::formatTetri($tetri);
     }
 }

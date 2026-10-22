@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Providers;
 
+use App\Http\Middleware\SecurityHeaders;
 use App\Listeners\ProvisionPlatformUser;
 use App\Livewire\Account\Errors;
 use App\Livewire\Account\Products;
@@ -18,8 +19,10 @@ use Illuminate\Auth\Events\Login;
 use Illuminate\Auth\Events\Logout;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Auth\Events\Verified;
+use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
 use Laravel\Cashier\Cashier;
 use Livewire\Livewire;
@@ -34,6 +37,38 @@ class AppServiceProvider extends ServiceProvider
 
     public function boot(): void
     {
+        // <script @nonce> / <style @nonce>: the per-request CSP nonce (SecurityHeaders, QA GEO-QA-022).
+        // Electrik/Slate views whose inline Alpine code Alpine's CSP build cannot parse
+        // (methods, arrow functions, template literals, optional chaining).
+        View::composer([
+            'electrik::livewire.auth.login',
+            'electrik::livewire.settings.security',
+            'electrik::livewire.clients.index',
+            'electrik::livewire.projects.index',
+            'slate::components.toaster',
+            'slate::components.toast-close',
+            'slate::components.partials.overlay-root-attrs',
+            'slate::components.partials.focus-trap-attrs',
+            'slate::components.partials.file-input-control',
+            'slate::components.accordion*',
+            'slate::components.calendar',
+            'slate::components.carousel*',
+            'slate::components.combobox*',
+            'slate::components.command-empty',
+            'slate::components.context-menu*',
+            'slate::components.dark-mode-toggle',
+            'slate::components.dropdown-menu',
+            'slate::components.hover-card',
+            'slate::components.menubar*',
+            'slate::components.navigation-menu*',
+            'slate::components.popover',
+            'slate::components.rating',
+            'slate::components.resizable*',
+            'slate::components.slider',
+            'slate::components.spotlight',
+            'slate::components.toggle-group',
+        ], static fn () => SecurityHeaders::needsEval());
+        Blade::directive('nonce', static fn (): string => '<?php echo \'nonce="\'.e((string) \Illuminate\Support\Facades\Vite::cspNonce()).\'"\'; ?>');
         // Electrik's SetLocale replaces unsupported codes, including ka, and
         // app()->setLocale() also overwrites config('app.locale').
         config(['carapi.locale' => (string) config('app.locale')]);

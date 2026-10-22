@@ -16,7 +16,7 @@ use Throwable;
 
 final class IssueAdminToken extends Command
 {
-    protected $signature = 'admin:issue-token {email=drom.amin@socialsave.cc}';
+    protected $signature = 'admin:issue-token {email : The operator email}';
 
     protected $description = 'Ensure an admin user and print a new Sanctum personal access token';
 

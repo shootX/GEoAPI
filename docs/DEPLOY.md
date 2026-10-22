@@ -33,7 +33,7 @@ php artisan up
 
 `php artisan migrate --force` uses the credentials already in `.env` and the SSH user's environment. Catalog migrations need `CARAPI_CATALOG_ADMIN_*` in that environment (the table owner, not `carapi_catalog_reader`). Variables that exist only in the PHP-FPM pool are not visible to this SSH session. Do not copy them into `.env` from the workflow.
 
-PHP-FPM for this site runs as `carapi`. The checkout is owned by `www`. See `docs/DEPLOYMENT.md` for the pool, socket, and secret files under `/www/server/carapi/`.
+PHP-FPM for this site runs as `carapi`. The checkout is owned by `www`. The pool, socket and secret files are documented in the internal operations notes, not in this repository.
 
 ## One-time server setup
 

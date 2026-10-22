@@ -27,10 +27,10 @@
 </details>
 
 @once
-    <style>
+    <style @nonce>
         details[data-locale-switch] > summary::-webkit-details-marker { display: none; }
     </style>
-    <script>
+    <script @nonce>
         document.addEventListener('click', (event) => {
             document.querySelectorAll('details[data-locale-switch][open]').forEach((node) => {
                 if (!node.contains(event.target)) {

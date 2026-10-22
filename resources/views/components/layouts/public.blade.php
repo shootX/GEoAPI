@@ -82,7 +82,7 @@
         </div>
         <div class="wrap xs mut" style="margin-top:28px;display:flex;justify-content:space-between"><span>© {{ date('Y') }} GeoAPI.ge</span><span>KA · EN</span></div>
     </footer>
-    <script>
+    <script @nonce>
         (function () {
             var toggle = document.querySelector('[data-nav-toggle]');
             var menu = document.getElementById('site-menu');

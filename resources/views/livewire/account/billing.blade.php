@@ -18,7 +18,7 @@
     <x-ga.panel-side active="billing" :project="$current" />
     <div class="main">
         <header class="top">
-            <button class="btn menu" id="menu" type="button" aria-expanded="false" aria-controls="side" aria-label="{{ __('Menu') }}" onclick="var s=document.getElementById('side');var o=s.classList.toggle('open');this.setAttribute('aria-expanded',o?'true':'false')"><x-ga.icon name="menu" :size="20" /></button><a class="mlogo" href="{{ url('/') }}"><img src="{{ asset('assets/brand/geoapi-lockup-light.svg') }}" alt="geoapi.ge" height="22" width="69"></a>
+            <button class="btn menu" id="menu" type="button" aria-expanded="false" aria-controls="side" aria-label="{{ __('Menu') }}" data-menu-toggle><x-ga.icon name="menu" :size="20" /></button><a class="mlogo" href="{{ url('/') }}"><img src="{{ asset('assets/brand/geoapi-lockup-light.svg') }}" alt="geoapi.ge" height="22" width="69"></a>
             <h1>{{ $en ? 'Billing' : 'ბილინგი' }}</h1>
             <div class="who"><span class="seg hide-m" style="padding:3px"><a href="{{ route('locale.switch', 'ka') }}" class="{{ $en ? '' : 'on' }}">KA</a><a href="{{ route('locale.switch', 'en') }}" class="{{ $en ? 'on' : '' }}">EN</a></span></div>
         </header>
@@ -39,11 +39,8 @@
             @unless ($configured)
                 <div class="al al-wa" data-code="payments not configured"><x-ga.icon name="warn" :size="18" /><div>{{ $en ? 'The payment provider is not connected yet. Card payment is temporarily unavailable.' : 'გადახდის პროვაიდერი ჯერ არ არის მიერთებული. ბარათით გადახდა დროებით მიუწვდომელია.' }}</div></div>
             @endunless
-            @if ($rate === null)
-                <div class="al al-wa" data-code="the rate is unavailable"><x-ga.icon name="warn" :size="18" /><div>{{ $en ? 'The National Bank rate is unavailable. A paid order is not created without it.' : 'ეროვნული ბანკის კურსი მიუწვდომელია. გადახდილი შეკვეთა კურსის გარეშე არ იქმნება.' }}</div></div>
-            @endif
             @error('checkout')
-                <div class="al al-er" data-code="{{ $message }}"><x-ga.icon name="err" :size="18" /><div>{{ $message === 'payments not configured' ? ($en ? 'The payment provider is not connected.' : 'გადახდის პროვაიდერი არ არის მიერთებული.') : ($message === 'no project' ? ($en ? 'Create a project first: the subscription is attached to your workspace through a project.' : 'ჯერ შექმენით პროექტი: გამოწერა სამუშაო სივრცეს პროექტის მეშვეობით ებმება.') : ($message === 'the rate is unavailable' ? ($en ? 'The rate is unavailable.' : 'კურსი მიუწვდომელია.') : $message)) }}</div></div>
+                <div class="al al-er" data-code="{{ $message }}"><x-ga.icon name="err" :size="18" /><div>{{ $message === 'payments not configured' ? ($en ? 'The payment provider is not connected.' : 'გადახდის პროვაიდერი არ არის მიერთებული.') : ($message === 'no project' ? ($en ? 'Create a project first: the subscription is attached to your workspace through a project.' : 'ჯერ შექმენით პროექტი: გამოწერა სამუშაო სივრცეს პროექტის მეშვეობით ებმება.') : $message) }}</div></div>
             @enderror
 
             @if (! empty($v2))
@@ -78,8 +75,8 @@
                     </article>
                     @foreach (['basic' => 'Basic', 'premium' => 'Premium'] as $code => $label)
                         @php
-                            $monthCents = \App\Billing\Plans::usdCents($code, 'month');
-                            $yearCents = \App\Billing\Plans::usdCents($code, 'year');
+                            $monthCents = \App\Billing\Plans::tetri($code, 'month');
+                            $yearCents = \App\Billing\Plans::tetri($code, 'year');
                             $off = ! $configured;
                             $isCurrent = $currentPlan === $code;
                         @endphp

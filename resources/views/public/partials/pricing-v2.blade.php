@@ -17,8 +17,8 @@
         ],
         'starter' => [
             'name' => 'Starter',
-            'month' => \App\Billing\V2\Catalog::usdCents('starter', 'month'),
-            'year' => \App\Billing\V2\Catalog::usdCents('starter', 'year'),
+            'month' => \App\Billing\V2\Catalog::tetri('starter', 'month'),
+            'year' => \App\Billing\V2\Catalog::tetri('starter', 'year'),
             'quota' => $en ? '25 000 successful requests / month' : '25 000 წარმატებული მოთხოვნა / თვე',
             'features' => $en
                 ? ['3 active projects', '60 requests / minute', 'PDF invoice']
@@ -29,8 +29,8 @@
         ],
         'growth' => [
             'name' => 'Growth',
-            'month' => \App\Billing\V2\Catalog::usdCents('growth', 'month'),
-            'year' => \App\Billing\V2\Catalog::usdCents('growth', 'year'),
+            'month' => \App\Billing\V2\Catalog::tetri('growth', 'month'),
+            'year' => \App\Billing\V2\Catalog::tetri('growth', 'year'),
             'quota' => $en ? '150 000 successful requests / month' : '150 000 წარმატებული მოთხოვნა / თვე',
             'features' => $en
                 ? ['10 active projects', '120 requests / minute', 'Prepaid request packs']
@@ -44,8 +44,8 @@
     if ($business) {
         $plans['business'] = [
             'name' => 'Business',
-            'month' => \App\Billing\V2\Catalog::usdCents('business', 'month'),
-            'year' => \App\Billing\V2\Catalog::usdCents('business', 'year'),
+            'month' => \App\Billing\V2\Catalog::tetri('business', 'month'),
+            'year' => \App\Billing\V2\Catalog::tetri('business', 'year'),
             'quota' => $en ? '500 000 successful requests / month' : '500 000 წარმატებული მოთხოვნა / თვე',
             'features' => $en
                 ? ['25 active projects', '240 requests / minute', 'PDF invoice']
@@ -103,7 +103,7 @@
         <p class="xs mut" style="text-align:center;margin-top:6px">{{ $en ? 'Enterprise: custom limits and terms —' : 'Enterprise: ინდივიდუალური ლიმიტები და პირობები —' }} <a href="mailto:hello@geoapi.ge">hello@geoapi.ge</a></p>
     </div>
 </section>
-<script>
+<script @nonce>
     document.addEventListener('click', function (event) {
         var button = event.target.closest('[data-period]');
         if (!button) return;

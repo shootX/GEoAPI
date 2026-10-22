@@ -10,9 +10,9 @@ use Illuminate\Support\Facades\Schema;
  * Billing V2 tables only. This file does not ALTER an existing table.
  *
  * Production: platform.* and billing_orders are owned by postgres. The app
- * role carapi_electrik has DML and cannot ALTER those tables. This migration
+ * role has DML and cannot ALTER those tables. This migration
  * is CREATE TABLE in the application schema. Run it with a role that has
- * CREATE on that schema. If carapi_electrik lacks CREATE, run this migration
+ * CREATE on that schema. If the app role lacks CREATE, run this migration
  * as the postgres owner. It does not need to own platform.* or billing_orders.
  * Boolean columns are PostgreSQL boolean, not integers.
  */
