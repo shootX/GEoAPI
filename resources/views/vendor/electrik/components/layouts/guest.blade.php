@@ -1,7 +1,5 @@
-@component('components.layouts.public', [
+@component('components.layouts.auth', [
     'title' => ($title ?? 'GeoAPI'),
 ])
-    <div class="mx-auto w-full max-w-md">
-        {{ $slot }}
-    </div>
+    {{ $slot }}
 @endcomponent

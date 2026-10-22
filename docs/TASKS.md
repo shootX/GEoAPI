@@ -188,3 +188,12 @@
 ## 2026-10-22 — Docs sync
 
 - [x] `docs/audits/geoapi-current-state.md` marked as historical WP-00 snapshot. `docs/CATALOG_API.md` has a current-state section. `docs/ROLLBACK.md` intro reflects the restore test and the p95 baseline.
+
+## 2026-10-22 — Public site redesign (designer handoff, Indigo Premium)
+
+- [x] P1 (#30): tokens.css in `app.css` (FiraGO + JetBrains Mono; Noto removed), `resources/css/geoapi-design.css` (handoff ds/site CSS scoped to `.ga`), new header/footer, lockup/favicon/OG ka+en, home, 403/404.
+- [x] P2 (#31): pricing (monthly/yearly −12%, GEL by stored NBG rate, „გადახდა“ → `/account/billing`, BOG sandbox unchanged), docs `/guide`, demo, Redoc theme.
+- [x] P3: blog index/post, CMS/privacy/terms prose, auth split layout (login + 2FA step, register incl. legal entity, forgot, reset, verify). `public-design.css` no longer loaded by the public layout.
+- [ ] Integrations page stays hidden (Proposed, phase 5). Contact form removed by design (hello@geoapi.ge).
+- [ ] Docs per-endpoint pages and the right sticky code column from the handoff: kept as one long page with per-section code (deviation).
+- [ ] User panel redesign (handoff `panel/`) — next stage.

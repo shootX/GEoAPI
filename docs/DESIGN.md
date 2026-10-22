@@ -16,3 +16,7 @@ The approved static mockups are `docs/mockups/home.html` and `docs/mockups/dashb
 - Empty picker steps say to choose the previous level first.
 - Unknown URLs render `resources/views/errors/404.blade.php`. Forbidden URLs render `resources/views/errors/403.blade.php`.
 - The admin panel keeps its layout. `admin.css` only changes color.
+
+## 2026-10-22 — Indigo Premium (designer handoff)
+
+Source of truth: designer handoff (`design-system/DESIGN.md`, `tokens.css`). Implemented for public pages and auth; cabinet/admin follow in later stages. Fonts FiraGO + JetBrains Mono, accent #4338CA, ink #0F0E2A.

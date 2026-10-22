@@ -13,7 +13,7 @@ use Illuminate\Validation\ValidationException;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Title;
 
-#[Layout('components.layouts.public')]
+#[Layout('components.layouts.auth')]
 #[Title('ანგარიშის შექმნა')]
 final class Register extends \Electrik\Livewire\Auth\Register
 {

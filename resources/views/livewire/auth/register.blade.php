@@ -1,41 +1,58 @@
-<div class="mx-auto w-full max-w-md">
-    <x-slate::card>
-        <x-slate::card-header>
-            <x-slate::card-title>{{ __('Create an account') }}</x-slate::card-title>
-            <x-slate::card-description>{{ __('Name, email, and a password of at least 15 characters.') }}</x-slate::card-description>
-        </x-slate::card-header>
-        <x-slate::card-content>
-            <x-slate::form wire:submit="register" class="space-y-4">
-                <x-slate::input wire:model="name" type="text" label="{{ __('Name and surname') }}" autocomplete="name" required />
-                <x-slate::input wire:model="email" type="email" label="{{ __('Email') }}" autocomplete="username" required :readonly="$inviteLockedEmail" />
-                <x-slate::input wire:model="password" type="password" label="{{ __('Password') }}" autocomplete="new-password" required />
-                <x-slate::input wire:model="password_confirmation" type="password" label="{{ __('Repeat the password') }}" autocomplete="new-password" required />
-                <fieldset class="space-y-2 text-sm">
-                    <legend>{{ __('Account type') }}</legend>
-                    <label class="flex items-center gap-2"><input type="radio" wire:model.live="buyer_kind" value="individual"> {{ __('Individual') }}</label>
-                    <label class="flex items-center gap-2"><input type="radio" wire:model.live="buyer_kind" value="legal"> {{ __('Legal entity') }}</label>
-                </fieldset>
-                @if ($buyer_kind === 'legal')
-                    <x-slate::input wire:model="company_name" type="text" label="{{ __('Company name') }}" required />
-                    <x-slate::input wire:model="company_code" type="text" label="{{ __('Identification code') }}" required />
-                    <x-slate::input wire:model="company_address" type="text" label="{{ __('Legal address') }}" required />
-                    <label class="flex items-start gap-2 text-sm">
-                        <input type="checkbox" wire:model="vat_payer" class="mt-1" value="1">
-                        <span>{{ __('VAT payer') }}</span>
-                    </label>
-                @endif
-                <label class="flex items-start gap-2 text-sm">
-                    <input type="checkbox" wire:model="accept_terms" class="mt-1" value="1">
-                    <span>{{ __('I agree to the') }} <a href="{{ url('/terms') }}" class="underline">{{ __('terms of use') }}</a>.</span>
-                </label>
-                @error('accept_terms')
-                    <p class="text-sm text-destructive">{{ __('You must accept the terms.') }}</p>
-                @enderror
-                <x-slate::button type="submit" class="w-full" size="lg">{{ __('Create an account') }}</x-slate::button>
-            </x-slate::form>
-        </x-slate::card-content>
-        <x-slate::card-footer class="justify-center">
-            <p class="text-sm text-muted-foreground">{{ __('Already have an account?') }} <a href="{{ route('login') }}" class="font-medium text-foreground underline">{{ __('Sign in') }}</a></p>
-        </x-slate::card-footer>
-    </x-slate::card>
+@php $en = app()->getLocale() === 'en'; @endphp
+<div>
+    <h1>{{ __('Create an account') }}</h1>
+    <p class="mut" style="margin:6px 0 24px">{{ $en ? 'Free plan · 100 successful requests a month' : 'Free გეგმა · 100 წარმატებული მოთხოვნა თვეში' }}</p>
+    <form wire:submit="register" class="col" style="gap:16px">
+        <div class="fld">
+            <span style="font-size:13px;font-weight:500">{{ __('Account type') }}</span>
+            <div class="seg-r" role="radiogroup">
+                <label><input type="radio" wire:model.live="buyer_kind" value="individual"> {{ __('Individual') }}</label>
+                <label><input type="radio" wire:model.live="buyer_kind" value="legal"> {{ __('Legal entity') }}</label>
+            </div>
+        </div>
+        <div class="fld">
+            <label for="reg-name">{{ __('Name and surname') }}</label>
+            <input id="reg-name" class="inp @error('name') err @enderror" wire:model="name" type="text" autocomplete="name" required>
+            @error('name')<span class="emsg"><x-ga.icon name="err" :size="14" />{{ $message }}</span>@enderror
+        </div>
+        @if ($buyer_kind === 'legal')
+            <div class="col" style="border:1px solid var(--line);border-radius:12px;padding:16px;background:var(--bg);gap:14px">
+                <div class="xs mut" style="font-weight:500">{{ $en ? 'Company details · for invoices' : 'კომპანიის მონაცემები · ინვოისისთვის' }}</div>
+                <div class="fld">
+                    <label for="reg-company">{{ __('Company name') }}</label>
+                    <input id="reg-company" class="inp @error('company_name') err @enderror" wire:model="company_name" type="text" required>
+                    @error('company_name')<span class="emsg"><x-ga.icon name="err" :size="14" />{{ $message }}</span>@enderror
+                </div>
+                <div class="fld">
+                    <label for="reg-code">{{ __('Identification code') }}</label>
+                    <input id="reg-code" class="inp mono @error('company_code') err @enderror" wire:model="company_code" type="text" inputmode="numeric" required>
+                    @error('company_code')<span class="emsg"><x-ga.icon name="err" :size="14" />{{ $en ? 'The code must be 9 or 11 digits' : 'კოდი უნდა იყოს 9 ან 11 ციფრი' }}</span>@else<span class="hint">{{ $en ? '9 or 11 digits' : '9 ან 11 ციფრი' }}</span>@enderror
+                </div>
+                <div class="fld">
+                    <label for="reg-address">{{ __('Legal address') }}</label>
+                    <input id="reg-address" class="inp @error('company_address') err @enderror" wire:model="company_address" type="text" placeholder="{{ $en ? 'City, street' : 'ქალაქი, ქუჩა' }}" required>
+                    @error('company_address')<span class="emsg"><x-ga.icon name="err" :size="14" />{{ $message }}</span>@enderror
+                </div>
+                <label class="chk-l"><input type="checkbox" wire:model="vat_payer" value="1"> {{ __('VAT payer') }}</label>
+            </div>
+        @endif
+        <div class="fld">
+            <label for="reg-email">{{ __('Email') }}</label>
+            <input id="reg-email" class="inp @error('email') err @enderror" wire:model="email" type="email" autocomplete="username" required @if ($inviteLockedEmail) readonly @endif>
+            @error('email')<span class="emsg"><x-ga.icon name="err" :size="14" />{{ $message }}</span>@enderror
+        </div>
+        <div class="fld">
+            <label for="reg-password">{{ __('Password') }}</label>
+            <input id="reg-password" class="inp @error('password') err @enderror" wire:model="password" type="password" autocomplete="new-password" minlength="15" required>
+            @error('password')<span class="emsg"><x-ga.icon name="err" :size="14" />{{ $message }}</span>@else<span class="hint">{{ $en ? 'At least 15 characters' : 'მინიმუმ 15 სიმბოლო' }}</span>@enderror
+        </div>
+        <div class="fld">
+            <label for="reg-password2">{{ __('Repeat the password') }}</label>
+            <input id="reg-password2" class="inp" wire:model="password_confirmation" type="password" autocomplete="new-password" required>
+        </div>
+        <label class="chk-l"><input type="checkbox" wire:model="accept_terms" value="1"><span>{{ __('I agree to the') }} <a href="{{ url('/terms') }}" class="lnk" style="text-decoration:underline">{{ __('terms of use') }}</a> · <a href="{{ url('/privacy') }}" class="lnk" style="text-decoration:underline">{{ $en ? 'privacy policy' : 'კონფიდენციალურობის პოლიტიკა' }}</a>.</span></label>
+        @error('accept_terms')<span class="emsg"><x-ga.icon name="err" :size="14" />{{ __('You must accept the terms.') }}</span>@enderror
+        <button type="submit" class="btn b-pri b-lg" style="justify-content:center;width:100%">{{ __('Create an account') }}</button>
+    </form>
+    <p class="sm mut" style="text-align:center;margin-top:20px">{{ __('Already have an account?') }} <a href="{{ route('login') }}" class="lnk">{{ __('Sign in') }}</a></p>
 </div>
