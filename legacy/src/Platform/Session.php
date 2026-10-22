@@ -145,18 +145,23 @@ final class Session
         if (! is_numeric($id)) {
             return;
         }
-        $now = time();
-        $issued = (int) ($_SESSION['issued_at'] ?? 0);
-        $seen = (int) ($_SESSION['last_seen'] ?? 0);
-        $idle = self::limit('CARAPI_PLATFORM_IDLE_SECONDS', 1800);
-        $absolute = self::limit('CARAPI_PLATFORM_ABSOLUTE_SECONDS', 43200);
-        if ($issued < 1 || $seen < 1 || ($now - $seen) > $idle || ($now - $issued) > $absolute) {
+        if (self::expired((int) ($_SESSION['issued_at'] ?? 0), (int) ($_SESSION['last_seen'] ?? 0))) {
             $_SESSION = [];
             session_regenerate_id(true);
 
             return;
         }
-        $_SESSION['last_seen'] = $now;
+        $_SESSION['last_seen'] = time();
+    }
+
+    /** Idle and absolute limits of a signed-in session; also applied by App\Http\Middleware\BridgeLegacySession. */
+    public static function expired(int $issued, int $seen): bool
+    {
+        $now = time();
+        $idle = self::limit('CARAPI_PLATFORM_IDLE_SECONDS', 1800);
+        $absolute = self::limit('CARAPI_PLATFORM_ABSOLUTE_SECONDS', 43200);
+
+        return $issued < 1 || $seen < 1 || ($now - $seen) > $idle || ($now - $issued) > $absolute;
     }
 
     private static function limit(string $name, int $default): int

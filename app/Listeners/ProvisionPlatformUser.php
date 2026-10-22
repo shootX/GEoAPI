@@ -78,6 +78,11 @@ final class ProvisionPlatformUser
 
     public function logout(Logout $event): void
     {
+        // Forgetting the cookie only clears this browser; the session file must go too (QA retest H1).
+        $sid = request()->cookie('geoapi_platform');
+        if (is_string($sid) && preg_match('/^[a-f0-9]{32}$/', $sid) === 1) {
+            @unlink($this->sessionDir().'/sess_'.$sid);
+        }
         Cookie::queue(Cookie::forget('geoapi_platform'));
     }
 
@@ -101,8 +106,7 @@ final class ProvisionPlatformUser
 
     private function writeLegacySession(int $legacyId, int $version): void
     {
-        $dir = carapi_env('CARAPI_PLATFORM_SESSION_PATH');
-        $dir = is_string($dir) && $dir !== '' ? $dir : storage_path('framework/carapi-sessions');
+        $dir = $this->sessionDir();
         if (! is_dir($dir) && ! mkdir($dir, 0700, true) && ! is_dir($dir)) {
             return;
         }
@@ -111,5 +115,12 @@ final class ProvisionPlatformUser
         $payload = 'user_id|i:'.$legacyId.';auth_version|i:'.$version.';issued_at|i:'.$now.';last_seen|i:'.$now.';csrf|s:64:"'.bin2hex(random_bytes(32)).'";';
         file_put_contents($dir.'/sess_'.$sid, $payload, LOCK_EX);
         Cookie::queue(cookie('geoapi_platform', $sid, 0, '/', null, true, true, true, 'lax'));
+    }
+
+    private function sessionDir(): string
+    {
+        $dir = carapi_env('CARAPI_PLATFORM_SESSION_PATH');
+
+        return is_string($dir) && $dir !== '' ? $dir : storage_path('framework/carapi-sessions');
     }
 }
