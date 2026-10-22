@@ -13,3 +13,4 @@
 - [x] Billing: current plan badge+disabled button, no Recommended on current; last known NBG rate (on-demand fetch if none), buttons not disabled by rate; rate 4 decimals; Georgian statuses; demo cabinet shows demo project.
 - [x] Mobile: page heading + menu on billing/test checkout; no scrollbar-gutter strip on mobile.
 - Mock-mode access unchanged (awaiting owner).
+- 2026-10-22: billing orders table stacks as cards ≤640px (GEL no longer clipped).
