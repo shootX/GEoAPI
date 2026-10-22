@@ -1615,7 +1615,7 @@ JS;
         echo '<main class="au" id="content"><div class="l"><div class="top">' . SiteChrome::logo()
             . '<a class="btn btn-g" href="/" style="height:36px">მთავარი</a></div><div class="form"><div class="dl"><b>' . self::e($step) . '</b>' . self::e($crumb) . '</div><h1>'
             . $heading . '</h1>' . ($sub !== '' ? '<p class="sub">' . $sub . '</p>' : '') . $form . $footer . '</div><div class="foot"><span>© '
-            . date('Y') . ' GeoAPI</span><a href="/terms">გამოყენების წესები</a><a href="/privacy">კონფიდენციალურობა</a>' . SiteChrome::themeButton() . '</div></div>'
+            . date('Y') . ' შპს „ინოვა ლაბ“</span><a href="/terms">გამოყენების წესები</a><a href="/privacy">კონფიდენციალურობა</a>' . SiteChrome::themeButton() . '</div></div>'
             . $aside . '</main>';
         echo '<script src="/assets/site.js?v=20261022a"></script>';
         echo SiteChrome::end();

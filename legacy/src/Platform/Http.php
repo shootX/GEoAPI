@@ -875,6 +875,11 @@ final class Http
         if (isset($result['user_id']) && class_exists(\App\Account\IdentitySync::class)) {
             \App\Account\IdentitySync::markLaravelVerified((int) $result['user_id']);
         }
+        // The owner is usually still signed in from registration: send them back instead of asking to sign in.
+        $signedIn = function_exists('auth') ? auth()->user() : null;
+        if (isset($result['user_id']) && $signedIn !== null && (int) ($signedIn->legacy_platform_user_id ?? 0) === (int) $result['user_id']) {
+            self::redirect('/account');
+        }
         View::notice('ელფოსტა დადასტურდა', 'ელფოსტა დადასტურდა. შედით ანგარიშში. API გასაღები ავტომატურად არ იქმნება — პროექტს კაბინეტში დაამატებთ.');
     }
 
