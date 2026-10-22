@@ -9,6 +9,7 @@ use App\Billing\BogClient;
 use App\Billing\BogSignature;
 use App\Billing\Entitlements;
 use App\Billing\InvoicePdf;
+use App\Billing\MockPay;
 use App\Billing\NbgRate;
 use App\Livewire\Account\Billing;
 use App\Livewire\Auth\Register;
@@ -16,8 +17,10 @@ use App\Models\User;
 use Carapi\Platform\ApiKeys;
 use Carapi\Platform\Connection as PlatformConnection;
 use Carapi\Platform\ProjectRepository;
+use Illuminate\Foundation\Http\Middleware\ValidateCsrfToken;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\URL;
 use Illuminate\Testing\TestResponse;
 use Livewire\Livewire;
 use PDO;
@@ -111,7 +114,7 @@ final class BogBillingTest extends TestCase
         $this->assertSame('pending', $order->status);
         $this->assertSame(10000, (int) DB::table('platform.project_limits')->where('project_id', 7)->value('monthly_quota'));
 
-        $page = \Illuminate\Support\Facades\URL::temporarySignedRoute('billing.mock.show', now()->addMinutes(5), ['order' => $order->public_id]);
+        $page = URL::temporarySignedRoute('billing.mock.show', now()->addMinutes(5), ['order' => $order->public_id]);
         $this->actingAs($user)->get($page)->assertOk()->assertSee('სატესტო გადახდა')->assertDontSee('card_number')->assertDontSee('cvv');
         $this->actingAs($user)->get('/billing/test/'.$order->public_id)->assertForbidden();
 
@@ -141,11 +144,11 @@ final class BogBillingTest extends TestCase
 
     public function test_mock_mode_is_impossible_with_credentials_or_production(): void
     {
-        $this->assertTrue(\App\Billing\MockPay::enabled());
+        $this->assertTrue(MockPay::enabled());
         config(['services.bog.client_id' => 'sandbox-client', 'services.bog.client_secret' => 'sandbox-secret-value']);
-        $this->assertFalse(\App\Billing\MockPay::enabled());
+        $this->assertFalse(MockPay::enabled());
         config(['services.bog.client_id' => null, 'services.bog.client_secret' => null, 'services.bog.env' => 'production']);
-        $this->assertFalse(\App\Billing\MockPay::enabled());
+        $this->assertFalse(MockPay::enabled());
 
         $user = $this->owner();
         $this->limits(7, 10000, null, false, null);
@@ -164,12 +167,12 @@ final class BogBillingTest extends TestCase
         $user = $this->owner();
         $this->limits(7, 10000, null, false, null);
         $id = DB::table('billing_orders')->insertGetId(['public_id' => 'mock-prod', 'user_id' => $user->id, 'legacy_user_id' => (int) $user->legacy_platform_user_id, 'project_id' => 7, 'plan_code' => 'basic', 'interval' => 'month', 'usd_cents' => 5000, 'gel_amount' => '150.00', 'rate' => '3.0000', 'rate_quantity' => 1, 'rate_date' => '2026-10-22', 'buyer' => '{}', 'previous' => '{}', 'status' => 'pending', 'bog_order_id' => 'mock:mock-prod', 'created_at' => now(), 'updated_at' => now()]);
-        $this->withoutMiddleware(\Illuminate\Foundation\Http\Middleware\ValidateCsrfToken::class);
+        $this->withoutMiddleware(ValidateCsrfToken::class);
         $this->app['env'] = 'production';
 
         try {
-            $this->assertTrue(\App\Billing\MockPay::enabled());
-            $this->assertFalse(\App\Billing\MockPay::allowedFor($user));
+            $this->assertTrue(MockPay::enabled());
+            $this->assertFalse(MockPay::allowedFor($user));
             Livewire::actingAs($user)->test(Billing::class)
                 ->assertSee('data-code="payments not configured"', false)
                 ->set('projectId', 7)
@@ -179,7 +182,7 @@ final class BogBillingTest extends TestCase
             $this->assertSame('pending', DB::table('billing_orders')->where('id', $id)->value('status'));
 
             config(['electrik.operators.emails' => [$user->email]]);
-            $this->assertTrue(\App\Billing\MockPay::allowedFor($user->fresh()));
+            $this->assertTrue(MockPay::allowedFor($user->fresh()));
             $this->actingAs($user)->post('/billing/test/mock-prod', ['result' => 'success'])->assertRedirect('/account/billing?paid=test');
             $this->assertSame('paid', DB::table('billing_orders')->where('id', $id)->value('status'));
         } finally {
@@ -294,9 +297,14 @@ final class BogBillingTest extends TestCase
         $publicId = $this->pendingOrder($user, 'basic');
         $body = $this->callbackBody($publicId, 'bog-9', 'completed', '1.00');
 
-        $this->postRaw($body, $this->sign($body))->assertOk();
+        $this->postRaw($body, $this->sign($body))->assertOk()->assertJsonPath('ok', false)->assertJsonPath('error.code', 'mismatch');
         $this->assertSame(10000, (int) DB::table('platform.project_limits')->where('project_id', 7)->value('monthly_quota'));
         $this->assertSame('pending', DB::table('billing_orders')->where('public_id', $publicId)->value('status'));
+
+        // The mismatch must not burn bog-9:completed: the correct callback still grants (GEO-QA-007).
+        $good = $this->callbackBody($publicId, 'bog-9', 'completed');
+        $this->postRaw($good, $this->sign($good))->assertOk()->assertJsonPath('duplicate', false);
+        $this->assertSame('paid', DB::table('billing_orders')->where('public_id', $publicId)->value('status'));
     }
 
     public function test_a_partial_refund_keeps_the_paid_plan_and_records_the_amount(): void

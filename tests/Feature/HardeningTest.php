@@ -39,6 +39,16 @@ final class HardeningTest extends TestCase
         $this->assertMatchesRegularExpression('/^[0-9a-f-]{36}$/', (string) $response->headers->get('X-Request-Id'));
     }
 
+    public function test_template_stripe_routes_are_gone_and_billing_screens_redirect(): void
+    {
+        $webhook = $this->postJson('/stripe/webhook', ['type' => 'customer.subscription.deleted']);
+        $this->assertContains($webhook->getStatusCode(), [404, 405]);
+        $webhook->assertDontSee('Webhook Handled');
+        foreach (['/billing', '/billing/plans', '/billing/subscription', '/billing/invoices'] as $path) {
+            $this->get($path)->assertRedirect('/account/billing');
+        }
+    }
+
     public function test_up_carries_the_request_id(): void
     {
         $this->withHeader('X-Request-Id', 'health-1')->get('/up')->assertOk()->assertHeader('X-Request-Id', 'health-1');

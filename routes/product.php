@@ -11,6 +11,7 @@ use App\Http\Controllers\BogCallbackController;
 use App\Http\Controllers\ComingSoonSignupController;
 use App\Http\Controllers\InvoiceController;
 use App\Http\Controllers\LocaleController;
+use App\Http\Controllers\MockPaymentController;
 use App\Http\Controllers\PaymentWebhookController;
 use App\Http\Controllers\PhotoReportController;
 use App\Http\Controllers\PublicOpenApiController;
@@ -22,6 +23,7 @@ use App\Livewire\Account\Billing;
 use App\Livewire\Account\Errors;
 use App\Livewire\Account\Products;
 use App\Livewire\Account\Projects;
+use Electrik\Http\Controllers\Auth\VerifyEmailController;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware('web')->group(function (): void {
@@ -87,11 +89,16 @@ Route::get('/account/billing', Billing::class)
     ->middleware(['web', 'auth'])
     ->name('account.billing');
 
-Route::get('/billing/test/{order}', [\App\Http\Controllers\MockPaymentController::class, 'show'])
+// Electrik's Stripe billing screens are not GeoAPI's billing (QA GEO-QA-010).
+foreach (['', '/plans', '/subscription', '/payment-methods', '/address', '/invoices', '/usage'] as $path) {
+    Route::redirect('/billing'.$path, '/account/billing');
+}
+
+Route::get('/billing/test/{order}', [MockPaymentController::class, 'show'])
     ->middleware(['web', 'auth', 'signed'])
     ->name('billing.mock.show');
 
-Route::post('/billing/test/{order}', [\App\Http\Controllers\MockPaymentController::class, 'complete'])
+Route::post('/billing/test/{order}', [MockPaymentController::class, 'complete'])
     ->middleware(['web', 'auth', 'throttle:20,1'])
     ->name('billing.mock.complete');
 
@@ -111,7 +118,7 @@ Route::get('/ready', ReadyController::class)->name('ready');
 // ELECTRIK_EMAIL_VERIFICATION=false (prod) skips Electrik's verification routes, but
 // registration still mails VerifyEmail, which needs verification.verify. Keep the link working.
 if (! config('electrik.auth.email_verification', true)) {
-    Route::get('/verify-email/{id}/{hash}', \Electrik\Http\Controllers\Auth\VerifyEmailController::class)
+    Route::get('/verify-email/{id}/{hash}', VerifyEmailController::class)
         ->middleware(['web', 'auth', 'signed', 'throttle:6,1'])
         ->name('verification.verify');
 }
