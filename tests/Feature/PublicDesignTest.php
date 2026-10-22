@@ -52,14 +52,16 @@ class PublicDesignTest extends TestCase
             $this->withSession(['locale' => 'ka'])
                 ->get('/')
                 ->assertOk()
-                ->assertSee('ავტომობილების მონაცემები')
-                ->assertSee('API ან მზა ვიჯეტი')
-                ->assertSee('მზა არჩევანი')
+                ->assertSee('ბრენდები, მოდელები, თაობები და სპეციფიკაციები')
+                ->assertSee('ერთი API-ით')
+                ->assertSee('ჩასაშენებელი ვიჯეტი')
                 ->assertDontSee('ამრჩევი')
+                ->assertSee('314', false)
+                ->assertSee('4 710', false)
                 ->assertSee('22 367', false)
                 ->assertSee('343 640', false)
-                ->assertSee('634', false)
-                ->assertDontSee('10 228', false);
+                ->assertDontSee('10 228', false)
+                ->assertDontSee('ინტეგრაციები');
         } finally {
             unset($_ENV['CARAPI_CATALOG_ENABLED'], $_SERVER['CARAPI_CATALOG_ENABLED']);
             @unlink($path);
@@ -83,5 +85,17 @@ class PublicDesignTest extends TestCase
             ->assertSee('JavaScript')
             ->assertSee('PHP')
             ->assertSee('ბრენდები');
+    }
+
+    public function test_new_design_layout_and_brand_assets(): void
+    {
+        $home = (string) $this->withSession(['locale' => 'ka'])->get('/')->assertOk()->getContent();
+        $this->assertStringContainsString('class="site ga', $home);
+        $this->assertStringContainsString('assets/brand/geoapi-lockup-light.svg', $home);
+        $this->assertStringContainsString('assets/brand/og-image-ka.png', $home);
+        $this->assertStringContainsString('hello@geoapi.ge', $home);
+        $this->assertFileExists(public_path('assets/brand/og-image-en.png'));
+        $this->assertFileExists(public_path('assets/brand/favicon.svg'));
+        $this->assertFileExists(resource_path('fonts/jetbrains-mono-400.woff2'));
     }
 }
