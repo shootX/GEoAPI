@@ -118,7 +118,7 @@
                             <thead><tr><th>{{ $en ? 'Plan' : 'გეგმა' }}</th><th>{{ $en ? 'Status' : 'სტატუსი' }}</th><th style="text-align:right">GEL</th></tr></thead>
                             <tbody>
                                 @foreach ($orders as $order)
-                                    <tr><td class="mono" data-label="{{ $en ? 'Plan' : 'გეგმა' }}">{{ $order->plan_code }}@if (\App\Billing\MockPay::isMock($order)) <span class="bd bd-wa">TEST</span>@endif</td><td data-label="{{ $en ? 'Status' : 'სტატუსი' }}"><span class="bd bd-{{ $statusTone[$order->status] ?? 'ne' }}"><i></i>{{ $statusLabel[$order->status] ?? $order->status }}</span></td><td style="text-align:right" class="mono" data-label="GEL">{{ $order->gel_amount }} GEL</td></tr>
+                                    <tr><td class="mono" data-label="{{ $en ? 'Plan' : 'გეგმა' }}"><span>{{ $order->plan_code }}@if (\App\Billing\MockPay::isMock($order)) <span class="bd bd-wa">TEST</span>@endif</span></td><td data-label="{{ $en ? 'Status' : 'სტატუსი' }}"><span class="bd bd-{{ $statusTone[$order->status] ?? 'ne' }}"><i></i>{{ $statusLabel[$order->status] ?? $order->status }}</span></td><td style="text-align:right" class="mono" data-label="GEL">{{ $order->gel_amount }} GEL</td></tr>
                                 @endforeach
                             </tbody>
                         </table>
