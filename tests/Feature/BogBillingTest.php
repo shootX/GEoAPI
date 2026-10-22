@@ -158,6 +158,35 @@ final class BogBillingTest extends TestCase
         $this->assertSame(10000, (int) DB::table('platform.project_limits')->where('project_id', 7)->value('monthly_quota'));
     }
 
+    public function test_in_production_only_an_admin_may_use_mock_mode(): void
+    {
+        $this->rate();
+        $user = $this->owner();
+        $this->limits(7, 10000, null, false, null);
+        $id = DB::table('billing_orders')->insertGetId(['public_id' => 'mock-prod', 'user_id' => $user->id, 'legacy_user_id' => (int) $user->legacy_platform_user_id, 'project_id' => 7, 'plan_code' => 'basic', 'interval' => 'month', 'usd_cents' => 5000, 'gel_amount' => '150.00', 'rate' => '3.0000', 'rate_quantity' => 1, 'rate_date' => '2026-10-22', 'buyer' => '{}', 'previous' => '{}', 'status' => 'pending', 'bog_order_id' => 'mock:mock-prod', 'created_at' => now(), 'updated_at' => now()]);
+        $this->withoutMiddleware(\Illuminate\Foundation\Http\Middleware\ValidateCsrfToken::class);
+        $this->app['env'] = 'production';
+
+        try {
+            $this->assertTrue(\App\Billing\MockPay::enabled());
+            $this->assertFalse(\App\Billing\MockPay::allowedFor($user));
+            Livewire::actingAs($user)->test(Billing::class)
+                ->assertSee('data-code="payments not configured"', false)
+                ->set('projectId', 7)
+                ->call('checkout', 'basic', 'month')
+                ->assertHasErrors('checkout');
+            $this->actingAs($user)->post('/billing/test/mock-prod', ['result' => 'success'])->assertNotFound();
+            $this->assertSame('pending', DB::table('billing_orders')->where('id', $id)->value('status'));
+
+            config(['electrik.operators.emails' => [$user->email]]);
+            $this->assertTrue(\App\Billing\MockPay::allowedFor($user->fresh()));
+            $this->actingAs($user)->post('/billing/test/mock-prod', ['result' => 'success'])->assertRedirect('/account/billing?paid=test');
+            $this->assertSame('paid', DB::table('billing_orders')->where('id', $id)->value('status'));
+        } finally {
+            $this->app['env'] = 'testing';
+        }
+    }
+
     public function test_new_project_limits_insert_a_boolean_literal_for_unlimited_month(): void
     {
         $repo = new ProjectRepository($this->platform);
