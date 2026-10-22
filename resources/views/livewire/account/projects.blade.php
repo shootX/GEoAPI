@@ -18,9 +18,9 @@
     <x-ga.panel-side :spa="true" active="overview" :project="$project['name'] ?? null" :plan="$plan" />
     <div class="main">
         <header class="top">
-            <button class="btn menu" id="menu" type="button" aria-expanded="false" aria-controls="side" aria-label="{{ __('Menu') }}"><x-ga.icon name="menu" :size="20" /></button>
+            <button class="btn menu" id="menu" type="button" aria-expanded="false" aria-controls="side" aria-label="{{ __('Menu') }}"><x-ga.icon name="menu" :size="20" /></button><a class="mlogo" href="{{ url('/') }}"><img src="{{ asset('assets/brand/geoapi-lockup-light.svg') }}" alt="geoapi.ge" height="22" width="69"></a>
             <h1 id="title">{{ $en ? 'Overview' : 'მიმოხილვა' }}</h1>
-            <div class="who"><span class="seg hide-m" style="padding:3px"><a href="{{ route('locale.switch', 'ka') }}" class="{{ $en ? '' : 'on' }}">KA</a><a href="{{ route('locale.switch', 'en') }}" class="{{ $en ? 'on' : '' }}">EN</a></span><span class="bd {{ $planBd }}">{{ $plan }}</span><button class="btn pine" type="button" onclick="document.querySelector('.nav button[data-screen=keys]').click()"><x-ga.icon name="plus" :size="16" /><span class="hide-m">{{ $en ? 'New key' : 'ახალი გასაღები' }}</span></button></div>
+            <div class="who"><span class="seg hide-m" style="padding:3px"><a href="{{ route('locale.switch', 'ka') }}" class="{{ $en ? '' : 'on' }}">KA</a><a href="{{ route('locale.switch', 'en') }}" class="{{ $en ? 'on' : '' }}">EN</a></span><span class="bd {{ $planBd }}">{{ $plan }}</span></div>
         </header>
         <div class="content">
             @if ($unavailable)
@@ -30,6 +30,7 @@
                 <div class="al al-wa"><x-ga.icon name="mail" :size="18" /><div><b>{{ $en ? 'Confirm your email' : 'დაადასტურეთ ელფოსტა' }}</b><p class="xs">{{ $en ? 'Secret keys stay blocked (403) until '.$me->email.' is confirmed.' : 'საიდუმლო გასაღების შექმნა დაბლოკილია (403), სანამ '.$me->email.'-ს არ დაადასტურებთ.' }}</p></div></div>
             @endunless
             <section class="screen active" id="overview">
+                <div class="ph"><div><h2 class="h">{{ $en ? 'Overview' : 'მიმოხილვა' }}</h2><p class="muted">{{ $who }} · {{ $en ? 'updated' : 'განახლებულია' }} {{ now()->format('Y-m-d H:i') }}</p></div><div class="row"><button class="btn" type="button" data-go="new"><x-ga.icon name="plus" :size="16" />{{ $en ? 'New project' : 'ახალი პროექტი' }}</button><button class="btn pine" type="button" data-go="keys"><x-ga.icon name="key" :size="16" />{{ $en ? 'New key' : 'ახალი გასაღები' }}</button></div></div>
                 @if (! $unavailable && $project === null)
                     <div class="panel empty"><span class="ic"><x-ga.icon name="fold" :size="22" /></span><h2>{{ $en ? 'Create your first project' : 'ჯერ შექმენით პროექტი' }}</h2><p class="muted">{{ $en ? 'A project has its own keys, limits and plan. Free — 100 requests a month.' : 'პროექტს ექნება საკუთარი გასაღებები, ლიმიტი და გეგმა. Free — 100 მოთხოვნა თვეში.' }}</p><button class="btn pine" type="button" data-go="new"><x-ga.icon name="plus" :size="16" />{{ $en ? 'New project' : 'ახალი პროექტი' }}</button></div>
                 @endif
