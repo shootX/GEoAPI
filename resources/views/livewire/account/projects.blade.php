@@ -133,18 +133,24 @@
 
             <section class="screen" id="projects">
                 <div class="ph"><div><h2 class="h">{{ $en ? 'Projects' : 'პროექტები' }}</h2><p class="muted">{{ $en ? 'Each project has its own keys, limits and plan' : 'თითოეულ პროექტს აქვს საკუთარი გასაღებები, ლიმიტი და გეგმა' }}</p></div><button class="btn pine" type="button" data-go="new"><x-ga.icon name="plus" :size="16" />{{ $en ? 'New project' : 'ახალი პროექტი' }}</button></div>
-                <div class="panel flush"><div class="tw"><table>
-                    <thead><tr><th>{{ $en ? 'Project' : 'პროექტი' }}</th><th>{{ $en ? 'Status' : 'სტატუსი' }}</th><th>{{ $en ? 'Created' : 'შექმნა' }}</th><th></th></tr></thead>
+                <div class="panel flush"><div class="ph"><label class="srch"><x-ga.icon name="search" :size="16" /><input type="search" id="proj-q" placeholder="{{ $en ? 'Search' : 'ძიება' }}" aria-label="{{ $en ? 'Search projects' : 'პროექტების ძიება' }}" autocomplete="off"></label></div><div class="tw"><table id="proj-t">
+                    <thead><tr><th>{{ $en ? 'Project' : 'პროექტი' }}</th><th>{{ $en ? 'This month' : 'ამ თვის მოხმარება' }}</th><th>{{ $en ? 'Status' : 'სტატუსი' }}</th><th>{{ $en ? 'Created' : 'შექმნა' }}</th><th></th></tr></thead>
                     <tbody>
                     @forelse ($projects as $row)
-                        @php $rowName = (string) ($row['name'] ?? ''); $on = ($row['status'] ?? 'active') === 'active'; @endphp
-                        <tr><td><div class="row" style="flex-wrap:nowrap"><span class="av">{{ mb_strtoupper(mb_substr($rowName, 0, 1)) }}</span><div style="min-width:0"><b>{{ $rowName }}</b>@if ((int) $row['id'] === (int) ($project['id'] ?? 0)) <span class="bd bd-ac">{{ $en ? 'selected' : 'არჩეული' }}</span>@endif<div class="xs mut mono">{{ $row['website_url'] ?? '' ?: '—' }}</div></div></div></td>
+                        @php
+                            $rowName = (string) ($row['name'] ?? ''); $on = ($row['status'] ?? 'active') === 'active';
+                            $u = $usageById[(int) $row['id']] ?? null;
+                            $uPct = $u && ! $u['unlimited'] && $u['limit'] > 0 ? min(100, round($u['used'] / $u['limit'] * 100)) : 0;
+                        @endphp
+                        <tr data-name="{{ mb_strtolower($rowName.' '.($row['website_url'] ?? '')) }}"><td><div class="row" style="flex-wrap:nowrap"><span class="av">{{ mb_strtoupper(mb_substr($rowName, 0, 1)) }}</span><div style="min-width:0"><b>{{ $rowName }}</b>@if ((int) $row['id'] === (int) ($project['id'] ?? 0)) <span class="bd bd-ac">{{ $en ? 'selected' : 'არჩეული' }}</span>@endif<div class="xs mut mono">{{ $row['website_url'] ?? '' ?: '—' }}</div></div></div></td>
+                            <td>@if ($u)<div class="ubar"><div class="quota"><span style="width:{{ $uPct }}%;{{ $uPct >= 90 ? 'background:#B3261E' : '' }}"></span></div><span class="mono xs">{{ $fmt((int) $u['used']) }} / {{ $u['unlimited'] ? '∞' : $fmt((int) $u['limit']) }}</span></div>@else<span class="mut">—</span>@endif</td>
                             <td>@if ($on)<span class="bd bd-ok">{{ $en ? 'Active' : 'აქტიური' }}</span>@else<span class="bd bd-out">{{ $en ? 'Disabled' : 'გამორთული' }}</span>@endif</td>
                             <td class="mono xs">{{ $dayFmt($row['created_at'] ?? null) }}</td>
                             <td style="text-align:right;white-space:nowrap">@if (empty($demo))<button class="btn sm" type="button" wire:click="selectProject({{ (int) $row['id'] }})" data-go="overview">{{ $en ? 'Select' : 'არჩევა' }}</button> <a class="btn sm" href="{{ url('/account/projects/'.(int) $row['id']) }}">{{ $en ? 'Open' : 'გახსნა' }} <x-ga.icon name="chev" :size="14" /></a>@endif</td></tr>
                     @empty
-                        <tr><td colspan="4"><div class="empty"><span class="ic"><x-ga.icon name="fold" :size="22" /></span><h2>{{ $en ? 'No projects yet' : 'პროექტი ჯერ არ გაქვთ' }}</h2><button class="btn pine" type="button" data-go="new"><x-ga.icon name="plus" :size="16" />{{ $en ? 'New project' : 'ახალი პროექტი' }}</button></div></td></tr>
+                        <tr><td colspan="5"><div class="empty"><span class="ic"><x-ga.icon name="fold" :size="22" /></span><h2>{{ $en ? 'No projects yet' : 'პროექტი ჯერ არ გაქვთ' }}</h2><button class="btn pine" type="button" data-go="new"><x-ga.icon name="plus" :size="16" />{{ $en ? 'New project' : 'ახალი პროექტი' }}</button></div></td></tr>
                     @endforelse
+                    <tr id="proj-none" hidden><td colspan="5" class="mut" style="text-align:center;height:64px">{{ $en ? 'Nothing found.' : 'ვერაფერი მოიძებნა.' }}</td></tr>
                     </tbody>
                 </table></div></div>
             </section>
@@ -187,13 +193,13 @@
             <section class="screen" id="settings">
                 <div class="set-row"><div><h2>{{ $en ? 'Profile' : 'პროფილი' }}</h2><p class="xs mut">{{ $en ? 'Name and email' : 'სახელი და ელფოსტა' }}</p></div>
                     <div class="panel form-n">
-                        <label>{{ $en ? 'Name' : 'სახელი' }}<input value="{{ $me?->name }}" readonly></label>
-                        <label><span>{{ $en ? 'Email' : 'ელფოსტა' }} @if ($verified)<span class="bd bd-ok">{{ $en ? 'verified' : 'დადასტურებული' }}</span>@else<span class="bd bd-wa">{{ $en ? 'not verified' : 'დაუდასტურებელი' }}</span>@endif</span><input value="{{ $me?->email }}" readonly></label>
-                        @if (\Illuminate\Support\Facades\Route::has('settings.profile'))<div class="row" style="justify-content:flex-end"><a class="btn pine" href="{{ route('settings.profile') }}">{{ $en ? 'Edit profile' : 'პროფილის შეცვლა' }}</a></div>@endif
+                        @php $editUrl = \Illuminate\Support\Facades\Route::has('settings.profile') ? route('settings.profile') : null; $editTxt = $en ? 'Edit' : 'რედაქტირება'; @endphp
+                        <label><span class="lrow"><span>{{ $en ? 'Name' : 'სახელი' }}</span>@if ($editUrl)<a class="edit" href="{{ $editUrl }}">{{ $editTxt }}</a>@endif</span><input value="{{ $me?->name }}" readonly></label>
+                        <label><span class="lrow"><span>{{ $en ? 'Email' : 'ელფოსტა' }} @if ($verified)<span class="bd bd-ok">{{ $en ? 'verified' : 'დადასტურებული' }}</span>@else<span class="bd bd-wa">{{ $en ? 'not verified' : 'დაუდასტურებელი' }}</span>@endif</span>@if ($editUrl)<a class="edit" href="{{ $editUrl }}">{{ $editTxt }}</a>@endif</span><input value="{{ $me?->email }}" readonly></label>
                     </div></div>
                 <div class="set-row"><div><h2>{{ $en ? 'Security' : 'უსაფრთხოება' }}</h2><p class="xs mut">{{ $en ? 'Password, 2FA, sessions' : 'პაროლი, 2FA, სესიები' }}</p></div>
                     <div class="panel row" style="justify-content:space-between"><div class="row"><span class="ic"><x-ga.icon name="lock" :size="18" /></span><div><b>{{ $en ? 'Password and two-factor' : 'პაროლი და ორსაფეხურიანი ავთენტიფიკაცია' }}</b><p class="xs mut">{{ $en ? 'Password at least 15 characters · TOTP app' : 'პაროლი მინიმუმ 15 სიმბოლო · TOTP აპი' }}</p></div></div>
-                        @if (\Illuminate\Support\Facades\Route::has('settings.security'))<a class="btn" href="{{ route('settings.security') }}">{{ $en ? 'Open' : 'გახსნა' }}</a>@endif</div></div>
+                        @if (\Illuminate\Support\Facades\Route::has('settings.security'))<a class="edit" href="{{ route('settings.security') }}">{{ $en ? 'Edit' : 'რედაქტირება' }}</a>@endif</div></div>
                 <form method="post" action="{{ url('/logout') }}" class="row" style="justify-content:flex-end">@csrf<button class="btn" type="submit">{{ $en ? 'Log out' : 'გასვლა' }}</button></form>
             </section>
 
@@ -252,6 +258,12 @@
         }
         document.addEventListener('livewire:init', hook);
         hook();
+        document.addEventListener('input', function (event) {
+            if (event.target.id !== 'proj-q') return;
+            var q = event.target.value.trim().toLowerCase(), shown = 0;
+            document.querySelectorAll('#proj-t tbody tr[data-name]').forEach(function (tr) { var ok = !q || tr.dataset.name.indexOf(q) !== -1; tr.hidden = !ok; if (ok) shown++; });
+            var none = document.getElementById('proj-none'); if (none) none.hidden = shown !== 0 || !q;
+        });
         var initial = (location.hash || '').replace('#', '');
         if (initial) show(initial);
         window.addEventListener('hashchange', function () { show((location.hash || '').replace('#', '') || 'overview'); });

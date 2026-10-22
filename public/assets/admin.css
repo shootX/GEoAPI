@@ -117,3 +117,4 @@ section>.admin-table,.admin-group>.admin-table,.admin-split .admin-table{margin:
 .admin-main>.admin-table th{border-top:0}
 @media (min-width:981px){.admin-shell{background:linear-gradient(90deg,var(--ga-ink) 248px,transparent 248px)}}
 @media (max-width:640px){.admin-main>.admin-table tr{padding:10px 14px}.admin-main>.admin-table tr:first-child{border-top:0}}
+.admin-more{display:block;margin-top:6px;font-size:12.5px}
