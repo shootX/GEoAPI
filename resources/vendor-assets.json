@@ -7,7 +7,8 @@
             "version": "2.5.4",
             "source": "npm redoc@2.5.4, bundles/redoc.standalone.js",
             "license": "MIT",
-            "sha256": "dcaf76612bc4a3fbcc923a8966dee2f6146a5f32e5ce1b6f02dd60cbbf89500b"
+            "sha256": "a913436cf13a0adfe4af7c6fe832a1bd92b17666f199a4e493b5714a494831d8",
+            "patch": "Footer logo removed: function pw() returned an <img> hot-linked from https://cdn.redoc.ly/redoc/logo-mini.svg, which img-src blocks. Its body now returns null. Reapply after an upgrade."
         },
         {
             "path": "public/vendor/swagger-ui/swagger-ui-bundle.js",
