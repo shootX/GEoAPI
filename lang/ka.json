@@ -582,5 +582,8 @@
     "Loading": "იტვირთება",
     "Catalog is temporarily unavailable": "კატალოგი დროებით მიუწვდომელია",
     "On this page": "ამ გვერდზე",
-    "This email is already registered. Sign in or reset your password.": "ეს ელფოსტა უკვე რეგისტრირებულია. შედით ან აღადგინეთ პაროლი."
+    "This email is already registered. Sign in or reset your password.": "ეს ელფოსტა უკვე რეგისტრირებულია. შედით ან აღადგინეთ პაროლი.",
+    "Free, Starter, and Growth. Prices include VAT. A year is 15% less and does not renew by itself.": "Free, Starter და Growth. ფასები დღგ-ს შეიცავს. წლიური 15%-ით იაფია და თავისით არ განახლდება.",
+    "Free, Basic, and Premium. Prices include VAT.": "Free, Basic და Premium. ფასები დღგ-ს შეიცავს.",
+    "Code sample": "კოდის მაგალითი"
 }

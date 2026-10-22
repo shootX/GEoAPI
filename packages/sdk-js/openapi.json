@@ -1277,7 +1277,7 @@
                     },
                     {
                         "lang": "JavaScript",
-                        "source": "const response = await fetch(\"https://geoapi.ge/api/v1/brands?limit=1\", {\n  headers: { Authorization: 'Bearer geoapi_sk_…' },\n});\nconst data = await response.json();"
+                        "source": "// Server-side only: a geoapi_sk_ key must never reach the browser. In a web page use the widget (geoapi_pk_).\nconst response = await fetch(\"https://geoapi.ge/api/v1/brands?limit=1\", {\n  headers: { Authorization: 'Bearer geoapi_sk_…' },\n});\nconst data = await response.json();"
                     },
                     {
                         "lang": "Node.js",
@@ -1564,7 +1564,7 @@
                     },
                     {
                         "lang": "JavaScript",
-                        "source": "const response = await fetch(\"https://geoapi.ge/api/v1/brands/toyota/models?limit=1\", {\n  headers: { Authorization: 'Bearer geoapi_sk_…' },\n});\nconst data = await response.json();"
+                        "source": "// Server-side only: a geoapi_sk_ key must never reach the browser. In a web page use the widget (geoapi_pk_).\nconst response = await fetch(\"https://geoapi.ge/api/v1/brands/toyota/models?limit=1\", {\n  headers: { Authorization: 'Bearer geoapi_sk_…' },\n});\nconst data = await response.json();"
                     },
                     {
                         "lang": "Node.js",
@@ -1842,7 +1842,7 @@
                     },
                     {
                         "lang": "JavaScript",
-                        "source": "const response = await fetch(\"https://geoapi.ge/api/v1/models/10/years?limit=1\", {\n  headers: { Authorization: 'Bearer geoapi_sk_…' },\n});\nconst data = await response.json();"
+                        "source": "// Server-side only: a geoapi_sk_ key must never reach the browser. In a web page use the widget (geoapi_pk_).\nconst response = await fetch(\"https://geoapi.ge/api/v1/models/10/years?limit=1\", {\n  headers: { Authorization: 'Bearer geoapi_sk_…' },\n});\nconst data = await response.json();"
                     },
                     {
                         "lang": "Node.js",
@@ -2137,7 +2137,7 @@
                     },
                     {
                         "lang": "JavaScript",
-                        "source": "const response = await fetch(\"https://geoapi.ge/api/v1/models/10/generations?limit=1\", {\n  headers: { Authorization: 'Bearer geoapi_sk_…' },\n});\nconst data = await response.json();"
+                        "source": "// Server-side only: a geoapi_sk_ key must never reach the browser. In a web page use the widget (geoapi_pk_).\nconst response = await fetch(\"https://geoapi.ge/api/v1/models/10/generations?limit=1\", {\n  headers: { Authorization: 'Bearer geoapi_sk_…' },\n});\nconst data = await response.json();"
                     },
                     {
                         "lang": "Node.js",
@@ -2442,7 +2442,7 @@
                     },
                     {
                         "lang": "JavaScript",
-                        "source": "const response = await fetch(\"https://geoapi.ge/api/v1/generations/100/modifications?limit=1\", {\n  headers: { Authorization: 'Bearer geoapi_sk_…' },\n});\nconst data = await response.json();"
+                        "source": "// Server-side only: a geoapi_sk_ key must never reach the browser. In a web page use the widget (geoapi_pk_).\nconst response = await fetch(\"https://geoapi.ge/api/v1/generations/100/modifications?limit=1\", {\n  headers: { Authorization: 'Bearer geoapi_sk_…' },\n});\nconst data = await response.json();"
                     },
                     {
                         "lang": "Node.js",
@@ -2690,7 +2690,7 @@
                     },
                     {
                         "lang": "JavaScript",
-                        "source": "const response = await fetch(\"https://geoapi.ge/api/v1/modifications/1000/specs\", {\n  headers: { Authorization: 'Bearer geoapi_sk_…' },\n});\nconst data = await response.json();"
+                        "source": "// Server-side only: a geoapi_sk_ key must never reach the browser. In a web page use the widget (geoapi_pk_).\nconst response = await fetch(\"https://geoapi.ge/api/v1/modifications/1000/specs\", {\n  headers: { Authorization: 'Bearer geoapi_sk_…' },\n});\nconst data = await response.json();"
                     },
                     {
                         "lang": "Node.js",
@@ -2938,7 +2938,7 @@
                     },
                     {
                         "lang": "JavaScript",
-                        "source": "const response = await fetch(\"https://geoapi.ge/api/v1/modifications/1000/equipment\", {\n  headers: { Authorization: 'Bearer geoapi_sk_…' },\n});\nconst data = await response.json();"
+                        "source": "// Server-side only: a geoapi_sk_ key must never reach the browser. In a web page use the widget (geoapi_pk_).\nconst response = await fetch(\"https://geoapi.ge/api/v1/modifications/1000/equipment\", {\n  headers: { Authorization: 'Bearer geoapi_sk_…' },\n});\nconst data = await response.json();"
                     },
                     {
                         "lang": "Node.js",
@@ -3186,7 +3186,7 @@
                     },
                     {
                         "lang": "JavaScript",
-                        "source": "const response = await fetch(\"https://geoapi.ge/api/v1/modifications/1000\", {\n  headers: { Authorization: 'Bearer geoapi_sk_…' },\n});\nconst data = await response.json();"
+                        "source": "// Server-side only: a geoapi_sk_ key must never reach the browser. In a web page use the widget (geoapi_pk_).\nconst response = await fetch(\"https://geoapi.ge/api/v1/modifications/1000\", {\n  headers: { Authorization: 'Bearer geoapi_sk_…' },\n});\nconst data = await response.json();"
                     },
                     {
                         "lang": "Node.js",
@@ -3487,7 +3487,7 @@
                     },
                     {
                         "lang": "JavaScript",
-                        "source": "const response = await fetch(\"https://geoapi.ge/api/v1/modifications?limit=1\", {\n  headers: { Authorization: 'Bearer geoapi_sk_…' },\n});\nconst data = await response.json();"
+                        "source": "// Server-side only: a geoapi_sk_ key must never reach the browser. In a web page use the widget (geoapi_pk_).\nconst response = await fetch(\"https://geoapi.ge/api/v1/modifications?limit=1\", {\n  headers: { Authorization: 'Bearer geoapi_sk_…' },\n});\nconst data = await response.json();"
                     },
                     {
                         "lang": "Node.js",
@@ -3778,7 +3778,7 @@
                     },
                     {
                         "lang": "JavaScript",
-                        "source": "const response = await fetch(\"https://geoapi.ge/api/v1/engines?limit=1\", {\n  headers: { Authorization: 'Bearer geoapi_sk_…' },\n});\nconst data = await response.json();"
+                        "source": "// Server-side only: a geoapi_sk_ key must never reach the browser. In a web page use the widget (geoapi_pk_).\nconst response = await fetch(\"https://geoapi.ge/api/v1/engines?limit=1\", {\n  headers: { Authorization: 'Bearer geoapi_sk_…' },\n});\nconst data = await response.json();"
                     },
                     {
                         "lang": "Node.js",
@@ -4050,7 +4050,7 @@
                     },
                     {
                         "lang": "JavaScript",
-                        "source": "const response = await fetch(\"https://geoapi.ge/api/v1/bodies?limit=1\", {\n  headers: { Authorization: 'Bearer geoapi_sk_…' },\n});\nconst data = await response.json();"
+                        "source": "// Server-side only: a geoapi_sk_ key must never reach the browser. In a web page use the widget (geoapi_pk_).\nconst response = await fetch(\"https://geoapi.ge/api/v1/bodies?limit=1\", {\n  headers: { Authorization: 'Bearer geoapi_sk_…' },\n});\nconst data = await response.json();"
                     },
                     {
                         "lang": "Node.js",
@@ -4349,7 +4349,7 @@
                     },
                     {
                         "lang": "JavaScript",
-                        "source": "const response = await fetch(\"https://geoapi.ge/api/v1/fuel?limit=1\", {\n  headers: { Authorization: 'Bearer geoapi_sk_…' },\n});\nconst data = await response.json();"
+                        "source": "// Server-side only: a geoapi_sk_ key must never reach the browser. In a web page use the widget (geoapi_pk_).\nconst response = await fetch(\"https://geoapi.ge/api/v1/fuel?limit=1\", {\n  headers: { Authorization: 'Bearer geoapi_sk_…' },\n});\nconst data = await response.json();"
                     },
                     {
                         "lang": "Node.js",
@@ -4630,7 +4630,7 @@
                     },
                     {
                         "lang": "JavaScript",
-                        "source": "const response = await fetch(\"https://geoapi.ge/api/v1/colors?limit=1\", {\n  headers: { Authorization: 'Bearer geoapi_sk_…' },\n});\nconst data = await response.json();"
+                        "source": "// Server-side only: a geoapi_sk_ key must never reach the browser. In a web page use the widget (geoapi_pk_).\nconst response = await fetch(\"https://geoapi.ge/api/v1/colors?limit=1\", {\n  headers: { Authorization: 'Bearer geoapi_sk_…' },\n});\nconst data = await response.json();"
                     },
                     {
                         "lang": "Node.js",
@@ -4858,7 +4858,7 @@
                     },
                     {
                         "lang": "JavaScript",
-                        "source": "const response = await fetch(\"https://geoapi.ge/api/v1/coverage\", {\n  headers: { Authorization: 'Bearer geoapi_sk_…' },\n});\nconst data = await response.json();"
+                        "source": "// Server-side only: a geoapi_sk_ key must never reach the browser. In a web page use the widget (geoapi_pk_).\nconst response = await fetch(\"https://geoapi.ge/api/v1/coverage\", {\n  headers: { Authorization: 'Bearer geoapi_sk_…' },\n});\nconst data = await response.json();"
                     },
                     {
                         "lang": "Node.js",

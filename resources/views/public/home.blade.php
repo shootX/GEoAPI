@@ -8,7 +8,9 @@
         ['doc', $en ? 'Specifications' : 'სპეციფიკაციები', 'engine{volume_cc, fuel, power_hp}, transmission, consumption', '/modifications/{id}/specs'],
         ['chk', $en ? 'Equipment' : 'აღჭურვილობა', 'standard / optional / not_available', '/modifications/{id}/equipment'],
     ];
-    $freeQ = (\App\Billing\V2\Flag::on() ? '1 000' : '100');
+    $v2 = \App\Billing\V2\Flag::on();
+    $freeQ = ($v2 ? '1 000' : '100');
+    $freeRpm = $v2 ? \App\Billing\V2\Catalog::rpm('free') : 60;
     $steps = $en ? [
         ['Sign up', 'Free plan: $0, '.$freeQ.' successful requests a month.'],
         ['Confirm your email', 'Required before you can create a secret key.'],
@@ -22,13 +24,13 @@
     ];
     $faq = $en ? [
         ['Which requests count toward the limit?', 'Only successful (HTTP 200) responses, including an empty list. Errors do not use the limit.'],
-        ['What happens when the limit runs out?', 'The API returns 429 with the code MONTHLY_QUOTA_EXCEEDED. Above 60 requests a minute you get RATE_LIMIT_EXCEEDED and Retry-After.'],
-        ['Can I use the widget and the API together?', 'Yes. Both use the same project counter.'],
+        ['What happens when the limit runs out?', 'The API returns 429 with the code MONTHLY_QUOTA_EXCEEDED. Above '.($v2 ? 'your plan\'s per-minute limit (Free: '.$freeRpm.' requests a minute)' : $freeRpm.' requests a minute').' you get RATE_LIMIT_EXCEEDED and Retry-After.'],
+        ['Can I use the widget and the API together?', $v2 ? 'Yes. Both use one counter shared by all projects in your account.' : 'Yes. Both use the same project counter.'],
         ['Do you decode VINs?', 'No. That is not part of the current scope.'],
     ] : [
         ['რომელი მოთხოვნები ითვლება ლიმიტში?', 'მხოლოდ წარმატებული (HTTP 200) პასუხები, მათ შორის ცარიელი სია. შეცდომები ლიმიტს არ ხარჯავს.'],
-        ['რა მოხდება ლიმიტის ამოწურვისას?', 'API აბრუნებს 429-ს კოდით MONTHLY_QUOTA_EXCEEDED. წუთში 60 მოთხოვნის გადაჭარბებისას — RATE_LIMIT_EXCEEDED და Retry-After.'],
-        ['შემიძლია ვიჯეტის და API-ს ერთად გამოყენება?', 'დიახ. ორივე ერთ პროექტის მრიცხველს იყენებს.'],
+        ['რა მოხდება ლიმიტის ამოწურვისას?', 'API აბრუნებს 429-ს კოდით MONTHLY_QUOTA_EXCEEDED. '.($v2 ? 'გეგმის წუთის ლიმიტის გადაჭარბებისას (Free — წუთში '.$freeRpm.' მოთხოვნა)' : 'წუთში '.$freeRpm.' მოთხოვნის გადაჭარბებისას').' — RATE_LIMIT_EXCEEDED და Retry-After.'],
+        ['შემიძლია ვიჯეტის და API-ს ერთად გამოყენება?', $v2 ? 'დიახ. ორივე ერთ მრიცხველს იყენებს, რომელსაც ანგარიშის ყველა პროექტი იზიარებს.' : 'დიახ. ორივე ერთ პროექტის მრიცხველს იყენებს.'],
         ['VIN დეკოდირება გაქვთ?', 'არა — ეს მიმდინარე მოცულობაში არ შედის.'],
     ];
     $stats = [
@@ -76,7 +78,7 @@
             </div>
             <div style="background:#fff;border:1px solid var(--line);border-radius:14px;box-shadow:var(--sh2);margin-left:auto;max-width:430px;min-width:0;overflow:hidden">
                 <div class="row" style="justify-content:space-between;padding:10px 16px;border-bottom:1px solid var(--line)"><span class="xs mut">{{ $en ? 'Response · JSON' : 'პასუხი · JSON' }}</span><span class="row" style="gap:6px"><span class="bd bd-ok"><i></i>200 OK</span><span class="mono xs mut">X-Quota-Remaining</span></span></div>
-<pre class="mono viz-pre" style="font-size:11.5px;line-height:1.7;padding:12px 16px;margin:0;color:var(--ink);white-space:pre;overflow-x:auto;max-width:100%">{
+<pre class="mono viz-pre" tabindex="0" style="font-size:11.5px;line-height:1.7;padding:12px 16px;margin:0;color:var(--ink);white-space:pre;overflow-x:auto;max-width:100%">{
   <span style="color:#4338CA">"data"</span>: [{ <span style="color:#4338CA">"id"</span>: <span style="color:#1F6B45">"10"</span>, <span style="color:#4338CA">"slug"</span>: <span style="color:#1F6B45">"camry"</span>,
              <span style="color:#4338CA">"name"</span>: <span style="color:#1F6B45">"Camry"</span>, <span style="color:#4338CA">"generations_count"</span>: <span style="color:#8A5300">1</span> }],
   <span style="color:#4338CA">"meta"</span>: { <span style="color:#4338CA">"page"</span>: <span style="color:#8A5300">1</span>, <span style="color:#4338CA">"per_page"</span>: <span style="color:#8A5300">100</span>, <span style="color:#4338CA">"total"</span>: <span style="color:#8A5300">1</span> }
@@ -146,7 +148,7 @@ curl https://geoapi.ge<span class="k1">/api/v1/modifications/1000/specs</span> \
         <div class="g3">
             <div class="fc"><div class="fi"><x-ga.icon name="glob" :size="20" /></div><h4 style="margin-top:14px">REST API</h4><p class="sm mut" style="margin-top:6px">{{ $en ? '14 GET endpoints, JSON, Bearer auth, pagination and filters.' : '14 GET endpoint, JSON, Bearer ავტორიზაცია, pagination და ფილტრები.' }}</p></div>
             <div class="fc"><div class="fi"><x-ga.icon name="mobile" :size="20" /></div><h4 style="margin-top:14px">{{ $en ? 'Embeddable widget' : 'ჩასაშენებელი ვიჯეტი' }}</h4><p class="sm mut" style="margin-top:6px">{{ $en ? 'A ready cascading picker on your site. Public key geoapi_pk_ and allowed origins.' : 'მზა კასკადური არჩევა თქვენს საიტზე. საჯარო გასაღები geoapi_pk_ და დაშვებული origin-ები.' }}</p></div>
-            <div class="fc" style="opacity:.75;border-style:dashed"><div class="row" style="justify-content:space-between"><div class="fi" style="margin:0"><x-ga.icon name="box" :size="20" /></div><span class="prop">◇ {{ $en ? 'COMING' : 'მზადდება' }}</span></div><h4 style="margin-top:14px">SDK · MCP · CLI</h4><p class="sm mut" style="margin-top:6px">{{ $en ? 'JavaScript SDK, MCP Server and CLI. Guide pages are being prepared.' : 'JavaScript SDK, MCP Server და CLI — ინსტრუქციების გვერდები მზადდება.' }}</p></div>
+            <div class="fc" style="border-style:dashed"><div class="row" style="justify-content:space-between"><div class="fi" style="margin:0"><x-ga.icon name="box" :size="20" /></div><span class="prop">◇ {{ $en ? 'COMING' : 'მზადდება' }}</span></div><h4 style="margin-top:14px">SDK · MCP · CLI</h4><p class="sm mut" style="margin-top:6px">{{ $en ? 'JavaScript SDK, MCP Server and CLI. Guide pages are being prepared.' : 'JavaScript SDK, MCP Server და CLI — ინსტრუქციების გვერდები მზადდება.' }}</p></div>
         </div>
     </div>
 </section>
@@ -172,7 +174,7 @@ curl https://geoapi.ge<span class="k1">/api/v1/modifications/1000/specs</span> \
 </section>
 <section class="wrap" style="padding-bottom:96px">
     <div style="background:var(--soft);border-radius:24px;padding:48px;display:flex;align-items:center;gap:24px;flex-wrap:wrap" class="cta-band">
-        <div style="flex:1;min-width:260px"><h2 class="h2">{{ $en ? 'Start free' : 'დაიწყეთ უფასოდ' }}</h2><p class="mut" style="margin-top:8px">{{ $en ? $freeQ.' successful requests a month. Change the plan any time.' : $freeQ.' წარმატებული მოთხოვნა თვეში. გეგმის შეცვლა ნებისმიერ დროს.' }}</p></div>
+        <div style="flex:1;min-width:260px"><h2 class="h2">{{ $en ? 'Start free' : 'დაიწყეთ უფასოდ' }}</h2><p class="mut" style="margin-top:8px">{{ $en ? $freeQ.' successful requests a month. Upgrade any time; a downgrade starts when the paid term ends.' : $freeQ.' წარმატებული მოთხოვნა თვეში. გეგმის გაზრდა — ნებისმიერ დროს, შემცირება — გადახდილი ვადის ბოლოს.' }}</p></div>
         <a class="btn b-pri b-lg" href="{{ route('register') }}">{{ $en ? 'Create an account' : 'ანგარიშის შექმნა' }}</a>
         <a class="btn b-sec b-lg" href="{{ route('pricing') }}">{{ $en ? 'Pricing' : 'ტარიფები' }}</a>
     </div>
