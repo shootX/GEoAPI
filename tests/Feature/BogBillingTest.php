@@ -158,6 +158,19 @@ final class BogBillingTest extends TestCase
         $this->assertSame(10000, (int) DB::table('platform.project_limits')->where('project_id', 7)->value('monthly_quota'));
     }
 
+    public function test_new_project_limits_insert_a_boolean_literal_for_unlimited_month(): void
+    {
+        $repo = new ProjectRepository($this->platform);
+        $method = new \ReflectionMethod($repo, 'limitsInsert');
+        $sql = (string) $method->invoke($repo, 3);
+
+        // Postgres rejects an integer for the boolean column (42804), which broke project creation on prod.
+        $this->assertStringContainsString('unlimited_month', $sql);
+        $this->assertMatchesRegularExpression('/, FALSE\)$/', $sql);
+        $id = $repo->insert(3, 'bool-check', null);
+        $this->assertFalse((bool) DB::table('platform.project_limits')->where('project_id', $id)->value('unlimited_month'));
+    }
+
     public function test_a_paid_checkout_waits_for_the_signed_callback(): void
     {
         $this->rate();

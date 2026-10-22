@@ -195,7 +195,7 @@ final class ProjectRepository
         }
         if ($this->hasColumn('project_limits', 'unlimited_month')) {
             $columns[] = 'unlimited_month';
-            $values[] = '0';
+            $values[] = 'FALSE'; // boolean column: an integer literal fails on Postgres (42804)
         }
 
         return 'INSERT INTO platform.project_limits ('.implode(', ', $columns).') VALUES ('.implode(', ', $values).')';
