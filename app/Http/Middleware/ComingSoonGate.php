@@ -4,12 +4,11 @@ declare(strict_types=1);
 
 namespace App\Http\Middleware;
 
+use App\Access\AdminAccess;
 use App\Models\Setting;
 use App\Models\User;
 use Closure;
-use Electrik\Support\Operators;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 use Symfony\Component\HttpFoundation\Cookie;
 use Symfony\Component\HttpFoundation\Response;
 use Throwable;
@@ -78,24 +77,8 @@ final class ComingSoonGate
     private function isAdmin(Request $request): bool
     {
         $user = $request->user();
-        if (! $user instanceof User) {
-            return false;
-        }
 
-        if (Operators::check($user)) {
-            return true;
-        }
-
-        try {
-            return DB::table('model_has_roles')
-                ->join('roles', 'roles.id', '=', 'model_has_roles.role_id')
-                ->where('model_has_roles.model_type', $user->getMorphClass())
-                ->where('model_has_roles.model_id', $user->getKey())
-                ->where('roles.name', 'admin')
-                ->exists();
-        } catch (Throwable) {
-            return false;
-        }
+        return $user instanceof User && AdminAccess::allows($user);
     }
 
     private function previewGranted(Request $request): bool

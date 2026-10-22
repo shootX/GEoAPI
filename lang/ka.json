@@ -581,5 +581,6 @@
     "Unknown": "უცნობი",
     "Loading": "იტვირთება",
     "Catalog is temporarily unavailable": "კატალოგი დროებით მიუწვდომელია",
-    "On this page": "ამ გვერდზე"
+    "On this page": "ამ გვერდზე",
+    "This email is already registered. Sign in or reset your password.": "ეს ელფოსტა უკვე რეგისტრირებულია. შედით ან აღადგინეთ პაროლი."
 }
