@@ -103,7 +103,7 @@
         <p class="xs mut" style="text-align:center;margin-top:6px">{{ $en ? 'Enterprise: custom limits and terms —' : 'Enterprise: ინდივიდუალური ლიმიტები და პირობები —' }} <a href="mailto:hello@geoapi.ge">hello@geoapi.ge</a></p>
     </div>
 </section>
-<script>
+<script @nonce>
     document.addEventListener('click', function (event) {
         var button = event.target.closest('[data-period]');
         if (!button) return;

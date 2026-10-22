@@ -74,7 +74,7 @@
         <p id="snippet-url" style="color:#006621;font-size:13px;margin:2px 0"></p>
         <p id="snippet-desc" style="color:#545454;font-size:13px;margin:0"></p>
     </section>
-    <script>
+    <script @nonce>
         (function () {
             var map = {'ა':'a','ბ':'b','გ':'g','დ':'d','ე':'e','ვ':'v','ზ':'z','თ':'t','ი':'i','კ':'k','ლ':'l','მ':'m','ნ':'n','ო':'o','პ':'p','ჟ':'zh','რ':'r','ს':'s','ტ':'t','უ':'u','ფ':'p','ქ':'k','ღ':'gh','ყ':'q','შ':'sh','ჩ':'ch','ც':'ts','ძ':'dz','წ':'ts','ჭ':'ch','ხ':'kh','ჯ':'j','ჰ':'h'};
             function slugify(value) {

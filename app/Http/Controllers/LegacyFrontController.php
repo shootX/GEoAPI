@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers;
 
+use App\Http\Middleware\SecurityHeaders;
 use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -29,6 +30,11 @@ final class LegacyFrontController extends Controller
                 is_string($body) ? $body : '',
                 is_int($status) && $status >= 100 ? $status : 200,
             ));
+        }
+        if (! headers_sent()) {
+            foreach (SecurityHeaders::headers($request) as $name => $value) {
+                header($name.': '.$value);
+            }
         }
         carapi_handle_request();
         exit;

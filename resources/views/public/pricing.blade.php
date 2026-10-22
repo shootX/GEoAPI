@@ -101,7 +101,7 @@
         @endforeach
     </div>
 </section>
-<script>
+<script @nonce>
     document.addEventListener('click', function (event) {
         var button = event.target.closest('[data-period]');
         if (!button) return;

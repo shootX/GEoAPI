@@ -6,7 +6,7 @@
 
     <title>{{ config('electrik.name', config('app.name', 'Electrik')) }} — Laravel Application Starter</title>
 
-    <style>
+    <style @nonce>
         :root {
             --bg: #08090b;
             --bg-soft: #0d0f12;

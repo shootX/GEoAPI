@@ -243,7 +243,7 @@
         <button class="btn" id="drawer-close" type="button">{{ $en ? 'Close' : 'დახურვა' }}</button>
     </div>
 </aside>
-<script>
+<script @nonce>
     (function () {
         const titles = { overview: @json($en ? 'Overview' : 'მიმოხილვა'), projects: @json($en ? 'Projects' : 'პროექტები'), new: @json($en ? 'New project' : 'ახალი პროექტი'), usage: @json($en ? 'Usage' : 'მოხმარება'), keys: @json($en ? 'API keys' : 'API გასაღებები'), plan: @json($en ? 'Plan' : 'გეგმა'), catalog: @json($en ? 'Catalog' : 'კატალოგი'), settings: @json($en ? 'Settings' : 'პარამეტრები') };
         var current = 'overview';

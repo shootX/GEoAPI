@@ -7,7 +7,7 @@
     <title>{{ __('Coming soon') }} — GeoAPI</title>
     <x-electrik::brand-styles />
     @vite(['resources/css/app.css'])
-    <style>
+    <style @nonce>
         body { margin: 0; min-height: 100vh; background: #f4faf7; color: #091413; }
         .top { display: flex; justify-content: flex-end; padding: 20px 24px; background: #091413; color: #e7f6ef; }
         main { box-sizing: border-box; max-width: 28rem; margin: 8vh auto 0; padding: 0 24px 64px; text-align: center; }

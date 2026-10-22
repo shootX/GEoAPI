@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Tests\Feature;
 
-use App\Http\Middleware\SecurityHeaders;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -17,8 +16,8 @@ final class AuditFixesTest extends TestCase
         $this->get('/')
             ->assertOk()
             ->assertHeader('X-Content-Type-Options', 'nosniff')
-            ->assertHeader('X-Frame-Options', 'SAMEORIGIN')
-            ->assertHeader('Content-Security-Policy', SecurityHeaders::CSP);
+            ->assertHeader('X-Frame-Options', 'DENY')
+            ->assertHeader('Content-Security-Policy');
 
         $guide = $this->get('/guide')->assertOk()->assertHeader('Vary', 'Cookie');
         $cache = (string) $guide->headers->get('Cache-Control');
@@ -32,7 +31,7 @@ final class AuditFixesTest extends TestCase
             ->getJson('/api/admin/me')
             ->assertUnauthorized()
             ->assertHeader('X-Content-Type-Options', 'nosniff')
-            ->assertHeader('Content-Security-Policy', SecurityHeaders::CSP)
+            ->assertHeader('Content-Security-Policy')
             ->assertHeaderMissing('Access-Control-Allow-Origin');
     }
 

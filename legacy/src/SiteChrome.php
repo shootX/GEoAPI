@@ -70,7 +70,7 @@ final class SiteChrome
         $summary = $description ?? 'GeoAPI დეველოპერებს სთავაზობს ავტომობილების ბრენდების, მოდელებისა და თაობების მონაცემებს REST API-ის საშუალებით და ავტომობილის არჩევის მზა ვიჯეტს ვებსაიტებისთვის.';
 
         return '<!doctype html><html lang="ka"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">'
-            . '<script>(function(){try{var t=localStorage.getItem("geoapi-theme")||localStorage.getItem("carapi-theme");if(t==="light")document.documentElement.dataset.theme="light"}catch(e){}})()</script>'
+            . '<script' . \Carapi\Csp::attr() . '>(function(){try{var t=localStorage.getItem("geoapi-theme")||localStorage.getItem("carapi-theme");if(t==="light")document.documentElement.dataset.theme="light"}catch(e){}})()</script>'
             . '<title>' . $pageTitle . '</title>'
             . '<meta name="description" content="' . htmlspecialchars($summary, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') . '">'
             . '<link rel="icon" href="/favicon.ico" sizes="any">'

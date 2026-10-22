@@ -615,7 +615,7 @@ final class Http
         echo '<!doctype html><html lang="ka"><head><meta charset="utf-8"><title>ვიჯეტის წინასწარი ნახვა</title></head><body>';
         echo '<script src="/widget/v1/geoapi-filter.js"></script>';
         echo '<geoapi-filter public-key="' . $key . '"></geoapi-filter>';
-        echo '<pre id="out"></pre><script>document.querySelector("geoapi-filter").addEventListener("geoapi:change",function(e){document.getElementById("out").textContent=JSON.stringify(e.detail);});</script>';
+        echo '<pre id="out"></pre><script' . \Carapi\Csp::attr() . '>document.querySelector("geoapi-filter").addEventListener("geoapi:change",function(e){document.getElementById("out").textContent=JSON.stringify(e.detail);});</script>';
         echo '</body></html>';
     }
 
