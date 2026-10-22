@@ -18,7 +18,7 @@
                 </div>
                 <p class="text-sm">{{ $product->summary }}</p>
                 @if ($product->status === 'published' && $plan)
-                    <p class="text-sm text-muted-foreground">ლიმიტი: {{ $plan->per_minute }} მოთხოვნა წუთში, {{ number_format((int) $plan->monthly_quota, 0, '.', ' ') }} წარმატებული მოთხოვნა თვეში. კომერციული გეგმები არის <a href="{{ route('account.billing') }}">გადახდის გვერდზე</a>.</p>
+                    <p class="text-sm text-muted-foreground">ლიმიტი თქვენს გეგმაზეა დამოკიდებული. მიმდინარე კვოტა და გეგმები ნახეთ <a href="{{ route('account.billing') }}">გადახდის გვერდზე</a>.</p>
                     @if ($product->documentation_path)
                         <p class="text-sm"><a href="{{ $product->documentation_path }}">დოკუმენტაცია</a></p>
                     @endif

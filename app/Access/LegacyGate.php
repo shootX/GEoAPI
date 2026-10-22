@@ -40,7 +40,9 @@ final class LegacyGate
             'body' => [
                 'error' => [
                     'code' => 'forbidden',
-                    'message' => 'მანქანების API-ზე წვდომა ამ ანგარიშზე აქტიური არ არის. გასაღები ვერ შეიქმნება.',
+                    'message' => app()->getLocale() === 'en'
+                        ? 'The Cars API is not turned on for this account yet. Turn it on at /account/products, then create the key.'
+                        : 'მანქანების API ამ ანგარიშზე ჯერ ჩართული არ არის. ჩართეთ გვერდზე /account/products და შემდეგ შექმენით გასაღები.',
                 ],
             ],
         ];
