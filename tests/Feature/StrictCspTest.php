@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Tests\Feature;
 
+use App\Http\Middleware\SecurityHeaders;
 use App\Models\User;
 use Carapi\Csp;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -60,6 +61,46 @@ final class StrictCspTest extends TestCase
         $this->assertDoesNotMatchRegularExpression("/style-src [^;]*'unsafe-inline'/", (string) $response->headers->get('Content-Security-Policy'));
     }
 
+    public function test_pages_without_the_ui_kit_refuse_style_attributes(): void
+    {
+        // QA retest L3: style-src-attr allowed 'unsafe-inline' on every page.
+        $user = User::factory()->create();
+        foreach (['/', '/pricing', '/guide', '/demo', '/terms', '/blog', '/api/v1/docs'] as $path) {
+            $this->assertStringContainsString("style-src-attr 'none'", (string) $this->get($path)->headers->get('Content-Security-Policy'), $path);
+        }
+        $this->assertStringContainsString("style-src-attr 'none'", (string) $this->actingAs($user)->get('/account/billing')->headers->get('Content-Security-Policy'));
+    }
+
+    public function test_ui_kit_views_with_style_attributes_relax_style_src_attr(): void
+    {
+        $this->assertStringContainsString("style-src-attr 'none'", SecurityHeaders::policy('n'));
+        $this->assertStringContainsString("style-src-attr 'unsafe-inline'", SecurityHeaders::policy('n', styleAttributes: true));
+
+        // Every UI-kit view that writes a style attribute must be listed, or its page breaks
+        // when the kit is upgraded.
+        $found = [];
+        foreach (['slate' => 'vendor/electrik/slate/resources/views', 'electrik' => 'vendor/electrik/electrik/resources/views'] as $namespace => $dir) {
+            foreach (new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator(base_path($dir), \FilesystemIterator::SKIP_DOTS)) as $file) {
+                if (preg_match("/\\sstyle=|:style=|x-bind:style|'style'/", (string) file_get_contents($file->getPathname())) === 1) {
+                    $found[] = $namespace.'::'.str_replace('/', '.', substr($file->getPathname(), strlen(base_path($dir)) + 1, -strlen('.blade.php')));
+                }
+            }
+        }
+        sort($found);
+        $this->assertSame($found, SecurityHeaders::STYLE_ATTRIBUTE_VIEWS);
+    }
+
+    public function test_project_views_and_legacy_pages_have_no_style_attributes(): void
+    {
+        $files = ['legacy/front.php', 'legacy/src/Platform/View.php', 'legacy/src/SiteChrome.php'];
+        foreach (new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator(resource_path('views'), \FilesystemIterator::SKIP_DOTS)) as $file) {
+            $files[] = substr($file->getPathname(), strlen(base_path()) + 1);
+        }
+        foreach ($files as $file) {
+            $this->assertDoesNotMatchRegularExpression('/\sstyle=/', (string) file_get_contents(base_path($file)), $file.' has a style attribute; use a class (resources/css/geoapi-inline.css)');
+        }
+    }
+
     public function test_each_request_gets_a_new_nonce(): void
     {
         $this->assertNotSame($this->nonce($this->get('/')), $this->nonce($this->get('/')));
@@ -111,6 +152,9 @@ final class StrictCspTest extends TestCase
                 continue;
             }
             $this->assertStringContainsString('nonce="'.$nonce.'"', $attributes, 'inline <'.$name.'> without the nonce: '.$tag);
+        }
+        if (str_contains($policy, "style-src-attr 'none'")) {
+            $this->assertDoesNotMatchRegularExpression('/<[a-z][^>]*\sstyle\s*=/i', $html, 'style attributes are blocked by the policy');
         }
         $this->assertDoesNotMatchRegularExpression('/<[a-z][^>]*\son(click|change|load|error|submit|input|keydown|mouseover)\s*=/i', $html, 'inline event handlers are blocked by the policy');
     }

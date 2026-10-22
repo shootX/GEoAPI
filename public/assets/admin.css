@@ -145,3 +145,207 @@ html{scrollbar-gutter:stable}body{overflow-x:hidden}@media (max-width:980px){htm
 .admin-rlist li>span{min-width:0;display:flex;flex-direction:column}
 .admin-rlist strong{font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .admin-rlist small{color:var(--ga-ink-3);font-size:12px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+/* Bar sizes in whole percent, used instead of inline styles (CSP style-src-attr 'none'). */
+.qw-0{width:0%}
+.qw-1{width:1%}
+.qw-2{width:2%}
+.qw-3{width:3%}
+.qw-4{width:4%}
+.qw-5{width:5%}
+.qw-6{width:6%}
+.qw-7{width:7%}
+.qw-8{width:8%}
+.qw-9{width:9%}
+.qw-10{width:10%}
+.qw-11{width:11%}
+.qw-12{width:12%}
+.qw-13{width:13%}
+.qw-14{width:14%}
+.qw-15{width:15%}
+.qw-16{width:16%}
+.qw-17{width:17%}
+.qw-18{width:18%}
+.qw-19{width:19%}
+.qw-20{width:20%}
+.qw-21{width:21%}
+.qw-22{width:22%}
+.qw-23{width:23%}
+.qw-24{width:24%}
+.qw-25{width:25%}
+.qw-26{width:26%}
+.qw-27{width:27%}
+.qw-28{width:28%}
+.qw-29{width:29%}
+.qw-30{width:30%}
+.qw-31{width:31%}
+.qw-32{width:32%}
+.qw-33{width:33%}
+.qw-34{width:34%}
+.qw-35{width:35%}
+.qw-36{width:36%}
+.qw-37{width:37%}
+.qw-38{width:38%}
+.qw-39{width:39%}
+.qw-40{width:40%}
+.qw-41{width:41%}
+.qw-42{width:42%}
+.qw-43{width:43%}
+.qw-44{width:44%}
+.qw-45{width:45%}
+.qw-46{width:46%}
+.qw-47{width:47%}
+.qw-48{width:48%}
+.qw-49{width:49%}
+.qw-50{width:50%}
+.qw-51{width:51%}
+.qw-52{width:52%}
+.qw-53{width:53%}
+.qw-54{width:54%}
+.qw-55{width:55%}
+.qw-56{width:56%}
+.qw-57{width:57%}
+.qw-58{width:58%}
+.qw-59{width:59%}
+.qw-60{width:60%}
+.qw-61{width:61%}
+.qw-62{width:62%}
+.qw-63{width:63%}
+.qw-64{width:64%}
+.qw-65{width:65%}
+.qw-66{width:66%}
+.qw-67{width:67%}
+.qw-68{width:68%}
+.qw-69{width:69%}
+.qw-70{width:70%}
+.qw-71{width:71%}
+.qw-72{width:72%}
+.qw-73{width:73%}
+.qw-74{width:74%}
+.qw-75{width:75%}
+.qw-76{width:76%}
+.qw-77{width:77%}
+.qw-78{width:78%}
+.qw-79{width:79%}
+.qw-80{width:80%}
+.qw-81{width:81%}
+.qw-82{width:82%}
+.qw-83{width:83%}
+.qw-84{width:84%}
+.qw-85{width:85%}
+.qw-86{width:86%}
+.qw-87{width:87%}
+.qw-88{width:88%}
+.qw-89{width:89%}
+.qw-90{width:90%}
+.qw-91{width:91%}
+.qw-92{width:92%}
+.qw-93{width:93%}
+.qw-94{width:94%}
+.qw-95{width:95%}
+.qw-96{width:96%}
+.qw-97{width:97%}
+.qw-98{width:98%}
+.qw-99{width:99%}
+.qw-100{width:100%}
+.admin-bar-c i.qh-0{height:0%}
+.admin-bar-c i.qh-1{height:1%}
+.admin-bar-c i.qh-2{height:2%}
+.admin-bar-c i.qh-3{height:3%}
+.admin-bar-c i.qh-4{height:4%}
+.admin-bar-c i.qh-5{height:5%}
+.admin-bar-c i.qh-6{height:6%}
+.admin-bar-c i.qh-7{height:7%}
+.admin-bar-c i.qh-8{height:8%}
+.admin-bar-c i.qh-9{height:9%}
+.admin-bar-c i.qh-10{height:10%}
+.admin-bar-c i.qh-11{height:11%}
+.admin-bar-c i.qh-12{height:12%}
+.admin-bar-c i.qh-13{height:13%}
+.admin-bar-c i.qh-14{height:14%}
+.admin-bar-c i.qh-15{height:15%}
+.admin-bar-c i.qh-16{height:16%}
+.admin-bar-c i.qh-17{height:17%}
+.admin-bar-c i.qh-18{height:18%}
+.admin-bar-c i.qh-19{height:19%}
+.admin-bar-c i.qh-20{height:20%}
+.admin-bar-c i.qh-21{height:21%}
+.admin-bar-c i.qh-22{height:22%}
+.admin-bar-c i.qh-23{height:23%}
+.admin-bar-c i.qh-24{height:24%}
+.admin-bar-c i.qh-25{height:25%}
+.admin-bar-c i.qh-26{height:26%}
+.admin-bar-c i.qh-27{height:27%}
+.admin-bar-c i.qh-28{height:28%}
+.admin-bar-c i.qh-29{height:29%}
+.admin-bar-c i.qh-30{height:30%}
+.admin-bar-c i.qh-31{height:31%}
+.admin-bar-c i.qh-32{height:32%}
+.admin-bar-c i.qh-33{height:33%}
+.admin-bar-c i.qh-34{height:34%}
+.admin-bar-c i.qh-35{height:35%}
+.admin-bar-c i.qh-36{height:36%}
+.admin-bar-c i.qh-37{height:37%}
+.admin-bar-c i.qh-38{height:38%}
+.admin-bar-c i.qh-39{height:39%}
+.admin-bar-c i.qh-40{height:40%}
+.admin-bar-c i.qh-41{height:41%}
+.admin-bar-c i.qh-42{height:42%}
+.admin-bar-c i.qh-43{height:43%}
+.admin-bar-c i.qh-44{height:44%}
+.admin-bar-c i.qh-45{height:45%}
+.admin-bar-c i.qh-46{height:46%}
+.admin-bar-c i.qh-47{height:47%}
+.admin-bar-c i.qh-48{height:48%}
+.admin-bar-c i.qh-49{height:49%}
+.admin-bar-c i.qh-50{height:50%}
+.admin-bar-c i.qh-51{height:51%}
+.admin-bar-c i.qh-52{height:52%}
+.admin-bar-c i.qh-53{height:53%}
+.admin-bar-c i.qh-54{height:54%}
+.admin-bar-c i.qh-55{height:55%}
+.admin-bar-c i.qh-56{height:56%}
+.admin-bar-c i.qh-57{height:57%}
+.admin-bar-c i.qh-58{height:58%}
+.admin-bar-c i.qh-59{height:59%}
+.admin-bar-c i.qh-60{height:60%}
+.admin-bar-c i.qh-61{height:61%}
+.admin-bar-c i.qh-62{height:62%}
+.admin-bar-c i.qh-63{height:63%}
+.admin-bar-c i.qh-64{height:64%}
+.admin-bar-c i.qh-65{height:65%}
+.admin-bar-c i.qh-66{height:66%}
+.admin-bar-c i.qh-67{height:67%}
+.admin-bar-c i.qh-68{height:68%}
+.admin-bar-c i.qh-69{height:69%}
+.admin-bar-c i.qh-70{height:70%}
+.admin-bar-c i.qh-71{height:71%}
+.admin-bar-c i.qh-72{height:72%}
+.admin-bar-c i.qh-73{height:73%}
+.admin-bar-c i.qh-74{height:74%}
+.admin-bar-c i.qh-75{height:75%}
+.admin-bar-c i.qh-76{height:76%}
+.admin-bar-c i.qh-77{height:77%}
+.admin-bar-c i.qh-78{height:78%}
+.admin-bar-c i.qh-79{height:79%}
+.admin-bar-c i.qh-80{height:80%}
+.admin-bar-c i.qh-81{height:81%}
+.admin-bar-c i.qh-82{height:82%}
+.admin-bar-c i.qh-83{height:83%}
+.admin-bar-c i.qh-84{height:84%}
+.admin-bar-c i.qh-85{height:85%}
+.admin-bar-c i.qh-86{height:86%}
+.admin-bar-c i.qh-87{height:87%}
+.admin-bar-c i.qh-88{height:88%}
+.admin-bar-c i.qh-89{height:89%}
+.admin-bar-c i.qh-90{height:90%}
+.admin-bar-c i.qh-91{height:91%}
+.admin-bar-c i.qh-92{height:92%}
+.admin-bar-c i.qh-93{height:93%}
+.admin-bar-c i.qh-94{height:94%}
+.admin-bar-c i.qh-95{height:95%}
+.admin-bar-c i.qh-96{height:96%}
+.admin-bar-c i.qh-97{height:97%}
+.admin-bar-c i.qh-98{height:98%}
+.admin-bar-c i.qh-99{height:99%}
+.admin-bar-c i.qh-100{height:100%}
+.admin-ubar i.quota-hot{background:var(--ga-er)}

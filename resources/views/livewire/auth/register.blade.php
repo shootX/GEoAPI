@@ -1,10 +1,10 @@
 @php $en = app()->getLocale() === 'en'; @endphp
 <div>
     <h1>{{ __('Create an account') }}</h1>
-    <p class="mut" style="margin:6px 0 24px">{{ $en ? 'Free plan · '.(\App\Billing\V2\Flag::on() ? '1 000' : '100').' successful requests a month' : 'Free გეგმა · '.(\App\Billing\V2\Flag::on() ? '1 000' : '100').' წარმატებული მოთხოვნა თვეში' }}</p>
-    <form wire:submit="register" class="col" style="gap:16px">
+    <p class="s-96b813 mut">{{ $en ? 'Free plan · '.(\App\Billing\V2\Flag::on() ? '1 000' : '100').' successful requests a month' : 'Free გეგმა · '.(\App\Billing\V2\Flag::on() ? '1 000' : '100').' წარმატებული მოთხოვნა თვეში' }}</p>
+    <form wire:submit="register" class="s-f6ce4d col">
         <div class="fld">
-            <span style="font-size:13px;font-weight:500">{{ __('Account type') }}</span>
+            <span class="s-c4f362">{{ __('Account type') }}</span>
             <div class="seg-r" role="radiogroup">
                 <label><input type="radio" wire:model.live="buyer_kind" value="individual"> {{ __('Individual') }}</label>
                 <label><input type="radio" wire:model.live="buyer_kind" value="legal"> {{ __('Legal entity') }}</label>
@@ -16,8 +16,8 @@
             @error('name')<span class="emsg"><x-ga.icon name="err" :size="14" />{{ $message }}</span>@enderror
         </div>
         @if ($buyer_kind === 'legal')
-            <div class="col" style="border:1px solid var(--line);border-radius:12px;padding:16px;background:var(--bg);gap:14px">
-                <div class="xs mut" style="font-weight:500">{{ $en ? 'Company details · for invoices' : 'კომპანიის მონაცემები · ინვოისისთვის' }}</div>
+            <div class="s-939272 col">
+                <div class="s-02a2d3 xs mut">{{ $en ? 'Company details · for invoices' : 'კომპანიის მონაცემები · ინვოისისთვის' }}</div>
                 <div class="fld">
                     <label for="reg-company">{{ __('Company name') }}</label>
                     <input id="reg-company" class="inp @error('company_name') err @enderror" wire:model="company_name" type="text" required>
@@ -52,7 +52,7 @@
         </div>
         <label class="chk-l"><input type="checkbox" wire:model="accept_terms" value="1"><span>{{ __('I agree to the') }} <a href="{{ url('/terms') }}" class="lnk">{{ __('terms of use') }}</a> · <a href="{{ url('/privacy') }}" class="lnk">{{ $en ? 'privacy policy' : 'კონფიდენციალურობის პოლიტიკა' }}</a>.</span></label>
         @error('accept_terms')<span class="emsg"><x-ga.icon name="err" :size="14" />{{ __('You must accept the terms.') }}</span>@enderror
-        <button type="submit" class="btn b-pri b-lg" style="justify-content:center;width:100%">{{ __('Create an account') }}</button>
+        <button type="submit" class="s-e6a3b7 btn b-pri b-lg">{{ __('Create an account') }}</button>
     </form>
-    <p class="sm mut" style="text-align:center;margin-top:20px">{{ __('Already have an account?') }} <a href="{{ route('login') }}" class="lnk">{{ __('Sign in') }}</a></p>
+    <p class="s-c7b101 sm mut">{{ __('Already have an account?') }} <a href="{{ route('login') }}" class="lnk">{{ __('Sign in') }}</a></p>
 </div>

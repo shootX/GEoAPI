@@ -11,11 +11,11 @@
     @vite(['resources/css/app.css'])
 </head>
 <body class="site ga min-h-screen antialiased">
-    <main style="max-width:560px;margin:40px auto;padding:0 16px;text-align:center">
-        <a href="{{ url('/') }}" aria-label="GeoAPI.ge"><img src="{{ asset('assets/brand/geoapi-lockup-light.svg') }}" alt="geoapi.ge" style="height:30px;margin:0 auto" width="94" height="30"></a>
-        <div class="mono" style="margin-top:40px;font-size:13px;color:var(--ac);letter-spacing:.08em">@yield('code')</div>
-        <h1 class="h1" style="margin-top:10px;font-size:40px">@yield('message')</h1>
-        <p style="margin-top:28px"><a class="btn b-pri b-lg" href="{{ url('/') }}">{{ __('Back to the home page') }}</a></p>
+    <main class="s-1ae07a">
+        <a href="{{ url('/') }}" aria-label="GeoAPI.ge"><img src="{{ asset('assets/brand/geoapi-lockup-light.svg') }}" alt="geoapi.ge" class="s-7f574b" width="94" height="30"></a>
+        <div class="s-6bae1e mono">@yield('code')</div>
+        <h1 class="s-97768e h1">@yield('message')</h1>
+        <p class="s-583f75"><a class="btn b-pri b-lg" href="{{ url('/') }}">{{ __('Back to the home page') }}</a></p>
     </main>
 </body>
 </html>

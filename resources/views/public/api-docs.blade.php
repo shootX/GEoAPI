@@ -8,15 +8,14 @@
         : 'GeoAPI-ის საჯარო კატალოგის ინტერაქტიული ცნობარი.',
     'active' => 'docs',
 ])
-    <div style="max-width:760px">
-        <h1 class="h1" style="font-size:36px">{{ $en ? 'API reference' : 'API ცნობარი' }}</h1>
-        <p class="lead" style="margin-top:12px;font-size:16px">{{ $en ? 'The reference is generated from the OpenAPI document. Field names stay in English. The guide is Georgian and English. Download the same document or a Postman collection. Admin routes are not in this document.' : 'ცნობარი OpenAPI დოკუმენტიდან ივსება. ველების სახელები ინგლისურია. გზამკვლევი ქართული და ინგლისურია. იგივე დოკუმენტი ან Postman კოლექცია ჩამოიტვირთება. ადმინისტრაციული მისამართები ამ დოკუმენტში არ არის.' }}</p>
-        <p class="sm" style="margin-top:12px;color:var(--ac)"><a href="{{ url('/api/v1/openapi.json') }}">openapi.json</a> · <a href="{{ url('/api/v1/postman.json') }}">Postman</a> · <a href="{{ url('/guide') }}">{{ $en ? 'Guide' : 'გზამკვლევი' }}</a></p>
+    <div class="s-71e179">
+        <h1 class="s-f2d0be h1">{{ $en ? 'API reference' : 'API ცნობარი' }}</h1>
+        <p class="s-9be78c lead">{{ $en ? 'The reference is generated from the OpenAPI document. Field names stay in English. The guide is Georgian and English. Download the same document or a Postman collection. Admin routes are not in this document.' : 'ცნობარი OpenAPI დოკუმენტიდან ივსება. ველების სახელები ინგლისურია. გზამკვლევი ქართული და ინგლისურია. იგივე დოკუმენტი ან Postman კოლექცია ჩამოიტვირთება. ადმინისტრაციული მისამართები ამ დოკუმენტში არ არის.' }}</p>
+        <p class="s-89a2dc sm"><a href="{{ url('/api/v1/openapi.json') }}">openapi.json</a> · <a href="{{ url('/api/v1/postman.json') }}">Postman</a> · <a href="{{ url('/guide') }}">{{ $en ? 'Guide' : 'გზამკვლევი' }}</a></p>
     </div>
-    <div id="redoc" style="margin-top:32px;border:1px solid var(--line);border-radius:14px;overflow:hidden"></div>
-    {{-- Redoc's footer logo is hot-linked from its CDN; img-src does not allow it. --}}
-    <style @nonce>#redoc a[href*="redocly.com"] img { display: none; } #redoc .redoc-json .collapser { min-width: 24px; min-height: 24px; } #redoc .redoc-json li { line-height: 24px; }</style>
-    <script src="{{ asset('vendor/redoc/redoc.standalone.js') }}?v=2.5.4"></script>
+    <div id="redoc" class="s-fdddf4"></div>
+    <style @nonce>#redoc .redoc-json .collapser { min-width: 24px; min-height: 24px; } #redoc .redoc-json li { line-height: 24px; }</style>
+    <script src="{{ asset('vendor/redoc/redoc.standalone.js') }}?v=2.5.4-p1"></script>
     <script @nonce>
         Redoc.init({{ \Illuminate\Support\Js::from(url('/api/v1/openapi.json')) }}, {
             theme: {

@@ -32,7 +32,7 @@
             $lower = $shared && \App\Billing\V2\Catalog::rank($code) < \App\Billing\V2\Catalog::rank($planNow);
         @endphp
         <article class="plan {{ $isCurrent ? 'now' : '' }}">
-            <div class="row" style="justify-content:space-between"><h2>{{ $label }}</h2>@if ($isCurrent)<span class="bd bd-ok">{{ $en ? 'Current' : 'მიმდინარე' }}</span>@endif</div>
+            <div class="s-a562f4 row"><h2>{{ $label }}</h2>@if ($isCurrent)<span class="bd bd-ok">{{ $en ? 'Current' : 'მიმდინარე' }}</span>@endif</div>
             <p class="price">{{ $lari($monthCents) }} <span class="muted">/ {{ $en ? 'month' : 'თვე' }}</span></p>
             <p class="muted">{{ $fmt(\App\Billing\V2\Catalog::plans()[$code]['quota']) }} {{ $en ? 'successful requests a month.' : 'წარმატებული მოთხოვნა თვეში.' }}</p>
             <p class="xs mut">{{ $en ? 'Year' : 'წელი' }}: {{ $lari($yearCents) }} · −15%</p>
@@ -63,18 +63,18 @@
 </div>
 <p class="xs mut">{{ $en ? 'Business is not for sale while its rate limit is still being measured. Enterprise is assigned by an administrator.' : 'Business ჯერ არ იყიდება, სანამ მისი სიჩქარის ზღვარი იზომება. Enterprise-ს ადმინისტრატორი ნიშნავს.' }}</p>
 @if (count($orders) > 0)
-    <div class="panel" style="padding:0;overflow:hidden">
-        <h2 style="padding:18px 20px 0">{{ $en ? 'Invoices' : 'ინვოისები' }}</h2>
-        <div style="overflow-x:auto;margin-top:12px;border-top:1px solid var(--line)">
+    <div class="s-22a267 panel">
+        <h2 class="s-bb9e9f">{{ $en ? 'Invoices' : 'ინვოისები' }}</h2>
+        <div class="s-c7d5b9">
             <table class="orders">
-                <thead><tr><th>{{ $en ? 'Plan' : 'გეგმა' }}</th><th>{{ $en ? 'Status' : 'სტატუსი' }}</th><th style="text-align:right">GEL</th><th></th></tr></thead>
+                <thead><tr><th>{{ $en ? 'Plan' : 'გეგმა' }}</th><th>{{ $en ? 'Status' : 'სტატუსი' }}</th><th class="s-54c2af">GEL</th><th></th></tr></thead>
                 <tbody>
                     @foreach ($orders as $order)
                         @php $invoiceId = \Illuminate\Support\Facades\DB::table('billing_invoices')->where('billing_order_id', $order->id)->value('id'); @endphp
                         <tr>
                             <td class="mono">{{ $order->plan_code }}@if (\App\Billing\MockPay::isMock($order)) <span class="bd bd-wa">TEST</span>@endif</td>
                             <td>{{ $order->status }}</td>
-                            <td style="text-align:right" class="mono">{{ $order->gel_amount }}</td>
+                            <td class="s-54c2af mono">{{ $order->gel_amount }}</td>
                             <td>@if ($invoiceId)<a href="{{ route('account.invoice', $invoiceId) }}">PDF</a>@endif</td>
                         </tr>
                     @endforeach

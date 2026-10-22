@@ -71,6 +71,7 @@ class AppServiceProvider extends ServiceProvider
             'slate::components.spotlight',
             'slate::components.toggle-group',
         ], static fn () => SecurityHeaders::needsEval());
+        View::composer(SecurityHeaders::STYLE_ATTRIBUTE_VIEWS, static fn () => SecurityHeaders::needsStyleAttributes());
         Blade::directive('nonce', static fn (): string => '<?php echo \'nonce="\'.e((string) \Illuminate\Support\Facades\Vite::cspNonce()).\'"\'; ?>');
         // Electrik's SetLocale replaces unsupported codes, including ka, and
         // app()->setLocale() also overwrites config('app.locale').

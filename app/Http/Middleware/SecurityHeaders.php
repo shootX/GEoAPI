@@ -14,14 +14,17 @@ use Symfony\Component\HttpFoundation\Response;
  *
  * Scripts run only from this origin or with the per-request nonce: no 'unsafe-inline',
  * no third-party hosts, no inline event handlers. Livewire uses its CSP-safe Alpine build,
- * so there is no 'unsafe-eval' either, and reads the nonce from Vite::cspNonce(). Style
- * attributes stay allowed (style-src-attr) because markup and Livewire set them; <style>
- * blocks need the nonce.
+ * so there is no 'unsafe-eval' either, and reads the nonce from Vite::cspNonce(). <style>
+ * blocks need the nonce, and style attributes are refused (style-src-attr 'none'): the views
+ * use classes (resources/css/geoapi-inline.css). Scripts may still set element.style.
  *
  * Exception: the Electrik/Slate UI kit (login, onboarding, settings, teams, ops) writes
  * Alpine methods inline, which the CSP-safe build cannot parse. A page that renders one of
  * those views calls needsEval(): it gets Livewire's standard build and 'unsafe-eval', still
- * with the nonce and without 'unsafe-inline'.
+ * with the nonce and without 'unsafe-inline'. Likewise a page that renders one of the Slate
+ * components that write style attributes (STYLE_ATTRIBUTE_VIEWS) gets style-src-attr
+ * 'unsafe-inline'. A Livewire SPA visit would keep the first page's policy, so
+ * resources/js/app.js loads every page in full.
  *
  * The two OpenAPI viewers (Redoc, Swagger UI) are served from public/vendor and start a
  * blob: search worker, so only those pages allow that. Redoc takes the nonce for the <style>
@@ -44,11 +47,31 @@ final class SecurityHeaders
 
     private const EVAL = 'csp.unsafe_eval';
 
+    private const STYLE_ATTRIBUTES = 'csp.style_attributes';
+
+    /** Slate 5.5 views that render style="" or a string :style binding (StrictCspTest checks the list). */
+    public const STYLE_ATTRIBUTE_VIEWS = [
+        'slate::components.app-shell',
+        'slate::components.aspect-ratio',
+        'slate::components.calendar',
+        'slate::components.carousel-content',
+        'slate::components.chart',
+        'slate::components.chart-bar',
+        'slate::components.context-menu-content',
+        'slate::components.marquee',
+        'slate::components.progress',
+        'slate::components.resizable-panel',
+        'slate::components.sidebar',
+        'slate::components.slider',
+        'slate::components.spotlight',
+    ];
+
     public function handle(Request $request, Closure $next): Response
     {
         Vite::useCspNonce();
         config(['livewire.csp_safe' => true]);
         $request->attributes->remove(self::EVAL);
+        $request->attributes->remove(self::STYLE_ATTRIBUTES);
         $response = $next($request);
         foreach (self::headers($request) as $name => $value) {
             $response->headers->set($name, $value);
@@ -77,7 +100,13 @@ final class SecurityHeaders
             'Referrer-Policy' => 'strict-origin-when-cross-origin',
             'Permissions-Policy' => 'camera=(), microphone=(), geolocation=(), payment=(), usb=()',
             'Cross-Origin-Opener-Policy' => 'same-origin',
-            'Content-Security-Policy' => self::policy($nonce, $request->is(...self::VIEWERS), $request->attributes->get(self::EVAL) === true, $request->is(...self::INLINE_STYLES)),
+            'Content-Security-Policy' => self::policy(
+                $nonce,
+                $request->is(...self::VIEWERS),
+                $request->attributes->get(self::EVAL) === true,
+                $request->is(...self::INLINE_STYLES),
+                $request->attributes->get(self::STYLE_ATTRIBUTES) === true,
+            ),
         ];
     }
 
@@ -88,7 +117,13 @@ final class SecurityHeaders
         config(['livewire.csp_safe' => false]);
     }
 
-    public static function policy(string $nonce, bool $viewer = false, bool $eval = false, bool $inlineStyles = false): string
+    /** Called while rendering a STYLE_ATTRIBUTE_VIEWS view; see the class comment. */
+    public static function needsStyleAttributes(): void
+    {
+        request()->attributes->set(self::STYLE_ATTRIBUTES, true);
+    }
+
+    public static function policy(string $nonce, bool $viewer = false, bool $eval = false, bool $inlineStyles = false, bool $styleAttributes = false): string
     {
         $styles = $inlineStyles ? "'self' 'unsafe-inline'" : "'self' 'nonce-".$nonce."'".($viewer ? ' '.self::REDOC_STYLE_HASHES : '');
 
@@ -97,7 +132,7 @@ final class SecurityHeaders
             "script-src 'self' 'nonce-".$nonce."'".($eval ? " 'unsafe-eval'" : ''),
             "script-src-attr 'none'",
             'style-src '.$styles,
-            "style-src-attr 'unsafe-inline'",
+            'style-src-attr '.($inlineStyles || $styleAttributes ? "'unsafe-inline'" : "'none'"),
             "img-src 'self' data:",
             "font-src 'self'",
             "connect-src 'self'",

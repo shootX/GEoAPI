@@ -1,20 +1,20 @@
 @php $en = app()->getLocale() === 'en'; @endphp
 <div>
     @if ($requiresTwoFactor)
-        <div style="width:64px;height:64px;border-radius:16px;background:var(--soft);color:var(--ac);display:grid;place-items:center;margin-bottom:22px"><x-ga.icon name="lock" :size="30" /></div>
+        <div class="s-34bcf1"><x-ga.icon name="lock" :size="30" /></div>
         <h1>{{ $en ? 'Two-step sign in' : 'ორსაფეხურიანი შესვლა' }}</h1>
-        <p class="mut" style="margin:8px 0 28px">{{ $en ? 'Enter the 6-digit code from your authenticator app.' : 'შეიყვანეთ 6-ნიშნა კოდი ავთენტიფიკატორის აპიდან.' }}</p>
+        <p class="s-387404 mut">{{ $en ? 'Enter the 6-digit code from your authenticator app.' : 'შეიყვანეთ 6-ნიშნა კოდი ავთენტიფიკატორის აპიდან.' }}</p>
     @else
         <h1>{{ __('Sign in') }}</h1>
-        <p class="mut" style="margin:6px 0 28px">{{ $en ? 'Continue to your cabinet' : 'გააგრძელეთ თქვენს კაბინეტში' }}</p>
+        <p class="s-0596e9 mut">{{ $en ? 'Continue to your cabinet' : 'გააგრძელეთ თქვენს კაბინეტში' }}</p>
     @endif
     @if (session('status'))
-        <div class="al al-ok" style="margin-bottom:18px"><x-ga.icon name="ok" :size="18" /><div>{{ session('status') }}</div></div>
+        <div class="s-905d8b al al-ok"><x-ga.icon name="ok" :size="18" /><div>{{ session('status') }}</div></div>
     @endif
     @if (session('error'))
-        <div class="al al-er" style="margin-bottom:18px"><x-ga.icon name="err" :size="18" /><div>{{ session('error') }}</div></div>
+        <div class="s-905d8b al al-er"><x-ga.icon name="err" :size="18" /><div>{{ session('error') }}</div></div>
     @endif
-    <form wire:submit="login" class="col" style="gap:16px">
+    <form wire:submit="login" class="s-f6ce4d col">
         @unless ($requiresTwoFactor)
             <div class="fld">
                 <label for="login-email">{{ __('Email') }}</label>
@@ -22,7 +22,7 @@
                 @error('email')<span class="emsg"><x-ga.icon name="err" :size="14" />{{ $message }}</span>@enderror
             </div>
             <div class="fld">
-                <div class="row" style="justify-content:space-between"><label for="login-password">{{ __('Password') }}</label><a href="{{ route('password.request') }}" class="sm lnk">{{ __('Forgot password?') }}</a></div>
+                <div class="s-a562f4 row"><label for="login-password">{{ __('Password') }}</label><a href="{{ route('password.request') }}" class="sm lnk">{{ __('Forgot password?') }}</a></div>
                 <input id="login-password" class="inp @error('password') err @enderror" wire:model="password" type="password" autocomplete="current-password" required>
                 @error('password')<span class="emsg"><x-ga.icon name="err" :size="14" />{{ $message }}</span>@enderror
             </div>
@@ -30,13 +30,13 @@
         @else
             <div class="fld">
                 <label for="login-code">კოდი</label>
-                <input id="login-code" class="inp mono @error('twoFactorCode') err @enderror" wire:model="twoFactorCode" inputmode="numeric" autocomplete="one-time-code" maxlength="10" required style="font-size:22px;letter-spacing:.4em;text-align:center;height:60px">
+                <input id="login-code" class="s-4c3751 inp mono @error('twoFactorCode') err @enderror" wire:model="twoFactorCode" inputmode="numeric" autocomplete="one-time-code" maxlength="10" required>
                 @error('twoFactorCode')<span class="emsg"><x-ga.icon name="err" :size="14" />{{ $message }}</span>@enderror
             </div>
         @endunless
-        <button type="submit" class="btn b-pri b-lg" style="justify-content:center;width:100%">{{ $requiresTwoFactor ? 'დადასტურება' : __('Sign in') }}</button>
+        <button type="submit" class="s-e6a3b7 btn b-pri b-lg">{{ $requiresTwoFactor ? 'დადასტურება' : __('Sign in') }}</button>
     </form>
     @if (config('electrik.auth.registration', true) && ! $requiresTwoFactor)
-        <p class="sm mut" style="text-align:center;margin-top:24px">{{ __('No account?') }} <a href="{{ route('register') }}" class="lnk">{{ __('Create one') }}</a></p>
+        <p class="s-4e97dd sm mut">{{ __('No account?') }} <a href="{{ route('register') }}" class="lnk">{{ __('Create one') }}</a></p>
     @endif
 </div>

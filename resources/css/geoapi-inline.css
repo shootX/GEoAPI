@@ -1,0 +1,407 @@
+/* Generated from the inline style attributes the views used to carry (QA retest L3), so the
+ * CSP can send style-src-attr 'none'. :not(#\#) gives each rule ID-level specificity, as
+ * close as a class gets to an inline style. Edit a rule here, or replace it with a named class. */
+.s-02a2d3:not(#\#){font-weight:500}
+.s-03bdc8:not(#\#){background:#FAFAFE;font-weight:500}
+.s-03c4bb:not(#\#){justify-content:center}
+.s-0596e9:not(#\#){margin:6px 0 28px}
+.s-0a3d57:not(#\#){color:#545454;font-size:13px;margin:0}
+.s-0b1435:not(#\#){padding-top:4px}
+.s-0bc09c:not(#\#){margin-left:auto;color:#A5A0F0}
+.s-0be020:not(#\#){gap:8px;flex-wrap:nowrap}
+.s-0dc840:not(#\#){border-radius:6px}
+.s-0fb990:not(#\#){width:36px;height:36px;border-radius:10px;background:var(--ac);display:grid;place-items:center}
+.s-0fcc4b:not(#\#){margin-top:40px;color:#fff}
+.s-1100f9:not(#\#){width:32px;height:32px;border-radius:50%;background:var(--soft);color:var(--ac);display:grid;place-items:center;font-weight:600;font-size:12px}
+.s-116966:not(#\#){margin:0}
+.s-12296c:not(#\#){border-style:dashed}
+.s-13b474:not(#\#){gap:8px;margin-top:14px}
+.s-160b06:not(#\#){font-weight:600;font-size:13px}
+.s-16f023:not(#\#){display:flex;align-items:center;gap:12px;background:#0F0E2A;color:#fff;border-radius:14px;padding:10px 16px 10px 10px;box-shadow:0 0 0 8px rgb(165 160 240/.18)}
+.s-196905:not(#\#){margin-top:24px;gap:8px}
+.s-1ae07a:not(#\#){max-width:560px;margin:40px auto;padding:0 16px;text-align:center}
+.s-1b0f49:not(#\#){margin-top:16px}
+.s-1b397b:not(#\#){color:#4338CA}
+.s-1d914c:not(#\#){margin-top:14px;font-size:42px}
+.s-1da5cd:not(#\#){color:var(--ac);white-space:nowrap}
+.s-1e64d0:not(#\#){margin:16px 0 28px;gap:10px}
+.s-1ebb58:not(#\#){height:34px}
+.s-20c260:not(#\#){font-size:13px;color:var(--ac);letter-spacing:.08em}
+.s-22a267:not(#\#){padding:0;overflow:hidden}
+.s-24f19e:not(#\#){min-width:0;line-height:1.3}
+.s-27510f:not(#\#){gap:10px;margin-top:20px}
+.s-289355:not(#\#){font-size:11.5px;color:var(--ac);margin-top:10px;border-top:1px solid var(--line);padding-top:10px}
+.s-2aca6d:not(#\#){flex-wrap:nowrap}
+.s-2bf96e:not(#\#){color:var(--ac)}
+.s-2e3ee8:not(#\#){padding-bottom:12px}
+.s-30da31:not(#\#){position:absolute;inset:0;background:radial-gradient(600px 400px at 100% 0,#2A2670,transparent)}
+.s-329c66:not(#\#){margin-top:18px;max-width:720px}
+.s-33b371:not(#\#){justify-content:space-between;align-items:flex-end}
+.s-347bbd:not(#\#){padding-block:40px}
+.s-34bcf1:not(#\#){width:64px;height:64px;border-radius:16px;background:var(--soft);color:var(--ac);display:grid;place-items:center;margin-bottom:22px}
+.s-387404:not(#\#){margin:8px 0 28px}
+.s-3922d3:not(#\#){min-width:0}
+.s-3a4c3f:not(#\#){padding-bottom:96px}
+.s-3a8bc5:not(#\#){height:28px}
+.s-3b802c:not(#\#){cursor:pointer;color:var(--ac);font-weight:500}
+.s-3d01a4:not(#\#){font-size:42px;font-weight:700;letter-spacing:-.02em}
+.s-3e50bd:not(#\#){color:#B9B6D3;margin-top:14px}
+.s-3e6cea:not(#\#){font-weight:600;display:flex;justify-content:space-between;list-style:none;cursor:pointer;gap:12px}
+.s-3f3a6c:not(#\#){white-space:pre-wrap;word-break:break-all}
+.s-3f7179:not(#\#){margin:8px 0 24px}
+.s-3f7efa:not(#\#){max-width:800px}
+.s-3f8196:not(#\#){gap:12px;margin-top:28px;color:#D9D7EE}
+.s-433de3:not(#\#){font-size:14px}
+.s-455f8c:not(#\#){justify-content:flex-end}
+.s-460915:not(#\#){color:#1a0dab;font-size:18px;margin:0}
+.s-47a3c2:not(#\#){margin-top:14px;display:flex;align-items:baseline;gap:6px}
+.s-49f14f:not(#\#){margin-bottom:20px}
+.s-49fcd8:not(#\#){margin-top:24px}
+.s-4a2700:not(#\#){width:100%;justify-content:center}
+.s-4b1385:not(#\#){color:#006621;font-size:13px;margin:2px 0}
+.s-4c3751:not(#\#){font-size:22px;letter-spacing:.4em;text-align:center;height:60px}
+.s-4e97dd:not(#\#){text-align:center;margin-top:24px}
+.s-4ede69:not(#\#){text-align:right;white-space:nowrap}
+.s-5008a2:not(#\#){font-weight:600;margin:14px 0}
+.s-54c2af:not(#\#){text-align:right}
+.s-56e5af:not(#\#){border-top:1px solid var(--line);padding:28px 0 8px}
+.s-56f435:not(#\#){margin-top:12px}
+.s-583f75:not(#\#){margin-top:28px}
+.s-5af183:not(#\#){margin-top:36px;background:#17163A;border:1px solid #26244F}
+.s-5d7eb4:not(#\#){color:var(--ac);font-weight:600}
+.s-5e0faa:not(#\#){font-size:13px}
+.s-62ba2f:not(#\#){font-size:20px;font-weight:700}
+.s-64de39:not(#\#){margin-top:18px;max-width:540px}
+.s-662632:not(#\#){padding:3px;margin-top:8px;align-self:flex-start}
+.s-67de55:not(#\#){margin-top:28px;align-items:start}
+.s-6b438b:not(#\#){border-top:1px solid #26244F;padding:8px 18px;font-size:11.5px}
+.s-6bae1e:not(#\#){margin-top:40px;font-size:13px;color:var(--ac);letter-spacing:.08em}
+.s-6cb285:not(#\#){font-size:12px}
+.s-6cb639:not(#\#){height:18px;font-size:11px;margin-left:4px}
+.s-6d0006:not(#\#){margin-left:auto}
+.s-6ee9de:not(#\#){font-size:14px;overflow-wrap:anywhere}
+.s-703894:not(#\#){background:var(--soft);border-radius:24px;padding:48px;display:flex;align-items:center;gap:24px;flex-wrap:wrap}
+.s-71e179:not(#\#){max-width:760px}
+.s-7291ea:not(#\#){font-size:11.5px;line-height:1.7;padding:12px 16px;margin:0;color:var(--ink);white-space:pre;overflow-x:auto;max-width:100%}
+.s-74c2a8:not(#\#){border-bottom:1px solid var(--line);padding:18px 0}
+.s-7596e8:not(#\#){font-size:12px;color:var(--ink2);margin-top:6px;min-height:38px}
+.s-789157:not(#\#){color:var(--ink)}
+.s-794980:not(#\#){color:var(--er);font-weight:500;text-decoration:underline}
+.s-7ae4a4:not(#\#){color:#8A5300}
+.s-7c43fb:not(#\#){margin-top:10px;max-width:300px}
+.s-7e56e5:not(#\#){overflow:hidden;text-overflow:ellipsis}
+.s-7f574b:not(#\#){height:30px;margin:0 auto}
+.s-867774:not(#\#){margin-bottom:24px}
+.s-86de7a:not(#\#){margin-top:18px}
+.s-87c641:not(#\#){row-gap:40px}
+.s-8855dd:not(#\#){padding-bottom:72px}
+.s-89a2dc:not(#\#){margin-top:12px;color:var(--ac)}
+.s-8a77e5:not(#\#){margin-top:8px}
+.s-8c3743:not(#\#){width:100%;justify-content:center;margin-top:14px}
+.s-8ca97c:not(#\#){margin-top:14px;gap:16px;color:var(--ac)}
+.s-8cfc29:not(#\#){font-size:34px;font-weight:700;letter-spacing:-.02em}
+.s-8d3abb:not(#\#){color:var(--ac);font-weight:500}
+.s-8d7302:not(#\#){gap:10px;flex-wrap:nowrap}
+.s-901059:not(#\#){max-height:360px;overflow:auto}
+.s-905d8b:not(#\#){margin-bottom:18px}
+.s-9099a8:not(#\#){background:var(--bg);border:0}
+.s-90e308:not(#\#){margin:28px 0 32px;gap:8px}
+.s-939272:not(#\#){border:1px solid var(--line);border-radius:12px;padding:16px;background:var(--bg);gap:14px}
+.s-9687cb:not(#\#){max-height:420px;overflow:auto}
+.s-96ad60:not(#\#){margin-top:4px}
+.s-96b813:not(#\#){margin:6px 0 24px}
+.s-97445a:not(#\#){flex:1}
+.s-97768e:not(#\#){margin-top:10px;font-size:40px}
+.s-9bae86:not(#\#){justify-content:space-between;padding:10px 16px;border-bottom:1px solid var(--line)}
+.s-9be78c:not(#\#){margin-top:12px;font-size:16px}
+.s-9ca068:not(#\#){margin-top:8px;max-width:720px}
+.s-9e6ac2:not(#\#){gap:6px;margin-bottom:24px}
+.s-9f0c97:not(#\#){text-align:center;height:64px}
+.s-a26bda:not(#\#){margin-top:20px}
+.s-a562f4:not(#\#){justify-content:space-between}
+.s-a58e8b:not(#\#){flex:1;min-width:260px}
+.s-a6dded:not(#\#){gap:12px;min-width:0}
+.s-a79feb:not(#\#){margin-top:14px;color:var(--ink2)}
+.s-a7ca67:not(#\#){display:flex;align-items:center;gap:14px;margin:18px 0 18px 40px}
+.s-a9c5e7:not(#\#){width:45%}
+.s-aa8940:not(#\#){position:absolute;top:-12px;left:24px;background:var(--ac);color:#fff}
+.s-af4721:not(#\#){font-size:11px;color:#A5A0F0}
+.s-afbfcd:not(#\#){height:30px;display:block}
+.s-b12974:not(#\#){max-width:720px}
+.s-b5c03c:not(#\#){max-width:560px;margin:40px auto;text-align:center}
+.s-b7c21f:not(#\#){padding:4px 0}
+.s-b852a3:not(#\#){flex-wrap:wrap;gap:10px 28px;margin-top:28px}
+.s-bae40f:not(#\#){padding-top:48px}
+.s-bb9e9f:not(#\#){padding:18px 20px 0}
+.s-bd28c7:not(#\#){background:#fff;border:1px solid var(--line);border-radius:14px;padding:14px 16px;box-shadow:var(--sh2);max-width:360px}
+.s-bd97b4:not(#\#){margin-left:auto;color:#A5A0F0;font-size:12px}
+.s-bec7b1:not(#\#){min-width:260px}
+.s-bfb357:not(#\#){font-size:12.5px;min-width:0;overflow-wrap:anywhere}
+.s-c1cf7f:not(#\#){justify-content:space-between;margin-bottom:8px}
+.s-c4f362:not(#\#){font-size:13px;font-weight:500}
+.s-c52459:not(#\#){color:#A5A0F0}
+.s-c6031c:not(#\#){position:relative;background:#fff;border:1px solid var(--line);border-radius:24px;padding:26px;box-shadow:var(--sh2);background-image:radial-gradient(#E4E3EE 1.2px,transparent 1.2px);background-size:24px 24px}
+.s-c6eb23:not(#\#){padding-top:56px;padding-bottom:56px;background:linear-gradient(180deg,#F7F7FB,#fff)}
+.s-c7b101:not(#\#){text-align:center;margin-top:20px}
+.s-c7d5b9:not(#\#){overflow-x:auto;margin-top:12px;border-top:1px solid var(--line)}
+.s-c8779f:not(#\#){margin-top:14px;border:1px solid var(--line);border-radius:10px;padding:10px 14px;flex-wrap:nowrap;background:#fff}
+.s-c8db12:not(#\#){margin-top:22px;gap:10px;color:#D9D7EE}
+.s-cd5979:not(#\#){background:var(--ac);color:#fff;border-radius:5px;font-size:11px;font-weight:600}
+.s-cda68d:not(#\#){padding:3px}
+.s-ce92a4:not(#\#){padding-block:40px 96px;max-width:1360px}
+.s-d0007a:not(#\#){text-align:right;margin-top:10px}
+.s-d12ea1:not(#\#){justify-content:center;margin-top:6px;color:#fff}
+.s-d2c171:not(#\#){margin-top:10px}
+.s-d34d92:not(#\#){margin-top:36px}
+.s-d461c9:not(#\#){position:relative}
+.s-d5dbc8:not(#\#){justify-content:space-between;flex-wrap:nowrap}
+.s-d6f2af:not(#\#){margin-top:14px}
+.s-d73c66:not(#\#){background:#123325;color:#7CCFA3;height:20px}
+.s-d96538:not(#\#){font-size:18px;font-weight:600;line-height:1.4;margin-top:8px}
+.s-db3675:not(#\#){justify-content:space-between;margin-bottom:14px}
+.s-dbe7f0:not(#\#){color:#1F6B45}
+.s-dc39b8:not(#\#){width:40%}
+.s-dd6ec3:not(#\#){flex:1;min-width:0;line-height:1.25}
+.s-dfb216:not(#\#){align-items:start}
+.s-e21473:not(#\#){margin-top:48px}
+.s-e2b01b:not(#\#){max-width:640px}
+.s-e415e2:not(#\#){padding-block:72px 64px}
+.s-e57620:not(#\#){background:var(--ac);color:#fff;border-radius:5px;font-size:11px;font-weight:600;height:20px}
+.s-e5831b:not(#\#){background:#fff;border:1px solid var(--line);border-radius:14px;box-shadow:var(--sh2);margin-left:auto;max-width:430px;min-width:0;overflow:hidden}
+.s-e6a3b7:not(#\#){justify-content:center;width:100%}
+.s-e8228a:not(#\#){background:linear-gradient(180deg,#F7F7FB,#fff)}
+.s-e8f6d1:not(#\#){margin-top:28px;display:flex;justify-content:space-between}
+.s-ed74eb:not(#\#){text-align:center;margin-top:6px}
+.s-ed929b:not(#\#){padding-top:56px}
+.s-f0aa63:not(#\#){border-top:1px solid var(--line);margin-top:40px;padding-top:28px}
+.s-f0abc1:not(#\#){gap:6px}
+.s-f1a90b:not(#\#){display:flex;gap:10px;flex-wrap:wrap;padding-top:16px}
+.s-f2d0be:not(#\#){font-size:36px}
+.s-f6ce4d:not(#\#){gap:16px}
+.s-fdddf4:not(#\#){margin-top:32px;border:1px solid var(--line);border-radius:14px;overflow:hidden}
+.s-fdf33f:not(#\#){margin-bottom:8px}
+.s-fe4549:not(#\#){padding:28px;box-shadow:var(--sh2)}
+.s-fe74f3:not(#\#){font-size:36px;font-weight:700;margin-top:6px;line-height:1.2}
+.s-fe7b49:not(#\#){margin-top:6px}
+
+/* Values the views compute; written by hand. */
+.site-main-pad:not(#\#){padding-block:56px 96px}
+.plan-card:not(#\#){padding:28px;position:relative}
+.plan-card-hi:not(#\#){border:2px solid var(--ac);box-shadow:var(--sh2)}
+.cover-v0:not(#\#){background:#ECEBFB;color:#4338CA}
+.cover-v1:not(#\#){background:#0F0E2A;color:#A5A0F0}
+.cover-v2:not(#\#){background:#F7F7FB;color:#4338CA}
+.quota-hot:not(#\#){background:#B3261E}
+.ic-12:not(#\#){width:12px;height:12px}
+.ic-13:not(#\#){width:13px;height:13px}
+.ic-14:not(#\#){width:14px;height:14px}
+.ic-16:not(#\#){width:16px;height:16px}
+.ic-18:not(#\#){width:18px;height:18px}
+.ic-20:not(#\#){width:20px;height:20px}
+.ic-22:not(#\#){width:22px;height:22px}
+.ic-24:not(#\#){width:24px;height:24px}
+.ic-30:not(#\#){width:30px;height:30px}
+/* Quota bars: .qw-0 to .qw-100 set the filled width in whole percent. */
+.qw-0:not(#\#){width:0%}
+.qw-1:not(#\#){width:1%}
+.qw-2:not(#\#){width:2%}
+.qw-3:not(#\#){width:3%}
+.qw-4:not(#\#){width:4%}
+.qw-5:not(#\#){width:5%}
+.qw-6:not(#\#){width:6%}
+.qw-7:not(#\#){width:7%}
+.qw-8:not(#\#){width:8%}
+.qw-9:not(#\#){width:9%}
+.qw-10:not(#\#){width:10%}
+.qw-11:not(#\#){width:11%}
+.qw-12:not(#\#){width:12%}
+.qw-13:not(#\#){width:13%}
+.qw-14:not(#\#){width:14%}
+.qw-15:not(#\#){width:15%}
+.qw-16:not(#\#){width:16%}
+.qw-17:not(#\#){width:17%}
+.qw-18:not(#\#){width:18%}
+.qw-19:not(#\#){width:19%}
+.qw-20:not(#\#){width:20%}
+.qw-21:not(#\#){width:21%}
+.qw-22:not(#\#){width:22%}
+.qw-23:not(#\#){width:23%}
+.qw-24:not(#\#){width:24%}
+.qw-25:not(#\#){width:25%}
+.qw-26:not(#\#){width:26%}
+.qw-27:not(#\#){width:27%}
+.qw-28:not(#\#){width:28%}
+.qw-29:not(#\#){width:29%}
+.qw-30:not(#\#){width:30%}
+.qw-31:not(#\#){width:31%}
+.qw-32:not(#\#){width:32%}
+.qw-33:not(#\#){width:33%}
+.qw-34:not(#\#){width:34%}
+.qw-35:not(#\#){width:35%}
+.qw-36:not(#\#){width:36%}
+.qw-37:not(#\#){width:37%}
+.qw-38:not(#\#){width:38%}
+.qw-39:not(#\#){width:39%}
+.qw-40:not(#\#){width:40%}
+.qw-41:not(#\#){width:41%}
+.qw-42:not(#\#){width:42%}
+.qw-43:not(#\#){width:43%}
+.qw-44:not(#\#){width:44%}
+.qw-45:not(#\#){width:45%}
+.qw-46:not(#\#){width:46%}
+.qw-47:not(#\#){width:47%}
+.qw-48:not(#\#){width:48%}
+.qw-49:not(#\#){width:49%}
+.qw-50:not(#\#){width:50%}
+.qw-51:not(#\#){width:51%}
+.qw-52:not(#\#){width:52%}
+.qw-53:not(#\#){width:53%}
+.qw-54:not(#\#){width:54%}
+.qw-55:not(#\#){width:55%}
+.qw-56:not(#\#){width:56%}
+.qw-57:not(#\#){width:57%}
+.qw-58:not(#\#){width:58%}
+.qw-59:not(#\#){width:59%}
+.qw-60:not(#\#){width:60%}
+.qw-61:not(#\#){width:61%}
+.qw-62:not(#\#){width:62%}
+.qw-63:not(#\#){width:63%}
+.qw-64:not(#\#){width:64%}
+.qw-65:not(#\#){width:65%}
+.qw-66:not(#\#){width:66%}
+.qw-67:not(#\#){width:67%}
+.qw-68:not(#\#){width:68%}
+.qw-69:not(#\#){width:69%}
+.qw-70:not(#\#){width:70%}
+.qw-71:not(#\#){width:71%}
+.qw-72:not(#\#){width:72%}
+.qw-73:not(#\#){width:73%}
+.qw-74:not(#\#){width:74%}
+.qw-75:not(#\#){width:75%}
+.qw-76:not(#\#){width:76%}
+.qw-77:not(#\#){width:77%}
+.qw-78:not(#\#){width:78%}
+.qw-79:not(#\#){width:79%}
+.qw-80:not(#\#){width:80%}
+.qw-81:not(#\#){width:81%}
+.qw-82:not(#\#){width:82%}
+.qw-83:not(#\#){width:83%}
+.qw-84:not(#\#){width:84%}
+.qw-85:not(#\#){width:85%}
+.qw-86:not(#\#){width:86%}
+.qw-87:not(#\#){width:87%}
+.qw-88:not(#\#){width:88%}
+.qw-89:not(#\#){width:89%}
+.qw-90:not(#\#){width:90%}
+.qw-91:not(#\#){width:91%}
+.qw-92:not(#\#){width:92%}
+.qw-93:not(#\#){width:93%}
+.qw-94:not(#\#){width:94%}
+.qw-95:not(#\#){width:95%}
+.qw-96:not(#\#){width:96%}
+.qw-97:not(#\#){width:97%}
+.qw-98:not(#\#){width:98%}
+.qw-99:not(#\#){width:99%}
+.qw-100:not(#\#){width:100%}
+/* Bar charts: .qh-0 to .qh-100 set the bar height in whole percent. */
+.qh-0:not(#\#){height:0%}
+.qh-1:not(#\#){height:1%}
+.qh-2:not(#\#){height:2%}
+.qh-3:not(#\#){height:3%}
+.qh-4:not(#\#){height:4%}
+.qh-5:not(#\#){height:5%}
+.qh-6:not(#\#){height:6%}
+.qh-7:not(#\#){height:7%}
+.qh-8:not(#\#){height:8%}
+.qh-9:not(#\#){height:9%}
+.qh-10:not(#\#){height:10%}
+.qh-11:not(#\#){height:11%}
+.qh-12:not(#\#){height:12%}
+.qh-13:not(#\#){height:13%}
+.qh-14:not(#\#){height:14%}
+.qh-15:not(#\#){height:15%}
+.qh-16:not(#\#){height:16%}
+.qh-17:not(#\#){height:17%}
+.qh-18:not(#\#){height:18%}
+.qh-19:not(#\#){height:19%}
+.qh-20:not(#\#){height:20%}
+.qh-21:not(#\#){height:21%}
+.qh-22:not(#\#){height:22%}
+.qh-23:not(#\#){height:23%}
+.qh-24:not(#\#){height:24%}
+.qh-25:not(#\#){height:25%}
+.qh-26:not(#\#){height:26%}
+.qh-27:not(#\#){height:27%}
+.qh-28:not(#\#){height:28%}
+.qh-29:not(#\#){height:29%}
+.qh-30:not(#\#){height:30%}
+.qh-31:not(#\#){height:31%}
+.qh-32:not(#\#){height:32%}
+.qh-33:not(#\#){height:33%}
+.qh-34:not(#\#){height:34%}
+.qh-35:not(#\#){height:35%}
+.qh-36:not(#\#){height:36%}
+.qh-37:not(#\#){height:37%}
+.qh-38:not(#\#){height:38%}
+.qh-39:not(#\#){height:39%}
+.qh-40:not(#\#){height:40%}
+.qh-41:not(#\#){height:41%}
+.qh-42:not(#\#){height:42%}
+.qh-43:not(#\#){height:43%}
+.qh-44:not(#\#){height:44%}
+.qh-45:not(#\#){height:45%}
+.qh-46:not(#\#){height:46%}
+.qh-47:not(#\#){height:47%}
+.qh-48:not(#\#){height:48%}
+.qh-49:not(#\#){height:49%}
+.qh-50:not(#\#){height:50%}
+.qh-51:not(#\#){height:51%}
+.qh-52:not(#\#){height:52%}
+.qh-53:not(#\#){height:53%}
+.qh-54:not(#\#){height:54%}
+.qh-55:not(#\#){height:55%}
+.qh-56:not(#\#){height:56%}
+.qh-57:not(#\#){height:57%}
+.qh-58:not(#\#){height:58%}
+.qh-59:not(#\#){height:59%}
+.qh-60:not(#\#){height:60%}
+.qh-61:not(#\#){height:61%}
+.qh-62:not(#\#){height:62%}
+.qh-63:not(#\#){height:63%}
+.qh-64:not(#\#){height:64%}
+.qh-65:not(#\#){height:65%}
+.qh-66:not(#\#){height:66%}
+.qh-67:not(#\#){height:67%}
+.qh-68:not(#\#){height:68%}
+.qh-69:not(#\#){height:69%}
+.qh-70:not(#\#){height:70%}
+.qh-71:not(#\#){height:71%}
+.qh-72:not(#\#){height:72%}
+.qh-73:not(#\#){height:73%}
+.qh-74:not(#\#){height:74%}
+.qh-75:not(#\#){height:75%}
+.qh-76:not(#\#){height:76%}
+.qh-77:not(#\#){height:77%}
+.qh-78:not(#\#){height:78%}
+.qh-79:not(#\#){height:79%}
+.qh-80:not(#\#){height:80%}
+.qh-81:not(#\#){height:81%}
+.qh-82:not(#\#){height:82%}
+.qh-83:not(#\#){height:83%}
+.qh-84:not(#\#){height:84%}
+.qh-85:not(#\#){height:85%}
+.qh-86:not(#\#){height:86%}
+.qh-87:not(#\#){height:87%}
+.qh-88:not(#\#){height:88%}
+.qh-89:not(#\#){height:89%}
+.qh-90:not(#\#){height:90%}
+.qh-91:not(#\#){height:91%}
+.qh-92:not(#\#){height:92%}
+.qh-93:not(#\#){height:93%}
+.qh-94:not(#\#){height:94%}
+.qh-95:not(#\#){height:95%}
+.qh-96:not(#\#){height:96%}
+.qh-97:not(#\#){height:97%}
+.qh-98:not(#\#){height:98%}
+.qh-99:not(#\#){height:99%}
+.qh-100:not(#\#){height:100%}

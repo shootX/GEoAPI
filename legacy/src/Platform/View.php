@@ -127,7 +127,7 @@ final class View
             $activeKeys++;
         }
         $kpis = '<div class="kp"><div><small>მოთხოვნები ამ თვეში</small><b class="num" id="usage-month-used">' . ($usage === null ? '—' : self::e((string) $used)) . '</b><div class="d">მოთხოვნების ლიმიტი ' . ($usage === null ? '—' : self::e((string) $limit)) . '</div></div>'
-            . '<div><small>მოხმარება</small><b class="num">' . $percent . '%</b><div class="bar"><i style="width:' . $percent . '%"></i></div></div>'
+            . '<div><small>მოხმარება</small><b class="num">' . $percent . '%</b><div class="bar"><i class="qw-' . $percent . '"></i></div></div>'
             . '<div><small>დარჩენილი მოთხოვნები</small><b class="num" id="usage-month-remaining">' . ($usage === null ? '—' : self::e((string) $usage['remaining'])) . '</b><div class="d">განახლება ' . self::e(self::day($usage === null ? null : (string) $usage['reset_at'])) . '</div></div>'
             . '<div><small>დაშვებული დომენები</small><b class="num">' . count($origins) . '</b><div class="d">' . $activeKeys . ' აქტიური გასაღები</div></div></div>';
         if ($usage === null) {
@@ -1018,7 +1018,7 @@ JS;
         return '<!doctype html><html lang="ka"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="robots" content="noindex, nofollow">'
             . '<title>' . self::e($heading) . ' — GeoAPI ადმინი</title>'
             . '<link rel="icon" href="/favicon.ico" sizes="any"><link rel="icon" href="/assets/brand/favicon.svg" type="image/svg+xml">'
-            . '<link rel="stylesheet" href="/assets/admin.css?v=20261022r4"></head><body class="admin-app">'
+            . '<link rel="stylesheet" href="/assets/admin.css?v=20261022r5"></head><body class="admin-app">'
             . '<a class="admin-skip" href="#admin-content">შინაარსზე გადასვლა</a>'
             . '<div class="admin-shell"><aside class="admin-side" id="admin-nav"><div class="admin-brand"><a href="/admin"><img src="/assets/brand/geoapi-lockup-on-ink.svg" alt="geoapi.ge" height="24"></a><span>ADMIN</span></div>'
             . '<nav aria-label="ადმინისტრირება">' . self::adminNav($section) . '</nav>'
@@ -1283,7 +1283,7 @@ JS;
         $bars = '';
         foreach ($detail['days'] as $day) {
             $h = max(2, (int) round($day['used'] / $max * 100));
-            $bars .= '<span class="admin-bar-c" data-day="' . self::e($day['day']) . '" data-day-used="' . $day['used'] . '" title="' . self::e($day['day'] . ': ' . $day['used']) . '"><i style="height:' . $h . '%"></i></span>';
+            $bars .= '<span class="admin-bar-c" data-day="' . self::e($day['day']) . '" data-day-used="' . $day['used'] . '" title="' . self::e($day['day'] . ': ' . $day['used']) . '"><i class="qh-' . $h . '"></i></span>';
         }
         $first = $detail['days'][0]['day'] ?? '';
         $last = $detail['days'] === [] ? '' : $detail['days'][count($detail['days']) - 1]['day'];
@@ -1322,7 +1322,7 @@ JS;
     {
         $pct = $limit > 0 ? (int) min(100, round($used / $limit * 100)) : 0;
 
-        return '<span class="admin-ubar"><span><i style="width:' . $pct . '%' . ($pct >= 90 ? ';background:var(--ga-er)' : '') . '"></i></span><span class="mono">'
+        return '<span class="admin-ubar"><span><i class="qw-' . $pct . ($pct >= 90 ? ' quota-hot' : '') . '"></i></span><span class="mono">'
             . self::e(number_format($used, 0, '.', ' ')) . ' / ' . self::e(number_format($limit, 0, '.', ' ')) . '</span></span>';
     }
 
@@ -1613,7 +1613,7 @@ JS;
             . self::e(Session::csrf()) . '">' . $formError . $fields . $submit . '</form>';
         echo SiteChrome::start($title);
         echo '<main class="au" id="content"><div class="l"><div class="top">' . SiteChrome::logo()
-            . '<a class="btn btn-g" href="/" style="height:36px">მთავარი</a></div><div class="form"><div class="dl"><b>' . self::e($step) . '</b>' . self::e($crumb) . '</div><h1>'
+            . '<a class="btn btn-g btn-36" href="/">მთავარი</a></div><div class="form"><div class="dl"><b>' . self::e($step) . '</b>' . self::e($crumb) . '</div><h1>'
             . $heading . '</h1>' . ($sub !== '' ? '<p class="sub">' . $sub . '</p>' : '') . $form . $footer . '</div><div class="foot"><span>© '
             . date('Y') . ' შპს „ინოვა ლაბ“</span><a href="/terms">გამოყენების წესები</a><a href="/privacy">კონფიდენციალურობა</a>' . SiteChrome::themeButton() . '</div></div>'
             . $aside . '</main>';
@@ -1660,7 +1660,7 @@ JS;
         foreach ($navItems as [$href, $i, $label, $on]) {
             $nav .= '<a href="' . $href . '"' . ($on ? ' aria-current="page"' : '') . '>' . $icon($ic[$i]) . '<span>' . self::e($label) . '</span></a>';
         }
-        $nav .= '<div class="gr">ანგარიში</div><a href="/account#settings">' . $icon($ic['user']) . '<span>პარამეტრები</span></a><a href="/guide">' . $icon($ic['doc']) . '<span style="flex:1">დოკუმენტაცია</span></a>';
+        $nav .= '<div class="gr">ანგარიში</div><a href="/account#settings">' . $icon($ic['user']) . '<span>პარამეტრები</span></a><a href="/guide">' . $icon($ic['doc']) . '<span class="s-97445a">დოკუმენტაცია</span></a>';
         $tabs = '';
         $crumb = '<a href="/account#projects">პროექტები</a>';
         if ($project !== null) {
@@ -1683,11 +1683,11 @@ JS;
             . '<title>' . self::e($title) . ' — GeoAPI</title><link rel="icon" href="/favicon.ico" sizes="any"><link rel="icon" href="/assets/brand/favicon.svg" type="image/svg+xml">'
             . '<link rel="stylesheet" href="/assets/cabinet.css?v=20261022r4">' . $css . '</head><body class="cab ga">';
         echo '<div class="app"><aside class="side" id="side"><a class="logo" href="/"><img src="/assets/brand/geoapi-lockup-light.svg" alt="geoapi.ge" height="26"></a>'
-            . ($project === null ? '' : '<div class="proj"><span class="av">' . self::e($initial) . '</span><div style="flex:1;min-width:0;line-height:1.25"><div class="pn">' . self::e($name) . '</div><div class="xs mut">' . self::e($state) . '</div></div></div>')
+            . ($project === null ? '' : '<div class="proj"><span class="av">' . self::e($initial) . '</span><div class="s-dd6ec3"><div class="pn">' . self::e($name) . '</div><div class="xs mut">' . self::e($state) . '</div></div></div>')
             . '<nav class="nav" aria-label="პანელი">' . $nav . '</nav>'
-            . '<div class="me"><span class="av round">' . self::e($whoInitial) . '</span><div style="min-width:0;line-height:1.3"><div class="pn">' . self::e($who) . '</div><div class="xs mut" style="overflow:hidden;text-overflow:ellipsis">' . self::e($email) . '</div></div></div></aside>';
+            . '<div class="me"><span class="av round">' . self::e($whoInitial) . '</span><div class="s-24f19e"><div class="pn">' . self::e($who) . '</div><div class="xs mut s-7e56e5">' . self::e($email) . '</div></div></div></aside>';
         echo '<div class="main" id="content"><header class="top"><button class="btn menu" id="menu" type="button" aria-expanded="false" aria-controls="side" aria-label="მენიუ" data-menu-toggle>' . $icon($ic['menu']) . '</button><a class="mlogo" href="/"><img src="/assets/brand/geoapi-lockup-light.svg" alt="geoapi.ge" height="22" width="69"></a>'
-            . '<div class="crumb">' . $crumb . '</div><div class="who"><a class="hide-m" href="/guide" style="color:var(--ac);font-weight:500">დოკუმენტაცია</a></div></header>'
+            . '<div class="crumb">' . $crumb . '</div><div class="who"><a class="hide-m s-8d3abb" href="/guide">დოკუმენტაცია</a></div></header>'
             . '<div class="content lgc">' . ($project === null ? '' : '<div class="ph"><div><h2 class="h">' . self::e($name) . '</h2><p class="mono xs mut">' . self::e((string) ($project['website_url'] ?? '') ?: '—') . '</p></div><span class="bd ' . ($state === 'აქტიური' ? 'bd-ok' : 'bd-ne') . '"><i></i>' . self::e($state) . '</span></div>') . $tabs . $main . '</div></div></div>';
         echo '<script src="/assets/site.js?v=20261022a"></script><script src="/assets/menu.js?v=1"></script></body></html>';
     }
@@ -1714,10 +1714,10 @@ JS;
             . '<form method="post" action="/account/projects/' . $projectId . '"><input type="hidden" name="_csrf" value="' . self::e(Session::csrf())
             . '"><input type="hidden" name="action" value="save_origins"><div class="fld"><div class="lbl"><span>საიტის მისამართი</span></div><textarea class="inp" name="allowed_origins" aria-label="დაშვებული origin-ები">'
             . self::e($origins) . '</textarea></div><p class="hint">შენახვა ცვლის სრულ სიას. http დასაშვებია მხოლოდ localhost-ისა და 127.0.0.1-ისთვის.</p>' . $originError . '<button class="btn btn-g" type="submit">ცვლილებების შენახვა</button></form>'
-            . '<form method="post" action="/account/projects/' . $projectId . '" style="margin-top:12px"><input type="hidden" name="_csrf" value="' . self::e(Session::csrf())
+            . '<form method="post" action="/account/projects/' . $projectId . '" class="s-56f435"><input type="hidden" name="_csrf" value="' . self::e(Session::csrf())
             . '"><input type="hidden" name="action" value="set_widget"><input type="hidden" name="enabled" value="' . $toggle
             . '"><button class="btn btn-g" type="submit">' . self::e($toggleLabel) . '</button></form>'
-            . '<form method="post" action="/account/projects/' . $projectId . '" style="margin-top:12px"><input type="hidden" name="_csrf" value="' . self::e(Session::csrf())
+            . '<form method="post" action="/account/projects/' . $projectId . '" class="s-56f435"><input type="hidden" name="_csrf" value="' . self::e(Session::csrf())
             . '"><input type="hidden" name="action" value="rotate_widget"><button class="btn btn-g" type="submit">საჯარო გასაღების შეცვლა</button></form>'
             . '<p class="hint">საჯარო API გასაღების შეცვლის შემდეგ ძველი გასაღები აღარ იმუშავებს. ვიჯეტის ჩართვა ან გამორთვა ახალ გასაღებს არ ქმნის.</p>';
     }
@@ -1736,7 +1736,7 @@ JS;
         $snippet = '<script src="' . $base . '/widget/v1/geoapi-filter.js"></script>' . "\n" . '<geoapi-filter public-key="' . $key . '"></geoapi-filter>';
 
         return '<textarea class="inp mono" readonly id="embed-code">' . self::e($snippet) . '</textarea>'
-            . '<button class="btn btn-g" type="button" id="copy-embed" data-copy="embed-code" style="margin-top:12px">კოდის კოპირება</button>'
+            . '<button class="btn btn-g s-56f435" type="button" id="copy-embed" data-copy="embed-code">კოდის კოპირება</button>'
             . '<p class="hint">ჩაანაცვლება არ სჭირდება: public-key უკვე ამ პროექტის საჯარო API გასაღებია. <a href="/account/projects/' . $projectId . '/preview">წინასწარი ნახვა</a> იმავე თვიურ მოთხოვნების ლიმიტს იყენებს.</p>';
     }
 
@@ -1773,7 +1773,7 @@ JS;
             . '"><input type="hidden" name="action" value="' . self::e($name) . '">' . $hidden
             . '<div class="fld"><div class="lbl"><span>პროექტის სახელი</span></div><input class="inp" name="name" value="' . self::e((string) ($old['name'] ?? '')) . '" required aria-label="პროექტის სახელი"></div>' . $nameError
             . '<div class="fld"><div class="lbl"><span>საიტის მისამართი</span></div><input class="inp" name="website_url" value="' . self::e((string) ($old['website_url'] ?? '')) . '" placeholder="https://example.com" aria-label="საიტის მისამართი"></div>' . $webError
-            . '<button class="btn btn-l" type="submit" style="margin-top:16px">' . self::e($button) . '</button></form>';
+            . '<button class="btn btn-l s-1b0f49" type="submit">' . self::e($button) . '</button></form>';
     }
 
     private static function statusForm(int $id, string $current): string
@@ -1781,7 +1781,7 @@ JS;
         $status = $current === 'active' ? 'disabled' : 'active';
         $label = $status === 'disabled' ? 'გამორთვა' : 'ჩართვა';
 
-        return '<form method="post" action="/account" style="margin-top:12px"><input type="hidden" name="_csrf" value="' . self::e(Session::csrf())
+        return '<form method="post" action="/account" class="s-56f435"><input type="hidden" name="_csrf" value="' . self::e(Session::csrf())
             . '"><input type="hidden" name="action" value="set_project_status"><input type="hidden" name="project_id" value="' . $id
             . '"><input type="hidden" name="status" value="' . self::e($status) . '"><button class="btn btn-g" type="submit">' . self::e($label) . '</button></form>';
     }
@@ -1792,12 +1792,12 @@ JS;
         $nameError = isset($errors['name']) ? '<p class="hint err">' . self::e($errors['name']) . '</p>' : '';
         $expError = isset($errors['expires_at']) ? '<p class="hint err">' . self::e($errors['expires_at']) . '</p>' : '';
 
-        return '<form id="key-form" method="post" action="/account/projects/' . $projectId . '" style="margin-top:20px">'
+        return '<form id="key-form" method="post" action="/account/projects/' . $projectId . '" class="s-a26bda">'
             . '<input type="hidden" name="_csrf" value="' . self::e(Session::csrf()) . '"><input type="hidden" name="action" value="create_key">'
             . '<div class="fld"><div class="lbl"><span>გასაღების სახელი</span></div><input class="inp" name="name" value="' . self::e((string) ($old['name'] ?? '')) . '" required></div>' . $nameError
             . '<div class="fld"><div class="lbl"><span>ვადა</span></div><input class="inp" name="expires_at" value="' . self::e((string) ($old['expires_at'] ?? '')) . '" placeholder="არასავალდებულო, მომავალი თარიღი" aria-label="გასაღების ვადა"></div>' . $expError
             . '<p class="hint">ცარიელი ველი ნიშნავს, რომ გასაღებს ვადა არ აქვს. ეს ფორმა ქმნის საიდუმლო API გასაღებს სერვერული მოთხოვნებისთვის.</p>'
-            . '<button class="btn btn-l" type="submit" style="margin-top:16px">ახალი გასაღების შექმნა</button></form>';
+            . '<button class="btn btn-l s-1b0f49" type="submit">ახალი გასაღების შექმნა</button></form>';
     }
 
     private static function loginAside(): string
@@ -1860,7 +1860,7 @@ JS;
         $rows = '';
         foreach ($usage['days'] as $day) {
             $height = $max > 0 ? (int) round(($day['used'] / $max) * 100) : 0;
-            $bars .= '<span class="usage-col"><span class="usage-bar" style="height:' . $height . '%"><span class="usage-val">'
+            $bars .= '<span class="usage-col"><span class="usage-bar qh-' . $height . '"><span class="usage-val">'
                 . self::e($day['day'] . ', ' . $day['used']) . '</span></span></span>';
             $rows .= '<tr data-day="' . self::e($day['day']) . '"><td>' . self::e($day['day']) . '</td><td>' . $day['used'] . '</td></tr>';
         }

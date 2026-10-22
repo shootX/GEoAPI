@@ -9,7 +9,7 @@ final class SiteChrome
     public static function assets(): string
     {
         return '<link rel="stylesheet" href="/assets/fonts/fonts.css?v=20261018">'
-            . '<link rel="stylesheet" href="/assets/site.css?v=20261020r">';
+            . '<link rel="stylesheet" href="/assets/site.css?v=20261022s">';
     }
 
     public static function logo(string $href = '/'): string
@@ -86,7 +86,7 @@ final class SiteChrome
 
     public static function themeButton(): string
     {
-        return '<button class="btn btn-g" type="button" data-theme-toggle aria-label="ღია და მუქი რეჟიმის შეცვლა" style="width:40px;padding:0">'
+        return '<button class="btn btn-g btn-sq" type="button" data-theme-toggle aria-label="ღია და მუქი რეჟიმის შეცვლა">'
             . self::icon('sun') . '</button>';
     }
 
