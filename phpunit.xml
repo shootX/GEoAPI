@@ -19,6 +19,7 @@
     </source>
     <php>
         <env name="APP_ENV" value="testing"/>
+        <env name="APP_URL" value="http://localhost" force="true"/>
         <env name="APP_LOCALE" value="ka"/>
         <env name="APP_FALLBACK_LOCALE" value="en"/>
         <env name="HASH_DRIVER" value="argon2id"/>
