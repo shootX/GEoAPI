@@ -1,150 +1,87 @@
 <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
 <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    @php
-        $seo = $seo ?? [];
-        $canonical = $seo['canonical'] ?? url()->current();
-        $hreflang = $seo['hreflang'] ?? ['ka' => url('/ka'), 'en' => url('/en'), 'x-default' => url('/')];
-        $ogImage = $seo['image'] ?? asset('assets/brand/apple-touch-icon.png');
-        $ogType = $seo['type'] ?? 'website';
-        $twitterCard = $seo['card'] ?? 'summary';
-    @endphp
-    <title>{{ $title ?? 'GeoAPI' }}</title>
-    @if (!empty($description))
-        <meta name="description" content="{{ $description }}">
-    @endif
-    @if (!empty($robots))
-        <meta name="robots" content="{{ $robots }}">
-    @endif
-    <link rel="icon" href="{{ asset('favicon.ico') }}" sizes="any">
-    <link rel="icon" href="{{ asset('assets/brand/favicon-32.png') }}" type="image/png" sizes="32x32">
-    <link rel="icon" href="{{ asset('assets/brand/favicon-16.png') }}" type="image/png" sizes="16x16">
-    <link rel="apple-touch-icon" href="{{ asset('assets/brand/apple-touch-icon-180.png') }}">
-    <link rel="canonical" href="{{ $canonical }}">
-    @foreach ($hreflang as $lang => $href)
-        <link rel="alternate" hreflang="{{ $lang }}" href="{{ $href }}">
-    @endforeach
-    <meta property="og:title" content="{{ $title ?? 'GeoAPI' }}">
-    @if (!empty($description))
-        <meta property="og:description" content="{{ $description }}">
-        <meta name="twitter:description" content="{{ $description }}">
-    @endif
-    <meta property="og:url" content="{{ $canonical }}">
-    <meta property="og:type" content="{{ $ogType }}">
-    <meta property="og:image" content="{{ $ogImage }}">
-    <meta name="twitter:card" content="{{ $twitterCard }}">
-    <meta name="twitter:title" content="{{ $title ?? 'GeoAPI' }}">
-    <link rel="stylesheet" href="{{ asset('assets/public-design.css') }}?v=20261021toc">
-    <x-electrik::brand-styles />
-    @vite(['resources/css/app.css', 'resources/js/app.js'])
-    <style>
-        article section { border: 1px solid var(--slate-border, #d7e7df); border-radius: 0.75rem; padding: 1.25rem; background: #fff; }
-        article h1 { font-size: 1.875rem; font-weight: 800; letter-spacing: -0.02em; color: #091413; }
-        article h2 { margin-top: 1rem; font-size: 1.05rem; font-weight: 600; }
-        article p, article li { margin-top: 0.75rem; color: var(--slate-muted-foreground, #3d564c); }
-        article a { text-decoration: underline; text-underline-offset: 4px; }
-        article table { width: 100%; margin-top: 0.75rem; border-collapse: collapse; }
-        article th, article td { padding: 0.45rem 0.75rem 0.45rem 0; text-align: left; vertical-align: top; }
-        article code { font-size: 0.85em; }
-    </style>
+@include('components.layouts.partials.head')
 </head>
 @php
     $showBlog = \Illuminate\Support\Facades\Schema::hasTable('blog_posts')
         && \App\Models\BlogPost::query()->visible()->exists();
     $homeNav = ! empty($home ?? null);
+    $en = app()->getLocale() === 'en';
+    $active = $active ?? '';
+    // "Integrations" is a Proposed screen (phase 5) and stays out of the nav until it ships.
     $nav = [
-        ['href' => $homeNav ? '#features' : url('/').'#features', 'label' => __('Features')],
-        ['href' => $homeNav ? '#how' : url('/').'#how', 'label' => __('How it works')],
-        ['href' => $homeNav ? '#pricing' : route('pricing'), 'label' => __('Pricing')],
-        ['href' => url('/demo'), 'label' => __('Demo')],
-        ['href' => url('/guide'), 'label' => __('Documentation')],
+        ['key' => 'docs', 'href' => url('/guide'), 'label' => $en ? 'Documentation' : 'დოკუმენტაცია'],
+        ['key' => 'pricing', 'href' => route('pricing'), 'label' => $en ? 'Pricing' : 'ტარიფები'],
+        ['key' => 'demo', 'href' => url('/demo'), 'label' => $en ? 'Demo' : 'დემო'],
     ];
     if ($showBlog) {
-        $nav[] = ['href' => url('/blog'), 'label' => __('Blog')];
+        $nav[] = ['key' => 'blog', 'href' => url('/blog'), 'label' => $en ? 'Blog' : 'ბლოგი'];
     }
+    $slogan = $en ? 'Brands, models, generations and specifications — one API.' : 'ბრენდები, მოდელები, თაობები და სპეციფიკაციები — ერთი API-ით.';
 @endphp
-<body class="site min-h-screen text-foreground antialiased {{ $homeNav ? 'is-home' : '' }}">
-    @if ($homeNav)
-        {{ $slot }}
-    @else
-    <div class="flex min-h-screen flex-col">
-        <header class="site-header {{ $homeNav ? 'is-overlay' : 'is-solid' }}">
-            <div class="m-wrap">
-                <a class="m-logo" href="{{ url('/') }}"><img class="logo-full" src="{{ asset('assets/brand/geoapi-lockup.png') }}" alt="geoapi.ge" height="36"><img class="logo-mark" src="{{ asset('assets/brand/geoapi-mark-light.png') }}" alt="" height="32"></a>
-                <nav class="m-nav" aria-label="{{ __('Menu') }}">
-                    @foreach ($nav as $item)
-                        <a href="{{ $item['href'] }}">{{ $item['label'] }}</a>
-                    @endforeach
-                    @auth
-                        <a href="{{ url('/account') }}">{{ __('Cabinet') }}</a>
-                    @else
-                        <a href="{{ route('login') }}">{{ __('Sign in') }}</a>
-                    @endauth
-                </nav>
-                <nav class="m-lang" aria-label="{{ __('Language') }}">
-                    <a href="{{ route('locale.switch', 'ka') }}" @if (app()->getLocale() === 'ka') aria-current="true" @endif>KA</a>
-                    <span aria-hidden="true">/</span>
-                    <a href="{{ route('locale.switch', 'en') }}" @if (app()->getLocale() === 'en') aria-current="true" @endif>EN</a>
-                </nav>
-                @guest
-                    <a class="m-cta" href="{{ route('register') }}">{{ __('Free account') }}</a>
-                @endguest
-                <button type="button" class="m-menu" aria-expanded="false" aria-controls="site-menu" data-nav-toggle>{{ __('Menu') }}</button>
-            </div>
-            <nav id="site-menu" hidden>
+<body class="site ga min-h-screen antialiased {{ $homeNav ? 'is-home' : '' }}">
+    <header class="hd">
+        <div class="wrap">
+            <a href="{{ url('/') }}" aria-label="GeoAPI.ge"><img src="{{ asset('assets/brand/geoapi-lockup-light.svg') }}" alt="geoapi.ge" style="height:30px;display:block" width="134" height="30"></a>
+            <nav class="nav" aria-label="{{ __('Menu') }}">
                 @foreach ($nav as $item)
-                    <a href="{{ $item['href'] }}">{{ $item['label'] }}</a>
+                    <a href="{{ $item['href'] }}" class="{{ $active === $item['key'] ? 'on' : '' }}" @if ($active === $item['key']) aria-current="page" @endif>{{ $item['label'] }}</a>
                 @endforeach
-                @auth
-                    <a href="{{ url('/account') }}">{{ __('Cabinet') }}</a>
-                @else
-                    <a href="{{ route('login') }}">{{ __('Sign in') }}</a>
-                    <a href="{{ route('register') }}">{{ __('Free account') }}</a>
-                @endauth
             </nav>
-        </header>
-        <main class="site-main mx-auto w-full min-w-0 max-w-6xl flex-1 px-4 py-12 sm:px-6 md:py-16 {{ !empty($bleed) ? 'is-bleed' : '' }}">
-            @if (session('coming_soon_saved'))
-                <p class="mb-6 rounded-2xl border border-[#d7e7df] bg-white px-4 py-3 text-sm">{{ __('Thanks. We will write when Pro opens.') }}</p>
-            @endif
-            {{ $slot }}
-        </main>
-        <footer class="site-footer">
-            <div class="m-wrap">
-                <div class="footer-grid">
-                    <div>
-                        <a class="m-logo" href="{{ url('/') }}"><img src="{{ asset('assets/brand/geoapi-lockup.png') }}" alt="geoapi.ge" height="36"></a>
-                        <p style="margin-top:10px">{{ __('Vehicle catalog API.') }}</p>
-                    </div>
-                    <div>
-                        <h3>{{ __('Product') }}</h3>
-                        <a href="{{ url('/') }}#features">{{ __('Features') }}</a>
-                        <a href="{{ url('/') }}#how">{{ __('How it works') }}</a>
-                        <a href="{{ route('pricing') }}">{{ __('Pricing') }}</a>
-                    </div>
-                    <div>
-                        <h3>{{ __('Documentation') }}</h3>
-                        <a href="{{ url('/demo') }}">{{ __('Demo') }}</a>
-                        <a href="{{ url('/guide') }}">{{ __('Documentation') }}</a>
-                        <a href="{{ url('/') }}#faq">{{ __('Questions') }}</a>
-                    </div>
-                    <div>
-                        <h3>{{ __('Contact') }}</h3>
-                        <a href="mailto:hello@geoapi.ge">hello@geoapi.ge</a>
-                        <a href="{{ url('/privacy') }}">{{ __('Privacy') }}</a>
-                        <a href="{{ url('/terms') }}">{{ __('Terms') }}</a>
-                        @if ($showBlog)
-                            <a href="{{ url('/blog') }}">{{ __('Blog') }}</a>
-                        @endif
-                    </div>
-                </div>
-                <p class="legal">© {{ date('Y') }} GeoAPI</p>
+            <div class="hd-r">
+                <span class="seg hide-m" style="padding:3px" aria-label="{{ __('Language') }}">
+                    <a href="{{ route('locale.switch', 'ka') }}" class="{{ $en ? '' : 'on' }}" @unless ($en) aria-current="true" @endunless>KA</a>
+                    <a href="{{ route('locale.switch', 'en') }}" class="{{ $en ? 'on' : '' }}" @if ($en) aria-current="true" @endif>EN</a>
+                </span>
+                @auth
+                    <a class="btn b-pri hide-m" href="{{ url('/account') }}">{{ $en ? 'Cabinet' : 'კაბინეტი' }}</a>
+                @else
+                    <a class="btn b-gh hide-m" href="{{ route('login') }}">{{ $en ? 'Sign in' : 'შესვლა' }}</a>
+                    <a class="btn b-pri hide-m" href="{{ route('register') }}">{{ $en ? 'Start free' : 'დაიწყე უფასოდ' }}</a>
+                @endauth
+                <button type="button" class="burger" aria-expanded="false" aria-controls="site-menu" aria-label="{{ __('Menu') }}" data-nav-toggle><x-ga.icon name="menu" :size="24" /></button>
             </div>
-        </footer>
-    </div>
-    @endif
+        </div>
+    </header>
+    <nav id="site-menu" class="m-menu" hidden>
+        <div class="wrap">
+            @foreach ($nav as $item)
+                <a href="{{ $item['href'] }}">{{ $item['label'] }}</a>
+            @endforeach
+            @auth
+                <a href="{{ url('/account') }}">{{ $en ? 'Cabinet' : 'კაბინეტი' }}</a>
+            @else
+                <a href="{{ route('login') }}">{{ $en ? 'Sign in' : 'შესვლა' }}</a>
+                <a class="btn b-pri" style="justify-content:center;margin-top:6px;color:#fff" href="{{ route('register') }}">{{ $en ? 'Start free' : 'დაიწყე უფასოდ' }}</a>
+            @endauth
+            <span class="seg" style="padding:3px;margin-top:8px;align-self:flex-start">
+                <a href="{{ route('locale.switch', 'ka') }}" class="{{ $en ? '' : 'on' }}">KA</a>
+                <a href="{{ route('locale.switch', 'en') }}" class="{{ $en ? 'on' : '' }}">EN</a>
+            </span>
+        </div>
+    </nav>
+    <main class="site-main {{ !empty($bleed) || $homeNav ? 'is-bleed' : 'wrap' }}" style="{{ !empty($bleed) || $homeNav ? '' : 'padding-block:56px 96px' }}">
+        @if (session('coming_soon_saved'))
+            <p class="al al-ok" style="margin-bottom:24px">{{ __('Thanks. We will write when Pro opens.') }}</p>
+        @endif
+        {{ $slot }}
+    </main>
+    <footer class="ft">
+        <div class="wrap">
+            <div>
+                <img src="{{ asset('assets/brand/geoapi-lockup-light.svg') }}" alt="geoapi.ge" style="height:28px" width="125" height="28">
+                <p class="sm mut" style="margin-top:10px;max-width:300px">{{ $slogan }}</p>
+                <p class="sm" style="margin-top:12px"><a href="mailto:hello@geoapi.ge" style="color:var(--ac)">hello@geoapi.ge</a></p>
+            </div>
+            <div class="cols">
+                <div><b>{{ $en ? 'Product' : 'პროდუქტი' }}</b><a href="{{ route('pricing') }}">{{ $en ? 'Pricing' : 'ტარიფები' }}</a><a href="{{ url('/demo') }}">{{ $en ? 'Demo' : 'დემო' }}</a></div>
+                <div><b>{{ $en ? 'Developers' : 'დეველოპერებს' }}</b><a href="{{ url('/guide') }}">{{ $en ? 'Documentation' : 'დოკუმენტაცია' }}</a><a href="{{ url('/api/v1/docs') }}">API reference</a><a href="{{ url('/api/v1/openapi.json') }}">OpenAPI JSON</a><a href="{{ url('/api/v1/postman.json') }}">Postman</a></div>
+                <div><b>{{ $en ? 'Company' : 'კომპანია' }}</b>@if ($showBlog)<a href="{{ url('/blog') }}">{{ $en ? 'Blog' : 'ბლოგი' }}</a>@endif<a href="{{ url('/terms') }}">{{ $en ? 'Terms' : 'წესები' }}</a><a href="{{ url('/privacy') }}">{{ $en ? 'Privacy' : 'კონფიდენციალურობა' }}</a></div>
+            </div>
+        </div>
+        <div class="wrap xs mut" style="margin-top:28px;display:flex;justify-content:space-between"><span>© {{ date('Y') }} GeoAPI.ge</span><span>KA · EN</span></div>
+    </footer>
     <script>
         (function () {
             var toggle = document.querySelector('[data-nav-toggle]');

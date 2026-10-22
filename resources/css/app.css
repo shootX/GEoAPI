@@ -6,6 +6,8 @@
 @source '../**/*.blade.php';
 @source '../**/*.js';
 
+@import './geoapi-design.css';
+
 @font-face {
     font-family: "FiraGO";
     font-style: normal;
@@ -47,107 +49,127 @@
 }
 
 @font-face {
-    font-family: "Noto Sans Georgian";
+    font-family: "JetBrains Mono";
     font-style: normal;
-    font-weight: 400 700;
+    font-weight: 400 600;
     font-display: swap;
-    src: url("/assets/fonts/noto/noto-sans-georgian-georgian-400.woff2") format("woff2");
-    unicode-range: U+0589, U+10A0-10FF, U+1C90-1CBA, U+1CBD-1CBF, U+205A, U+2D00-2D2F, U+2E31;
+    src: url("../fonts/jetbrains-mono-400.woff2") format("woff2");
 }
 
-@font-face {
-    font-family: "Noto Sans Georgian";
-    font-style: normal;
-    font-weight: 400 700;
-    font-display: swap;
-    src: url("/assets/fonts/noto/noto-sans-georgian-latin-ext-400.woff2") format("woff2");
-    unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C4, U+2113, U+2C60-2C7F, U+A720-A7FF;
+/* Design tokens: geoapi-handoff/design-system/tokens.css (Indigo Premium, 2026-10-22) */
+/* ---------- 2. Tailwind @theme (utilities: bg-surface, text-ink, border-line …) ---------- */
+@theme inline {
+  --font-sans: "FiraGO", "Fira Sans", ui-sans-serif, system-ui, sans-serif;   /* Noto Sans Georgian removed */
+  --font-mono: "JetBrains Mono", "FiraGO", ui-monospace, monospace;
+
+  --color-bg: var(--ga-bg);
+  --color-surface: var(--ga-surface);
+  --color-surface-2: var(--ga-surface-2);
+  --color-ink: var(--ga-ink);
+  --color-ink-2: var(--ga-ink-2);
+  --color-ink-3: var(--ga-ink-3);
+  --color-line: var(--ga-line);
+  --color-line-strong: var(--ga-line-strong);
+  --color-accent: var(--ga-accent);
+  --color-accent-hover: var(--ga-accent-hover);
+  --color-accent-soft: var(--ga-accent-soft);
+  --color-lavender: var(--ga-lavender);
+  --color-success: var(--ga-success);
+  --color-success-soft: var(--ga-success-soft);
+  --color-warning: var(--ga-warning);
+  --color-warning-soft: var(--ga-warning-soft);
+  --color-error: var(--ga-error);
+  --color-error-soft: var(--ga-error-soft);
+  --color-neutral-soft: var(--ga-neutral-soft);
+  --color-proposed: var(--ga-proposed);
+  --color-admin: var(--ga-admin);
+
+  /* type scale (px / line-height) — 4px baseline */
+  --text-display: 3.25rem;  --text-display--line-height: 1.1;  --text-display--letter-spacing: -0.02em;
+  --text-h1: 2.25rem;       --text-h1--line-height: 1.2;       --text-h1--letter-spacing: -0.015em;
+  --text-h2: 1.75rem;       --text-h2--line-height: 1.25;
+  --text-h3: 1.25rem;       --text-h3--line-height: 1.4;
+  --text-h4: 1rem;          --text-h4--line-height: 1.5;
+  --text-body: 1rem;        --text-body--line-height: 1.6;
+  --text-sm: 0.875rem;      --text-sm--line-height: 1.5;
+  --text-xs: 0.75rem;       --text-xs--line-height: 1.4;
+  --text-code: 0.8125rem;   --text-code--line-height: 1.7;
+
+  --radius-xs: 6px; --radius-sm: 8px; --radius-md: 10px; --radius-lg: 14px; --radius-xl: 20px; --radius-pill: 999px;
+
+  --shadow-1: 0 1px 2px rgb(15 14 42 / .05);
+  --shadow-2: 0 1px 3px rgb(15 14 42 / .06), 0 8px 24px rgb(15 14 42 / .06);
+  --shadow-3: 0 12px 40px rgb(15 14 42 / .14), 0 2px 8px rgb(15 14 42 / .06);
+  --shadow-focus: 0 0 0 3px rgb(67 56 202 / .28);
+
+  --breakpoint-sm: 640px; --breakpoint-md: 768px; --breakpoint-lg: 1024px; --breakpoint-xl: 1280px; --breakpoint-2xl: 1440px;
+  --container-page: 1200px; --container-app: 1280px; --container-prose: 720px;
 }
 
-@font-face {
-    font-family: "Noto Sans Georgian";
-    font-style: normal;
-    font-weight: 400 700;
-    font-display: swap;
-    src: url("/assets/fonts/noto/noto-sans-georgian-latin-400.woff2") format("woff2");
-    unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+/* ---------- 3. Light (default) — LOCKED Indigo Premium ---------- */
+:root{
+  --ga-bg:#F7F7FB; --ga-surface:#FFFFFF; --ga-surface-2:#FBFBFE;
+  --ga-ink:#0F0E2A; --ga-ink-2:#4A4866; --ga-ink-3:#6E6B8A;         /* ink-3: 4.9:1 on white, meta only */
+  --ga-line:#E4E3EE; --ga-line-strong:#C9C7DA; --ga-input:#8E8BA8;   /* input border 3.3:1 (non-text AA) */
+  --ga-accent:#4338CA; --ga-accent-hover:#3730A3; --ga-accent-soft:#ECEBFB; --ga-lavender:#A5A0F0;
+  --ga-success:#1F6B45; --ga-success-soft:#E6F2EC;
+  --ga-warning:#8A5300; --ga-warning-soft:#FBF1E1;
+  --ga-error:#B3261E;   --ga-error-soft:#FBEAE8;
+  --ga-neutral-soft:#EFEEF4;
+  --ga-proposed:#8A5300;                                              /* dashed amber marker, never accent */
+  --ga-admin:#0F0E2A;                                                 /* admin sidebar = ink, user sidebar = white */
+
+  /* Electrik / slate mapping (existing names) */
+  --slate-radius:.625rem;
+  --slate-background:var(--ga-bg); --slate-foreground:var(--ga-ink);
+  --slate-card:var(--ga-surface); --slate-card-foreground:var(--ga-ink);
+  --slate-popover:var(--ga-surface); --slate-popover-foreground:var(--ga-ink);
+  --slate-primary:var(--ga-accent); --slate-primary-foreground:#FFFFFF;
+  --slate-secondary:var(--ga-accent-soft); --slate-secondary-foreground:var(--ga-ink);
+  --slate-muted:var(--ga-neutral-soft); --slate-muted-foreground:var(--ga-ink-2);
+  --slate-accent:var(--ga-accent-soft); --slate-accent-foreground:var(--ga-ink);
+  --slate-destructive:var(--ga-error); --slate-destructive-foreground:#FFFFFF;
+  --slate-success:var(--ga-success); --slate-success-foreground:#FFFFFF;
+  --slate-warning:var(--ga-warning); --slate-warning-foreground:#FFFFFF;
+  --slate-info:var(--ga-accent); --slate-info-foreground:#FFFFFF;
+  --slate-border:var(--ga-line); --slate-input:var(--ga-input); --slate-ring:var(--ga-accent);
+  /* user cabinet sidebar: light */
+  --slate-sidebar:var(--ga-surface); --slate-sidebar-foreground:var(--ga-ink-2);
+  --slate-sidebar-accent:var(--ga-accent-soft); --slate-sidebar-accent-foreground:var(--ga-accent);
+  --slate-sidebar-border:var(--ga-line); --slate-sidebar-ring:var(--ga-accent);
+  --brand-accent:var(--ga-accent);
+}
+/* admin shell: dark ink sidebar to separate it visually from the user cabinet */
+[data-area="admin"]{
+  --slate-sidebar:#0F0E2A; --slate-sidebar-foreground:#C9C7E8;
+  --slate-sidebar-accent:#1E1C45; --slate-sidebar-accent-foreground:#A5A0F0;
+  --slate-sidebar-border:#22204A; --slate-sidebar-ring:#A5A0F0;
+}
+/* public-design.css aliases (old green names → indigo) */
+.site{
+  --ink:var(--ga-ink); --pine:var(--ga-accent); --leaf:var(--ga-accent-hover); --mint:var(--ga-accent-soft);
+  --paper:var(--ga-surface); --wash:var(--ga-bg); --line:var(--ga-line); --muted:var(--ga-ink-2);
+  --shadow:0 1px 3px rgb(15 14 42/.06),0 8px 24px rgb(15 14 42/.06); --radius:14px;
+  --border:var(--ga-line); --foreground:var(--ga-ink); --muted-foreground:var(--ga-ink-2); --background:var(--ga-bg);
+  background:var(--ga-bg); color:var(--ga-ink);
 }
 
-@theme {
-    --font-sans: "Noto Sans Georgian", "FiraGO", "Fira Sans", ui-sans-serif, system-ui, sans-serif;
+/* ---------- 4. Dark — prepared, NOT shipped in phase 1 ---------- */
+.dark{
+  --ga-bg:#0B0A1F; --ga-surface:#141331; --ga-surface-2:#1A1940;
+  --ga-ink:#F3F2FA; --ga-ink-2:#B9B6D3; --ga-ink-3:#8E8BA8;
+  --ga-line:#26244F; --ga-line-strong:#36346A; --ga-input:#5A5786;
+  --ga-accent:#A5A0F0; --ga-accent-hover:#C2BEF6; --ga-accent-soft:#1E1C45; --ga-lavender:#A5A0F0;
+  --ga-success:#7CCFA3; --ga-success-soft:#123325; --ga-warning:#F0B862; --ga-warning-soft:#33240C;
+  --ga-error:#F28B82; --ga-error-soft:#3A1715; --ga-neutral-soft:#1E1D3D;
+  --slate-primary-foreground:#0F0E2A; --slate-destructive-foreground:#0F0E2A;
 }
 
-:root,
-.light {
-    --slate-radius: 0.9rem;
-    --slate-background: #f4faf7;
-    --slate-foreground: #091413;
-    --slate-card: #ffffff;
-    --slate-card-foreground: #091413;
-    --slate-popover: #ffffff;
-    --slate-popover-foreground: #091413;
-    --slate-primary: #285A48;
-    --slate-primary-foreground: #f4faf7;
-    --slate-secondary: #e7f5ee;
-    --slate-secondary-foreground: #091413;
-    --slate-muted: #e7f5ee;
-    --slate-muted-foreground: #3d564c;
-    --slate-accent: #e7f5ee;
-    --slate-accent-foreground: #091413;
-    --slate-destructive: #d1264a;
-    --slate-destructive-foreground: #ffffff;
-    --slate-success: #0e8a4a;
-    --slate-success-foreground: #ffffff;
-    --slate-warning: #a16207;
-    --slate-warning-foreground: #ffffff;
-    --slate-info: #1d4ed8;
-    --slate-info-foreground: #ffffff;
-    --slate-border: #d7e7df;
-    --slate-input: #8aa89a;
-    --slate-ring: #285A48;
-    --slate-sidebar: #091413;
-    --slate-sidebar-foreground: #d7efe4;
-    --slate-sidebar-accent: #13261f;
-    --slate-sidebar-accent-foreground: #B0E4CC;
-    --slate-sidebar-border: #1e3a30;
-    --slate-sidebar-ring: #408A71;
-    --brand-accent: #285A48;
-}
-
-.dark {
-    --slate-background: #091413;
-    --slate-foreground: #f4faf7;
-    --slate-card: #10211c;
-    --slate-card-foreground: #f4faf7;
-    --slate-popover: #10211c;
-    --slate-popover-foreground: #f4faf7;
-    --slate-primary: #B0E4CC;
-    --slate-primary-foreground: #091413;
-    --slate-secondary: #13261f;
-    --slate-secondary-foreground: #f4faf7;
-    --slate-muted: #13261f;
-    --slate-muted-foreground: #B0E4CC;
-    --slate-accent: #13261f;
-    --slate-accent-foreground: #f4faf7;
-    --slate-destructive: #fb7185;
-    --slate-destructive-foreground: #091413;
-    --slate-success: #4ade80;
-    --slate-success-foreground: #052e16;
-    --slate-warning: #fbbf24;
-    --slate-warning-foreground: #091413;
-    --slate-info: #93c5fd;
-    --slate-info-foreground: #091413;
-    --slate-border: #1e3a30;
-    --slate-input: #1e3a30;
-    --slate-ring: #408A71;
-    --slate-sidebar: #06100e;
-    --slate-sidebar-foreground: #f4faf7;
-    --slate-sidebar-accent: #13261f;
-    --slate-sidebar-accent-foreground: #B0E4CC;
-    --slate-sidebar-border: #1e3a30;
-    --slate-sidebar-ring: #408A71;
-    --brand-accent: #B0E4CC;
-}
+/* ---------- 5. Base ---------- */
+html{font-family:var(--font-sans);font-feature-settings:"tnum" 0;-webkit-font-smoothing:antialiased}
+.tabular,td.num{font-variant-numeric:tabular-nums}
+:focus-visible{outline:2px solid var(--ga-accent);outline-offset:2px}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
 
 body:has([data-slot="app-shell"]) {
     background: var(--slate-card);
@@ -177,39 +199,15 @@ html,
 }
 
 .site {
-    background: #f4faf7;
-    color: #091413;
     font-size: 16px;
     line-height: 1.6;
-    --border: #d7e7df;
-    --foreground: #091413;
-    --muted-foreground: #3d564c;
-    --background: #f4faf7;
-    --slate-background: #f4faf7;
-    --slate-foreground: #091413;
-    --slate-card: #ffffff;
-    --slate-card-foreground: #091413;
-    --slate-primary: #285A48;
-    --slate-primary-foreground: #f4faf7;
-    --slate-secondary: #e7f5ee;
-    --slate-secondary-foreground: #091413;
-    --slate-muted: #e7f5ee;
-    --slate-muted-foreground: #3d564c;
-    --slate-accent: #e7f5ee;
-    --slate-accent-foreground: #091413;
-    --slate-border: #d7e7df;
-    --slate-input: #5d7a6e;
-    --slate-ring: #285A48;
-    --color-background: #f4faf7;
-    --color-primary: #285A48;
-    --color-primary-foreground: #f4faf7;
-    --color-foreground: #091413;
-    --color-muted-foreground: #3d564c;
-    --color-accent: #e7f5ee;
-    --color-accent-foreground: #091413;
-    --color-border: #d7e7df;
+    --color-background: var(--ga-bg);
+    --color-primary: var(--ga-accent);
+    --color-primary-foreground: #ffffff;
+    --color-foreground: var(--ga-ink);
+    --color-muted-foreground: var(--ga-ink-2);
+    --color-border: var(--ga-line);
     --color-card: #ffffff;
-    --brand-accent: #285A48;
 }
 
 .site a.accent {
