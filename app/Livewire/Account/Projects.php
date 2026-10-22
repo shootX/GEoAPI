@@ -5,6 +5,10 @@ declare(strict_types=1);
 namespace App\Livewire\Account;
 
 use App\Access\LegacyGate;
+use App\Billing\V2\Flag;
+use App\Billing\V2\Gate;
+use App\Billing\V2\ProjectLimitReached;
+use App\Billing\V2\Workspace;
 use Carapi\Platform\ApiKeys;
 use Carapi\Platform\Connection;
 use Carapi\Platform\ProjectRepository;
@@ -30,6 +34,8 @@ final class Projects extends Component
 
     public ?int $projectId = null;
 
+    public string $capInput = '';
+
     public function mount(): void
     {
         $snap = $this->snapshot();
@@ -53,7 +59,13 @@ final class Projects extends Component
                 return;
             }
         }
-        $id = (new ProjectRepository(Connection::pdo()))->insert($legacyId, $name, $website === '' ? null : $website);
+        try {
+            $id = (new ProjectRepository(Connection::pdo()))->insert($legacyId, $name, $website === '' ? null : $website);
+        } catch (ProjectLimitReached $e) {
+            $this->addError('name', $e->getMessage());
+
+            return;
+        }
         $this->projectId = $id;
         $this->reset('name', 'website_url');
         $this->dispatch('screen', name: 'projects');
@@ -119,6 +131,26 @@ final class Projects extends Component
         $this->reset('key_name');
     }
 
+    public function setCap(): void
+    {
+        if (! Flag::on() || $this->projectId === null) {
+            return;
+        }
+        $raw = trim($this->capInput);
+        if ($raw !== '' && preg_match('/^[1-9][0-9]{0,8}$/', $raw) !== 1) {
+            $this->addError('capInput', app()->getLocale() === 'en' ? 'Enter a whole number, or leave it empty to clear the cap.' : 'ჩაწერეთ მთელი რიცხვი, ან დატოვეთ ცარიელი ზღვრის მოსახსნელად.');
+
+            return;
+        }
+        $ok = Gate::setCap($this->legacyId(), (int) $this->projectId, $raw === '' ? null : (int) $raw);
+        if (! $ok) {
+            $this->addError('capInput', app()->getLocale() === 'en' ? 'That cap was not saved.' : 'ზღვარი ვერ შეინახა.');
+
+            return;
+        }
+        session()->flash('billing', app()->getLocale() === 'en' ? 'The project cap was saved.' : 'პროექტის ზღვარი შეინახა.');
+    }
+
     public function revokeKey(int $keyId): void
     {
         if ($this->projectId === null) {
@@ -155,6 +187,7 @@ final class Projects extends Component
             'activeKeys' => 0,
             'cars' => [],
             'usageById' => [],
+            'v2' => null,
         ];
         if (filter_var(env('CARAPI_CABINET_DEMO', false), FILTER_VALIDATE_BOOL)) {
             return $this->demoSnapshot($base);
@@ -212,6 +245,29 @@ final class Projects extends Component
         }
         $base['widget'] = $widget;
         $base['activeKeys'] = $active;
+        if (Flag::on()) {
+            try {
+                $v2 = Workspace::present($this->legacyId());
+            } catch (\Throwable) {
+                $v2 = null;
+            }
+            if (is_array($v2) && ! empty($v2['shared'])) {
+                $base['v2'] = $v2;
+                $base['used'] = (int) $v2['used'];
+                $base['limit'] = (int) $v2['quota'];
+                $base['remaining'] = (int) $v2['remaining'];
+                $base['perMinute'] = (int) $v2['rpm'];
+                $base['unlimited'] = false;
+                foreach ($v2['projects'] as $pid => $row) {
+                    $base['usageById'][(int) $pid] = [
+                        'used' => (int) $row['used'],
+                        'limit' => $row['cap'] ?? (int) $v2['quota'],
+                        'per_minute' => (int) $v2['rpm'],
+                        'unlimited' => false,
+                    ];
+                }
+            }
+        }
 
         return $base;
     }

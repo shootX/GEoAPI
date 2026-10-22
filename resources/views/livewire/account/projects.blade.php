@@ -7,6 +7,9 @@
     }
     $quota = $limit > 0 ? min(100, round(($used / $limit) * 100, 1)) : 0;
     $plan = ! empty($unlimited) ? 'Premium' : ((int) $limit === 2000 ? 'Basic' : ((int) $limit === 100 ? 'Free' : 'Legacy'));
+    if (! empty($v2['label'])) {
+        $plan = (string) $v2['label'];
+    }
     $planBd = $plan === 'Legacy' ? 'bd-ne' : ($plan === 'Free' ? 'bd-out' : 'bd-ac');
     $who = (string) ($project['name'] ?? ($en ? 'Project' : 'პროექტი'));
     $me = auth()->user();
@@ -56,9 +59,9 @@
                     <div class="row" style="justify-content:space-between;margin-bottom:14px"><h2 style="margin:0">{{ $en ? 'Plan' : 'გეგმა' }}</h2><span class="bd {{ $planBd }}">{{ $plan }}</span></div>
                     <div class="row" style="justify-content:space-between;margin-bottom:8px"><span style="font-weight:500">{{ $en ? 'Monthly quota' : 'თვიური კვოტა' }}</span><span class="mono sm"><b>{{ $fmt($used) }}</b> <span class="mut">/ {{ ! empty($unlimited) ? '∞' : $fmt($limit) }}</span></span></div>
                     <div class="quota" aria-label="{{ $fmt($used) }} / {{ $fmt($limit) }}"><span style="width: {{ ! empty($unlimited) ? 0 : $quota }}%"></span></div>
-                    <p class="muted" style="margin-top:8px">@if (! empty($unlimited)){{ $en ? $fmt($used).' successful requests. Unlimited for this project.' : $fmt($used).' წარმატებული მოთხოვნა. ამ პროექტზე შეუზღუდავია.' }}@else{{ $en ? $fmt($used).' successful requests of '.$fmt($limit).'. '.$plan.' plan, per project.' : $fmt($used).' წარმატებული მოთხოვნა '.$fmt($limit).'-დან. '.$plan.' გეგმა, პროექტზე.' }}@endif</p>
+                    <p class="muted" style="margin-top:8px">@if (! empty($v2)){{ $en ? $fmt($used).' successful requests of '.$fmt($limit).'. Shared by the projects on this account.' : $fmt($used).' წარმატებული მოთხოვნა '.$fmt($limit).'-დან. ანგარიშის პროექტები ერთ კვოტას იყოფენ.' }}@elseif (! empty($unlimited)){{ $en ? $fmt($used).' successful requests. Unlimited for this project.' : $fmt($used).' წარმატებული მოთხოვნა. ამ პროექტზე შეუზღუდავია.' }}@else{{ $en ? $fmt($used).' successful requests of '.$fmt($limit).'. '.$plan.' plan, per project.' : $fmt($used).' წარმატებული მოთხოვნა '.$fmt($limit).'-დან. '.$plan.' გეგმა, პროექტზე.' }}@endif</p>
                     <div class="mini-plans">
-                        @foreach ([['Free', '100'], ['Basic', '2 000'], ['Premium', '∞']] as [$n, $q])
+                        @foreach (! empty($v2) ? [['Free', '1 000'], ['Starter', '25 000'], ['Growth', '150 000']] : [['Free', '100'], ['Basic', '2 000'], ['Premium', '∞']] as [$n, $q])
                             <div class="{{ $plan === $n ? 'on' : '' }}"><b>{{ $n }}</b><span class="xs mut">{{ $q }} / {{ $en ? 'mo' : 'თვე' }}</span></div>
                         @endforeach
                     </div>
@@ -110,7 +113,11 @@
 
             <section class="screen" id="plan">
                 <div class="plans">
-                    @foreach ([
+                    @foreach (! empty($v2) ? [
+                        ['Free', '$0', $en ? '1 000 successful requests a month, 1 project' : '1 000 წარმატებული მოთხოვნა თვეში, 1 პროექტი'],
+                        ['Starter', '$19', $en ? '25 000 successful requests a month, 3 projects' : '25 000 წარმატებული მოთხოვნა თვეში, 3 პროექტი'],
+                        ['Growth', '$59', $en ? '150 000 successful requests a month, 10 projects' : '150 000 წარმატებული მოთხოვნა თვეში, 10 პროექტი'],
+                    ] : [
                         ['Free', '$0', $en ? '100 successful requests a month' : '100 წარმატებული მოთხოვნა თვეში'],
                         ['Basic', '$59', $en ? '2 000 successful requests a month' : '2 000 წარმატებული მოთხოვნა თვეში'],
                         ['Premium', '$99', $en ? 'Unlimited successful requests' : 'შეუზღუდავი წარმატებული მოთხოვნა'],
@@ -127,13 +134,20 @@
                     @endforeach
                 </div>
                 <div class="panel row" style="justify-content:space-between">
-                    <p class="muted">{{ $en ? 'The plan applies to this project. Prices include VAT; a year is 12% cheaper.' : 'გეგმა მოქმედებს ამ პროექტზე. ფასი დღგ-ს შეიცავს; წლიური 12%-ით იაფია.' }}</p>
+                    <p class="muted">@if (! empty($v2)){{ $en ? 'One subscription covers the workspace. Prices include VAT. A year is 15% less and does not renew by itself.' : 'ერთი გამოწერა ფარავს სამუშაო სივრცეს. ფასი დღგ-ს შეიცავს. წელიწადი 15%-ით ნაკლებია და თავისით არ გრძელდება.' }}@else{{ $en ? 'The plan applies to this project. Prices include VAT; a year is 12% cheaper.' : 'გეგმა მოქმედებს ამ პროექტზე. ფასი დღგ-ს შეიცავს; წლიური 12%-ით იაფია.' }}@endif</p>
                     <a class="btn pine" href="{{ route('account.billing') }}">{{ $en ? 'Change the plan' : 'გეგმის შეცვლა' }}</a>
                 </div>
             </section>
 
             <section class="screen" id="projects">
-                <div class="ph"><div><h2 class="h">{{ $en ? 'Projects' : 'პროექტები' }}</h2><p class="muted">{{ $en ? 'Each project has its own keys, limits and plan' : 'თითოეულ პროექტს აქვს საკუთარი გასაღებები, ლიმიტი და გეგმა' }}</p></div><button class="btn pine" type="button" data-go="new"><x-ga.icon name="plus" :size="16" />{{ $en ? 'New project' : 'ახალი პროექტი' }}</button></div>
+                <div class="ph"><div><h2 class="h">{{ $en ? 'Projects' : 'პროექტები' }}</h2><p class="muted">@if (! empty($v2)){{ $en ? 'Active projects' : 'აქტიური პროექტები' }}: {{ (int) $v2['active'] }} / {{ (int) $v2['allowed'] }}. {{ $en ? 'Usage is shared. A cap is optional.' : 'მოხმარება საერთოა. ზღვარი არასავალდებულოა.' }}@else{{ $en ? 'Each project has its own keys, limits and plan' : 'თითოეულ პროექტს აქვს საკუთარი გასაღებები, ლიმიტი და გეგმა' }}@endif</p></div><button class="btn pine" type="button" data-go="new"><x-ga.icon name="plus" :size="16" />{{ $en ? 'New project' : 'ახალი პროექტი' }}</button></div>
+                @if (! empty($v2))
+                    <form class="panel row" wire:submit="setCap" data-v2-cap>
+                        <label>{{ $en ? 'Cap for the selected project' : 'არჩეული პროექტის ზღვარი' }}<input wire:model="capInput" inputmode="numeric" placeholder="{{ $en ? 'empty clears it' : 'ცარიელი ხსნის' }}"></label>
+                        <button class="btn" type="submit">{{ $en ? 'Save cap' : 'ზღვრის შენახვა' }}</button>
+                        @error('capInput') <p class="err">{{ $message }}</p> @enderror
+                    </form>
+                @endif
                 <div class="panel flush"><div class="ph"><label class="srch"><x-ga.icon name="search" :size="16" /><input type="search" id="proj-q" placeholder="{{ $en ? 'Search' : 'ძიება' }}" aria-label="{{ $en ? 'Search projects' : 'პროექტების ძიება' }}" autocomplete="off"></label></div><div class="tw"><table id="proj-t">
                     <thead><tr><th>{{ $en ? 'Project' : 'პროექტი' }}</th><th>{{ $en ? 'This month' : 'ამ თვის მოხმარება' }}</th><th>{{ $en ? 'Status' : 'სტატუსი' }}</th><th>{{ $en ? 'Created' : 'შექმნა' }}</th><th></th></tr></thead>
                     <tbody>
@@ -157,7 +171,7 @@
             </section>
 
             <section class="screen" id="new">
-                <div><h2 class="h">{{ $en ? 'New project' : 'ახალი პროექტი' }}</h2><p class="muted">{{ $en ? 'A project starts on Free — 100 successful requests a month.' : 'პროექტი იწყება Free გეგმით — 100 წარმატებული მოთხოვნა თვეში.' }}</p></div>
+                <div><h2 class="h">{{ $en ? 'New project' : 'ახალი პროექტი' }}</h2><p class="muted">@if (! empty($v2)){{ $en ? 'A new project shares the workspace quota. It does not reset usage.' : 'ახალი პროექტი სამუშაო სივრცის კვოტას იყოფს. მოხმარებას არ ანულებს.' }}@else{{ $en ? 'A project starts on Free — 100 successful requests a month.' : 'პროექტი იწყება Free გეგმით — 100 წარმატებული მოთხოვნა თვეში.' }}@endif</p></div>
                 <form class="panel form-n" wire:submit="create">
                     <label>{{ $en ? 'Project name' : 'პროექტის სახელი' }}<input wire:model="name" required minlength="2" maxlength="120" placeholder="autopass-web"></label>
                     @error('name') <p class="err">{{ $message }}</p> @enderror

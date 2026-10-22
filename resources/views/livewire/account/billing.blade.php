@@ -24,8 +24,6 @@
         </header>
         <div class="content">
             <h1 class="mh">{{ $en ? 'Billing' : 'ბილინგი' }}</h1>
-            <p class="muted">{{ $en ? 'Prices are in USD and include VAT. A year costs 12% less than 12 months. GEL is shown at the National Bank rate.' : 'ფასი დოლარშია და დღგ-ს შეიცავს. წელიწადი 12 თვის ფასზე 12%-ით ნაკლებია. ლარი ნაჩვენებია ეროვნული ბანკის კურსით.' }}</p>
-
             @if (session('billing'))
                 <div class="al al-ok"><x-ga.icon name="ok" :size="18" /><div>{{ session('billing') }}</div></div>
             @endif
@@ -47,6 +45,11 @@
             @error('checkout')
                 <div class="al al-er" data-code="{{ $message }}"><x-ga.icon name="err" :size="18" /><div>{{ $message === 'payments not configured' ? ($en ? 'The payment provider is not connected.' : 'გადახდის პროვაიდერი არ არის მიერთებული.') : ($message === 'the rate is unavailable' ? ($en ? 'The rate is unavailable.' : 'კურსი მიუწვდომელია.') : $message) }}</div></div>
             @enderror
+
+            @if (! empty($v2))
+                @include('livewire.account.billing-v2')
+            @else
+            <p class="muted">{{ $en ? 'Prices are in USD and include VAT. A year costs 12% less than 12 months. GEL is shown at the National Bank rate.' : 'ფასი დოლარშია და დღგ-ს შეიცავს. წელიწადი 12 თვის ფასზე 12%-ით ნაკლებია. ლარი ნაჩვენებია ეროვნული ბანკის კურსით.' }}</p>
 
             @if ($projects === [])
                 <div class="panel"><h2>{{ $en ? 'Create a project first' : 'ჯერ შექმენით პროექტი' }}</h2><p class="muted">{{ $en ? 'You have no project yet.' : 'პროექტი ჯერ არ არის.' }}</p><p style="margin-top:12px"><a class="btn pine" href="{{ route('account.home') }}">{{ $en ? 'Projects' : 'პროექტები' }}</a></p></div>
@@ -108,6 +111,7 @@
                 @else
                 <p class="xs mut">{{ $en ? 'Payment: Bank of Georgia. You return here after the bank page; the plan turns on only after the bank confirms.' : 'გადახდა: Bank of Georgia. ბანკის გვერდის შემდეგ აქ დაბრუნდებით; გეგმა ჩაირთვება მხოლოდ ბანკის დადასტურების შემდეგ.' }}</p>
                 @endif
+            @endif
             @endif
 
             @if (count($orders) > 0)

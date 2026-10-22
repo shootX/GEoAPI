@@ -1,3 +1,6 @@
+@if (config('billing.v2'))
+    @include('public.partials.pricing-v2')
+@else
 @php
     $en = app()->getLocale() === 'en';
     $rate = null;
@@ -136,3 +139,4 @@
     });
 </script>
 </div>
+@endif
