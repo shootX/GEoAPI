@@ -142,3 +142,7 @@ Existing access is kept by a new column, not by rewriting quotas. On PostgreSQL 
 `GET /ready` is outside the web middleware group. It runs `SELECT 1` and returns `{"ok":true}` or HTTP 503 `{"ok":false}`. The body has no SQL text, host, or exception message. `X-Request-Id` is global. An incoming value is kept when it matches `^[A-Za-z0-9._-]{1,64}$`; otherwise a UUID is generated. That id is the log context. The request body is not added to the context. When `SESSION_SECURE_COOKIE` is unset or empty, the session cookie is Secure only for `APP_ENV=production`. Explicit `true` and `false` are honored. `same_site` stays `lax`. Login, register, account, and admin stay CSRF-exempt because those posts were not retested in a browser. The two billing webhook paths stay exempt. No exemption was added. Security headers were not weakened. OpenAPI was not changed.
 
 `docs/ROLLBACK.md` lists the manual rollback. A restore was not executed. No production `EXPLAIN` was run. No index was added. A p95 baseline was not measured. There is no metrics collector in this tree. `APP_DEBUG`, `APP_KEY`, and `MAIL_*` were not changed. The deploy job still skips on a pull request. The day cap stays inactive unless `per_day` exists. The minute cap stays 60. No new production measurement was taken. Photo rights and VIN stay open.
+
+## 2026-10-22
+
+- CSRF: legacy platform pages use their own `_csrf`; Laravel pages must not be added to the exemption list.

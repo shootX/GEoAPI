@@ -28,7 +28,7 @@ No `EXPLAIN` was run against production for this change. No index was added from
 
 ## CSRF
 
-`login`, `register`, `account`, and `admin` stay outside the framework CSRF check. Those posts were not retested in a browser for this change, and removing the exemption could lock the account pages. `billing/provider-webhook` and `billing/bog/callback` stay exempt because Stripe and the bank do not send a session token. No further path was added to the exemption list.
+Updated 2026-10-22. Only legacy platform paths (`login`, `register`, `logout`, `account`, `account/projects/*`, `admin`, `admin/users*`, `admin/projects*`, `email/verify`, `email/verification/resend`, `forgot-password`, `reset-password`) skip Laravel's check. Each of those POST handlers in `legacy/src/Platform/Http.php` verifies the session `_csrf` token and answers 419 without it; the legacy admin pages are GET-only (405 otherwise). Laravel routes under `/admin/*` and `/account/*` are checked by Laravel. `api/*`, `widget/*`, `billing/provider-webhook` and `billing/bog/callback` stay exempt (token or signature auth). Rollback: revert the PR that narrowed the list.
 
 ## Session cookie
 
