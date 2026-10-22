@@ -14,7 +14,7 @@ class PublicDesignTest extends TestCase
         $this->get('/ka')->assertRedirect('/')->assertSessionHas('locale', 'ka');
     }
 
-    public function test_pricing_shows_free_and_upcoming_pro_without_a_price(): void
+    public function test_pricing_shows_free_basic_and_premium_with_bog_checkout(): void
     {
         $this->withSession(['locale' => 'ka'])
             ->get('/pricing')
@@ -22,9 +22,10 @@ class PublicDesignTest extends TestCase
             ->assertSee('Free')
             ->assertSee('Basic')
             ->assertSee('Premium')
-            ->assertSee('59 USD')
+            ->assertSee('$59')
+            ->assertSee('$99')
             ->assertSee('10 000')
-            ->assertDontSee('$59')
+            ->assertSee('Bank of Georgia')
             ->assertDontSee('Stripe');
     }
 

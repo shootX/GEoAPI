@@ -259,9 +259,9 @@ final class PublicDocsTest extends TestCase
         $this->assertStringContainsString('not enforced in production today', $english);
         $this->assertStringContainsString('packages/sdk-js', $english);
         $this->assertStringContainsString('requestId is null', $english);
-        $this->assertStringContainsString('<details class="guide-toc guide-toc-mobile">', $english);
+        $this->assertStringContainsString('<details class="toc-m">', $english);
         $this->assertStringContainsString('<summary>On this page</summary>', $english);
-        $this->assertStringContainsString('class="guide-toc guide-toc-desktop"', $english);
+        $this->assertStringContainsString('<aside class="toc"', $english);
 
         $georgian = (string) $this->withSession(['locale' => 'ka'])->get('/guide')->assertOk()->getContent();
         $this->assertStringContainsString('არა 405', $georgian);

@@ -26,7 +26,7 @@
         <div class="vp-sheet">
             <div class="vp-photo" id="vp-frame">
                 <div id="vp-empty">
-                    <svg viewBox="0 0 160 72" fill="none" stroke="#285A48" stroke-width="2.2" aria-hidden="true"><path d="M14 46h132l-10-18a8 8 0 0 0-7-4H34a8 8 0 0 0-7 4L14 46z"/><path d="M28 46v6M132 46v6"/><circle cx="42" cy="52" r="7" fill="#B0E4CC"/><circle cx="118" cy="52" r="7" fill="#B0E4CC"/></svg>
+                    <svg viewBox="0 0 160 72" fill="none" stroke="#4338CA" stroke-width="2.2" aria-hidden="true"><path d="M14 46h132l-10-18a8 8 0 0 0-7-4H34a8 8 0 0 0-7 4L14 46z"/><path d="M28 46v6M132 46v6"/><circle cx="42" cy="52" r="7" fill="#A5A0F0"/><circle cx="118" cy="52" r="7" fill="#A5A0F0"/></svg>
                     <span>{{ __('No photo yet') }}</span>
                     <span class="vp-mark">GEOAPI.GE</span>
                 </div>
@@ -68,7 +68,7 @@
     #vehicle-picker .vp-field.open [data-vp-trigger] svg { transform: rotate(180deg); }
     #vehicle-picker [data-vp-label] { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
     #vehicle-picker .is-empty { color: var(--slate-muted-foreground); font-weight: 400; }
-    #vehicle-picker [data-vp-pop] { position: absolute; left: -1px; right: -1px; top: calc(100% + 8px); z-index: 40; overflow: hidden; border: 1px solid var(--slate-input); border-radius: 0.75rem; background: var(--slate-card); box-shadow: 0 18px 44px rgba(9, 20, 19, 0.12); transform-origin: top center; animation: vp-open 0.18s ease; }
+    #vehicle-picker [data-vp-pop] { position: absolute; left: -1px; right: -1px; top: calc(100% + 8px); z-index: 40; overflow: hidden; border: 1px solid var(--slate-input); border-radius: 0.75rem; background: var(--slate-card); box-shadow: 0 18px 44px rgba(15, 14, 42, 0.12); transform-origin: top center; animation: vp-open 0.18s ease; }
     #vehicle-picker [data-vp-q] { width: 100%; padding: 0.75rem 1rem; border: 0; border-bottom: 1px solid var(--slate-border); background: transparent; color: inherit; font-size: 14px; outline: none; }
     #vehicle-picker [data-vp-hint] { margin: 0; padding: 0.6rem 1rem 0; font-size: 12px; color: var(--slate-muted-foreground); }
     #vehicle-picker [data-vp-list] { display: grid; grid-template-columns: repeat(auto-fill, minmax(14rem, 1fr)); max-height: 18rem; margin: 0; padding: 0.4rem; overflow: auto; list-style: none; }
@@ -78,19 +78,19 @@
     #vp-status { min-height: 1.25rem; margin: 0.6rem 0 0; font-size: 12px; color: var(--slate-muted-foreground); }
     #vp-card { margin-top: 0.85rem; overflow: hidden; border: 1px solid var(--slate-border); border-radius: 0.75rem; background: var(--slate-card); animation: vp-open 0.22s ease; }
     #vehicle-picker .vp-sheet { display: block; }
-    #vehicle-picker .vp-photo { position: relative; border-bottom: 1px solid var(--slate-border); background: #e7f5ee; -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; }
-    #vp-flag { position: absolute; right: 0.55rem; bottom: 0.55rem; z-index: 2; display: grid; place-items: center; width: 2rem; height: 2rem; padding: 0; border: 0; border-radius: 999px; background: #d1264a; color: #fff; cursor: pointer; }
+    #vehicle-picker .vp-photo { position: relative; border-bottom: 1px solid var(--slate-border); background: #ECEBFB; -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; }
+    #vp-flag { position: absolute; right: 0.55rem; bottom: 0.55rem; z-index: 2; display: grid; place-items: center; width: 2rem; height: 2rem; padding: 0; border: 0; border-radius: 999px; background: #B3261E; color: #fff; cursor: pointer; }
     #vp-flag svg { width: 1rem; height: 1rem; }
     #vp-flag:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
     #vp-flag:disabled { cursor: default; }
-    #vp-flag-note { position: absolute; left: 0.55rem; right: 3.2rem; bottom: 0.55rem; z-index: 2; margin: 0; padding: 0.45rem 0.6rem; border-radius: 0.5rem; background: rgba(9, 20, 19, 0.88); color: #fff; font-size: 13px; line-height: 1.35; }
-    #vp-empty { position: relative; display: grid; place-items: center; width: 100%; min-height: 190px; background: linear-gradient(180deg, #e7f6ef 0%, #d5eee3 100%); color: #3d564c; font-size: 14px; }
+    #vp-flag-note { position: absolute; left: 0.55rem; right: 3.2rem; bottom: 0.55rem; z-index: 2; margin: 0; padding: 0.45rem 0.6rem; border-radius: 0.5rem; background: rgba(15, 14, 42, 0.88); color: #fff; font-size: 13px; line-height: 1.35; }
+    #vp-empty { position: relative; display: grid; place-items: center; width: 100%; min-height: 190px; background: linear-gradient(180deg, #F3F2FD 0%, #DEDCF8 100%); color: #4A4866; font-size: 14px; }
     #vp-empty svg { width: 120px; height: 64px; }
-    #vp-empty .vp-mark { position: absolute; right: 14px; bottom: 10px; color: rgba(9, 20, 19, 0.42); font-size: 12px; font-weight: 700; letter-spacing: 0.16em; }
+    #vp-empty .vp-mark { position: absolute; right: 14px; bottom: 10px; color: rgba(15, 14, 42, 0.42); font-size: 12px; font-weight: 700; letter-spacing: 0.16em; }
     #vehicle-picker.is-busy [data-vp-trigger] { color: transparent; }
-    #vehicle-picker.is-busy .vp-field { background-image: linear-gradient(90deg, #e7f3ed 0%, #f7fbf9 50%, #e7f3ed 100%); background-size: 200% 100%; animation: vp-skel 1.1s ease infinite; }
+    #vehicle-picker.is-busy .vp-field { background-image: linear-gradient(90deg, #EFEEF4 0%, #F7F7FB 50%, #EFEEF4 100%); background-size: 200% 100%; animation: vp-skel 1.1s ease infinite; }
     @keyframes vp-skel { from { background-position: 100% 0; } to { background-position: -100% 0; } }
-    #vp-img { display: block; width: 100%; height: auto; background: #e7f5ee; pointer-events: none; -webkit-user-drag: none; user-select: none; -webkit-touch-callout: none; }
+    #vp-img { display: block; width: 100%; height: auto; background: #ECEBFB; pointer-events: none; -webkit-user-drag: none; user-select: none; -webkit-touch-callout: none; }
     #vp-shield { position: absolute; inset: 0; z-index: 1; }
     #vehicle-picker .vp-body { padding: 1.1rem 1.25rem 1.2rem; }
     #vp-title { margin: 0; font-size: 1.05rem; font-weight: 600; letter-spacing: -0.01em; }

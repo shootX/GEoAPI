@@ -210,8 +210,10 @@ final class PublicApiV1Test extends TestCase
             ->assertSee('Premium')
             ->assertSee('2 000')
             ->assertSee('10 000')
-            ->assertSee('59 USD')
-            ->assertDontSee('$59')
+            ->assertSee('$59')
+            ->assertSee('$99')
+            ->assertSee('Bank of Georgia')
+            ->assertSee('გადახდა')
             ->assertDontSee('Stripe');
     }
 }
