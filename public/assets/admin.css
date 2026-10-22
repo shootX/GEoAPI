@@ -1,6 +1,7 @@
 @font-face{font-family:FiraGO;src:url(/assets/fonts/firago/firago-400.woff2) format('woff2');font-weight:400;font-display:swap}
 @font-face{font-family:FiraGO;src:url(/assets/fonts/firago/firago-600.woff2) format('woff2');font-weight:600;font-display:swap}
 @font-face{font-family:FiraGO;src:url(/assets/fonts/firago/firago-700.woff2) format('woff2');font-weight:700;font-display:swap}
+@font-face{font-family:"JetBrains Mono";src:url(/assets/fonts/jetbrains-mono-400.woff2) format("woff2");font-weight:400;font-display:swap}
 .admin-app {
   margin: 0;
   min-height: 100vh;
