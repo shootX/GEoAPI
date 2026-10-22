@@ -403,6 +403,15 @@
     line(labels.suspension, pair(data.front_suspension, data.rear_suspension));
     line(labels.tires, pair(data.front_tires, data.rear_tires));
     showEquipment(data.equipment);
+    root.querySelectorAll('#vp-equipment details').forEach(function (d) {
+      var host = d.querySelector('[data-eq]');
+      var key = host ? host.getAttribute('data-eq') : '';
+      var n = (data.equipment && data.equipment[key] && data.equipment[key].length) || 0;
+      var sum = d.querySelector('summary');
+      if (!sum.getAttribute('data-base')) sum.setAttribute('data-base', sum.textContent);
+      sum.textContent = sum.getAttribute('data-base') + ' (' + n + ')';
+      d.open = key === 'standard' && n > 0;
+    });
     var photoMatches = data.photo_matches_generation === true;
     if (photoMatches && data.model && data.model.id && data.generation && data.generation.id) {
       empty.hidden = true;

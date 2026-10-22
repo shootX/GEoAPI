@@ -69,6 +69,32 @@ class PublicDesignTest extends TestCase
         }
     }
 
+    public function test_home_shows_specs_markets_equipment_and_photos(): void
+    {
+        $dir = base_path('legacy/cache');
+        if (! is_dir($dir)) {
+            mkdir($dir, 0700, true);
+        }
+        $path = $dir.'/public-counts.json';
+        file_put_contents($path, json_encode([
+            'status' => 'ok', 'brands' => 314, 'models' => 4710, 'generations' => 22367, 'generation_groups' => 10228,
+            'models_without_generations' => 1, 'modifications' => 420021, 'photos' => 573,
+            'specifications' => 420021, 'markets' => 3070, 'equipment' => 47312000,
+        ]));
+        $_ENV['CARAPI_CATALOG_ENABLED'] = '1';
+        $_SERVER['CARAPI_CATALOG_ENABLED'] = '1';
+
+        try {
+            $this->withSession(['locale' => 'ka'])->get('/')->assertOk()
+                ->assertSee('3 070', false)->assertSee('47 მლნ+')->assertSee('კომპლექტაციის')->assertSee('573', false)->assertSee('სპეციფიკაცია ·');
+            $this->withSession(['locale' => 'en'])->get('/')->assertOk()
+                ->assertSee('47M+')->assertSee('trim/equipment')->assertSee('photos')->assertDontSee('AI photo');
+        } finally {
+            unset($_ENV['CARAPI_CATALOG_ENABLED'], $_SERVER['CARAPI_CATALOG_ENABLED']);
+            @unlink($path);
+        }
+    }
+
     public function test_demo_and_guide_render_the_public_sections(): void
     {
         $this->withSession(['locale' => 'ka'])
@@ -77,7 +103,8 @@ class PublicDesignTest extends TestCase
             ->assertSee('ავტომობილის არჩევა')
             ->assertSee('ჩასასმელი კოდი')
             ->assertSee('კოპირება')
-            ->assertSee('vp-response', false);
+            ->assertSee('vp-response', false)
+            ->assertSee('კომპლექტაცია');
 
         $this->withSession(['locale' => 'ka'])
             ->get('/guide')

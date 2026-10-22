@@ -42,6 +42,7 @@
                 <dl id="vp-specs"></dl>
             </div>
         </div>
+        <h3 class="vp-eq-h">{{ app()->getLocale() === 'en' ? 'Trim/equipment' : 'კომპლექტაცია' }}</h3>
         <div id="vp-equipment">
             <details><summary>{{ __('Standard') }}</summary><div data-eq="standard"></div></details>
             <details><summary>{{ __('Optional') }}</summary><div data-eq="optional"></div></details>
@@ -97,6 +98,7 @@
     #vp-specs { display: grid; grid-template-columns: 8rem minmax(0, 1fr) 8rem minmax(0, 1fr); gap: 0.55rem 1.5rem; margin: 0.9rem 0 0; font-size: 14px; }
     #vp-specs dt { color: var(--slate-muted-foreground); }
     #vp-specs dd { min-width: 0; margin: 0; overflow-wrap: break-word; }
+    #vehicle-picker .vp-eq-h { margin: 0; padding: 0.85rem 1rem 0; font-size: 15px; font-weight: 600; border-top: 1px solid var(--slate-border); }
     #vp-equipment { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); border-top: 1px solid var(--slate-border); }
     #vp-equipment details { min-width: 0; padding: 0.75rem 1rem 0.9rem; }
     #vp-equipment details + details { border-left: 1px solid var(--slate-border); }
@@ -186,4 +188,4 @@
     ],
     'values' => $specValues,
 ], JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_AMP | JSON_HEX_QUOT) !!}</script>
-<script src="/assets/vehicle-picker.js?v=20261020s"></script>
+<script src="/assets/vehicle-picker.js?v=20261022e"></script>
