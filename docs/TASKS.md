@@ -219,3 +219,6 @@
 ## 2026-10-22 — P7 panel pages
 - SPA screens: projects list, new project (create()), usage (30-day chart + day table), keys table, settings (profile read-only + links to Electrik profile/security), empty state + unverified banner. Hash routing + hashchange; screen kept after Livewire commits.
 - Legacy project/playground/explorer pages now render in the cabinet shell (sidebar, breadcrumb, tabs) with cabinet.css .lgc styles.
+
+## 2026-10-22 — P8 admin shell
+- Legacy admin (overview, users, user, projects, project) and Laravel /admin/blog share View::adminShellStart/End: ink sidebar + ADMIN badge, grouped nav (only built screens; Proposed catalog/plans/billing/pages/settings/audit not shown), breadcrumb top bar, read-only lock badge/bar, status badges, card tables, mobile stacked rows. admin.css rewritten on --ga-* tokens.
