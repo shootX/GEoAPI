@@ -18,6 +18,6 @@ Requirements: PHP 8.4+ with `ext-bcmath` (the lockfile needs them) and PostgreSQ
 
 `vendor/bin/phpunit` runs the test suite. Do not commit `.env` or payment secrets.
 
-Deploy, rollback, and the PHP-FPM layout are in [docs/DEPLOY.md](docs/DEPLOY.md), [docs/ROLLBACK.md](docs/ROLLBACK.md), and [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md).
+Deploy, rollback, and the PHP-FPM layout are in [docs/DEPLOY.md](docs/DEPLOY.md) and [docs/ROLLBACK.md](docs/ROLLBACK.md). Server-specific notes (hosts, pools, mail, DB roles) are kept outside this repository.
 
 The SDK, MCP server, and CLI live under `packages/`. They are not published. Each package has its own lockfile and test command. The site deploy still builds this directory with `npm ci` and `npm run build`.

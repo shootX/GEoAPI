@@ -115,7 +115,7 @@ Route::post('/billing/bog/callback', BogCallbackController::class)
 
 Route::get('/ready', ReadyController::class)->name('ready');
 
-// ELECTRIK_EMAIL_VERIFICATION=false (prod) skips Electrik's verification routes, but
+// ELECTRIK_EMAIL_VERIFICATION=false skips Electrik's verification routes, but
 // registration still mails VerifyEmail, which needs verification.verify. Keep the link working.
 if (! config('electrik.auth.email_verification', true)) {
     Route::get('/verify-email/{id}/{hash}', VerifyEmailController::class)

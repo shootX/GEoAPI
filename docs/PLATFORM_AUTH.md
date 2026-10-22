@@ -45,7 +45,7 @@ php bin/migrate.php
 | `CARAPI_PLATFORM_ATTEMPT_LIMIT` | ელფოსტაზე, ნაგულისხმევი 8 / 900 წამი |
 | `CARAPI_PLATFORM_IP_ATTEMPT_LIMIT` | IP-ზე, ნაგულისხმევი 30 |
 
-ადმინისტრაციული მიგრაციის ცვლადებია `CARAPI_PLATFORM_ADMIN_*`. ისინი runtime პულში არ არის. საიდუმლოები GeoAPI-ის ცალკე FPM გარემოშია (`docs/DEPLOYMENT.md`), საერთო პულში არა.
+ადმინისტრაციული მიგრაციის ცვლადებია `CARAPI_PLATFORM_ADMIN_*`. ისინი runtime პულში არ არის. საიდუმლოები GeoAPI-ის ცალკე FPM გარემოშია (შიდა ოპერაციულ ჩანაწერებში), საერთო პულში არა.
 
 runtime როლია `geoapi_platform_app`: `LOGIN`, არა სუპერმომხმარებელი და არა მფლობელი, DDL არ შეუძლია. აქვს `SELECT`, `INSERT`, `UPDATE` `platform.users`-ზე, `SELECT`, `INSERT`, `DELETE` `platform.login_attempts`-ზე და შესაბამისი sequence-ის `USAGE`. კატალოგზე `INSERT` არ აქვს. `carapi_catalog_reader`-ს `platform.users` არ ხსნის.
 
@@ -73,6 +73,6 @@ runtime როლია `geoapi_platform_app`: `LOGIN`, არა სუპე�
 
 ## საჯარო ჩართვამდე
 
-ცალკე PHP-FPM უკვე დგას (`docs/DEPLOYMENT.md`). ელფოსტის დადასტურება და პაროლის აღდგენა აგებულია. საჯარო ჩართვამდე რჩება რეალური SMTP და სამი ფუნქციური დროშის ჩართვა.
+ცალკე PHP-FPM უკვე დგას. ელფოსტის დადასტურება და პაროლის აღდგენა აგებულია. საჯარო ჩართვამდე რჩება რეალური SMTP და სამი ფუნქციური დროშის ჩართვა.
 
-პროექტები და სერვერული გასაღებები: `docs/PROJECTS_API_KEYS.md`. ელფოსტის დადასტურება და პაროლის აღდგენა: `docs/EMAIL_AND_PASSWORD_RESET.md`. ჩასასმელი ფილტრი: `docs/WIDGET_INTEGRATION.md`.
+პროექტები და სერვერული გასაღებები: `docs/PROJECTS_API_KEYS.md`. ჩასასმელი ფილტრი: `docs/WIDGET_INTEGRATION.md`.

@@ -41,3 +41,13 @@ Homestead.yaml
 Thumbs.db
 /legacy/data/sessions/*
 !/legacy/data/sessions/.gitkeep
+
+# Internal operations notes (server, mail, DB roles, audits) stay out of the repo (QA GEO-QA-011).
+/MEMORY.md
+/TASKS.md
+/docs/MEMORY.md
+/docs/TASKS.md
+/docs/DEPLOYMENT.md
+/docs/EMAIL_AND_PASSWORD_RESET.md
+/docs/PROJECT_AUDIT.md
+/docs/audits/
