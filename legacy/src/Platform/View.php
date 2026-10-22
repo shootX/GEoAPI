@@ -950,7 +950,12 @@ JS;
     /** @param array<string,mixed> $user @param array{period:string,stats:array<string,int>,users:list<array<string,string>>,projects:list<array<string,string>>} $overview */
     public static function admin(array $user, array $overview): void
     {
-        self::adminPage($user, 'მიმოხილვა', 'overview', self::adminStats($overview) . self::adminActivity($overview) . '<div class="admin-split">' . self::comingSoonControl() . self::photoReports() . '</div>' . self::adminSystem($overview));
+        $month = substr($overview['period'], 0, 7);
+        $photos = self::photoRows() === [] ? '' : self::photoReports();
+        self::adminPage($user, 'მიმოხილვა', 'overview', self::adminKpis($overview)
+            . '<div class="admin-split"><section><h2>ბოლო რეგისტრაციები</h2>' . self::adminTable($overview['users'], 'users', 'რეგისტრაცია ჯერ არ არის.') . '</section>'
+            . '<div class="admin-stack">' . self::comingSoonControl() . '<section><h2>ბოლო პროექტები</h2>' . self::adminTable($overview['projects'], 'projects', 'პროექტი ჯერ არ შექმნილა.') . '</section></div></div>'
+            . $photos . self::adminSystem($overview), 'სისტემა · UTC თვე ' . $month);
     }
 
     /**
@@ -968,7 +973,7 @@ JS;
      */
     public static function adminUser(array $user, array $detail): void
     {
-        self::adminPage($user, 'მომხმარებლები', 'users', self::adminUserDetail($detail));
+        self::adminPage($user, $detail['name'], 'users', self::adminUserDetail($detail), 'ID ' . $detail['id'] . ' · ' . $detail['email'], ['მომხმარებლები', '/admin/users']);
     }
 
     /**
@@ -986,42 +991,45 @@ JS;
      */
     public static function adminProject(array $user, array $detail): void
     {
-        self::adminPage($user, 'პროექტები', 'projects', self::adminProjectDetail($detail));
+        self::adminPage($user, $detail['name'], 'projects', self::adminProjectDetail($detail), 'ID ' . $detail['id'] . ' · ' . $detail['email'], ['პროექტები', '/admin/projects']);
     }
 
     /** @param array<string,mixed> $user */
-    private static function adminPage(array $user, string $heading, string $section, string $main): void
+    /** @param array{0:string,1:string}|null $parent */
+    private static function adminPage(array $user, string $heading, string $section, string $main, string $sub = '', ?array $parent = null): void
     {
         header('Cache-Control: no-store');
         header('Content-Type: text/html; charset=utf-8');
         header('X-Content-Type-Options: nosniff');
         $name = trim((string) $user['first_name'] . ' ' . (string) $user['last_name']);
         $email = (string) $user['email'];
-        echo self::adminShellStart($heading, $section, $name, $email, true)
+        echo self::adminShellStart($heading, $section, $name, $email, true, '', $sub, $parent)
             . '<div class="admin-lockbar"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg><span><b>მხოლოდ ნახვა.</b> მართვის მოქმედებები ამ გვერდზე ჯერ არ არის.</span></div>'
             . $main . self::adminShellEnd();
     }
 
-    public static function adminShellStart(string $heading, string $section, string $name, string $email, bool $readOnly, string $csrfField = ''): string
+    /** @param array{0:string,1:string}|null $parent */
+    public static function adminShellStart(string $heading, string $section, string $name, string $email, bool $readOnly, string $csrfField = '', string $sub = '', ?array $parent = null): string
     {
+        $crumbParent = $parent === null ? '' : '<a href="' . self::e($parent[1]) . '">' . self::e($parent[0]) . '</a><span>›</span>';
         $initial = $name === '' ? 'A' : mb_strtoupper(mb_substr($name, 0, 1));
         $logout = $csrfField !== '' ? $csrfField : '<input type="hidden" name="_csrf" value="' . self::e(Session::csrf()) . '">';
 
         return '<!doctype html><html lang="ka"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="robots" content="noindex, nofollow">'
             . '<title>' . self::e($heading) . ' — GeoAPI ადმინი</title>'
             . '<link rel="icon" href="/favicon.ico" sizes="any"><link rel="icon" href="/assets/brand/favicon.svg" type="image/svg+xml">'
-            . '<link rel="stylesheet" href="/assets/admin.css?v=20261022ge"></head><body class="admin-app">'
+            . '<link rel="stylesheet" href="/assets/admin.css?v=20261022gf"></head><body class="admin-app">'
             . '<a class="admin-skip" href="#admin-content">შინაარსზე გადასვლა</a>'
             . '<div class="admin-shell"><aside class="admin-side" id="admin-nav"><div class="admin-brand"><a href="/admin"><img src="/assets/brand/geoapi-lockup-on-ink.svg" alt="geoapi.ge" height="24"></a><span>ADMIN</span></div>'
             . '<nav aria-label="ადმინისტრირება">' . self::adminNav($section) . '</nav>'
             . '<p class="admin-soon"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg> მხოლოდ ნახვა</p></aside>'
             . '<div class="admin-col"><header class="admin-bar"><button class="admin-menu" type="button" aria-expanded="false" aria-controls="admin-nav" aria-label="მენიუ"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button>'
-            . '<p class="admin-crumb"><a href="/admin">ადმინი</a><span>›</span><b>' . self::e($heading) . '</b></p>'
+            . '<p class="admin-crumb"><a href="/admin">ადმინი</a><span>›</span>' . $crumbParent . '<b>' . self::e($heading) . '</b></p>'
             . '<div class="admin-who"><span class="admin-utc">UTC</span><details><summary aria-label="' . self::e($name) . '"><span class="admin-av">' . self::e($initial) . '</span></summary><div class="admin-pop"><p><b>' . self::e($name) . '</b><span>' . self::e($email) . '</span></p>'
             . '<a href="/account">დეველოპერის კაბინეტი</a><form method="post" action="/logout">' . $logout . '<button type="submit">გასვლა</button></form></div></details></div></header>'
             . '<main class="admin-main" id="admin-content"><div class="admin-head"><h1>' . self::e($heading) . '</h1>'
             . ($readOnly ? '<span class="admin-ro"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>მხოლოდ ნახვა</span>' : '')
-            . '</div>';
+            . '</div>' . ($sub === '' ? '' : '<p class="admin-sub">' . self::e($sub) . '</p>');
     }
 
     public static function adminShellEnd(): string
@@ -1037,7 +1045,7 @@ JS;
             '' => [['overview', 'მიმოხილვა', '/admin', '<path d="M3 10.5 12 3l9 7.5V21H3z"/>', true]],
             'მომხმარებლები' => [
                 ['users', 'მომხმარებლები', '/admin/users', '<circle cx="12" cy="8" r="4"/><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"/>', true],
-                ['projects', 'პროექტები · კვოტები', '/admin/projects', '<path d="M3 6.5A1.5 1.5 0 0 1 4.5 5H10l2 2h7.5A1.5 1.5 0 0 1 21 8.5v10a1.5 1.5 0 0 1-1.5 1.5h-15A1.5 1.5 0 0 1 3 18.5z"/>', true],
+                ['projects', 'პროექტები', '/admin/projects', '<path d="M3 6.5A1.5 1.5 0 0 1 4.5 5H10l2 2h7.5A1.5 1.5 0 0 1 21 8.5v10a1.5 1.5 0 0 1-1.5 1.5h-15A1.5 1.5 0 0 1 3 18.5z"/>', true],
             ],
             'კონტენტი' => [['blog', 'ბლოგი', '/admin/blog', '<path d="M6 3h8l4 4v14H6z"/><path d="M14 3v4h4M9 13h6M9 17h6"/>', false]],
             'სისტემა' => [['photos', 'არასწორი ფოტოები', '/admin#photo-reports', '<path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/>', true]],
@@ -1067,7 +1075,7 @@ JS;
         };
         $hiddenPer = $list['per'] === 20 ? '' : '<input type="hidden" name="per" value="' . $list['per'] . '">';
         $form = '<form class="admin-filters" method="get" action="/admin/users">' . $hiddenPer
-            . '<label for="user-q">ძებნა<input id="user-q" name="q" type="search" maxlength="80" value="' . self::e($list['q']) . '"></label>'
+            . '<label for="user-q">ძებნა<input id="user-q" name="q" type="search" maxlength="80" placeholder="სახელი, ელფოსტა, ID" value="' . self::e($list['q']) . '"></label>'
             . '<label for="user-status">სტატუსი<select id="user-status" name="status">'
             . '<option value=""' . $status('') . '>ყველა</option>'
             . '<option value="active"' . $status('active') . '>აქტიური</option>'
@@ -1092,8 +1100,11 @@ JS;
             ? '<p class="admin-empty" data-empty="users">მომხმარებელი ვერ მოიძებნა.</p>'
             : '<table class="admin-table"><thead><tr><th>ID</th><th>სახელი</th><th>ელფოსტა</th><th>როლი</th><th>სტატუსი</th><th>დადასტურება</th><th>რეგისტრაცია UTC</th><th>ბოლო შესვლა UTC</th><th>პროექტები</th></tr></thead><tbody>'
             . $rows . '</tbody></table>';
-        $prev = $list['page'] > 1 ? '<a href="' . self::e(self::adminUserQuery($list, $list['page'] - 1)) . '">წინა</a>' : '';
-        $next = $list['page'] < $list['pages'] ? '<a href="' . self::e(self::adminUserQuery($list, $list['page'] + 1)) . '">შემდეგი</a>' : '';
+        $prev = $list['page'] > 1 ? '<a href="' . self::e(self::adminUserQuery($list, $list['page'] - 1)) . '" aria-label="წინა">‹</a>' : '';
+        for ($i = max(1, $list['page'] - 2); $i <= min($list['pages'], $list['page'] + 2); $i++) {
+            $prev .= $i === $list['page'] ? '<span aria-current="page">' . $i . '</span>' : '<a href="' . self::e(self::adminUserQuery($list, $i)) . '">' . $i . '</a>';
+        }
+        $next = $list['page'] < $list['pages'] ? '<a href="' . self::e(self::adminUserQuery($list, $list['page'] + 1)) . '" aria-label="შემდეგი">›</a>' : '';
 
         return $form . '<p class="admin-meta" data-total="' . $list['total'] . '" data-page="' . $list['page'] . '">'
             . self::e((string) $list['total']) . ' მომხმარებელი · გვერდი ' . $list['page'] . ' / ' . $list['pages'] . '</p>'
@@ -1178,16 +1189,18 @@ JS;
             $rows .= '<tr data-project="' . $row['id'] . '" data-used="' . $row['used'] . '" data-limit="' . $row['limit'] . '" data-remaining="' . $row['remaining'] . '">'
                 . '<td data-label="ID">' . $row['id'] . '</td><td data-label="პროექტი"><a href="/admin/projects/' . $row['id'] . '">' . self::e($row['name']) . '</a></td>'
                 . '<td data-label="მფლობელი"><a href="/admin/users/' . $row['owner_id'] . '">' . self::e($row['owner']) . '</a></td><td data-label="ელფოსტა">' . self::e($row['email'])
-                . '</td><td data-label="სტატუსი">' . self::adminBadge($row['status']) . '</td><td data-label="შექმნა UTC">' . self::e($row['created_at'])
-                . '</td><td data-label="თვის მოხმარება">' . self::e(number_format($row['used'], 0, '.', ' '))
-                . '</td><td data-label="თვის ლიმიტი">' . self::e(number_format($row['limit'], 0, '.', ' '))
-                . '</td><td data-label="დარჩენილი">' . self::e(number_format($row['remaining'], 0, '.', ' ')) . '</td></tr>';
+                . '</td><td data-label="სტატუსი">' . self::adminBadge($row['status']) . '</td><td data-label="გეგმა">' . self::adminPlanBadge($row['limit'])
+                . '</td><td data-label="თვის მოხმარება">' . self::adminUsage($row['used'], $row['limit'])
+                . '</td><td data-label="შექმნა UTC">' . self::e($row['created_at']) . '</td></tr>';
         }
         $body = $rows === ''
             ? '<p class="admin-empty" data-empty="projects">პროექტი ვერ მოიძებნა.</p>'
-            : '<table class="admin-table"><thead><tr><th>ID</th><th>პროექტი</th><th>მფლობელი</th><th>ელფოსტა</th><th>სტატუსი</th><th>შექმნა UTC</th><th>თვის მოხმარება</th><th>თვის ლიმიტი</th><th>დარჩენილი</th></tr></thead><tbody>' . $rows . '</tbody></table>';
-        $prev = $list['page'] > 1 ? '<a href="' . self::e(self::adminProjectQuery($list, $list['page'] - 1)) . '">წინა</a>' : '';
-        $next = $list['page'] < $list['pages'] ? '<a href="' . self::e(self::adminProjectQuery($list, $list['page'] + 1)) . '">შემდეგი</a>' : '';
+            : '<table class="admin-table"><thead><tr><th>ID</th><th>პროექტი</th><th>მფლობელი</th><th>ელფოსტა</th><th>სტატუსი</th><th>გეგმა</th><th>თვის მოხმარება</th><th>შექმნა UTC</th></tr></thead><tbody>' . $rows . '</tbody></table>';
+        $prev = $list['page'] > 1 ? '<a href="' . self::e(self::adminProjectQuery($list, $list['page'] - 1)) . '" aria-label="წინა">‹</a>' : '';
+        for ($i = max(1, $list['page'] - 2); $i <= min($list['pages'], $list['page'] + 2); $i++) {
+            $prev .= $i === $list['page'] ? '<span aria-current="page">' . $i . '</span>' : '<a href="' . self::e(self::adminProjectQuery($list, $i)) . '">' . $i . '</a>';
+        }
+        $next = $list['page'] < $list['pages'] ? '<a href="' . self::e(self::adminProjectQuery($list, $list['page'] + 1)) . '" aria-label="შემდეგი">›</a>' : '';
 
         return $form . '<p class="admin-meta" data-total="' . $list['total'] . '" data-page="' . $list['page'] . '">'
             . self::e((string) $list['total']) . ' პროექტი · გვერდი ' . $list['page'] . ' / ' . $list['pages'] . '</p>'
@@ -1257,9 +1270,69 @@ JS;
             ? '<p class="admin-empty" data-empty="keys">ამ პროექტს API გასაღები არ აქვს.</p>'
             : '<table class="admin-table"><thead><tr><th>ID</th><th>გასაღები</th><th>ფარგლები</th><th>შექმნა UTC</th><th>ვადა UTC</th><th>გაუქმება UTC</th><th>ბოლო გამოყენება UTC</th><th>სტატუსი</th></tr></thead><tbody>' . $keys . '</tbody></table>';
 
-        return '<a class="admin-back" href="/admin/projects">პროექტები</a>' . $project . $owner . $usage
-            . '<section><h2>ბოლო 30 UTC დღე</h2><table class="admin-table"><thead><tr><th>დღე UTC</th><th>მოთხოვნები</th></tr></thead><tbody>' . $days . '</tbody></table></section>'
-            . '<section><h2>API გასაღებები</h2>' . $keyTable . '</section>';
+        $fmt = static fn (int $v): string => number_format($v, 0, '.', ' ');
+        $kpi = '<div class="admin-cards admin-kpi" data-project="' . $detail['id'] . '" data-used="' . $detail['used'] . '" data-limit="' . $detail['limit'] . '" data-remaining="' . $detail['remaining'] . '" data-minute="' . $detail['per_minute'] . '">'
+            . '<article class="admin-card"><p>მოხმარება · თვე</p><strong>' . $fmt($detail['used']) . '</strong><small>UTC თვე</small></article>'
+            . '<article class="admin-card"><p>ლიმიტი</p><strong>' . $fmt($detail['limit']) . '</strong><small>' . self::e(self::adminPlan($detail['limit'])) . '</small></article>'
+            . '<article class="admin-card"><p>დარჩენილი</p><strong>' . $fmt($detail['remaining']) . '</strong><small>ამ თვეში</small></article>'
+            . '<article class="admin-card"><p>წუთში</p><strong>' . $detail['per_minute'] . '</strong><small>rate limit</small></article></div>';
+        $max = 1;
+        foreach ($detail['days'] as $day) {
+            $max = max($max, $day['used']);
+        }
+        $bars = '';
+        foreach ($detail['days'] as $day) {
+            $h = max(2, (int) round($day['used'] / $max * 100));
+            $bars .= '<span class="admin-bar-c" data-day="' . self::e($day['day']) . '" data-day-used="' . $day['used'] . '" title="' . self::e($day['day'] . ': ' . $day['used']) . '"><i style="height:' . $h . '%"></i></span>';
+        }
+        $first = $detail['days'][0]['day'] ?? '';
+        $last = $detail['days'] === [] ? '' : $detail['days'][count($detail['days']) - 1]['day'];
+        $chart = '<section><h2>ბოლო 30 UTC დღე</h2><div class="admin-chart" role="img" aria-label="ბოლო 30 UTC დღის მოთხოვნები">' . $bars . '</div><p class="admin-axis"><span>' . self::e($first) . '</span><span>' . self::e($last) . '</span></p></section>';
+        $keys = '';
+        foreach ($detail['keys'] as $key) {
+            $keys .= '<tr data-key="' . $key['id'] . '" data-key-status="' . self::e($key['status']) . '"><td data-label="გასაღები" class="mono">' . self::e($key['masked'])
+                . '</td><td data-label="ფარგლები">' . self::e($key['scope']) . '</td><td data-label="შექმნა UTC">' . self::e($key['created_at'])
+                . '</td><td data-label="ვადა UTC">' . self::e($blank($key['expires_at'])) . '</td><td data-label="ბოლო გამოყენება UTC">' . self::e($blank($key['last_used_at'])) . '</td><td data-label="სტატუსი">' . self::adminBadge($key['status'], self::adminKeyStatus($key['status'])) . '</td></tr>';
+        }
+        $keyTable = $keys === ''
+            ? '<p class="admin-empty" data-empty="keys">ამ პროექტს API გასაღები არ აქვს.</p>'
+            : '<table class="admin-table"><thead><tr><th>გასაღები</th><th>ფარგლები</th><th>შექმნა UTC</th><th>ვადა UTC</th><th>ბოლო გამოყენება UTC</th><th>სტატუსი</th></tr></thead><tbody>' . $keys . '</tbody></table>';
+        $facts = '<section class="admin-system"><h2>პროექტი და მფლობელი</h2><dl>'
+            . self::adminFact('საიტი', $blank($detail['website']))
+            . '<div><dt>სტატუსი</dt><dd>' . self::adminBadge($detail['status']) . '</dd></div>'
+            . '<div><dt>მფლობელი</dt><dd><a href="/admin/users/' . $detail['owner_id'] . '">' . self::e($detail['owner']) . '</a></dd></div>'
+            . self::adminFact('ელფოსტა', $detail['email'] . ($detail['verified'] ? ' · დადასტურებული' : ' · დაუდასტურებელი'))
+            . self::adminFact('შექმნა UTC', $detail['created_at'])
+            . self::adminFact('განახლება UTC', $detail['updated_at'])
+            . '</dl></section>';
+        unset($project, $owner, $usage, $days);
+
+        return $kpi . '<section><h2>API გასაღებები</h2>' . $keyTable . '</section>' . $chart . $facts;
+    }
+
+    private static function adminPlanBadge(int $limit): string
+    {
+        $plan = self::adminPlan($limit);
+        $tone = match ($plan) { 'Basic' => 'ac', 'Free' => 'out', default => 'ne' };
+
+        return '<span class="admin-bd ' . $tone . '">' . $plan . '</span>';
+    }
+
+    private static function adminUsage(int $used, int $limit): string
+    {
+        $pct = $limit > 0 ? (int) min(100, round($used / $limit * 100)) : 0;
+
+        return '<span class="admin-ubar"><span><i style="width:' . $pct . '%' . ($pct >= 90 ? ';background:var(--ga-er)' : '') . '"></i></span><span class="mono">'
+            . self::e(number_format($used, 0, '.', ' ')) . ' / ' . self::e(number_format($limit, 0, '.', ' ')) . '</span></span>';
+    }
+
+    private static function adminPlan(int $limit): string
+    {
+        return match ($limit) {
+            100 => 'Free',
+            2000 => 'Basic',
+            default => 'Legacy',
+        };
     }
 
     private static function adminKeyStatus(string $status): string
@@ -1370,6 +1443,27 @@ JS;
         }
 
         return $html . '<table class="admin-table"><thead><tr><th>ფოტო</th><th>დრო</th></tr></thead><tbody>' . $body . '</tbody></table></section>';
+    }
+
+    /** @param array{period:string,stats:array<string,int>,users:list<array<string,string>>,projects:list<array<string,string>>} $overview */
+    private static function adminKpis(array $overview): string
+    {
+        $n = static fn (string $k): string => number_format((int) ($overview['stats'][$k] ?? 0), 0, '.', ' ');
+        $cards = [
+            ['მომხმარებლები', $n('users_total'), 'სულ', 'users_total'],
+            ['პროექტები', $n('projects_active'), 'აქტიური', 'projects_active'],
+            ['მოთხოვნები · თვე', $n('month_requests'), 'HTTP 200', 'month_requests'],
+        ];
+        $photos = count(self::photoRows());
+        if ($photos > 0) {
+            $cards[] = ['არასწორი ფოტოები', $photos >= 20 ? '20+' : (string) $photos, 'შეტყობინება', 'photo_reports'];
+        }
+        $html = '<div class="admin-cards admin-kpi">';
+        foreach ($cards as [$label, $value, $foot, $key]) {
+            $html .= '<article class="admin-card"><p>' . self::e($label) . '</p><strong data-stat="' . $key . '">' . self::e($value) . '</strong><small>' . self::e($foot) . '</small></article>';
+        }
+
+        return $html . '</div>';
     }
 
     /** @param array{period:string,stats:array<string,int>,users:list<array<string,string>>,projects:list<array<string,string>>} $overview */
@@ -1573,12 +1667,12 @@ JS;
         $whoInitial = $who === '' ? 'G' : mb_strtoupper(mb_substr($who, 0, 1));
         echo '<!doctype html><html lang="ka"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="robots" content="noindex">'
             . '<title>' . self::e($title) . ' — GeoAPI</title><link rel="icon" href="/favicon.ico" sizes="any"><link rel="icon" href="/assets/brand/favicon.svg" type="image/svg+xml">'
-            . '<link rel="stylesheet" href="/assets/cabinet.css?v=20261022gd">' . $css . '</head><body class="cab ga">';
+            . '<link rel="stylesheet" href="/assets/cabinet.css?v=20261022ge">' . $css . '</head><body class="cab ga">';
         echo '<div class="app"><aside class="side" id="side"><a class="logo" href="/"><img src="/assets/brand/geoapi-lockup-light.svg" alt="geoapi.ge" height="26"></a>'
             . ($project === null ? '' : '<div class="proj"><span class="av">' . self::e($initial) . '</span><div style="flex:1;min-width:0;line-height:1.25"><div class="pn">' . self::e($name) . '</div><div class="xs mut">' . self::e($state) . '</div></div></div>')
             . '<nav class="nav" aria-label="პანელი">' . $nav . '</nav>'
             . '<div class="me"><span class="av round">' . self::e($whoInitial) . '</span><div style="min-width:0;line-height:1.3"><div class="pn">' . self::e($who) . '</div><div class="xs mut" style="overflow:hidden;text-overflow:ellipsis">' . self::e($email) . '</div></div></div></aside>';
-        echo '<div class="main" id="content"><header class="top"><button class="btn menu" id="menu" type="button" aria-expanded="false" aria-controls="side" aria-label="მენიუ" onclick="var s=document.getElementById(\'side\');var o=s.classList.toggle(\'open\');this.setAttribute(\'aria-expanded\',o?\'true\':\'false\')">' . $icon($ic['menu']) . '</button>'
+        echo '<div class="main" id="content"><header class="top"><button class="btn menu" id="menu" type="button" aria-expanded="false" aria-controls="side" aria-label="მენიუ" onclick="var s=document.getElementById(\'side\');var o=s.classList.toggle(\'open\');this.setAttribute(\'aria-expanded\',o?\'true\':\'false\')">' . $icon($ic['menu']) . '</button><a class="mlogo" href="/"><img src="/assets/brand/geoapi-lockup-light.svg" alt="geoapi.ge" height="22" width="69"></a>'
             . '<div class="crumb">' . $crumb . '</div><div class="who"><a class="hide-m" href="/guide" style="color:var(--ac);font-weight:500">დოკუმენტაცია</a></div></header>'
             . '<div class="content lgc">' . ($project === null ? '' : '<div class="ph"><div><h2 class="h">' . self::e($name) . '</h2><p class="mono xs mut">' . self::e((string) ($project['website_url'] ?? '') ?: '—') . '</p></div><span class="bd ' . ($state === 'აქტიური' ? 'bd-ok' : 'bd-ne') . '"><i></i>' . self::e($state) . '</span></div>') . $tabs . $main . '</div></div></div>';
         echo '<script src="/assets/site.js?v=20261018f"></script></body></html>';

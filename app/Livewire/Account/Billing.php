@@ -122,17 +122,18 @@ final class Billing extends Component
         if (! $user instanceof User || $user->legacy_platform_user_id === null) {
             return [];
         }
+        // Same source as the cabinet (legacy platform PDO), not Laravel's default connection,
+        // which may point at a different database/search_path than platform.projects.
         try {
-            $rows = DB::table('platform.projects')
-                ->where('user_id', $user->legacy_platform_user_id)
-                ->orderBy('id')
-                ->get(['id', 'name']);
-        } catch (PDOException) {
+            $rows = (new \Carapi\Platform\ProjectRepository(\Carapi\Platform\Connection::pdo()))->forUser((int) $user->legacy_platform_user_id);
+        } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::error('billing.projects failed', ['user' => $user->id, 'error' => $e->getMessage()]);
+
             return [];
         }
         $projects = [];
         foreach ($rows as $row) {
-            $projects[] = ['id' => (int) $row->id, 'name' => (string) $row->name];
+            $projects[] = ['id' => (int) $row['id'], 'name' => (string) $row['name']];
         }
 
         return $projects;

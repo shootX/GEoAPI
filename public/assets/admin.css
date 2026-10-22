@@ -4,7 +4,7 @@
 @font-face{font-family:FiraGO;src:url(/assets/fonts/firago/firago-700.woff2) format('woff2');font-weight:700;font-display:swap}
 @font-face{font-family:"JetBrains Mono";src:url(/assets/fonts/jetbrains-mono-400.woff2) format("woff2");font-weight:400 600;font-display:swap}
 :root{--ga-ac:#4338CA;--ga-ach:#3730A3;--ga-ink:#0F0E2A;--ga-soft:#ECEBFB;--ga-line:#E4E3EE;--ga-line2:#C9C7DA;--ga-inp:#8E8BA8;--ga-ink2:#4A4866;--ga-ink3:#6E6B8A;--ga-bg:#F7F7FB;--ga-lav:#A5A0F0;--ga-ns:#EFEEF4;
---ga-ok:#1F6B45;--ga-oks:#E6F4EC;--ga-wa:#8A5300;--ga-was:#FBF1E1;--ga-er:#B3261E;--ga-ers:#FBEAE8;--ga-sh1:0 1px 2px rgb(15 14 42/.05);--ga-sh3:0 12px 40px rgb(15 14 42/.14)}
+--ga-ok:#1F6B45;--ga-oks:#E6F4EC;--ga-wa:#8A5300;--ga-was:#FBF1E1;--ga-er:#B3261E;--ga-ers:#FBEAE8;--ga-stx:#C9C7E8;--ga-smut:#6E6B9A;--ga-son:#1E1C45;--ga-shov:#1A1840;--ga-sline:#22204A;--ga-th:#FBFBFE;--ga-sh1:0 1px 2px rgb(15 14 42/.05);--ga-sh3:0 12px 40px rgb(15 14 42/.14)}
 *{box-sizing:border-box}
 .admin-app{margin:0;background:var(--ga-bg);color:var(--ga-ink);font:14px/1.5 FiraGO,"Fira Sans",system-ui,sans-serif}
 .admin-app a{color:var(--ga-ac);text-decoration:none}
@@ -13,19 +13,19 @@
 .admin-skip{position:absolute;left:-999px;top:8px;background:#fff;padding:8px 12px;border-radius:8px;z-index:50}
 .admin-skip:focus{left:8px}
 .admin-shell{display:grid;grid-template-columns:248px 1fr;min-height:100vh}
-.admin-side{background:var(--ga-ink);border-right:1px solid #22204A;color:#C9C7E8;padding:18px 12px;display:flex;flex-direction:column;gap:2px;position:sticky;top:0;height:100vh;overflow-y:auto}
+.admin-side{background:var(--ga-ink);border-right:1px solid var(--ga-sline);color:var(--ga-stx);padding:18px 12px;display:flex;flex-direction:column;gap:2px;position:sticky;top:0;height:100vh;overflow-y:auto}
 .admin-brand{display:flex;align-items:center;justify-content:space-between;margin:2px 10px 20px}
 .admin-brand img{height:24px;width:auto;display:block}
 .admin-brand span{background:var(--ga-lav);color:var(--ga-ink);border-radius:4px;padding:1px 6px;font:600 10.5px "JetBrains Mono",monospace;letter-spacing:.08em}
 .admin-side nav{display:flex;flex-direction:column;gap:2px}
-.admin-gr{margin:14px 12px 4px;font:500 10.5px "JetBrains Mono",monospace;letter-spacing:.08em;color:#6E6B9A;text-transform:uppercase}
-.admin-side a{display:flex;align-items:center;gap:10px;min-height:38px;padding:6px 12px;border-radius:8px;color:#C9C7E8;font-size:14px;line-height:1.25}
-.admin-side a:hover{background:#1A1840;text-decoration:none;color:#fff}
+.admin-gr{margin:14px 12px 4px;font:500 10.5px "JetBrains Mono",monospace;letter-spacing:.08em;color:var(--ga-smut);text-transform:uppercase}
+.admin-side a{display:flex;align-items:center;gap:10px;min-height:38px;padding:6px 12px;border-radius:8px;color:var(--ga-stx);font-size:14px;line-height:1.25}
+.admin-side a:hover{background:var(--ga-shov);text-decoration:none;color:#fff}
 .admin-side a span{flex:1}
-.admin-side a .lk{color:#6E6B9A;flex:none}
-.admin-side a[aria-current="page"]{background:#1E1C45;color:var(--ga-lav);font-weight:500}
-.admin-soon{margin:auto 0 0;border-top:1px solid #22204A;padding:14px 8px 0;font-size:12px;color:#C9C7E8;display:flex;gap:8px;align-items:center}
-.admin-soon svg{color:#6E6B9A}
+.admin-side a .lk{color:var(--ga-smut);flex:none}
+.admin-side a[aria-current="page"]{background:var(--ga-son);color:var(--ga-lav);font-weight:500}
+.admin-soon{margin:auto 0 0;border-top:1px solid var(--ga-sline);padding:14px 8px 0;font-size:12px;color:var(--ga-stx);display:flex;gap:8px;align-items:center}
+.admin-soon svg{color:var(--ga-smut)}
 .admin-col{min-width:0;display:flex;flex-direction:column}
 .admin-bar{height:64px;background:#fff;border-bottom:1px solid var(--ga-line);display:flex;align-items:center;gap:14px;padding:0 32px;position:sticky;top:0;z-index:10}
 .admin-crumb{margin:0;display:flex;gap:8px;align-items:center;font-size:13px;color:var(--ga-ink2);min-width:0}
@@ -46,7 +46,7 @@
 .admin-head{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
 .admin-head h1{margin:0;font-size:30px;font-weight:700;letter-spacing:-.02em;line-height:1.2}
 .admin-ro{display:inline-flex;align-items:center;gap:5px;height:22px;padding:0 8px;border-radius:6px;background:var(--ga-ns);color:var(--ga-ink2);font-size:11.5px}
-.admin-lockbar{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:10px 14px;border:1px dashed var(--ga-line2);border-radius:10px;background:#FBFBFE;font-size:13px;color:var(--ga-ink2)}
+.admin-lockbar{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:10px 14px;border:1px dashed var(--ga-line2);border-radius:10px;background:var(--ga-th);font-size:13px;color:var(--ga-ink2)}
 .admin-lockbar b{color:var(--ga-ink);font-weight:600}
 .admin-main h2{margin:0 0 12px;font-size:17px;font-weight:600}
 .admin-group,.admin-system,.admin-main>section,.admin-split>section{background:#fff;border:1px solid var(--ga-line);border-radius:14px;box-shadow:var(--ga-sh1);padding:18px 20px;margin:0;min-width:0}
@@ -60,7 +60,7 @@
 .admin-split>*{min-width:0}
 .admin-table{width:100%;border-collapse:collapse;font-size:13px;margin:0}
 section>.admin-table,.admin-group>.admin-table,.admin-split .admin-table{margin:4px -20px -18px;width:calc(100% + 40px)}
-.admin-table th{text-align:left;font-weight:500;font-size:12px;color:var(--ga-ink2);background:#FBFBFE;padding:10px 16px;border-top:1px solid var(--ga-line);border-bottom:1px solid var(--ga-line);white-space:nowrap}
+.admin-table th{text-align:left;font-weight:500;font-size:12px;color:var(--ga-ink2);background:var(--ga-th);padding:10px 16px;border-top:1px solid var(--ga-line);border-bottom:1px solid var(--ga-line);white-space:nowrap}
 .admin-table td{padding:10px 16px;border-bottom:1px solid var(--ga-line);vertical-align:middle}
 .admin-table tr:last-child td{border-bottom:0}
 .admin-table td[data-label="ID"],.admin-table td[data-label*="UTC"]{font-family:"JetBrains Mono",monospace;font-size:12px;color:var(--ga-ink2);white-space:nowrap}
@@ -118,3 +118,24 @@ section>.admin-table,.admin-group>.admin-table,.admin-split .admin-table{margin:
 @media (min-width:981px){.admin-shell{background:linear-gradient(90deg,var(--ga-ink) 248px,transparent 248px)}}
 @media (max-width:640px){.admin-main>.admin-table tr{padding:10px 14px}.admin-main>.admin-table tr:first-child{border-top:0}}
 .admin-more{display:block;margin-top:6px;font-size:12.5px}
+.admin-sub{margin:-12px 0 0;color:var(--ga-ink2);font-size:13px}
+.admin-stack{display:grid;gap:20px;align-content:start;min-width:0}
+.admin-kpi{grid-template-columns:repeat(4,1fr)}
+.admin-kpi .admin-card small{display:block;margin-top:4px;color:var(--ga-ink3);font-size:12px}
+.admin-bd.out{background:#fff;border:1px solid var(--ga-line2);color:var(--ga-ink)}
+.admin-ubar{display:inline-flex;align-items:center;gap:8px;white-space:nowrap}
+.admin-ubar>span:first-child{width:80px;height:6px;border-radius:99px;background:var(--ga-ns);overflow:hidden;display:block}
+.admin-ubar i{display:block;height:100%;background:var(--ga-ac);border-radius:99px}
+.admin-ubar .mono,.admin-app .mono{font-family:"JetBrains Mono",monospace;font-size:12px}
+.admin-chart{display:flex;align-items:flex-end;gap:4px;height:180px;margin-top:8px}
+.admin-bar-c{flex:1;height:100%;display:flex;align-items:flex-end}
+.admin-bar-c i{display:block;width:100%;background:var(--ga-ac);border-radius:3px 3px 0 0;min-height:2px}
+.admin-axis{display:flex;justify-content:space-between;margin:8px 0 0;font:12px "JetBrains Mono",monospace;color:var(--ga-ink3)}
+.admin-pager span[aria-current]{height:32px;min-width:32px;padding:0 10px;border-radius:8px;display:inline-flex;align-items:center;justify-content:center;background:var(--ga-soft);color:var(--ga-ac);font-weight:600;font-size:13px}
+.admin-pager a{min-width:32px;justify-content:center}
+@media (max-width:980px){.admin-kpi{grid-template-columns:1fr 1fr}}
+@media (max-width:640px){.admin-kpi{grid-template-columns:1fr 1fr;gap:10px}.admin-kpi .admin-card{padding:14px}.admin-kpi .admin-card strong{font-size:20px}}
+html{scrollbar-gutter:stable}body{overflow-x:hidden}
+.admin-stack>section{background:#fff;border:1px solid var(--ga-line);border-radius:14px;box-shadow:var(--ga-sh1);padding:18px 20px;margin:0;min-width:0}
+.admin-stack .admin-table{margin:4px -20px -18px;width:calc(100% + 40px)}
+@media (max-width:640px){.admin-stack .admin-table{margin:4px 0 0;width:100%}}

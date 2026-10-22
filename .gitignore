@@ -39,3 +39,5 @@
 Homestead.json
 Homestead.yaml
 Thumbs.db
+/legacy/data/sessions/*
+!/legacy/data/sessions/.gitkeep

@@ -307,8 +307,8 @@ final class Projects extends Component
     {
         $values = [42, 38, 55, 61, 48, 22, 18, 70, 66, 80, 74, 59, 40, 28, 90, 84, 77, 69, 51, 33, 26, 96, 88, 73, 64, 58, 41, 30, 86, 79];
         $days = [];
-        foreach ($values as $used) {
-            $days[] = ['day' => '', 'used' => $used];
+        foreach ($values as $i => $used) {
+            $days[] = ['day' => gmdate('Y-m-d', time() - (29 - $i) * 86400), 'used' => $used];
         }
         $base['demo'] = true;
         $base['project'] = ['id' => 1, 'name' => 'დემო პროექტი'];

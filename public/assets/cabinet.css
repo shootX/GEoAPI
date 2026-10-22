@@ -218,3 +218,9 @@
 .cab.ga a.edit { color: var(--ac); font-size: 13px; font-weight: 500; display: inline-flex; align-items: center; gap: 4px; }
 .cab.ga a.edit::after { content: "›"; font-size: 15px; line-height: 1; }
 .cab.ga a.edit:hover { text-decoration: underline; }
+/* round 2 */
+html:has(body.cab) { background: #F7F7FB; scrollbar-gutter: stable; }
+.cab.ga .mlogo { display: none; }
+.cab.ga .mlogo img { display: block; height: 22px; width: auto; }
+@media (max-width: 980px) { .cab.ga .mlogo { display: block; } .cab.ga .top h1, .cab.ga .top .crumb { display: none; } }
+.cab.ga .main { overflow-x: clip; }

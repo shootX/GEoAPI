@@ -229,3 +229,9 @@
 - Admin overview: photo-reports card only when such notifications exist (shows 20+ at cap).
 - Projects list: per-project monthly usage bar + client-side name/URL search.
 - Billing/BOG untouched (owner decision pending).
+
+## 2026-10-22 — QA round 2
+- Removed committed legacy session files (csrf-only, anonymous; created by local render scripts) + gitignore.
+- Billing::projects() now reads via legacy platform PDO (same as cabinet) and logs failures; root cause: Laravel default connection != platform DB.
+- Admin: 4 KPI (2 cols mobile), coming-soon + recent projects stack, project detail = name title + KPI + keys + 30-day chart, projects plan badge + usage bar, numbered pagers, nav label "პროექტები", admin.css colors as vars.
+- Panel: overview heading + 2 CTAs, mobile logo in top bar, html bg/scrollbar-gutter (right-edge strip), demo days dated. Home @if(true) removed.

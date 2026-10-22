@@ -80,7 +80,6 @@
             <div class="xs mut" style="text-align:right;margin-top:10px">{{ $en ? 'Example from the OpenAPI spec' : 'მაგალითი OpenAPI სპეციფიკაციიდან' }}</div>
         </div>
     </div>
-    @if (true)
         <div class="wrap">
             <div class="g4 stats" style="border-top:1px solid var(--line);padding:28px 0 8px">
                 @foreach ($stats as [$n, $label])
@@ -89,7 +88,6 @@
             </div>
             <p class="xs mut" style="padding-bottom:12px">{{ $en ? 'Catalog counts' : 'კატალოგის მოცულობა' }} · {{ $measuredAt }} · <a class="mono" href="{{ url('/api/v1/docs') }}">/api/v1/coverage</a></p>
         </div>
-    @endif
 </section>
 <section class="sec" id="features">
     <div class="wrap">
