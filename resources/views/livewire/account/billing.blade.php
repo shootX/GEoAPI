@@ -26,6 +26,9 @@
             @if ($notice === 'return')
                 <div class="al al-in"><x-ga.icon name="info" :size="18" /><div>{{ $en ? 'No bank confirmation yet. The return page alone does not turn the plan on.' : 'ბანკის დადასტურება ჯერ არ არის. გადახდის გვერდი უფლებას არ ჩართავს.' }}</div></div>
             @endif
+            @if ($notice === 'test')
+                <div class="al al-ok" data-code="test payment"><x-ga.icon name="ok" :size="18" /><div>{{ $en ? 'TEST payment recorded. The plan is active; the invoice is marked TEST. No money was charged.' : 'სატესტო გადახდა დაფიქსირდა. გეგმა ჩართულია; ინვოისი მონიშნულია TEST. თანხა არ ჩამოგეჭრათ.' }}</div></div>
+            @endif
             @if ($notice === 'fail')
                 <div class="al al-er"><x-ga.icon name="err" :size="18" /><div>{{ $en ? 'The payment was not completed. The quota did not change.' : 'გადახდა არ დასრულდა. კვოტა არ შეცვლილა.' }}</div></div>
             @endif
@@ -85,7 +88,11 @@
                         </article>
                     @endforeach
                 </div>
+                @if ($mock)
+                <p class="xs mut" data-code="mock mode">{{ $en ? 'TEST mode: the bank is not connected yet, so checkout opens a test payment page. No card is asked for and no money is charged.' : 'სატესტო რეჟიმი: ბანკი ჯერ არ არის მიერთებული, ამიტომ გადახდა სატესტო გვერდზე გადადის. ბარათის მონაცემები არ მოითხოვება და თანხა არ ჩამოიჭრება.' }}</p>
+                @else
                 <p class="xs mut">{{ $en ? 'Payment: Bank of Georgia. You return here after the bank page; the plan turns on only after the bank confirms.' : 'გადახდა: Bank of Georgia. ბანკის გვერდის შემდეგ აქ დაბრუნდებით; გეგმა ჩაირთვება მხოლოდ ბანკის დადასტურების შემდეგ.' }}</p>
+                @endif
             @endif
 
             @if (count($orders) > 0)
@@ -96,7 +103,7 @@
                             <thead><tr><th>{{ $en ? 'Plan' : 'გეგმა' }}</th><th>{{ $en ? 'Status' : 'სტატუსი' }}</th><th style="text-align:right">GEL</th></tr></thead>
                             <tbody>
                                 @foreach ($orders as $order)
-                                    <tr><td class="mono">{{ $order->plan_code }}</td><td><span class="bd bd-{{ $statusTone[$order->status] ?? 'ne' }}"><i></i>{{ $order->status }}</span></td><td style="text-align:right" class="mono">{{ $order->gel_amount }} GEL</td></tr>
+                                    <tr><td class="mono">{{ $order->plan_code }}@if (($order->provider ?? null) === 'mock') <span class="bd bd-wa">TEST</span>@endif</td><td><span class="bd bd-{{ $statusTone[$order->status] ?? 'ne' }}"><i></i>{{ $order->status }}</span></td><td style="text-align:right" class="mono">{{ $order->gel_amount }} GEL</td></tr>
                                 @endforeach
                             </tbody>
                         </table>

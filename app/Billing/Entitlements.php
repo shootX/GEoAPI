@@ -114,7 +114,7 @@ final class Entitlements
         $ends = (string) $order->interval === 'year' ? now()->addYear() : now()->addMonth();
         $endsAt = $ends->utc()->format('Y-m-d H:i:s');
         self::apply((int) $order->project_id, (string) $order->plan_code, $endsAt, Plans::unlimited((string) $order->plan_code));
-        self::setEntitlement((int) $order->legacy_user_id, (string) $order->plan_code, null, 'bog');
+        self::setEntitlement((int) $order->legacy_user_id, (string) $order->plan_code, null, (string) ($order->provider ?? 'bog'));
         DB::table('billing_orders')->where('id', $order->id)->update([
             'status' => 'paid',
             'updated_at' => now(),
@@ -320,7 +320,8 @@ final class Entitlements
     private static function invoice(object $order, string $endsAt): void
     {
         $buyer = self::jsonArray($order->buyer);
-        $number = 'GEO-'.now()->utc()->format('Ymd').'-'.$order->id;
+        $test = (string) ($order->provider ?? 'bog') === MockPay::PROVIDER;
+        $number = ($test ? 'TEST-' : 'GEO-').now()->utc()->format('Ymd').'-'.$order->id;
         $pdf = InvoicePdf::render([
             'kind' => (string) ($buyer['kind'] ?? 'individual'),
             'name' => (string) ($buyer['name'] ?? ''),
@@ -330,7 +331,7 @@ final class Entitlements
             'vat_payer' => (bool) ($buyer['vat_payer'] ?? false),
         ], [
             'number' => $number,
-            'plan' => (string) $order->plan_code,
+            'plan' => (string) $order->plan_code.($test ? ' — TEST / სატესტო, არ არის გადახდილი' : ''),
             'usd' => number_format(((int) $order->usd_cents) / 100, 2, '.', ''),
             'gel' => (string) $order->gel_amount,
             'rate' => self::rateString($order->rate),

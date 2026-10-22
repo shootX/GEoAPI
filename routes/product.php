@@ -87,6 +87,14 @@ Route::get('/account/billing', Billing::class)
     ->middleware(['web', 'auth'])
     ->name('account.billing');
 
+Route::get('/billing/test/{order}', [\App\Http\Controllers\MockPaymentController::class, 'show'])
+    ->middleware(['web', 'auth', 'signed'])
+    ->name('billing.mock.show');
+
+Route::post('/billing/test/{order}', [\App\Http\Controllers\MockPaymentController::class, 'complete'])
+    ->middleware(['web', 'auth', 'throttle:20,1'])
+    ->name('billing.mock.complete');
+
 Route::get('/account/billing/invoices/{id}', InvoiceController::class)
     ->middleware(['web', 'auth'])
     ->whereNumber('id')

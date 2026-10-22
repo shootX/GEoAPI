@@ -76,6 +76,7 @@ final class BogBillingTest extends TestCase
     public function test_checkout_without_credentials_does_not_call_the_bank_or_change_quota(): void
     {
         Http::fake();
+        config(['services.bog.env' => 'production']);
         $user = $this->owner();
         $this->limits(7, 10000, null, false, null);
 
@@ -88,6 +89,73 @@ final class BogBillingTest extends TestCase
         Http::assertNothingSent();
         $this->assertSame(10000, (int) DB::table('platform.project_limits')->where('project_id', 7)->value('monthly_quota'));
         $this->assertSame(0, DB::table('billing_orders')->count());
+    }
+
+    public function test_mock_mode_success_grants_through_the_callback_path_with_a_test_invoice(): void
+    {
+        Http::fake();
+        $this->rate();
+        $user = $this->owner();
+        $this->limits(7, 10000, null, false, null);
+
+        Livewire::actingAs($user)->test(Billing::class)
+            ->assertDontSee('data-code="payments not configured"', false)
+            ->assertSee('data-code="mock mode"', false)
+            ->set('projectId', 7)
+            ->call('checkout', 'basic', 'month')
+            ->assertRedirectContains('/billing/test/');
+
+        Http::assertNothingSent();
+        $order = DB::table('billing_orders')->first();
+        $this->assertSame('mock', $order->provider);
+        $this->assertSame('pending', $order->status);
+        $this->assertSame(10000, (int) DB::table('platform.project_limits')->where('project_id', 7)->value('monthly_quota'));
+
+        $page = \Illuminate\Support\Facades\URL::temporarySignedRoute('billing.mock.show', now()->addMinutes(5), ['order' => $order->public_id]);
+        $this->actingAs($user)->get($page)->assertOk()->assertSee('სატესტო გადახდა')->assertDontSee('card_number')->assertDontSee('cvv');
+        $this->actingAs($user)->get('/billing/test/'.$order->public_id)->assertForbidden();
+
+        $this->actingAs($user)->post('/billing/test/'.$order->public_id, ['result' => 'success'])->assertRedirect('/account/billing?paid=test');
+        $this->assertSame('paid', DB::table('billing_orders')->where('id', $order->id)->value('status'));
+        $this->assertNotSame(10000, (int) DB::table('platform.project_limits')->where('project_id', 7)->value('monthly_quota'));
+        $invoice = DB::table('billing_invoices')->where('billing_order_id', $order->id)->first();
+        $this->assertNotNull($invoice);
+        $this->assertStringStartsWith('TEST-', $invoice->number);
+        $this->actingAs($user)->post('/billing/test/'.$order->public_id, ['result' => 'success'])->assertStatus(410);
+        $this->assertSame(1, DB::table('billing_invoices')->count());
+    }
+
+    public function test_mock_mode_fail_marks_the_order_failed_and_keeps_quota(): void
+    {
+        $this->rate();
+        $user = $this->owner();
+        $this->limits(7, 10000, null, false, null);
+        Livewire::actingAs($user)->test(Billing::class)->set('projectId', 7)->call('checkout', 'basic', 'year');
+        $order = DB::table('billing_orders')->first();
+
+        $this->actingAs($user)->post('/billing/test/'.$order->public_id, ['result' => 'fail'])->assertRedirect('/account/billing?paid=fail');
+        $this->assertSame('failed', DB::table('billing_orders')->where('id', $order->id)->value('status'));
+        $this->assertSame(10000, (int) DB::table('platform.project_limits')->where('project_id', 7)->value('monthly_quota'));
+        $this->assertSame(0, DB::table('billing_invoices')->count());
+    }
+
+    public function test_mock_mode_is_impossible_with_credentials_or_production(): void
+    {
+        $this->assertTrue(\App\Billing\MockPay::enabled());
+        config(['services.bog.client_id' => 'sandbox-client', 'services.bog.client_secret' => 'sandbox-secret-value']);
+        $this->assertFalse(\App\Billing\MockPay::enabled());
+        config(['services.bog.client_id' => null, 'services.bog.client_secret' => null, 'services.bog.env' => 'production']);
+        $this->assertFalse(\App\Billing\MockPay::enabled());
+
+        $user = $this->owner();
+        $this->limits(7, 10000, null, false, null);
+        $id = DB::table('billing_orders')->insertGetId(['public_id' => 'mock-guard', 'user_id' => $user->id, 'legacy_user_id' => (int) $user->legacy_platform_user_id, 'project_id' => 7, 'plan_code' => 'basic', 'interval' => 'month', 'usd_cents' => 5000, 'gel_amount' => '150.00', 'rate' => '3.0000', 'rate_quantity' => 1, 'rate_date' => '2026-10-22', 'buyer' => '{}', 'previous' => '{}', 'status' => 'pending', 'provider' => 'mock', 'created_at' => now(), 'updated_at' => now()]);
+        $this->actingAs($user)->post('/billing/test/mock-guard', ['result' => 'success'])->assertNotFound();
+        $this->assertSame('pending', DB::table('billing_orders')->where('id', $id)->value('status'));
+
+        config(['services.bog.env' => 'sandbox', 'services.bog.client_id' => 'sandbox-client', 'services.bog.client_secret' => 'sandbox-secret-value']);
+        $this->actingAs($user)->post('/billing/test/mock-guard', ['result' => 'success'])->assertNotFound();
+        $this->assertSame(10000, (int) DB::table('platform.project_limits')->where('project_id', 7)->value('monthly_quota'));
     }
 
     public function test_a_paid_checkout_waits_for_the_signed_callback(): void
