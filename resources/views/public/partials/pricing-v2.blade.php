@@ -119,7 +119,8 @@
             @endif
             {{ $en ? 'Payment: Bank of Georgia. There is no automatic charge.' : 'გადახდა: Bank of Georgia. ავტომატური ჩამოჭრა არ არის.' }}
         </p>
-        <p class="xs mut" style="text-align:center;margin-top:6px">{{ $en ? 'Enterprise is set by an administrator. Extra requests are prepaid packs, not an overage bill.' : 'Enterprise-ს ადმინისტრატორი ნიშნავს. დამატებითი მოთხოვნები წინასწარ შეძენილი პაკეტია, არა ზედმეტი ანგარიში.' }}</p>
+        <p class="xs mut" style="text-align:center;margin-top:6px">{{ $en ? 'One subscription per workspace: all projects share the monthly quota. Prepaid packs: Starter +10 000 for $9, Growth +50 000 for $20; they expire after 90 days and are spent after the monthly quota. Extra active project: $5 / month. No overage bill.' : 'ერთი გამოწერა სამუშაო სივრცეზე: ყველა პროექტი თვიურ კვოტას იზიარებს. წინასწარი პაკეტები: Starter +10 000 — $9, Growth +50 000 — $20; 90 დღეში იწურება და თვიური კვოტის შემდეგ იხარჯება. დამატებითი აქტიური პროექტი: $5 / თვე. ზედმეტ მოხმარებაზე ანგარიში არ იწერება.' }}</p>
+        <p class="xs mut" style="text-align:center;margin-top:6px">{{ $en ? 'Enterprise: custom limits and terms —' : 'Enterprise: ინდივიდუალური ლიმიტები და პირობები —' }} <a href="mailto:hello@geoapi.ge">hello@geoapi.ge</a></p>
     </div>
 </section>
 <script>

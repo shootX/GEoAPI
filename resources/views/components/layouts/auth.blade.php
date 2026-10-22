@@ -31,8 +31,8 @@
                 <h2 class="h2" style="margin-top:40px;color:#fff">{{ $en ? 'Brands, models, generations and specifications —' : 'ბრენდები, მოდელები, თაობები და სპეციფიკაციები —' }} <span style="color:#A5A0F0">{{ $en ? 'one API' : 'ერთი API-ით' }}</span></h2>
                 <div class="col sm" style="gap:12px;margin-top:28px;color:#D9D7EE">
                     @foreach ($en
-                        ? ['Free plan: 100 successful requests a month', 'REST API and an embeddable widget', '14 endpoints · OpenAPI and Postman']
-                        : ['Free გეგმა — 100 წარმატებული მოთხოვნა თვეში', 'REST API და ჩასაშენებელი ვიჯეტი', '14 endpoint · OpenAPI და Postman'] as $line)
+                        ? ['Free plan: '.(\App\Billing\V2\Flag::on() ? '1 000' : '100').' successful requests a month', 'REST API and an embeddable widget', '14 endpoints · OpenAPI and Postman']
+                        : ['Free გეგმა — '.(\App\Billing\V2\Flag::on() ? '1 000' : '100').' წარმატებული მოთხოვნა თვეში', 'REST API და ჩასაშენებელი ვიჯეტი', '14 endpoint · OpenAPI და Postman'] as $line)
                         <span class="row" style="gap:10px;flex-wrap:nowrap"><x-ga.icon name="chk" style="color:#A5A0F0" />{{ $line }}</span>
                     @endforeach
                 </div>
