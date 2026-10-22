@@ -101,6 +101,7 @@ class AppServiceProvider extends ServiceProvider
         Livewire::component('electrik.settings.api-tokens', ApiTokens::class);
         Livewire::component('electrik.auth.login', \App\Livewire\Auth\Login::class);
         Livewire::component('electrik.auth.register', Register::class);
+        Livewire::component('electrik.auth.forgot-password', \App\Livewire\Auth\ForgotPassword::class);
         Livewire::component('electrik.auth.reset-password', \App\Livewire\Auth\ResetPassword::class);
         Livewire::component('account.products', Products::class);
         Livewire::component('account.projects', Projects::class);
