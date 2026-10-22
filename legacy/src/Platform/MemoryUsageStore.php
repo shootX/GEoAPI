@@ -102,6 +102,14 @@ final class MemoryUsageStore implements UsageStore
         ];
     }
 
+    public function recordDaily(int $projectId, string $route, int $now): void
+    {
+        $dayKey = $this->dayKey($projectId, $now);
+        $this->days[$dayKey] = ($this->days[$dayKey] ?? 0) + 1;
+        $routeKey = $projectId.'|'.gmdate('Y-m-d', $now);
+        $this->routes[$routeKey][$route] = ($this->routes[$routeKey][$route] ?? 0) + 1;
+    }
+
     public function stats(int $projectId, int $now): ?array
     {
         $month = $this->previewMonth($projectId, $now);

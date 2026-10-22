@@ -151,6 +151,18 @@ final class PostgresUsageStore implements UsageStore
         ];
     }
 
+    public function recordDaily(int $projectId, string $route, int $now): void
+    {
+        $daily = $this->pdo->prepare(<<<'SQL'
+            INSERT INTO platform.daily_usage (project_id, day, route, used_count)
+            VALUES (:id, :day, :route, 1)
+            ON CONFLICT (project_id, day, route)
+            DO UPDATE SET used_count = platform.daily_usage.used_count + 1
+        SQL);
+        $daily->execute(['id' => $projectId, 'day' => gmdate('Y-m-d', $now), 'route' => $route]);
+        $daily->closeCursor();
+    }
+
     public function stats(int $projectId, int $now): ?array
     {
         $limits = $this->limits($projectId);

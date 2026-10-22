@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Carapi\Platform;
 
+use App\Billing\V2\Gate;
+use App\Billing\V2\ProjectLimitReached;
 use PDO;
 
 final class ProjectRepository
@@ -39,6 +41,13 @@ final class ProjectRepository
 
     public function insert(int $userId, string $name, ?string $website): int
     {
+        if (class_exists(Gate::class)) {
+            Gate::prepareForCreate($userId);
+            $blocked = Gate::blockCreate($userId);
+            if ($blocked !== null) {
+                throw new ProjectLimitReached($blocked);
+            }
+        }
         $limitsSql = $this->limitsInsert($userId);
         $nested = $this->pdo->inTransaction();
         if ($nested) {

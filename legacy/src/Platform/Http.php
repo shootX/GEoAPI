@@ -382,7 +382,14 @@ final class Http
 
                 return;
             }
-            $projects->insert($userId, $parsed['name'], $parsed['website']);
+            try {
+                $projects->insert($userId, $parsed['name'], $parsed['website']);
+            } catch (\App\Billing\V2\ProjectLimitReached $e) {
+                http_response_code(422);
+                View::account($user, $projects->forUser($userId), ['name' => $e->getMessage()], $input);
+
+                return;
+            }
             self::redirect('/account');
         }
         $id = (int) ($input['project_id'] ?? 0);

@@ -50,6 +50,11 @@ final class Http
 
                 return;
             }
+            if (! empty($preview['cap'])) {
+                self::limited('PROJECT_CAP_EXCEEDED', max(1, $preview['reset_at'] - $now), $preview['limit'], $preview['reset_at']);
+
+                return;
+            }
             if ($preview['exhausted']) {
                 self::limited('MONTHLY_QUOTA_EXCEEDED', max(1, $preview['reset_at'] - $now), $preview['limit'], $preview['reset_at']);
 

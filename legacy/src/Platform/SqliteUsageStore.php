@@ -188,6 +188,17 @@ final class SqliteUsageStore implements UsageStore
         ];
     }
 
+    public function recordDaily(int $projectId, string $route, int $now): void
+    {
+        $daily = $this->pdo->prepare(<<<'SQL'
+            INSERT INTO days (project_id, day, route, used_count)
+            VALUES (:id, :day, :route, 1)
+            ON CONFLICT (project_id, day, route)
+            DO UPDATE SET used_count = used_count + 1
+        SQL);
+        $daily->execute(['id' => $projectId, 'day' => gmdate('Y-m-d', $now), 'route' => $route]);
+    }
+
     public function stats(int $projectId, int $now): ?array
     {
         $month = $this->previewMonth($projectId, $now);
