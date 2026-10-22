@@ -174,12 +174,25 @@ test("refuses a secret key in the browser before any request", () => {
         return true;
       },
     );
+    assert.throws(() => new GeoAPI({ apiKey: "carapi_sk_legacy_secret", fetch: async () => jsonResponse(200, {}) }), GeoAPIError);
     const publishable = new GeoAPI({ apiKey: "geoapi_pk_demo", fetch: async () => jsonResponse(200, {}) });
     assert.ok(publishable);
     assert.equal(calls, 0);
   } finally {
     delete globalThis.window;
   }
+});
+
+test("refuses a plain-http base URL except for this machine", () => {
+  const fetch = async () => jsonResponse(200, {});
+  assert.throws(() => new GeoAPI({ apiKey: KEY, baseUrl: "http://geoapi.ge", fetch }), (error) => {
+    assert.ok(error instanceof GeoAPIError);
+    assert.equal(error.message, "baseUrl must use https (http only for localhost).");
+    return true;
+  });
+  assert.throws(() => new GeoAPI({ apiKey: KEY, baseUrl: "ftp://geoapi.ge", fetch }), GeoAPIError);
+  assert.ok(new GeoAPI({ apiKey: KEY, baseUrl: "http://127.0.0.1:8080", fetch }));
+  assert.ok(new GeoAPI({ apiKey: KEY, baseUrl: "https://staging.geoapi.ge/", fetch }));
 });
 
 test("aborts when the caller signal or the timeout fires", async () => {
