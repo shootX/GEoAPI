@@ -7,7 +7,7 @@ namespace App\Livewire\Auth;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Title;
 
-#[Layout('components.layouts.public')]
+#[Layout('components.layouts.auth')]
 #[Title('შესვლა')]
 final class Login extends \Electrik\Livewire\Auth\Login
 {

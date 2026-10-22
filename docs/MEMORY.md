@@ -150,3 +150,10 @@ Existing access is kept by a new column, not by rewriting quotas. On PostgreSQL 
 - Restore test 2026-10-22: 163 s, clean; RPO up to 24 h (nightly dump only).
 - Perf 2026-10-22: ~13 rps at 20 conc, p95 ~2 s remote; app-side ~0.35 s for /ready. Docs in docs/PERFORMANCE.md.
 - Docs: WP-00 audit is historical; current state lives in TASKS.md.
+
+## 2026-10-22 — Design
+
+- Public pages use `<body class="site ga">`; component classes (`btn b-pri`, `fc`, `code`, `al`, `seg`, `tw`) live in `resources/css/geoapi-design.css`, scoped to `.ga` so Electrik cabinet/admin are unaffected.
+- Tokens: `--ga-*` in `app.css`; slate/Electrik variable names kept and mapped to Indigo.
+- Auth pages use `components.layouts.auth`; Electrik forgot/reset/verify are overridden in `resources/views/vendor/electrik/livewire/auth/`.
+- Integrations is Proposed: do not link it until SDK/MCP/CLI pages ship.

@@ -1,37 +1,42 @@
-<div class="mx-auto w-full max-w-md">
-    <x-slate::card>
-        <x-slate::card-header>
-            <x-slate::card-title>{{ __('Sign in') }}</x-slate::card-title>
-            <x-slate::card-description>{{ __('Welcome back. Enter your credentials to continue.') }}</x-slate::card-description>
-        </x-slate::card-header>
-        <x-slate::card-content>
-            @if (session('status'))
-                <x-slate::alert variant="success" :title="session('status')" class="mb-4" />
-            @endif
-            @if (session('error'))
-                <x-slate::alert variant="destructive" :title="session('error')" class="mb-4" />
-            @endif
-            <x-slate::form wire:submit="login" class="space-y-4">
-                @unless ($requiresTwoFactor)
-                    <x-slate::input wire:model="email" type="email" label="{{ __('Email') }}" autocomplete="username" required :readonly="$inviteLockedEmail" />
-                    <div class="space-y-2">
-                        <div class="flex items-center justify-between gap-2">
-                            <x-slate::field-label for="login-password">{{ __('Password') }}</x-slate::field-label>
-                            <a href="{{ route('password.request') }}" class="text-sm text-muted-foreground underline-offset-4 hover:underline">{{ __('Forgot password?') }}</a>
-                        </div>
-                        <x-slate::input id="login-password" wire:model="password" type="password" autocomplete="current-password" required />
-                    </div>
-                    <x-slate::checkbox wire:model="remember" label="{{ __('Remember me') }}" />
-                @else
-                    <x-slate::input wire:model="twoFactorCode" label="კოდი" inputmode="numeric" autocomplete="one-time-code" required />
-                @endunless
-                <x-slate::button type="submit" class="w-full" size="lg">{{ $requiresTwoFactor ? 'დადასტურება' : __('Sign in') }}</x-slate::button>
-            </x-slate::form>
-        </x-slate::card-content>
-        @if (config('electrik.auth.registration', true) && ! $requiresTwoFactor)
-            <x-slate::card-footer class="justify-center">
-                <p class="text-sm text-muted-foreground">{{ __('No account?') }} <a href="{{ route('register') }}" class="font-medium text-foreground underline">{{ __('Create one') }}</a></p>
-            </x-slate::card-footer>
-        @endif
-    </x-slate::card>
+@php $en = app()->getLocale() === 'en'; @endphp
+<div>
+    @if ($requiresTwoFactor)
+        <div style="width:64px;height:64px;border-radius:16px;background:var(--soft);color:var(--ac);display:grid;place-items:center;margin-bottom:22px"><x-ga.icon name="lock" :size="30" /></div>
+        <h1>{{ $en ? 'Two-step sign in' : 'ორსაფეხურიანი შესვლა' }}</h1>
+        <p class="mut" style="margin:8px 0 28px">{{ $en ? 'Enter the 6-digit code from your authenticator app.' : 'შეიყვანეთ 6-ნიშნა კოდი ავთენტიფიკატორის აპიდან.' }}</p>
+    @else
+        <h1>{{ __('Sign in') }}</h1>
+        <p class="mut" style="margin:6px 0 28px">{{ $en ? 'Continue to your cabinet' : 'გააგრძელეთ თქვენს კაბინეტში' }}</p>
+    @endif
+    @if (session('status'))
+        <div class="al al-ok" style="margin-bottom:18px"><x-ga.icon name="ok" :size="18" /><div>{{ session('status') }}</div></div>
+    @endif
+    @if (session('error'))
+        <div class="al al-er" style="margin-bottom:18px"><x-ga.icon name="err" :size="18" /><div>{{ session('error') }}</div></div>
+    @endif
+    <form wire:submit="login" class="col" style="gap:16px">
+        @unless ($requiresTwoFactor)
+            <div class="fld">
+                <label for="login-email">{{ __('Email') }}</label>
+                <input id="login-email" class="inp @error('email') err @enderror" wire:model="email" type="email" autocomplete="username" required @if ($inviteLockedEmail) readonly @endif>
+                @error('email')<span class="emsg"><x-ga.icon name="err" :size="14" />{{ $message }}</span>@enderror
+            </div>
+            <div class="fld">
+                <div class="row" style="justify-content:space-between"><label for="login-password">{{ __('Password') }}</label><a href="{{ route('password.request') }}" class="sm lnk">{{ __('Forgot password?') }}</a></div>
+                <input id="login-password" class="inp @error('password') err @enderror" wire:model="password" type="password" autocomplete="current-password" required>
+                @error('password')<span class="emsg"><x-ga.icon name="err" :size="14" />{{ $message }}</span>@enderror
+            </div>
+            <label class="chk-l"><input type="checkbox" wire:model="remember"> {{ __('Remember me') }}</label>
+        @else
+            <div class="fld">
+                <label for="login-code">კოდი</label>
+                <input id="login-code" class="inp mono @error('twoFactorCode') err @enderror" wire:model="twoFactorCode" inputmode="numeric" autocomplete="one-time-code" maxlength="10" required style="font-size:22px;letter-spacing:.4em;text-align:center;height:60px">
+                @error('twoFactorCode')<span class="emsg"><x-ga.icon name="err" :size="14" />{{ $message }}</span>@enderror
+            </div>
+        @endunless
+        <button type="submit" class="btn b-pri b-lg" style="justify-content:center;width:100%">{{ $requiresTwoFactor ? 'დადასტურება' : __('Sign in') }}</button>
+    </form>
+    @if (config('electrik.auth.registration', true) && ! $requiresTwoFactor)
+        <p class="sm mut" style="text-align:center;margin-top:24px">{{ __('No account?') }} <a href="{{ route('register') }}" class="lnk">{{ __('Create one') }}</a></p>
+    @endif
 </div>

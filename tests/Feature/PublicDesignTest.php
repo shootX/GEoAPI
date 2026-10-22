@@ -88,15 +88,30 @@ class PublicDesignTest extends TestCase
             ->assertSee('ბრენდები');
     }
 
-    public function test_new_design_layout_and_brand_assets(): void
+    public function test_new_design_layout_assets_and_auth_split_screen(): void
     {
         $home = (string) $this->withSession(['locale' => 'ka'])->get('/')->assertOk()->getContent();
         $this->assertStringContainsString('class="site ga', $home);
         $this->assertStringContainsString('assets/brand/geoapi-lockup-light.svg', $home);
         $this->assertStringContainsString('assets/brand/og-image-ka.png', $home);
         $this->assertStringContainsString('hello@geoapi.ge', $home);
+        $this->assertStringNotContainsString('public-design.css', $home);
         $this->assertFileExists(public_path('assets/brand/og-image-en.png'));
         $this->assertFileExists(public_path('assets/brand/favicon.svg'));
         $this->assertFileExists(resource_path('fonts/jetbrains-mono-400.woff2'));
+
+        $this->withSession(['locale' => 'ka'])->get('/login')->assertOk()
+            ->assertSee('class="auth"', false)
+            ->assertSee('ერთი API-ით')
+            ->assertSee('wire:model="email"', false);
+
+        $this->withSession(['locale' => 'ka'])->get('/register')->assertOk()
+            ->assertSee('class="auth"', false)
+            ->assertSee('value="legal"', false)
+            ->assertSee('wire:model="accept_terms"', false);
+
+        $this->withSession(['locale' => 'ka'])->get('/forgot-password')->assertOk()
+            ->assertSee('class="auth"', false)
+            ->assertSee('wire:submit="sendResetLink"', false);
     }
 }
