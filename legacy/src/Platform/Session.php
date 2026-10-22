@@ -6,6 +6,14 @@ namespace Carapi\Platform;
 
 final class Session
 {
+    /** The session file directory, shared with the Laravel side (ProvisionPlatformUser, BridgeLegacySession). */
+    public static function path(): string
+    {
+        $path = carapi_env('CARAPI_PLATFORM_SESSION_PATH');
+
+        return is_string($path) && $path !== '' ? $path : dirname(__DIR__, 2).'/data/sessions';
+    }
+
     public static function start(): void
     {
         if (session_status() === PHP_SESSION_ACTIVE && session_name() === 'geoapi_platform') {
@@ -17,8 +25,7 @@ final class Session
             session_write_close();
         }
 
-        $path = carapi_env('CARAPI_PLATFORM_SESSION_PATH');
-        $path = is_string($path) && $path !== '' ? $path : dirname(__DIR__, 2).'/data/sessions';
+        $path = self::path();
         if (! is_dir($path) && ! mkdir($path, 0700, true) && ! is_dir($path)) {
             throw new UnavailableException;
         }

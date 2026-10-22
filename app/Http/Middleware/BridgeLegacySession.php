@@ -93,9 +93,6 @@ final class BridgeLegacySession
 
     private function sessionFile(string $sid): string
     {
-        $dir = env('CARAPI_PLATFORM_SESSION_PATH');
-        $dir = is_string($dir) && $dir !== '' ? $dir : storage_path('framework/carapi-sessions');
-
-        return $dir.'/sess_'.$sid;
+        return Session::path().'/sess_'.$sid;
     }
 }

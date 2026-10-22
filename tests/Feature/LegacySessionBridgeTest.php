@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace Tests\Feature;
 
 use App\Models\User;
+use Carapi\Platform\Session;
+use Illuminate\Auth\Events\Login;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
 use Tests\TestCase;
@@ -87,6 +89,22 @@ final class LegacySessionBridgeTest extends TestCase
         $this->withUnencryptedCookie('geoapi_platform', $this->legacySession(13 * 3600, 60))->get('/');
 
         $this->assertGuest();
+    }
+
+    public function test_a_laravel_sign_in_writes_the_legacy_session_where_the_legacy_pages_read_it(): void
+    {
+        // The defaults used to differ (storage/framework/carapi-sessions here, legacy/data/sessions
+        // in the legacy app), so without the variable the legacy pages never saw the sign-in.
+        $this->setEnv('CARAPI_PLATFORM_SESSION_PATH', null);
+        $dir = base_path('legacy/data/sessions');
+        $before = glob($dir.'/sess_*') ?: [];
+
+        event(new Login('web', User::query()->where('legacy_platform_user_id', 70)->firstOrFail(), false));
+
+        $written = array_diff(glob($dir.'/sess_*') ?: [], $before);
+        array_map('unlink', $written);
+        $this->assertSame($dir, Session::path());
+        $this->assertCount(1, $written);
     }
 
     public function test_logout_deletes_the_legacy_session_so_a_copied_cookie_stops_working(): void

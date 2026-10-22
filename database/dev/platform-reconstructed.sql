@@ -281,7 +281,9 @@ CREATE TABLE platform.users (
     grandfathered boolean DEFAULT false NOT NULL,
     auth_version integer DEFAULT 1 NOT NULL,
     terms_version text,
-    terms_accepted_at timestamp with time zone
+    terms_accepted_at timestamp with time zone,
+    role text DEFAULT 'user'::text NOT NULL,
+    last_login_at timestamp with time zone
 );
 
 

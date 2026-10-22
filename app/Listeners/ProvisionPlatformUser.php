@@ -9,6 +9,7 @@ use App\Models\User;
 use Carapi\Platform\Connection;
 use Carapi\Platform\Letters;
 use Carapi\Platform\Mail;
+use Carapi\Platform\Session;
 use Carapi\Platform\Tokens;
 use Carapi\Platform\UnavailableException;
 use Carapi\Platform\UserRepository;
@@ -121,8 +122,6 @@ final class ProvisionPlatformUser
 
     private function sessionDir(): string
     {
-        $dir = carapi_env('CARAPI_PLATFORM_SESSION_PATH');
-
-        return is_string($dir) && $dir !== '' ? $dir : storage_path('framework/carapi-sessions');
+        return Session::path();
     }
 }
