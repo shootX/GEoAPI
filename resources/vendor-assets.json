@@ -1,0 +1,85 @@
+{
+    "_comment": "Third-party files committed under public/vendor. Update the version and sha256 here whenever a file changes; tests/Unit/VendorAssetsTest checks them.",
+    "files": [
+        {
+            "path": "public/vendor/redoc/redoc.standalone.js",
+            "package": "redoc",
+            "version": "2.5.4",
+            "source": "npm redoc@2.5.4, bundles/redoc.standalone.js",
+            "license": "MIT",
+            "sha256": "dcaf76612bc4a3fbcc923a8966dee2f6146a5f32e5ce1b6f02dd60cbbf89500b"
+        },
+        {
+            "path": "public/vendor/swagger-ui/swagger-ui-bundle.js",
+            "package": "swagger-ui-dist",
+            "version": "5.17.14",
+            "source": "npm swagger-ui-dist@5.17.14, swagger-ui-bundle.js",
+            "license": "Apache-2.0",
+            "sha256": "c2e4a9ef08144839ff47c14202063ecfe4e59e70a4e7154a26bd50d880c88ba1"
+        },
+        {
+            "path": "public/vendor/swagger-ui/swagger-ui.css",
+            "package": "swagger-ui-dist",
+            "version": "5.17.14",
+            "source": "npm swagger-ui-dist@5.17.14, swagger-ui.css",
+            "license": "Apache-2.0",
+            "sha256": "40170f0ee859d17f92131ba707329a88a070e4f66874d11365e9a77d232f6117"
+        },
+        {
+            "path": "public/vendor/livewire/livewire.csp.esm.js",
+            "package": "livewire/livewire",
+            "version": "v4.4.7",
+            "source": "composer: php artisan vendor:publish --tag=laravel-assets (vendor/livewire/livewire/dist)",
+            "license": "MIT",
+            "sha256": "5468c0ee01bef9e42d227dd3dfa2e4cdb4d9643454aa84108f1363ba97bc08bc"
+        },
+        {
+            "path": "public/vendor/livewire/livewire.csp.js",
+            "package": "livewire/livewire",
+            "version": "v4.4.7",
+            "source": "composer: php artisan vendor:publish --tag=laravel-assets (vendor/livewire/livewire/dist)",
+            "license": "MIT",
+            "sha256": "6796d5021ae1986e827a5e2b4bd4f50d1c0d59099aacd2696f7573a7f29ce969"
+        },
+        {
+            "path": "public/vendor/livewire/livewire.csp.min.js",
+            "package": "livewire/livewire",
+            "version": "v4.4.7",
+            "source": "composer: php artisan vendor:publish --tag=laravel-assets (vendor/livewire/livewire/dist)",
+            "license": "MIT",
+            "sha256": "c5e50c1e1b455eb415bd15a3bc13ecc28b15e309eb67f938990d9f22f44016d9"
+        },
+        {
+            "path": "public/vendor/livewire/livewire.esm.js",
+            "package": "livewire/livewire",
+            "version": "v4.4.7",
+            "source": "composer: php artisan vendor:publish --tag=laravel-assets (vendor/livewire/livewire/dist)",
+            "license": "MIT",
+            "sha256": "7abe11f7e495722854c1efea523f7123d3e5f0aac26f4833ddb5f2bdfc85543d"
+        },
+        {
+            "path": "public/vendor/livewire/livewire.js",
+            "package": "livewire/livewire",
+            "version": "v4.4.7",
+            "source": "composer: php artisan vendor:publish --tag=laravel-assets (vendor/livewire/livewire/dist)",
+            "license": "MIT",
+            "sha256": "fa03bcdfae501c8ef5c93e525ce0f5a658929accd98758651203c1e242dab3d3"
+        },
+        {
+            "path": "public/vendor/livewire/livewire.min.js",
+            "package": "livewire/livewire",
+            "version": "v4.4.7",
+            "source": "composer: php artisan vendor:publish --tag=laravel-assets (vendor/livewire/livewire/dist)",
+            "license": "MIT",
+            "sha256": "593582cab3657eba333a401d89630284c382bd10f2a7b9aca5fbb3ea47c417c0"
+        },
+        {
+            "path": "public/vendor/livewire/manifest.json",
+            "package": "livewire/livewire",
+            "version": "v4.4.7",
+            "source": "composer: php artisan vendor:publish --tag=laravel-assets (vendor/livewire/livewire/dist)",
+            "license": "MIT",
+            "sha256": "b83d4c243e9747f30fd7adba40dc4a649792039e9e1cbd5cd30042779a1da901"
+        }
+    ]
+}
