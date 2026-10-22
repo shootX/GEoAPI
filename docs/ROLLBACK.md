@@ -41,7 +41,7 @@ Executed on production host, into a scratch database. `carbase` was only read (r
 - Dump: `/root/geoapi-backups/daily/carbase-20261021T235314Z.dump` (348 MB, custom format, taken 2026-10-22 03:53 Tbilisi time).
 - Command: `createdb carbase_restore_test` then `pg_restore --no-owner --no-acl -j 4`. No errors in the log.
 - Restore time: **163 s** (about 2 min 43 s) for the whole database.
-- Row counts, all 76 tables: 71 identical. The 5 that differ all grew in `carbase` after the dump was taken (ongoing catalog ingest and live traffic): `modifications` / `modification_specs` 395 480 → 408 863, `modification_equipment` 43 885 091 → 45 497 625, `platform.api_keys` 14 → 15, `platform.rate_windows` 58 → 63, `authentication_log` 24 → 25, `migrations` 44 → 45 (WP-12 migration applied after the dump).
+- Row counts, all 76 tables: 69 identical. The 7 that differ all grew in `carbase` after the dump was taken (ongoing catalog ingest and live traffic): `modifications` / `modification_specs` 395 480 → 408 863, `modification_equipment` 43 885 091 → 45 497 625, `platform.api_keys` 14 → 15, `platform.rate_windows` 58 → 63, `authentication_log` 24 → 25, `migrations` 44 → 45 (WP-12 migration applied after the dump).
 - Core tables in the restore: brands 314, models 4 710, generations 22 367, model_photos 634, users 5.
 - `carbase_restore_test` was dropped afterwards.
 
