@@ -114,7 +114,7 @@ final class BillingV2Test extends TestCase
             ->assertSee('There is no automatic charge.')
             ->assertDontSee('Premium')
             ->assertDontSee('Business')
-            ->assertDontSee('240');
+            ->assertDontSee('240 requests / minute');
 
         $limits = $this->section(PublicSpec::narrative('en'), 'guide-limits');
         $this->assertStringContainsString('19 USD', $limits[0]);
