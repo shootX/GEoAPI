@@ -1003,7 +1003,7 @@ JS;
             . '<link rel="icon" href="/assets/brand/favicon-32.png" type="image/png" sizes="32x32">'
             . '<link rel="apple-touch-icon" href="/assets/brand/apple-touch-icon-180.png">'
             . '<link rel="stylesheet" href="/assets/fonts/fonts.css?v=20261018">'
-            . '<link rel="stylesheet" href="/assets/admin.css?v=20261022ga"></head><body class="admin-app">';
+            . '<link rel="stylesheet" href="/assets/admin.css?v=20261022gb"></head><body class="admin-app">';
         echo '<a class="admin-skip" href="#admin-content">შინაარსზე გადასვლა</a>';
         echo '<header class="admin-bar"><button class="admin-menu" type="button" aria-expanded="false" aria-controls="admin-nav">მენიუ</button>'
             . '<p class="admin-brand">GeoAPI <span>ადმინი</span></p><h1>' . self::e($heading) . '</h1>'

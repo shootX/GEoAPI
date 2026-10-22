@@ -160,3 +160,6 @@ Existing access is kept by a new column, not by rewriting quotas. On PostgreSQL 
 
 ## 2026-10-22 — P5 admin palette
 - Legacy admin.css recolored to Indigo tokens + FiraGO (self-hosted /assets/fonts/firago). Full admin handoff layouts (14 screens) not yet rebuilt.
+
+## 2026-10-22 — P6 JetBrains Mono
+- jetbrains-mono-400.woff2 (subset of handoff jbm.ttf, same family) is in resources/fonts (Vite, since #30) and now also public/assets/fonts for legacy admin.css. Handoff ships only jbm.ttf, no woff2.
