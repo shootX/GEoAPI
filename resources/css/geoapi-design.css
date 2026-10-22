@@ -268,3 +268,5 @@
 .ga .chips a.on{background:var(--soft);border-color:var(--soft);color:var(--ac)}
 .ga nav[role=navigation] svg{width:16px;height:16px}
 .ga .auth{min-height:100vh}.ga .auth-f h1{font-size:30px;font-weight:700;line-height:1.25}.ga .auth-f .lnk{color:var(--ac);font-weight:500}.ga .chk-l{display:flex;gap:8px;align-items:flex-start;font-size:13px;cursor:pointer}.ga .chk-l input{width:18px;height:18px;accent-color:var(--ac);margin-top:1px;flex:none}.ga .seg-r{display:flex;background:var(--ns);border-radius:10px;padding:4px;gap:4px}.ga .seg-r label{flex:1;text-align:center;padding:7px 14px;border-radius:7px;font-size:13px;color:var(--ink2);cursor:pointer}.ga .seg-r input{position:absolute;opacity:0;pointer-events:none}.ga .seg-r label:has(input:checked){background:#fff;color:var(--ink);box-shadow:var(--sh1);font-weight:500}.ga .seg-r label:has(input:focus-visible){outline:2px solid var(--ac)}.ga .fld input.inp{height:44px}
+.ga .lnk{color:var(--ac);text-decoration:none;font-weight:500}.ga .lnk:hover{text-decoration:underline}
+.ga .viz-pre{max-width:100%}

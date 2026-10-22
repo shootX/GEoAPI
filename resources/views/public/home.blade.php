@@ -59,7 +59,7 @@
         <div style="position:relative;background:#fff;border:1px solid var(--line);border-radius:24px;padding:26px;box-shadow:var(--sh2);background-image:radial-gradient(#E4E3EE 1.2px,transparent 1.2px);background-size:24px 24px">
             <div style="background:#fff;border:1px solid var(--line);border-radius:14px;padding:14px 16px;box-shadow:var(--sh2);max-width:360px">
                 <div class="xs mut" style="margin-bottom:8px">{{ $en ? 'Your app · request' : 'თქვენი აპლიკაცია · მოთხოვნა' }}</div>
-                <div class="row" style="gap:8px;flex-wrap:nowrap"><span class="bd mono" style="background:var(--ac);color:#fff;border-radius:5px;font-size:11px;font-weight:600;height:20px">GET</span><span class="mono" style="font-size:12.5px">/api/v1/brands/toyota/models</span></div>
+                <div class="row" style="gap:8px;flex-wrap:nowrap"><span class="bd mono" style="background:var(--ac);color:#fff;border-radius:5px;font-size:11px;font-weight:600;height:20px">GET</span><span class="mono" style="font-size:12.5px;min-width:0;overflow-wrap:anywhere">/api/v1/brands/toyota/models</span></div>
                 <div class="mono xs mut" style="margin-top:8px">Authorization: Bearer geoapi_sk_••••</div>
             </div>
             <div style="display:flex;align-items:center;gap:14px;margin:18px 0 18px 40px">
@@ -69,9 +69,9 @@
                     <div><div style="font-weight:600;font-size:13px">GeoAPI</div><div class="mono" style="font-size:11px;color:#A5A0F0">brand → model → generation → modification</div></div>
                 </div>
             </div>
-            <div style="background:#fff;border:1px solid var(--line);border-radius:14px;box-shadow:var(--sh2);margin-left:auto;max-width:430px;overflow:hidden">
+            <div style="background:#fff;border:1px solid var(--line);border-radius:14px;box-shadow:var(--sh2);margin-left:auto;max-width:430px;min-width:0;overflow:hidden">
                 <div class="row" style="justify-content:space-between;padding:10px 16px;border-bottom:1px solid var(--line)"><span class="xs mut">{{ $en ? 'Response · JSON' : 'პასუხი · JSON' }}</span><span class="row" style="gap:6px"><span class="bd bd-ok"><i></i>200 OK</span><span class="mono xs mut">X-Quota-Remaining</span></span></div>
-<pre class="mono viz-pre" style="font-size:11.5px;line-height:1.7;padding:12px 16px;margin:0;color:var(--ink);white-space:pre">{
+<pre class="mono viz-pre" style="font-size:11.5px;line-height:1.7;padding:12px 16px;margin:0;color:var(--ink);white-space:pre;overflow-x:auto;max-width:100%">{
   <span style="color:#4338CA">"data"</span>: [{ <span style="color:#4338CA">"id"</span>: <span style="color:#1F6B45">"10"</span>, <span style="color:#4338CA">"slug"</span>: <span style="color:#1F6B45">"camry"</span>,
              <span style="color:#4338CA">"name"</span>: <span style="color:#1F6B45">"Camry"</span>, <span style="color:#4338CA">"generations_count"</span>: <span style="color:#8A5300">1</span> }],
   <span style="color:#4338CA">"meta"</span>: { <span style="color:#4338CA">"page"</span>: <span style="color:#8A5300">1</span>, <span style="color:#4338CA">"per_page"</span>: <span style="color:#8A5300">100</span>, <span style="color:#4338CA">"total"</span>: <span style="color:#8A5300">1</span> }
@@ -80,13 +80,11 @@
             <div class="xs mut" style="text-align:right;margin-top:10px">{{ $en ? 'Example from the OpenAPI spec' : 'მაგალითი OpenAPI სპეციფიკაციიდან' }}</div>
         </div>
     </div>
-    @if ($catalogUp)
+    @if (true)
         <div class="wrap">
             <div class="g4 stats" style="border-top:1px solid var(--line);padding:28px 0 8px">
                 @foreach ($stats as [$n, $label])
-                    @if ($n !== null)
-                        <div style="padding:4px 0"><div class="tabular" style="font-size:34px;font-weight:700;letter-spacing:-.02em">{{ $n }}</div><div class="sm mut">{{ $label }}</div></div>
-                    @endif
+                    <div style="padding:4px 0"><div class="tabular" style="font-size:34px;font-weight:700;letter-spacing:-.02em">{{ ($n === null || $n === '' || $n === '0' || $n === 0) ? '—' : $n }}</div><div class="sm mut">{{ $label }}</div></div>
                 @endforeach
             </div>
             <p class="xs mut" style="padding-bottom:12px">{{ $en ? 'Catalog counts' : 'კატალოგის მოცულობა' }} · {{ $measuredAt }} · <a class="mono" href="{{ url('/api/v1/docs') }}">/api/v1/coverage</a></p>

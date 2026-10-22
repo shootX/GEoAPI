@@ -6,7 +6,8 @@
         $max = max($max, (int) $day['used']);
     }
     $quota = $limit > 0 ? min(100, round(($used / $limit) * 100, 1)) : 0;
-    $plan = ! empty($unlimited) ? 'Premium' : ((int) $limit === 2000 ? 'Basic' : 'Free');
+    $plan = ! empty($unlimited) ? 'Premium' : ((int) $limit === 2000 ? 'Basic' : ((int) $limit === 100 ? 'Free' : 'Legacy'));
+    $planBd = $plan === 'Legacy' ? 'bd-ne' : ($plan === 'Free' ? 'bd-out' : 'bd-ac');
     $who = (string) ($project['name'] ?? ($en ? 'Project' : 'პროექტი'));
 @endphp
 <div>
@@ -16,7 +17,7 @@
         <header class="top">
             <button class="btn menu" id="menu" type="button" aria-expanded="false" aria-controls="side" aria-label="{{ __('Menu') }}"><x-ga.icon name="menu" :size="20" /></button>
             <h1 id="title">{{ $en ? 'Overview' : 'მიმოხილვა' }}</h1>
-            <div class="who"><span class="seg hide-m" style="padding:3px"><a href="{{ route('locale.switch', 'ka') }}" class="{{ $en ? '' : 'on' }}">KA</a><a href="{{ route('locale.switch', 'en') }}" class="{{ $en ? 'on' : '' }}">EN</a></span><span class="hide-m">{{ $who }}</span><span class="bd {{ $plan === 'Free' ? 'bd-out' : 'bd-ac' }}">{{ $plan }}</span></div>
+            <div class="who"><span class="seg hide-m" style="padding:3px"><a href="{{ route('locale.switch', 'ka') }}" class="{{ $en ? '' : 'on' }}">KA</a><a href="{{ route('locale.switch', 'en') }}" class="{{ $en ? 'on' : '' }}">EN</a></span><span class="bd {{ $planBd }}">{{ $plan }}</span><button class="btn pine" type="button" onclick="document.querySelector('.nav button[data-screen=keys]').click()"><x-ga.icon name="plus" :size="16" /><span class="hide-m">{{ $en ? 'New key' : 'ახალი გასაღები' }}</span></button></div>
         </header>
         <div class="content">
             @if ($unavailable)
@@ -42,7 +43,7 @@
                     <p class="xs mut" style="margin-top:8px">{{ $en ? 'HTTP 200 only · widget and API share one counter' : 'მხოლოდ HTTP 200 · ვიჯეტი და API ერთ მრიცხველზე' }}</p>
                 </section>
                 <section class="panel">
-                    <div class="row" style="justify-content:space-between;margin-bottom:14px"><h2 style="margin:0">{{ $en ? 'Plan' : 'გეგმა' }}</h2><span class="bd {{ $plan === 'Free' ? 'bd-out' : 'bd-ac' }}">{{ $plan }}</span></div>
+                    <div class="row" style="justify-content:space-between;margin-bottom:14px"><h2 style="margin:0">{{ $en ? 'Plan' : 'გეგმა' }}</h2><span class="bd {{ $planBd }}">{{ $plan }}</span></div>
                     <div class="row" style="justify-content:space-between;margin-bottom:8px"><span style="font-weight:500">{{ $en ? 'Monthly quota' : 'თვიური კვოტა' }}</span><span class="mono sm"><b>{{ $fmt($used) }}</b> <span class="mut">/ {{ ! empty($unlimited) ? '∞' : $fmt($limit) }}</span></span></div>
                     <div class="quota" aria-label="{{ $fmt($used) }} / {{ $fmt($limit) }}"><span style="width: {{ ! empty($unlimited) ? 0 : $quota }}%"></span></div>
                     <p class="muted" style="margin-top:8px">@if (! empty($unlimited)){{ $en ? $fmt($used).' successful requests. Unlimited for this project.' : $fmt($used).' წარმატებული მოთხოვნა. ამ პროექტზე შეუზღუდავია.' }}@else{{ $en ? $fmt($used).' successful requests of '.$fmt($limit).'. '.$plan.' plan, per project.' : $fmt($used).' წარმატებული მოთხოვნა '.$fmt($limit).'-დან. '.$plan.' გეგმა, პროექტზე.' }}@endif</p>

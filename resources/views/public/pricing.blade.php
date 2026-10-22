@@ -59,7 +59,7 @@
                     <h3>{{ $plan['name'] }}</h3>
                     <div data-show="month">
                         <div style="margin-top:14px;display:flex;align-items:baseline;gap:6px"><span class="tabular" style="font-size:42px;font-weight:700;letter-spacing:-.02em">{{ $usd($plan['month']) }}</span><span class="mut">{{ $perMonth }}</span></div>
-                        <div class="sm mut" style="min-height:44px">@if ($plan['month'] === 0) ≈ 0 ₾ @elseif ($gel($plan['month'])) ≈ {{ $gel($plan['month']) }} ₾ {{ $perMonth }} @endif</div>
+                        <div class="sm mut" style="min-height:44px">@if ($plan['month'] === 0) ≈ 0 ₾ @elseif ($gel($plan['month'])) ≈ {{ $gel($plan['month']) }} ₾ {{ $perMonth }} @else ≈ — ₾ {{ $perMonth }} @endif</div>
                     </div>
                     <div data-show="year" hidden>
                         <div style="margin-top:14px;display:flex;align-items:baseline;gap:6px"><span class="tabular" style="font-size:42px;font-weight:700;letter-spacing:-.02em">{{ $usd($plan['year']) }}</span><span class="mut">{{ $plan['year'] === 0 ? $perMonth : $perYear }}</span></div>
