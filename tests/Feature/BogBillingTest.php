@@ -107,7 +107,7 @@ final class BogBillingTest extends TestCase
 
         Http::assertNothingSent();
         $order = DB::table('billing_orders')->first();
-        $this->assertSame('mock', $order->provider);
+        $this->assertSame('mock:'.$order->public_id, $order->bog_order_id);
         $this->assertSame('pending', $order->status);
         $this->assertSame(10000, (int) DB::table('platform.project_limits')->where('project_id', 7)->value('monthly_quota'));
 
@@ -149,7 +149,7 @@ final class BogBillingTest extends TestCase
 
         $user = $this->owner();
         $this->limits(7, 10000, null, false, null);
-        $id = DB::table('billing_orders')->insertGetId(['public_id' => 'mock-guard', 'user_id' => $user->id, 'legacy_user_id' => (int) $user->legacy_platform_user_id, 'project_id' => 7, 'plan_code' => 'basic', 'interval' => 'month', 'usd_cents' => 5000, 'gel_amount' => '150.00', 'rate' => '3.0000', 'rate_quantity' => 1, 'rate_date' => '2026-10-22', 'buyer' => '{}', 'previous' => '{}', 'status' => 'pending', 'provider' => 'mock', 'created_at' => now(), 'updated_at' => now()]);
+        $id = DB::table('billing_orders')->insertGetId(['public_id' => 'mock-guard', 'user_id' => $user->id, 'legacy_user_id' => (int) $user->legacy_platform_user_id, 'project_id' => 7, 'plan_code' => 'basic', 'interval' => 'month', 'usd_cents' => 5000, 'gel_amount' => '150.00', 'rate' => '3.0000', 'rate_quantity' => 1, 'rate_date' => '2026-10-22', 'buyer' => '{}', 'previous' => '{}', 'status' => 'pending', 'bog_order_id' => 'mock:mock-guard', 'created_at' => now(), 'updated_at' => now()]);
         $this->actingAs($user)->post('/billing/test/mock-guard', ['result' => 'success'])->assertNotFound();
         $this->assertSame('pending', DB::table('billing_orders')->where('id', $id)->value('status'));
 

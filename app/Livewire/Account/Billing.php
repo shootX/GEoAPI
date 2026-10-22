@@ -58,7 +58,7 @@ final class Billing extends Component
         $buyer = $this->buyer($user);
         $publicId = Entitlements::openOrder((int) $user->id, (int) $user->legacy_platform_user_id, $projectId, $plan, $interval, $rate, $buyer);
         if ($mock) {
-            DB::table('billing_orders')->where('public_id', $publicId)->update(['provider' => MockPay::PROVIDER]);
+            DB::table('billing_orders')->where('public_id', $publicId)->update(['bog_order_id' => MockPay::flag($publicId)]);
 
             return redirect()->to(URL::temporarySignedRoute('billing.mock.show', now()->addMinutes(30), ['order' => $publicId]));
         }
