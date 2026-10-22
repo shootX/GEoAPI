@@ -954,7 +954,7 @@ JS;
         $photos = self::photoRows() === [] ? '' : self::photoReports();
         self::adminPage($user, 'მიმოხილვა', 'overview', self::adminKpis($overview)
             . '<div class="admin-split"><section><h2>ბოლო რეგისტრაციები</h2>' . self::adminTable($overview['users'], 'users', 'რეგისტრაცია ჯერ არ არის.') . '</section>'
-            . '<div class="admin-stack">' . self::comingSoonControl() . '<section><h2>ბოლო პროექტები</h2>' . self::adminTable($overview['projects'], 'projects', 'პროექტი ჯერ არ შექმნილა.') . '</section></div></div>'
+            . '<div class="admin-stack">' . self::comingSoonControl() . '<section class="admin-recent"><h2>ბოლო პროექტები</h2>' . self::adminRecent($overview['projects'], 'პროექტი ჯერ არ შექმნილა.') . '</section></div></div>'
             . $photos . self::adminSystem($overview), 'სისტემა · UTC თვე ' . $month);
     }
 
@@ -1018,7 +1018,7 @@ JS;
         return '<!doctype html><html lang="ka"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="robots" content="noindex, nofollow">'
             . '<title>' . self::e($heading) . ' — GeoAPI ადმინი</title>'
             . '<link rel="icon" href="/favicon.ico" sizes="any"><link rel="icon" href="/assets/brand/favicon.svg" type="image/svg+xml">'
-            . '<link rel="stylesheet" href="/assets/admin.css?v=20261022gf"></head><body class="admin-app">'
+            . '<link rel="stylesheet" href="/assets/admin.css?v=20261022r3"></head><body class="admin-app">'
             . '<a class="admin-skip" href="#admin-content">შინაარსზე გადასვლა</a>'
             . '<div class="admin-shell"><aside class="admin-side" id="admin-nav"><div class="admin-brand"><a href="/admin"><img src="/assets/brand/geoapi-lockup-on-ink.svg" alt="geoapi.ge" height="24"></a><span>ADMIN</span></div>'
             . '<nav aria-label="ადმინისტრირება">' . self::adminNav($section) . '</nav>'
@@ -1516,6 +1516,20 @@ JS;
     }
 
     /** @param list<array<string,string>> $rows */
+    /** Compact list for the right-column card (name, owner e-mail, status), per handoff admin/overview. */
+    private static function adminRecent(array $rows, string $empty): string
+    {
+        if ($rows === []) {
+            return '<p class="admin-empty" data-empty="projects">' . self::e($empty) . '</p>';
+        }
+        $out = '';
+        foreach ($rows as $row) {
+            $out .= '<li><span><strong>' . self::e($row['name']) . '</strong><small>' . self::e($row['email']) . '</small></span>' . self::adminBadge($row['status']) . '</li>';
+        }
+
+        return '<ul class="admin-rlist">' . $out . '</ul>';
+    }
+
     private static function adminTable(array $rows, string $kind, string $empty): string
     {
         if ($rows === []) {
@@ -1667,7 +1681,7 @@ JS;
         $whoInitial = $who === '' ? 'G' : mb_strtoupper(mb_substr($who, 0, 1));
         echo '<!doctype html><html lang="ka"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="robots" content="noindex">'
             . '<title>' . self::e($title) . ' — GeoAPI</title><link rel="icon" href="/favicon.ico" sizes="any"><link rel="icon" href="/assets/brand/favicon.svg" type="image/svg+xml">'
-            . '<link rel="stylesheet" href="/assets/cabinet.css?v=20261022ge">' . $css . '</head><body class="cab ga">';
+            . '<link rel="stylesheet" href="/assets/cabinet.css?v=20261022r3">' . $css . '</head><body class="cab ga">';
         echo '<div class="app"><aside class="side" id="side"><a class="logo" href="/"><img src="/assets/brand/geoapi-lockup-light.svg" alt="geoapi.ge" height="26"></a>'
             . ($project === null ? '' : '<div class="proj"><span class="av">' . self::e($initial) . '</span><div style="flex:1;min-width:0;line-height:1.25"><div class="pn">' . self::e($name) . '</div><div class="xs mut">' . self::e($state) . '</div></div></div>')
             . '<nav class="nav" aria-label="პანელი">' . $nav . '</nav>'

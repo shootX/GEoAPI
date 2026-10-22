@@ -346,6 +346,18 @@ final class Entitlements
         ]);
     }
 
+    /** Plan in force for a project: free|basic|premium..., or null for legacy (grandfathered, no plan). */
+    public static function currentPlan(int $projectId): ?string
+    {
+        $limits = self::limits($projectId);
+        $code = $limits['plan_code'];
+        if ($code !== null && $code !== Plans::FREE && $limits['plan_ends_at'] !== null && strtotime($limits['plan_ends_at']) !== false && strtotime($limits['plan_ends_at']) <= time()) {
+            return Plans::FREE;
+        }
+
+        return $code;
+    }
+
     /** @return array{monthly_quota:int, plan_code:?string, unlimited:bool, plan_ends_at:?string} */
     private static function limits(int $projectId): array
     {

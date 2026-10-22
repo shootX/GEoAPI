@@ -224,3 +224,7 @@ html:has(body.cab) { background: #F7F7FB; scrollbar-gutter: stable; }
 .cab.ga .mlogo img { display: block; height: 22px; width: auto; }
 @media (max-width: 980px) { .cab.ga .mlogo { display: block; } .cab.ga .top h1, .cab.ga .top .crumb { display: none; } }
 .cab.ga .main { overflow-x: clip; }
+/* Round 3: no reserved scrollbar gutter on touch widths (it showed as a right-edge strip); mobile page heading. */
+@media (max-width: 980px) { html:has(body.cab) { scrollbar-gutter: auto; } .cab.ga .main, .cab.ga .top { max-width: 100vw; } }
+.cab.ga .mh { display: none; }
+@media (max-width: 980px) { .cab.ga .mh { display: flex; align-items: center; gap: 8px; font-size: 24px; font-weight: 700; margin: 0 0 14px; } }

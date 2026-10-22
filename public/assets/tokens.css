@@ -1,0 +1,14 @@
+/* GeoAPI shared design tokens (DESIGN.md §2). Same values as resources/css/app.css :root --ga-*; admin.css and legacy pages import this file. */
+:root{
+  --ga-bg:#F7F7FB; --ga-surface:#FFFFFF; --ga-surface-2:#FBFBFE;
+  --ga-ink:#0F0E2A; --ga-ink-2:#4A4866; --ga-ink-3:#6E6B8A;         /* ink-3: 4.9:1 on white, meta only */
+  --ga-line:#E4E3EE; --ga-line-strong:#C9C7DA; --ga-input:#8E8BA8;   /* input border 3.3:1 (non-text AA) */
+  --ga-accent:#4338CA; --ga-accent-hover:#3730A3; --ga-accent-soft:#ECEBFB; --ga-lavender:#A5A0F0;
+  --ga-success:#1F6B45; --ga-success-soft:#E6F2EC;
+  --ga-warning:#8A5300; --ga-warning-soft:#FBF1E1;
+  --ga-error:#B3261E;   --ga-error-soft:#FBEAE8;
+  --ga-neutral-soft:#EFEEF4;
+  --ga-proposed:#8A5300;                                              /* dashed amber marker, never accent */
+  --ga-admin:#0F0E2A;                                                 /* admin sidebar = ink, user sidebar = white */
+
+}
