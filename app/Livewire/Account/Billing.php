@@ -8,7 +8,9 @@ use App\Billing\BillingNotConfigured;
 use App\Billing\BogClient;
 use App\Billing\Entitlements;
 use App\Billing\NbgRate;
+use App\Billing\MockPay;
 use App\Billing\Plans;
+use Illuminate\Support\Facades\URL;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
 use Livewire\Attributes\Layout;
@@ -40,7 +42,8 @@ final class Billing extends Component
         if (! in_array($plan, [Plans::BASIC, Plans::PREMIUM], true) || ! in_array($interval, ['month', 'year'], true)) {
             abort(404);
         }
-        if (! BogClient::configured()) {
+        $mock = MockPay::enabled();
+        if (! $mock && ! BogClient::configured()) {
             $this->addError('checkout', 'payments not configured');
 
             return null;
@@ -54,6 +57,11 @@ final class Billing extends Component
         [$user, $projectId] = $this->ownedProject();
         $buyer = $this->buyer($user);
         $publicId = Entitlements::openOrder((int) $user->id, (int) $user->legacy_platform_user_id, $projectId, $plan, $interval, $rate, $buyer);
+        if ($mock) {
+            DB::table('billing_orders')->where('public_id', $publicId)->update(['provider' => MockPay::PROVIDER]);
+
+            return redirect()->to(URL::temporarySignedRoute('billing.mock.show', now()->addMinutes(30), ['order' => $publicId]));
+        }
         try {
             $created = BogClient::createOrder(
                 $publicId,
@@ -90,7 +98,8 @@ final class Billing extends Component
 
         return view('livewire.account.billing', [
             'projects' => $this->projects(),
-            'configured' => BogClient::configured(),
+            'configured' => BogClient::configured() || MockPay::enabled(),
+            'mock' => MockPay::enabled(),
             'rate' => $rate,
             'orders' => $orders,
             'notice' => request()->query('paid'),
