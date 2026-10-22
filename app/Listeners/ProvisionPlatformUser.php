@@ -7,6 +7,7 @@ namespace App\Listeners;
 use App\Account\IdentitySync;
 use App\Models\User;
 use Carapi\Platform\Connection;
+use Carapi\Platform\Letters;
 use Carapi\Platform\Mail;
 use Carapi\Platform\Tokens;
 use Carapi\Platform\UnavailableException;
@@ -52,7 +53,8 @@ final class ProvisionPlatformUser
         IdentitySync::ensure($legacyId);
         try {
             $token = (new Tokens(Connection::pdo()))->issue($legacyId, 'verify_email', UserRepository::email($user->email));
-            Mail::make()->send(UserRepository::email($user->email), 'ელფოსტის დადასტურება', Mail::appUrl().'/email/verify?token='.$token);
+            [$subject, $text] = Letters::verifyEmail(Mail::appUrl().'/email/verify?token='.$token);
+            Mail::make()->send(UserRepository::email($user->email), $subject, $text);
         } catch (UnavailableException) {
             // ფოსტა ამ გარემოში გამორთულია. ანგარიში მაინც იქმნება.
         } catch (\Throwable $e) {
