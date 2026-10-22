@@ -46,3 +46,13 @@ Executed on production host, into a scratch database. `carbase` was only read (r
 - `carbase_restore_test` was dropped afterwards.
 
 Conclusion: the nightly dump restores cleanly; expect about 3 minutes plus app checks. Data written after the last dump is lost on restore (RPO up to 24 h).
+
+## Billing V2
+
+Updated 2026-10-22. The feature flag `BILLING_V2` ships false. Setting it back to false restores the legacy per-project meter on the next request. Do not drop the new tables as part of an application rollback.
+
+1. Set `BILLING_V2=false` and `BILLING_V2_BUSINESS_RPM=false`, then `php artisan optimize:clear`.
+2. `php artisan billing:v2-backfill --rollback` deletes only `origin=backfill` workspaces that have no paid `v2:%` order. It does not update `platform.project_limits`, keys, invoices, or `billing_orders`.
+3. Migration `database/migrations/2026_12_31_930000_billing_v2.php` is CREATE TABLE only. It does not ALTER `platform.*` or `billing_orders`. Run it with a role that has CREATE on the application schema. If `carapi_electrik` lacks CREATE, run that migration as the postgres owner. It does not need to own `platform.*` or `billing_orders`.
+4. Migrations `2026_12_31_910000_billing_bog.php` and `2026_12_31_920000_billing_refunded_gel.php` still ALTER existing tables and need the postgres owner. Do not re-run them if they are already applied.
+5. There is no automatic renewal to cancel. Mock orders stay `mock:<id>` with `TEST-` invoices.

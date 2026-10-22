@@ -235,3 +235,10 @@
 - Billing::projects() now reads via legacy platform PDO (same as cabinet) and logs failures; root cause: Laravel default connection != platform DB.
 - Admin: 4 KPI (2 cols mobile), coming-soon + recent projects stack, project detail = name title + KPI + keys + 30-day chart, projects plan badge + usage bar, numbered pagers, nav label "პროექტები", admin.css colors as vars.
 - Panel: overview heading + 2 CTAs, mobile logo in top bar, html bg/scrollbar-gutter (right-edge strip), demo days dated. Home @if(true) removed.
+
+## 2026-10-22 — Billing V2
+- [x] Flag `BILLING_V2` default off. Off keeps Free 100 / Basic $59 / Premium $99, per-project meters, and the −12% year.
+- [x] On: Free $0 / 1000 / 1 project / 15 rpm, Starter $19 / 25000 / 3 / 60, Growth $59 / 150000 / 10 / 120, Business $149 / 500000 / 25 / 240 (not sold; rpm 120 until `BILLING_V2_BUSINESS_RPM`), Enterprise admin-only. Year −15%. Quota resets monthly. VAT included. NBG GEL kept. No new unlimited plan. No automatic renewal.
+- [x] One workspace subscription, shared monthly quota, per-project stats and optional caps, workspace RPM plus the existing IP limit. Extra project $5 / period. Credit packs 90 days, quota first, then earliest expiry. No overage billing.
+- [x] Additive migration `2026_12_31_930000_billing_v2` (CREATE only). `billing:v2-backfill` supports `--dry-run` and `--rollback`. Grandfathered 10000 and unexpired Basic/Premium stay off the shared meter.
+- [ ] Do not enable the flag until migrate + dry-run backfill. Do not enable Business 240 rpm until a load test. No production deploy from this change.
