@@ -250,7 +250,7 @@ final class VehiclePickerRepository
             'rear_suspension' => null,
             'front_tires' => null,
             'rear_tires' => null,
-            'has_photo' => $matchesPhoto,
+            'has_photo' => $matchesPhoto || (bool) $row['has_photo'],
             'photo_matches_generation' => $matchesPhoto,
             'equipment' => $this->equipment($id),
         ];
@@ -259,17 +259,21 @@ final class VehiclePickerRepository
     /** @return array{mime:string, bytes:string}|null */
     public function photo(string $modelId, ?string $generationId = null): ?array
     {
-        if (! $this->photoMatchesGeneration($modelId, $generationId)) {
-            return null;
-        }
+        // Prefer the photo of the selected generation; otherwise fall back to
+        // any approved photo of the same model.
+        $generation = ($generationId !== null && ctype_digit($generationId)) ? $generationId : null;
         $stmt = $this->pdo->prepare(<<<'SQL'
             SELECT mime, image
             FROM public.model_photos
             WHERE model_id = :id
               AND verified = true
               AND image IS NOT NULL
+            ORDER BY (generation_id::text IS NOT DISTINCT FROM CAST(:generation AS text)) DESC,
+                     (generation_id IS NULL) DESC
+            LIMIT 1
         SQL);
         $stmt->bindValue('id', $modelId);
+        $stmt->bindValue('generation', $generation);
         $stmt->execute();
         $row = $stmt->fetch();
         if (! is_array($row)) {

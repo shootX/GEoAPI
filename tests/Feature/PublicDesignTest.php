@@ -95,6 +95,14 @@ class PublicDesignTest extends TestCase
         }
     }
 
+    public function test_demo_vehicle_title_is_localized(): void
+    {
+        $this->withSession(['locale' => 'en'])->get('/demo')->assertOk()
+            ->assertSee('<h2 id="vp-title">Vehicle</h2>', false);
+        $this->withSession(['locale' => 'ka'])->get('/demo')->assertOk()
+            ->assertSee('<h2 id="vp-title">ავტომობილი</h2>', false);
+    }
+
     public function test_demo_and_guide_render_the_public_sections(): void
     {
         $this->withSession(['locale' => 'ka'])
