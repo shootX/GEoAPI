@@ -313,6 +313,14 @@ final class ProjectAccessQuotaTest extends TestCase
         $this->assertNotNull(DB::table('platform.api_keys')->where('id', $keyId)->value('revoked_at'));
     }
 
+    public function test_a_wrong_method_is_405_and_does_not_use_the_minute_window(): void
+    {
+        MemoryUsageStore::shared()->perMinute = 60;
+
+        $this->postJson('/api/v1/brands')->assertStatus(405)->assertHeader('Allow', 'GET');
+        $this->getJson('/api/v1/brands?limit=1')->assertOk()->assertHeader('X-RateLimit-Remaining', '59');
+    }
+
     public function test_utc_windows_headers_and_shared_widget_counter(): void
     {
         $now = gmmktime(23, 59, 30, 1, 31, 2026);
