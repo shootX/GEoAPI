@@ -118,7 +118,7 @@ final class BogBillingTest extends TestCase
         $this->assertSame('159.30', number_format((float) $order->gel_amount, 2, '.', ''));
         $this->assertStringNotContainsString('sandbox-secret-value', json_encode(DB::table('billing_audit')->get()));
 
-        $this->actingAs($user)->get('/account/billing?paid=return')->assertOk()->assertSee('ბანკის დადასტურება');
+        $this->actingAs($user)->get('/account/billing?paid=return')->assertOk()->assertSee('ბანკის დადასტურება')->assertSee('class="side"', false)->assertSee('Premium');
         $this->assertSame(10000, (int) DB::table('platform.project_limits')->where('project_id', 7)->value('monthly_quota'));
     }
 

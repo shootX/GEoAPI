@@ -16,7 +16,7 @@ use Livewire\Attributes\Title;
 use Livewire\Component;
 use PDOException;
 
-#[Layout('electrik::components.layouts.app')]
+#[Layout('components.layouts.cabinet')]
 #[Title('გადახდა')]
 final class Billing extends Component
 {

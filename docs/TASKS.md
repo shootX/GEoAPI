@@ -197,3 +197,10 @@
 - [ ] Integrations page stays hidden (Proposed, phase 5). Contact form removed by design (hello@geoapi.ge).
 - [ ] Docs per-endpoint pages and the right sticky code column from the handoff: kept as one long page with per-section code (deviation).
 - [ ] User panel redesign (handoff `panel/`) — next stage.
+
+## 2026-10-22 — User panel redesign (handoff panel/), stage 1
+
+- [x] Cabinet shell: white 248px sidebar (project card, nav with icons, account group, user), 64px topbar with KA/EN; `public/assets/cabinet.css` rewritten to Indigo; shared `x-ga.panel-side`.
+- [x] Overview: KPI tiles, 30-day chart + plan card (Free/Basic/Premium from project quota), plan screen no longer shows the stale "Pro — soon".
+- [x] Billing (`/account/billing`) moved into the cabinet layout; plan cards with „გადახდა · თვე / წელი“ (BOG, sandbox unchanged), order status badges, Free switch asks for confirmation.
+- [ ] Legacy project/playground/explorer pages (`Platform\Http` views), usage page (Proposed), settings (Electrik) and states screens are not yet ported to the new design.
