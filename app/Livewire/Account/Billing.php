@@ -59,6 +59,11 @@ final class Billing extends Component
         if (! in_array($plan, [Plans::BASIC, Plans::PREMIUM], true) || ! in_array($interval, ['month', 'year'], true)) {
             abort(404);
         }
+        if ($this->projects() === []) {
+            $this->addError('checkout', 'no project');
+
+            return null;
+        }
         $mock = MockPay::enabled();
         if (! $mock && ! BogClient::configured()) {
             $this->addError('checkout', 'payments not configured');

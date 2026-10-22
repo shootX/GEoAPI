@@ -241,4 +241,6 @@
 - [x] On: Free $0 / 1000 / 1 project / 15 rpm, Starter $19 / 25000 / 3 / 60, Growth $59 / 150000 / 10 / 120, Business $149 / 500000 / 25 / 240 (not sold; rpm 120 until `BILLING_V2_BUSINESS_RPM`), Enterprise admin-only. Year −15%. Quota resets monthly. VAT included. NBG GEL kept. No new unlimited plan. No automatic renewal.
 - [x] One workspace subscription, shared monthly quota, per-project stats and optional caps, workspace RPM plus the existing IP limit. Extra project $5 / period. Credit packs 90 days, quota first, then earliest expiry. No overage billing.
 - [x] Additive migration `2026_12_31_930000_billing_v2` (CREATE only). `billing:v2-backfill` supports `--dry-run` and `--rollback`. Grandfathered 10000 and unexpired Basic/Premium stay off the shared meter.
-- [ ] Do not enable the flag until migrate + dry-run backfill. Do not enable Business 240 rpm until a load test. No production deploy from this change.
+- [x] 2026-10-22: Billing V2 live (PR #48, `1a5b287`). Migrated, backfill dry-run then real: created 6, skipped 1, grandfathered 4, preserved 2, removed 0. `BILLING_V2=true`, `BILLING_V2_BUSINESS_RPM=false`.
+- [ ] Business 240 rpm stays off until a load test.
+- [x] 2026-10-22: V2 checkout without a project shows a ka/en message instead of 404; Free hides "paid through"; billing times shown in Asia/Tbilisi.

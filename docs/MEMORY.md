@@ -195,3 +195,6 @@ Existing access is kept by a new column, not by rewriting quotas. On PostgreSQL 
 - Booleans are PostgreSQL boolean. V2 orders reuse `billing_orders` (`v2:starter`, `v2:credits:starter`, `v2:extra-project`). Distinct partial refunds use `body.refund_id`; without it the cumulative `refund_amount` path is unchanged.
 - Backfill is insert-only (`origin=backfill`), `shared_quota` false. `--rollback` deletes those rows only when the user has no paid `v2:%` order. It does not rewrite `project_limits`.
 - Business 240 rpm stays off (~13 req/s measured). Enterprise is `billing:v2-assign`, not checkout. Mock pay (`mock:` / TEST- invoices) still grants through `Entitlements::grant`.
+- 2026-10-22 (Billing V2 go-live): the migration failed with `permission denied for table users` on the FK. Fixed with `GRANT REFERENCES ON users, projects TO carapi_electrik;` (as postgres), then `migrate --force` as www. New `billing_*` V2 tables are owned by `carapi_electrik`.
+- 2026-10-22: server PostgreSQL is 18; the system `pg_dump` is 16 and refuses. Use `/www/server/pgsql/bin/pg_dump -Fc carbase`. Pre-V2 dump: `/root/geoapi-backups/20261022-153254-pre-billing-v2.dump` (+ `.env`).
+- 2026-10-22: backfill counts: created 6, skipped 1, grandfathered 4, preserved 2, removed 0. Accounts with a preserved legacy plan keep the old billing screen until the term ends.
