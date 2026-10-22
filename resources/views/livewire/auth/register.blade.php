@@ -50,7 +50,7 @@
             <label for="reg-password2">{{ __('Repeat the password') }}</label>
             <input id="reg-password2" class="inp" wire:model="password_confirmation" type="password" autocomplete="new-password" required>
         </div>
-        <label class="chk-l"><input type="checkbox" wire:model="accept_terms" value="1"><span>{{ __('I agree to the') }} <a href="{{ url('/terms') }}" class="lnk" style="text-decoration:underline">{{ __('terms of use') }}</a> · <a href="{{ url('/privacy') }}" class="lnk" style="text-decoration:underline">{{ $en ? 'privacy policy' : 'კონფიდენციალურობის პოლიტიკა' }}</a>.</span></label>
+        <label class="chk-l"><input type="checkbox" wire:model="accept_terms" value="1"><span>{{ __('I agree to the') }} <a href="{{ url('/terms') }}" class="lnk">{{ __('terms of use') }}</a> · <a href="{{ url('/privacy') }}" class="lnk">{{ $en ? 'privacy policy' : 'კონფიდენციალურობის პოლიტიკა' }}</a>.</span></label>
         @error('accept_terms')<span class="emsg"><x-ga.icon name="err" :size="14" />{{ __('You must accept the terms.') }}</span>@enderror
         <button type="submit" class="btn b-pri b-lg" style="justify-content:center;width:100%">{{ __('Create an account') }}</button>
     </form>

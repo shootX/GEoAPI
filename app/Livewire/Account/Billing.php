@@ -32,7 +32,7 @@ final class Billing extends Component
     {
         [$user, $projectId] = $this->ownedProject();
         Entitlements::chooseFree((int) $user->id, (int) $user->legacy_platform_user_id, $projectId);
-        session()->flash('billing', 'ამ პროექტის თვიური ზღვარი ახლა 100 წარმატებული მოთხოვნაა.');
+        session()->flash('billing', app()->getLocale() === 'en' ? 'This project now has a monthly limit of 100 successful requests.' : 'ამ პროექტის თვიური ზღვარი ახლა 100 წარმატებული მოთხოვნაა.');
     }
 
     public function checkout(string $plan, string $interval): mixed
@@ -84,7 +84,7 @@ final class Billing extends Component
         }
         $orders = [];
         $user = auth()->user();
-        if ($user instanceof User) {
+        if ($user instanceof User && \Illuminate\Support\Facades\Schema::hasTable('billing_orders')) {
             $orders = DB::table('billing_orders')->where('user_id', $user->id)->orderByDesc('id')->limit(20)->get();
         }
 

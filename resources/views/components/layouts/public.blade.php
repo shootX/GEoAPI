@@ -23,7 +23,7 @@
 <body class="site ga min-h-screen antialiased {{ $homeNav ? 'is-home' : '' }}">
     <header class="hd">
         <div class="wrap">
-            <a href="{{ url('/') }}" aria-label="GeoAPI.ge"><img src="{{ asset('assets/brand/geoapi-lockup-light.svg') }}" alt="geoapi.ge" style="height:30px;display:block" width="134" height="30"></a>
+            <a href="{{ url('/') }}" aria-label="GeoAPI.ge"><img src="{{ asset('assets/brand/geoapi-lockup-light.svg') }}" alt="geoapi.ge" style="height:30px;display:block" width="94" height="30"></a>
             <nav class="nav" aria-label="{{ __('Menu') }}">
                 @foreach ($nav as $item)
                     <a href="{{ $item['href'] }}" class="{{ $active === $item['key'] ? 'on' : '' }}" @if ($active === $item['key']) aria-current="page" @endif>{{ $item['label'] }}</a>
@@ -70,7 +70,7 @@
     <footer class="ft">
         <div class="wrap">
             <div>
-                <img src="{{ asset('assets/brand/geoapi-lockup-light.svg') }}" alt="geoapi.ge" style="height:28px" width="125" height="28">
+                <img src="{{ asset('assets/brand/geoapi-lockup-light.svg') }}" alt="geoapi.ge" style="height:28px" width="88" height="28">
                 <p class="sm mut" style="margin-top:10px;max-width:300px">{{ $slogan }}</p>
                 <p class="sm" style="margin-top:12px"><a href="mailto:hello@geoapi.ge" style="color:var(--ac)">hello@geoapi.ge</a></p>
             </div>

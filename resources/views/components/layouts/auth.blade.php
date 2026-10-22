@@ -10,7 +10,7 @@
     <div class="auth">
         <div class="auth-l">
             <div class="row" style="justify-content:space-between">
-                <a href="{{ url('/') }}" aria-label="GeoAPI.ge"><img src="{{ asset('assets/brand/geoapi-lockup-light.svg') }}" alt="geoapi.ge" style="height:28px" width="125" height="28"></a>
+                <a href="{{ url('/') }}" aria-label="GeoAPI.ge"><img src="{{ asset('assets/brand/geoapi-lockup-light.svg') }}" alt="geoapi.ge" style="height:28px" width="88" height="28"></a>
                 <span class="seg" style="padding:3px">
                     <a href="{{ route('locale.switch', 'ka') }}" class="{{ $en ? '' : 'on' }}">KA</a>
                     <a href="{{ route('locale.switch', 'en') }}" class="{{ $en ? 'on' : '' }}">EN</a>

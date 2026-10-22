@@ -163,3 +163,8 @@ Existing access is kept by a new column, not by rewriting quotas. On PostgreSQL 
 
 ## 2026-10-22 — P6 JetBrains Mono
 - jetbrains-mono-400.woff2 (subset of handoff jbm.ttf, same family) is in resources/fonts (Vite, since #30) and now also public/assets/fonts for legacy admin.css. Handoff ships only jbm.ttf, no woff2.
+## 2026-10-22 — QA fixes on #30–#34
+- Billing: EN strings, localized BOG/rate errors (data-code keeps machine codes), Schema::hasTable(billing_orders) guard. Checkout still BOG sandbox hosts by default (services.bog.env != production).
+- Plan label: Free only at limit 100, Basic 2000, Premium unlimited, else grey Legacy (no mini-plan selected). Dashboard header CTA "ახალი გასაღები".
+- cabinet.css drawer shadow only when open. admin.css on --ga-* tokens, ink sidebar, ADMIN badge.
+- Home stats strip always shown (— for missing), hero code overflow-x, lockup width fixed (no phantom left gap on mobile), register links accent without underline, pricing ≈ — ₾ when rate missing.
