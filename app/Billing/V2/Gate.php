@@ -57,9 +57,11 @@ final class Gate
         }
         $en = function_exists('app') && app()->getLocale() === 'en';
 
+        $price = \App\Billing\Plans::lari(\App\Billing\V2\Catalog::EXTRA_PROJECT_CENTS);
+
         return $en
-            ? 'This workspace has no free project slot. An extra active project is 5 USD a month.'
-            : 'ამ სამუშაო სივრცეს თავისუფალი პროექტის ადგილი არ აქვს. დამატებითი აქტიური პროექტი თვეში 5 USD ღირს.';
+            ? 'This workspace has no free project slot. An extra active project is '.$price.' a month.'
+            : 'ამ სამუშაო სივრცეს თავისუფალი პროექტის ადგილი არ აქვს. დამატებითი აქტიური პროექტი თვეში '.$price.' ღირს.';
     }
 
     public static function setCap(int $legacyUserId, int $projectId, ?int $cap): bool

@@ -24,9 +24,7 @@ final class InvoicePdf
             'Legal address '.$buyer['company_address'],
             'VAT payer: '.($buyer['vat_payer'] ? 'yes' : 'no'),
             'Plan '.$invoice['plan'],
-            'USD '.$invoice['usd'],
             'GEL '.$invoice['gel'],
-            'NBG rate '.$invoice['rate'].' on '.$invoice['rate_date'],
             'Prices include VAT 18%: VAT GEL '.self::vatIncluded($invoice['gel']).' of GEL '.$invoice['gel'],
         ];
         $font = TrueTypeFont::load();

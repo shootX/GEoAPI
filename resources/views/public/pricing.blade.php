@@ -3,20 +3,7 @@
 @else
 @php
     $en = app()->getLocale() === 'en';
-    $rate = null;
-    try {
-        $rate = \App\Billing\NbgRate::latest();
-    } catch (\Throwable) {
-        $rate = null;
-    }
-    $gel = function (int $cents) use ($rate): ?string {
-        if ($rate === null) {
-            return null;
-        }
-
-        return \App\Billing\Plans::formatTetri(\App\Billing\Plans::gelTetri($cents, $rate['rate'], $rate['quantity']));
-    };
-    $usd = fn (int $cents): string => '$'.number_format($cents / 100, $cents % 100 === 0 ? 0 : 2, '.', ' ');
+    $lari = fn (int $cents): string => \App\Billing\Plans::lari($cents);
     $plans = [
         'free' => ['name' => 'Free', 'month' => 0, 'year' => 0, 'quota' => $en ? '100 successful requests / month' : '100 წარმატებული მოთხოვნა / თვე',
             'features' => $en ? ['REST API and widget', '60 requests / minute', 'All endpoints'] : ['REST API და ვიჯეტი', '60 მოთხოვნა / წუთი', 'ყველა endpoint'],
@@ -38,8 +25,8 @@
         [$en ? 'Widget (geoapi_pk_)' : 'ვიჯეტი (geoapi_pk_)', '✓', '✓', '✓'],
         [$en ? 'Projects and keys' : 'პროექტები და გასაღებები', '✓', '✓', '✓'],
         [$en ? 'PDF invoice' : 'ინვოისი PDF', '—', '✓', '✓'],
-        [$en ? 'Price / month' : 'ფასი / თვე', '$0', $usd($plans['basic']['month']), $usd($plans['premium']['month'])],
-        [$en ? 'Price / year (−12%)' : 'ფასი / წელი (−12%)', '$0', $usd($plans['basic']['year']), $usd($plans['premium']['year'])],
+        [$en ? 'Price / month' : 'ფასი / თვე', $lari(0), $lari($plans['basic']['month']), $lari($plans['premium']['month'])],
+        [$en ? 'Price / year (−12%)' : 'ფასი / წელი (−12%)', $lari(0), $lari($plans['basic']['year']), $lari($plans['premium']['year'])],
     ];
 @endphp
 <div>
@@ -61,17 +48,13 @@
                     @if ($hi)<span class="bd" style="position:absolute;top:-12px;left:24px;background:var(--ac);color:#fff">{{ $en ? 'Recommended' : 'რეკომენდებული' }}</span>@endif
                     <h3>{{ $plan['name'] }}</h3>
                     <div data-show="month">
-                        <div style="margin-top:14px;display:flex;align-items:baseline;gap:6px"><span class="tabular" style="font-size:42px;font-weight:700;letter-spacing:-.02em">{{ $usd($plan['month']) }}</span><span class="mut">{{ $perMonth }}</span></div>
-                        <div class="sm mut" style="min-height:44px">@if ($plan['month'] === 0) ≈ 0 ₾ @elseif ($gel($plan['month'])) ≈ {{ $gel($plan['month']) }} ₾ {{ $perMonth }} @else ≈ — ₾ {{ $perMonth }} @endif</div>
+                        <div style="margin-top:14px;display:flex;align-items:baseline;gap:6px"><span class="tabular" style="font-size:42px;font-weight:700;letter-spacing:-.02em">{{ $lari($plan['month']) }}</span><span class="mut">{{ $perMonth }}</span></div>
                     </div>
                     <div data-show="year" hidden>
-                        <div style="margin-top:14px;display:flex;align-items:baseline;gap:6px"><span class="tabular" style="font-size:42px;font-weight:700;letter-spacing:-.02em">{{ $usd($plan['year']) }}</span><span class="mut">{{ $plan['year'] === 0 ? $perMonth : $perYear }}</span></div>
-                        <div class="sm mut" style="min-height:44px">
-                            @if ($plan['year'] === 0) ≈ 0 ₾
-                            @else
-                                {{ $usd(intdiv($plan['year'], 12)) }} {{ $perMonth }}@if ($gel($plan['year'])) · ≈ {{ $gel($plan['year']) }} ₾ {{ $perYear }}@endif<br><s>{{ $usd($plan['month'] * 12) }}</s> −12%
-                            @endif
-                        </div>
+                        <div style="margin-top:14px;display:flex;align-items:baseline;gap:6px"><span class="tabular" style="font-size:42px;font-weight:700;letter-spacing:-.02em">{{ $lari($plan['year']) }}</span><span class="mut">{{ $plan['year'] === 0 ? $perMonth : $perYear }}</span></div>
+                        @if ($plan['year'] !== 0)
+                            <div class="sm mut">{{ $lari(intdiv($plan['year'], 12)) }} {{ $perMonth }}<br><s>{{ $lari($plan['month'] * 12) }}</s> −12%</div>
+                        @endif
                     </div>
                     <div style="font-weight:600;margin:14px 0">{{ $plan['quota'] }}</div>
                     <a class="btn {{ $hi ? 'b-pri' : 'b-sec' }}" style="width:100%;justify-content:center" href="{{ $plan['href'] }}">{{ $plan['cta'] }}</a>
@@ -84,12 +67,7 @@
             @endforeach
         </div>
         <p class="sm mut" style="text-align:center;margin-top:20px">
-            {{ $en ? 'Prices are in USD and include VAT.' : 'ფასები მითითებულია USD-ში და მოიცავს დღგ-ს.' }}
-            @if ($rate)
-                {{ $en ? 'GEL is indicative, at the National Bank of Georgia rate' : 'GEL — საორიენტაციო, ეროვნული ბანკის კურსით' }} 1 USD = {{ $rate['rate'] }} ₾ ({{ $rate['rated_on'] }}).
-            @else
-                {{ $en ? 'GEL appears once the National Bank rate is stored.' : 'ლარი გამოჩნდება, როცა ეროვნული ბანკის კურსი შეინახება.' }}
-            @endif
+            {{ $en ? 'Prices are in GEL and include VAT.' : 'ფასები ლარშია და დღგ-ს შეიცავს.' }}
             {{ $en ? 'Payment: Bank of Georgia.' : 'გადახდა: Bank of Georgia.' }}
         </p>
         <p class="xs mut" style="text-align:center;margin-top:6px">{{ $en ? 'An existing project keeps 10 000 requests a month until a plan is chosen.' : 'არსებული პროექტი 10 000 მოთხოვნას ინარჩუნებს, სანამ გეგმას აირჩევს.' }}</p>

@@ -22,8 +22,10 @@ class PublicDesignTest extends TestCase
             ->assertSee('Free')
             ->assertSee('Basic')
             ->assertSee('Premium')
-            ->assertSee('$59')
-            ->assertSee('$99')
+            ->assertSee('₾')
+            ->assertDontSee('$59')
+            ->assertDontSee('$99')
+            ->assertDontSee('USD')
             ->assertSee('10 000')
             ->assertSee('Bank of Georgia')
             ->assertDontSee('Stripe');

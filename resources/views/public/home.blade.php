@@ -10,12 +10,12 @@
     ];
     $freeQ = (\App\Billing\V2\Flag::on() ? '1 000' : '100');
     $steps = $en ? [
-        ['Sign up', 'Free plan: $0, '.$freeQ.' successful requests a month.'],
+        ['Sign up', 'Free plan: 0 ₾, '.$freeQ.' successful requests a month.'],
         ['Confirm your email', 'Required before you can create a secret key.'],
         ['Create a project and a key', 'geoapi_sk_ is shown only once. Save it.'],
         ['Send your first request', 'REST API or the widget, one shared counter.'],
     ] : [
-        ['დარეგისტრირდით', 'Free გეგმა — $0, '.$freeQ.' წარმატებული მოთხოვნა თვეში.'],
+        ['დარეგისტრირდით', 'Free გეგმა — 0 ₾, '.$freeQ.' წარმატებული მოთხოვნა თვეში.'],
         ['დაადასტურეთ ელფოსტა', 'საიდუმლო გასაღების შექმნისთვის აუცილებელია.'],
         ['შექმენით პროექტი და გასაღები', 'geoapi_sk_ ჩანს მხოლოდ ერთხელ — შეინახეთ.'],
         ['გაგზავნეთ პირველი მოთხოვნა', 'REST API ან ვიჯეტი — ერთი მრიცხველით.'],
@@ -59,7 +59,7 @@
                 <a class="btn b-pri b-lg" href="{{ route('register') }}">{{ $en ? 'Start free' : 'დაიწყე უფასოდ' }}</a>
                 <a class="btn b-sec b-lg" href="{{ url('/guide') }}"><x-ga.icon name="doc" />{{ $en ? 'Documentation' : 'დოკუმენტაცია' }}</a>
             </div>
-            <p class="sm mut" style="margin-top:14px">{{ $en ? 'Free plan · $0 · '.$freeQ.' successful requests a month' : 'Free გეგმა · $0 · '.$freeQ.' წარმატებული მოთხოვნა თვეში' }}</p>
+            <p class="sm mut" style="margin-top:14px">{{ $en ? 'Free plan · 0 ₾ · '.$freeQ.' successful requests a month' : 'Free გეგმა · 0 ₾ · '.$freeQ.' წარმატებული მოთხოვნა თვეში' }}</p>
         </div>
         <div style="position:relative;background:#fff;border:1px solid var(--line);border-radius:24px;padding:26px;box-shadow:var(--sh2);background-image:radial-gradient(#E4E3EE 1.2px,transparent 1.2px);background-size:24px 24px">
             <div style="background:#fff;border:1px solid var(--line);border-radius:14px;padding:14px 16px;box-shadow:var(--sh2);max-width:360px">

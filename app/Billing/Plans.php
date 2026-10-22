@@ -107,6 +107,28 @@ final class Plans
         return $sign.intdiv($tetri, 100).'.'.str_pad((string) ($tetri % 100), 2, '0', STR_PAD_LEFT);
     }
 
+    /** Customer-facing price in GEL. The bank is charged this amount. */
+    public static function lari(int $usdCents): string
+    {
+        if ($usdCents === 0) {
+            return '0 ₾';
+        }
+        try {
+            $rate = NbgRate::latest();
+        } catch (\Throwable) {
+            return '—';
+        }
+        if ($rate === null) {
+            return '—';
+        }
+        $formatted = self::formatTetri(self::gelTetri($usdCents, $rate['rate'], $rate['quantity']));
+        if (str_ends_with($formatted, '.00')) {
+            $formatted = substr($formatted, 0, -3);
+        }
+
+        return $formatted.' ₾';
+    }
+
     private static function assertPlan(string $plan): void
     {
         if (! array_key_exists($plan, self::catalog())) {

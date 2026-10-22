@@ -49,7 +49,7 @@
             @if (! empty($v2))
                 @include('livewire.account.billing-v2')
             @else
-            <p class="muted">{{ $en ? 'Prices are in USD and include VAT. A year costs 12% less than 12 months. GEL is shown at the National Bank rate.' : 'ფასი დოლარშია და დღგ-ს შეიცავს. წელიწადი 12 თვის ფასზე 12%-ით ნაკლებია. ლარი ნაჩვენებია ეროვნული ბანკის კურსით.' }}</p>
+            <p class="muted">{{ $en ? 'Prices are in GEL and include VAT. A year costs 12% less than 12 months.' : 'ფასი ლარშია და დღგ-ს შეიცავს. წელიწადი 12 თვის ფასზე 12%-ით ნაკლებია.' }}</p>
 
             @if ($projects === [])
                 <div class="panel"><h2>{{ $en ? 'Create a project first' : 'ჯერ შექმენით პროექტი' }}</h2><p class="muted">{{ $en ? 'You have no project yet.' : 'პროექტი ჯერ არ არის.' }}</p><p style="margin-top:12px"><a class="btn pine" href="{{ route('account.home') }}">{{ $en ? 'Projects' : 'პროექტები' }}</a></p></div>
@@ -62,16 +62,13 @@
                             @endforeach
                         </select>
                     </label>
-                    @if ($rate)
-                        <span class="muted">{{ $en ? 'National Bank rate' : 'ეროვნული ბანკის კურსი' }}: 1 USD = {{ number_format((float) $rate['rate'], 4, '.', '') }} GEL, {{ $en ? 'date' : 'თარიღი' }} {{ $rate['rated_on'] }}.</span>
-                    @endif
                 </div>
 
                 <div class="bill-plans">
                     <article class="plan">
                         <div class="row" style="justify-content:space-between"><h2>Free</h2>@if ($currentPlan === 'free'){!! $currentBadge !!}@endif</div>
-                        <p class="price">$0</p>
-                        <p class="muted">{{ $en ? '100 successful requests a month. 0 USD.' : '100 წარმატებული მოთხოვნა თვეში. 0 USD.' }}</p>
+                        <p class="price">{{ \App\Billing\Plans::lari(0) }}</p>
+                        <p class="muted">{{ $en ? '100 successful requests a month.' : '100 წარმატებული მოთხოვნა თვეში.' }}</p>
                         <p class="xs mut">{{ $en ? 'Choosing it lowers this project\'s monthly limit to 100, even if it has 10 000 now.' : 'არჩევა ამ პროექტის თვიურ ზღვარს 100-მდე დაწევს, მათ შორის მაშინაც, თუ ახლა 10 000 აქვს.' }}</p>
                         @if ($currentPlan === 'free')
                         {!! $currentBtn !!}
@@ -83,18 +80,14 @@
                         @php
                             $monthCents = \App\Billing\Plans::usdCents($code, 'month');
                             $yearCents = \App\Billing\Plans::usdCents($code, 'year');
-                            $monthUsd = number_format($monthCents / 100, 2, '.', '');
-                            $yearUsd = number_format($yearCents / 100, 2, '.', '');
-                            $monthGel = $rate ? \App\Billing\Plans::formatTetri(\App\Billing\Plans::gelTetri($monthCents, $rate['rate'], $rate['quantity'])) : null;
-                            $yearGel = $rate ? \App\Billing\Plans::formatTetri(\App\Billing\Plans::gelTetri($yearCents, $rate['rate'], $rate['quantity'])) : null;
                             $off = ! $configured;
                             $isCurrent = $currentPlan === $code;
                         @endphp
                         <article class="plan {{ $isCurrent ? 'now' : '' }}">
                             <div class="row" style="justify-content:space-between"><h2>{{ $label }}</h2>@if ($isCurrent){!! $currentBadge !!}@elseif ($code === 'basic')<span class="bd bd-ac">{{ $en ? 'Recommended' : 'რეკომენდებული' }}</span>@endif</div>
-                            <p class="price">${{ rtrim(rtrim($monthUsd, '0'), '.') }} <span class="muted">/ {{ $en ? 'month' : 'თვე' }}</span></p>
+                            <p class="price">{{ \App\Billing\Plans::lari($monthCents) }} <span class="muted">/ {{ $en ? 'month' : 'თვე' }}</span></p>
                             <p class="muted">@if ($code === 'premium') {{ $en ? 'Unlimited successful requests a month.' : 'შეუზღუდავი წარმატებული მოთხოვნა თვეში.' }} @else {{ $en ? '2 000 successful requests a month.' : '2 000 წარმატებული მოთხოვნა თვეში.' }} @endif</p>
-                            <p class="xs mut">{{ $en ? 'Month' : 'თვე' }}: {{ $monthUsd }} USD @if ($monthGel) / {{ $monthGel }} GEL @endif<br>{{ $en ? 'Year' : 'წელი' }}: {{ $yearUsd }} USD @if ($yearGel) / {{ $yearGel }} GEL @endif · −12%</p>
+                            <p class="xs mut">{{ $en ? 'Year' : 'წელი' }}: {{ \App\Billing\Plans::lari($yearCents) }} · −12%</p>
                             <div class="row">
                                 @if ($isCurrent)
                                 {!! $currentBtn !!}

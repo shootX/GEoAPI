@@ -17,7 +17,7 @@
             <section class="panel">
                 <div class="ph"><h2>{{ $en ? 'Order' : 'შეკვეთა' }}</h2><span class="bd bd-wa">provider: mock</span></div>
                 <div class="set-row"><span class="mut">{{ $en ? 'Plan' : 'გეგმა' }}</span><strong>{{ $planName }} · {{ $order->interval === 'year' ? ($en ? 'year' : 'წელი') : ($en ? 'month' : 'თვე') }}</strong></div>
-                <div class="set-row"><span class="mut">{{ $en ? 'Amount' : 'თანხა' }}</span><strong class="mono">${{ number_format($order->usd_cents / 100, 2) }} ≈ {{ number_format((float) $order->gel_amount, 2) }} ₾</strong></div>
+                <div class="set-row"><span class="mut">{{ $en ? 'Amount' : 'თანხა' }}</span><strong class="mono">{{ number_format((float) $order->gel_amount, 2) }} ₾</strong></div>
                 <div class="set-row"><span class="mut">{{ $en ? 'Order' : 'შეკვეთა' }}</span><span class="mono xs">{{ $order->public_id }}</span></div>
                 <div style="display:flex;gap:10px;flex-wrap:wrap;padding-top:16px">
                     <form method="post" action="{{ route('billing.mock.complete', $order->public_id) }}">@csrf<input type="hidden" name="result" value="success"><button class="btn pine" type="submit">{{ $en ? 'Pay (test) — success' : 'გადახდა (ტესტი) — წარმატება' }}</button></form>

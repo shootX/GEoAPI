@@ -74,13 +74,16 @@ final class BillingV2Test extends TestCase
         $this->get('/pricing')
             ->assertOk()
             ->assertSee('Basic')
-            ->assertSee('$59')
-            ->assertSee('$99')
+            ->assertSee('₾')
+            ->assertDontSee('$59')
+            ->assertDontSee('$99')
+            ->assertDontSee('USD')
             ->assertDontSee('data-billing-v2="1"', false);
 
         $guide = PublicSpec::narrative('en');
         $limits = $this->section($guide, 'guide-limits');
-        $this->assertStringContainsString('59 USD', $limits[0]);
+        $this->assertStringNotContainsString('USD', $limits[0]);
+        $this->assertStringContainsString('GEL', $limits[0]);
         $this->assertStringNotContainsString('PROJECT_CAP_EXCEEDED', $limits[3]);
         $this->assertSame(19380, Catalog::usdCents('starter', 'year'));
         $sql = (string) file_get_contents(base_path('database/migrations/2026_12_31_930000_billing_v2.php'));
@@ -93,9 +96,9 @@ final class BillingV2Test extends TestCase
     {
         config(['billing.v2' => true]);
         $this->get('/')->assertOk()->assertSee('1 000 წარმატებული')->assertDontSee('$0 · 100 ');
-        $this->get('/terms')->assertOk()->assertSee('Starter — $19/თვე')->assertDontSee('10 000 წარმატებული მოთხოვნა. ეს კომერციული');
+        $this->get('/terms')->assertOk()->assertSee('Starter —')->assertSee('₾')->assertDontSee('$19')->assertDontSee('10 000 წარმატებული მოთხოვნა. ეს კომერციული');
         $this->withSession(['locale' => 'en'])->get('/')->assertOk()->assertSee('1 000 successful')->assertDontSee('X-Quota-Limit: 2000');
-        $this->withSession(['locale' => 'en'])->get('/terms')->assertOk()->assertSee('Starter is $19/month')->assertDontSee('Unlimited');
+        $this->withSession(['locale' => 'en'])->get('/terms')->assertOk()->assertSee('Starter is')->assertSee('₾')->assertDontSee('$19')->assertDontSee('Unlimited');
     }
 
     public function test_public_pricing_lists_the_new_tiers_when_the_flag_is_on(): void
@@ -106,8 +109,10 @@ final class BillingV2Test extends TestCase
             ->assertOk()
             ->assertSee('data-billing-v2="1"', false)
             ->assertSee('Starter')
-            ->assertSee('$19')
-            ->assertSee('$193.80')
+            ->assertSee('₾')
+            ->assertDontSee('$19')
+            ->assertDontSee('$193.80')
+            ->assertDontSee('USD')
             ->assertSee('−15%')
             ->assertSee('25 000')
             ->assertSee('150 000')
@@ -117,7 +122,8 @@ final class BillingV2Test extends TestCase
             ->assertDontSee('240');
 
         $limits = $this->section(PublicSpec::narrative('en'), 'guide-limits');
-        $this->assertStringContainsString('19 USD', $limits[0]);
+        $this->assertStringNotContainsString('USD', $limits[0]);
+        $this->assertStringContainsString('GEL', $limits[0]);
         $this->assertStringContainsString('PROJECT_CAP_EXCEEDED', $limits[3]);
         $this->assertStringNotContainsString('240', $limits[0]);
     }
