@@ -43,7 +43,7 @@
                 <div class="al al-wa" data-code="the rate is unavailable"><x-ga.icon name="warn" :size="18" /><div>{{ $en ? 'The National Bank rate is unavailable. A paid order is not created without it.' : 'ეროვნული ბანკის კურსი მიუწვდომელია. გადახდილი შეკვეთა კურსის გარეშე არ იქმნება.' }}</div></div>
             @endif
             @error('checkout')
-                <div class="al al-er" data-code="{{ $message }}"><x-ga.icon name="err" :size="18" /><div>{{ $message === 'payments not configured' ? ($en ? 'The payment provider is not connected.' : 'გადახდის პროვაიდერი არ არის მიერთებული.') : ($message === 'the rate is unavailable' ? ($en ? 'The rate is unavailable.' : 'კურსი მიუწვდომელია.') : $message) }}</div></div>
+                <div class="al al-er" data-code="{{ $message }}"><x-ga.icon name="err" :size="18" /><div>{{ $message === 'payments not configured' ? ($en ? 'The payment provider is not connected.' : 'გადახდის პროვაიდერი არ არის მიერთებული.') : ($message === 'no project' ? ($en ? 'Create a project first: the subscription is attached to your workspace through a project.' : 'ჯერ შექმენით პროექტი: გამოწერა სამუშაო სივრცეს პროექტის მეშვეობით ებმება.') : ($message === 'the rate is unavailable' ? ($en ? 'The rate is unavailable.' : 'კურსი მიუწვდომელია.') : $message)) }}</div></div>
             @enderror
 
             @if (! empty($v2))

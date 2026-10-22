@@ -316,6 +316,34 @@ final class BillingV2Test extends TestCase
         $this->assertSame('free', Workspace::subscription((int) Workspace::find(3)->id)->plan_code);
     }
 
+    public function test_checkout_without_a_project_explains_instead_of_404(): void
+    {
+        config(['billing.v2' => true]);
+        $user = $this->owner();
+        $this->rate();
+        DB::table('platform.projects')->where('user_id', 3)->delete();
+
+        Livewire::actingAs($user)->test(Billing::class)
+            ->call('checkout', 'starter', 'month')
+            ->assertHasErrors(['checkout'])
+            ->assertSee('ჯერ შექმენით პროექტი')
+            ->assertNoRedirect();
+        $this->assertSame(0, DB::table('billing_orders')->count());
+    }
+
+    public function test_free_plan_hides_paid_through_and_times_are_tbilisi(): void
+    {
+        config(['billing.v2' => true]);
+        $user = $this->owner();
+        $this->projects();
+        $this->rate();
+        $this->shared($user, 'free');
+
+        Livewire::actingAs($user)->test(Billing::class)
+            ->assertDontSee('გადახდილია')
+            ->assertSee('(თბილისი)');
+    }
+
     public function test_mock_checkout_still_issues_a_test_invoice(): void
     {
         config(['billing.v2' => true]);

@@ -11,17 +11,19 @@
     };
     $planNow = is_array($v2) ? (string) ($v2['plan'] ?? 'free') : 'free';
     $shared = is_array($v2) && ! empty($v2['shared']);
+    $tbs = fn ($t) => $t ? \Illuminate\Support\Carbon::parse((string) $t, config('app.timezone'))->setTimezone('Asia/Tbilisi')->format('Y-m-d H:i') . ' (' . ($en ? 'Tbilisi' : 'თბილისი') . ')' : '';
+    $isFree = strtolower((string) ($v2['label'] ?? '')) === 'free';
 @endphp
 <p class="muted">{{ $en ? 'Prices are in USD and include VAT. A year is 15% less than 12 months and still resets the quota each month. Nothing is charged again unless you pay.' : 'ფასი დოლარშია და დღგ-ს შეიცავს. წელიწადი 12 თვეზე 15%-ით ნაკლებია და კვოტა მაინც ყოველ თვე ნულდება. თანხა ხელახლა არ ჩამოიჭრება, სანამ თავად არ გადაიხდით.' }}</p>
 @if ($shared)
     <div class="panel" data-v2-subscription>
         <h2>{{ $en ? 'Subscription' : 'გამოწერა' }} · {{ $v2['label'] }}</h2>
         <p class="muted">{{ $en ? 'Shared quota' : 'საერთო კვოტა' }}: {{ $fmt((int) $v2['used']) }} / {{ $fmt((int) $v2['quota']) }}. {{ $en ? 'Credits' : 'კრედიტი' }}: {{ $fmt((int) $v2['credits']) }}. {{ $en ? 'Active projects' : 'აქტიური პროექტები' }}: {{ (int) $v2['active'] }} / {{ (int) $v2['allowed'] }}. {{ $en ? 'Requests a minute' : 'მოთხოვნა წუთში' }}: {{ (int) $v2['rpm'] }}.</p>
-        <p class="xs mut">{{ $en ? 'This period ends' : 'ეს პერიოდი სრულდება' }} {{ $v2['period_end'] }}. {{ $en ? 'Paid through' : 'გადახდილია' }} {{ $v2['term_end'] }}.@if ($v2['pending']) {{ $en ? 'Next term' : 'შემდეგი ვადა' }}: {{ $v2['pending'] }}.@endif</p>
+        <p class="xs mut">{{ $en ? 'This period ends' : 'ეს პერიოდი სრულდება' }} {{ $tbs($v2['period_end']) }}.@unless ($isFree) {{ $en ? 'Paid through' : 'გადახდილია' }} {{ $tbs($v2['term_end']) }}.@endunless@if ($v2['pending']) {{ $en ? 'Next term' : 'შემდეგი ვადა' }}: {{ $v2['pending'] }}.@endif</p>
         @if (count($v2['credit_rows']) > 0)
             <ul class="sm">
                 @foreach ($v2['credit_rows'] as $credit)
-                    <li>{{ $fmt((int) $credit->remaining) }} · {{ $credit->expires_at }}</li>
+                    <li>{{ $fmt((int) $credit->remaining) }} · {{ $tbs($credit->expires_at) }}</li>
                 @endforeach
             </ul>
         @endif

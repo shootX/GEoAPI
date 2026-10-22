@@ -59,6 +59,12 @@ final class Billing extends Component
         if (! in_array($plan, [Plans::BASIC, Plans::PREMIUM], true) || ! in_array($interval, ['month', 'year'], true)) {
             abort(404);
         }
+        $ids = array_map(static fn ($p): int => (int) $p['id'], $this->projects());
+        if ($this->projectId === null || ! in_array((int) $this->projectId, $ids, true)) {
+            $this->addError('checkout', 'no project');
+
+            return null;
+        }
         $mock = MockPay::enabled();
         if (! $mock && ! BogClient::configured()) {
             $this->addError('checkout', 'payments not configured');
@@ -128,6 +134,12 @@ final class Billing extends Component
     {
         if (! in_array($interval, ['month', 'year'], true)) {
             abort(404);
+        }
+        $ids = array_map(static fn ($p): int => (int) $p['id'], $this->projects());
+        if ($this->projectId === null || ! in_array((int) $this->projectId, $ids, true)) {
+            $this->addError('checkout', 'no project');
+
+            return null;
         }
         $mock = MockPay::enabled();
         if (! $mock && ! BogClient::configured()) {
