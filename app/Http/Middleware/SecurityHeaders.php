@@ -23,13 +23,24 @@ use Symfony\Component\HttpFoundation\Response;
  * those views calls needsEval(): it gets Livewire's standard build and 'unsafe-eval', still
  * with the nonce and without 'unsafe-inline'.
  *
- * The two OpenAPI viewers (Redoc, Swagger UI) are served from public/vendor and inject
- * their own <style> tags and a blob: search worker, so only those pages allow that.
+ * The two OpenAPI viewers (Redoc, Swagger UI) are served from public/vendor and start a
+ * blob: search worker, so only those pages allow that. Redoc takes the nonce for the <style>
+ * tags it injects after Redoc.init; the two it adds while loading are allowed by hash. Swagger
+ * UI cannot take a nonce, so only the operator-only /api/docs allows inline styles.
  */
 final class SecurityHeaders
 {
     /** Pages that render a self-hosted OpenAPI viewer. */
     private const VIEWERS = ['api/v1/docs', 'api/docs'];
+
+    /**
+     * The <style> blocks redoc.standalone.js 2.5.4 adds before Redoc.init (one is empty).
+     * Update them with the bundle (resources/vendor-assets.json).
+     */
+    private const REDOC_STYLE_HASHES = "'sha256-QMIg+bpjm3JdElJ388KYke01izlUW0UoNOeKjpMxdgc=' 'sha256-47DEQpj8HBSa+/TImW+5JCeuQeRkm5NMpJWZG3hSuFU='";
+
+    /** Swagger UI injects <style> tags without a nonce. */
+    private const INLINE_STYLES = ['api/docs'];
 
     private const EVAL = 'csp.unsafe_eval';
 
@@ -66,7 +77,7 @@ final class SecurityHeaders
             'Referrer-Policy' => 'strict-origin-when-cross-origin',
             'Permissions-Policy' => 'camera=(), microphone=(), geolocation=(), payment=(), usb=()',
             'Cross-Origin-Opener-Policy' => 'same-origin',
-            'Content-Security-Policy' => self::policy($nonce, $request->is(...self::VIEWERS), $request->attributes->get(self::EVAL) === true),
+            'Content-Security-Policy' => self::policy($nonce, $request->is(...self::VIEWERS), $request->attributes->get(self::EVAL) === true, $request->is(...self::INLINE_STYLES)),
         ];
     }
 
@@ -77,9 +88,9 @@ final class SecurityHeaders
         config(['livewire.csp_safe' => false]);
     }
 
-    public static function policy(string $nonce, bool $viewer = false, bool $eval = false): string
+    public static function policy(string $nonce, bool $viewer = false, bool $eval = false, bool $inlineStyles = false): string
     {
-        $styles = $viewer ? "'self' 'unsafe-inline'" : "'self' 'nonce-".$nonce."'";
+        $styles = $inlineStyles ? "'self' 'unsafe-inline'" : "'self' 'nonce-".$nonce."'".($viewer ? ' '.self::REDOC_STYLE_HASHES : '');
 
         return implode('; ', [
             "default-src 'none'",

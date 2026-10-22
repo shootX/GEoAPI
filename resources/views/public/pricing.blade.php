@@ -75,7 +75,8 @@
 </section>
 <section class="wrap" style="padding-bottom:72px">
     <h2 class="h2" style="margin-bottom:20px">{{ $en ? 'Comparison' : 'შედარება' }}</h2>
-    <div class="tw">
+    {{-- Scrolls sideways on narrow screens, so keyboard users must be able to focus it. --}}
+    <div class="tw" tabindex="0" role="region" aria-label="{{ $en ? 'Plan comparison' : 'გეგმების შედარება' }}">
         <table style="font-size:14px">
             <thead><tr><th style="width:40%"></th><th class="num">Free</th><th class="num" style="color:var(--ac)">Basic</th><th class="num">Premium</th></tr></thead>
             <tbody>

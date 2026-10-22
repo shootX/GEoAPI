@@ -87,7 +87,7 @@
                 @error('key_name') <p class="err">{{ $message }}</p> @enderror
                 <div class="panel flush">
                     <div class="ph"><h2>{{ $en ? 'API keys' : 'API გასაღებები' }}</h2><span class="bd bd-out">{{ count($keys) + (is_array($widget) && ! empty($widget['public_key']) ? 1 : 0) }}</span></div>
-                    <div class="tw"><table>
+                    <div class="tw" tabindex="0" role="region" aria-label="{{ $en ? 'API keys' : 'API გასაღებები' }}"><table>
                         <thead><tr><th>{{ $en ? 'Name' : 'სახელი' }}</th><th>{{ $en ? 'Key' : 'გასაღები' }}</th><th>{{ $en ? 'Last used' : 'ბოლო გამოყენება' }}</th><th>{{ $en ? 'Expires' : 'ვადა' }}</th><th>{{ $en ? 'Status' : 'სტატუსი' }}</th><th></th></tr></thead>
                         <tbody>
                         @if (is_array($widget) && ! empty($widget['public_key']))
@@ -148,7 +148,7 @@
                         @error('capInput') <p class="err">{{ $message }}</p> @enderror
                     </form>
                 @endif
-                <div class="panel flush"><div class="ph"><label class="srch"><x-ga.icon name="search" :size="16" /><input type="search" id="proj-q" placeholder="{{ $en ? 'Search' : 'ძიება' }}" aria-label="{{ $en ? 'Search projects' : 'პროექტების ძიება' }}" autocomplete="off"></label></div><div class="tw"><table id="proj-t">
+                <div class="panel flush"><div class="ph"><label class="srch"><x-ga.icon name="search" :size="16" /><input type="search" id="proj-q" placeholder="{{ $en ? 'Search' : 'ძიება' }}" aria-label="{{ $en ? 'Search projects' : 'პროექტების ძიება' }}" autocomplete="off"></label></div><div class="tw" tabindex="0" role="region" aria-label="{{ $en ? 'Projects' : 'პროექტები' }}"><table id="proj-t">
                     <thead><tr><th>{{ $en ? 'Project' : 'პროექტი' }}</th><th>{{ $en ? 'This month' : 'ამ თვის მოხმარება' }}</th><th>{{ $en ? 'Status' : 'სტატუსი' }}</th><th>{{ $en ? 'Created' : 'შექმნა' }}</th><th></th></tr></thead>
                     <tbody>
                     @forelse ($projects as $row)
@@ -199,7 +199,7 @@
                     </svg>
                     <p class="xs mut" style="margin-top:8px">{{ $en ? 'HTTP 200 only · widget and API share one counter · resets on the 1st (UTC)' : 'მხოლოდ HTTP 200 · ვიჯეტი და API ერთ მრიცხველზე · ნულდება თვის 1-ს (UTC)' }}</p>
                 </section>
-                <div class="panel flush"><div class="ph"><h2>{{ $en ? 'By day' : 'დღეების მიხედვით' }}</h2></div><div class="tw" style="max-height:360px;overflow:auto"><table>
+                <div class="panel flush"><div class="ph"><h2>{{ $en ? 'By day' : 'დღეების მიხედვით' }}</h2></div><div class="tw" tabindex="0" role="region" aria-label="{{ $en ? 'By day' : 'დღეების მიხედვით' }}" style="max-height:360px;overflow:auto"><table>
                     <thead><tr><th>{{ $en ? 'Day (UTC)' : 'დღე (UTC)' }}</th><th style="text-align:right">{{ $en ? 'Requests' : 'მოთხოვნები' }}</th><th style="width:45%"></th></tr></thead>
                     <tbody>@foreach (array_reverse($days) as $day)<tr><td class="mono xs">{{ $day['day'] ?: '—' }}</td><td class="mono" style="text-align:right">{{ $fmt((int) $day['used']) }}</td><td><div class="quota"><span style="width:{{ round(((int) $day['used'] / $max) * 100) }}%"></span></div></td></tr>@endforeach</tbody>
                 </table></div></div>

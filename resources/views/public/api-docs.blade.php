@@ -15,7 +15,7 @@
     </div>
     <div id="redoc" style="margin-top:32px;border:1px solid var(--line);border-radius:14px;overflow:hidden"></div>
     {{-- Redoc's footer logo is hot-linked from its CDN; img-src does not allow it. --}}
-    <style @nonce>#redoc a[href*="redocly.com"] img { display: none; }</style>
+    <style @nonce>#redoc a[href*="redocly.com"] img { display: none; } #redoc .redoc-json .collapser { min-width: 24px; min-height: 24px; } #redoc .redoc-json li { line-height: 24px; }</style>
     <script src="{{ asset('vendor/redoc/redoc.standalone.js') }}?v=2.5.4"></script>
     <script @nonce>
         Redoc.init({{ \Illuminate\Support\Js::from(url('/api/v1/openapi.json')) }}, {
@@ -24,7 +24,12 @@
                 typography: { fontFamily: 'FiraGO, system-ui, sans-serif', headings: { fontFamily: 'FiraGO, system-ui, sans-serif', fontWeight: '700' }, code: { fontFamily: '"JetBrains Mono", ui-monospace, monospace' } },
                 sidebar: { backgroundColor: '#F7F7FB', activeTextColor: '#4338CA' },
                 rightPanel: { backgroundColor: '#0F0E2A' }
-            }
+            },
+            nonce: {{ \Illuminate\Support\Js::from((string) \Illuminate\Support\Facades\Vite::cspNonce()) }}
         }, document.getElementById('redoc'));
+        // Redoc's code samples scroll sideways but cannot take focus; keyboard users need to reach them.
+        new MutationObserver(function () {
+            document.querySelectorAll('#redoc pre:not([tabindex])').forEach(function (pre) { pre.tabIndex = 0; });
+        }).observe(document.getElementById('redoc'), { childList: true, subtree: true });
     </script>
 @endcomponent

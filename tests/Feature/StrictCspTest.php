@@ -37,7 +37,7 @@ final class StrictCspTest extends TestCase
     #[DataProvider('pages')]
     public function test_public_pages_send_the_strict_policy_and_nonce_every_inline_block(string $path): void
     {
-        $this->assertStrictPage($this->get($path), $path === '/api/v1/docs');
+        $this->assertStrictPage($this->get($path));
     }
 
     public function test_cabinet_pages_and_livewire_use_the_csp_safe_build(): void
@@ -48,6 +48,16 @@ final class StrictCspTest extends TestCase
             $this->assertStrictPage($response);
             $this->assertMatchesRegularExpression('#livewire[^"]*\.csp(\.min)?\.js#', (string) $response->getContent(), $path.' loads Livewire\'s CSP-safe Alpine build');
         }
+    }
+
+    public function test_redoc_gets_the_nonce_instead_of_inline_styles(): void
+    {
+        // QA retest L1: the API reference sent style-src 'unsafe-inline'.
+        $response = $this->get('/api/v1/docs');
+
+        $this->assertStringContainsString("nonce: '".$this->nonce($response)."'", (string) $response->getContent());
+        $this->assertMatchesRegularExpression("/style-src 'self' 'nonce-[^;]*;/", (string) $response->headers->get('Content-Security-Policy'));
+        $this->assertDoesNotMatchRegularExpression("/style-src [^;]*'unsafe-inline'/", (string) $response->headers->get('Content-Security-Policy'));
     }
 
     public function test_each_request_gets_a_new_nonce(): void
@@ -77,7 +87,7 @@ final class StrictCspTest extends TestCase
         }
     }
 
-    private function assertStrictPage(TestResponse $response, bool $viewer = false): void
+    private function assertStrictPage(TestResponse $response): void
     {
         $response->assertOk();
         $policy = (string) $response->headers->get('Content-Security-Policy');
@@ -89,7 +99,7 @@ final class StrictCspTest extends TestCase
         $this->assertStringNotContainsString('unpkg.com', $policy);
         $this->assertStringNotContainsString('redoc.ly', $policy);
         $this->assertStringNotContainsString('https:', $policy, 'no wildcard or third-party hosts');
-        $this->assertStringContainsString($viewer ? "style-src 'self' 'unsafe-inline'" : "style-src 'self' 'nonce-".$nonce."'", $policy);
+        $this->assertStringContainsString("style-src 'self' 'nonce-".$nonce."'", $policy);
         $scriptSrc = (string) preg_replace('/^.*?script-src ([^;]*);.*$/', '$1', $policy);
         $this->assertStringNotContainsString("'unsafe-inline'", $scriptSrc);
 
