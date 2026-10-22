@@ -114,7 +114,7 @@ final class Entitlements
         $ends = (string) $order->interval === 'year' ? now()->addYear() : now()->addMonth();
         $endsAt = $ends->utc()->format('Y-m-d H:i:s');
         self::apply((int) $order->project_id, (string) $order->plan_code, $endsAt, Plans::unlimited((string) $order->plan_code));
-        self::setEntitlement((int) $order->legacy_user_id, (string) $order->plan_code, null, (string) ($order->provider ?? 'bog'));
+        self::setEntitlement((int) $order->legacy_user_id, (string) $order->plan_code, null, MockPay::isMock($order) ? MockPay::PROVIDER : 'bog');
         DB::table('billing_orders')->where('id', $order->id)->update([
             'status' => 'paid',
             'updated_at' => now(),
@@ -320,7 +320,7 @@ final class Entitlements
     private static function invoice(object $order, string $endsAt): void
     {
         $buyer = self::jsonArray($order->buyer);
-        $test = (string) ($order->provider ?? 'bog') === MockPay::PROVIDER;
+        $test = MockPay::isMock($order);
         $number = ($test ? 'TEST-' : 'GEO-').now()->utc()->format('Ymd').'-'.$order->id;
         $pdf = InvoicePdf::render([
             'kind' => (string) ($buyer['kind'] ?? 'individual'),

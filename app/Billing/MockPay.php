@@ -25,4 +25,15 @@ final class MockPay
 
         return config('services.bog.mock', true) !== false;
     }
+
+    /** Mock orders carry bog_order_id "mock:<public_id>" (no schema change; a real BOG callback can never match it). */
+    public static function flag(string $publicId): string
+    {
+        return 'mock:'.$publicId;
+    }
+
+    public static function isMock(object $order): bool
+    {
+        return str_starts_with((string) ($order->bog_order_id ?? ''), 'mock:');
+    }
 }
