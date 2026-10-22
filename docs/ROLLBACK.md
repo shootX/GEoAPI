@@ -1,6 +1,6 @@
 # Rollback
 
-This is the rollback checklist. A database restore was not executed while writing it. This file is not a record of a successful production restore.
+This is the rollback checklist. A restore of the nightly dump into a scratch database was executed on 2026-10-22 (163 s, clean); see "Restore test — 2026-10-22" below.
 
 ## Application
 
@@ -18,9 +18,9 @@ The workflow does not edit `.env`, `APP_DEBUG`, `APP_KEY`, or `MAIL_*`. Do not r
 
 ## Database and media
 
-Backups of the database and of uploaded media are an owner task. This document has no connection string and no private key. A restore into production was not executed. Practice a restore on a copy the owner provides before relying on a backup.
+A nightly `pg_dump` of `carbase` runs at 02:30 Tbilisi time (`/etc/cron.d/geoapi-backup`, 7-day rotation in `/root/geoapi-backups/daily`). Uploaded media are not in that dump. This document has no connection string and no private key. A restore into production was not executed; a scratch-database restore was (see below).
 
-No `EXPLAIN` was run against production for this change. No index was added from a guess. A p95 latency baseline was not measured. This repository does not ship a metrics collector or an alert destination.
+No `EXPLAIN` was run against production for this change. No index was added from a guess. A remote p95 baseline was measured on 2026-10-22 (`docs/PERFORMANCE.md`). This repository does not ship a metrics collector or an alert destination.
 
 ## Billing column
 

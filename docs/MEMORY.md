@@ -149,3 +149,4 @@ Existing access is kept by a new column, not by rewriting quotas. On PostgreSQL 
 - Photo rights: cleared by owner 2026-10-22 (owner-generated images).
 - Restore test 2026-10-22: 163 s, clean; RPO up to 24 h (nightly dump only).
 - Perf 2026-10-22: ~13 rps at 20 conc, p95 ~2 s remote; app-side ~0.35 s for /ready. Docs in docs/PERFORMANCE.md.
+- Docs: WP-00 audit is historical; current state lives in TASKS.md.

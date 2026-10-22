@@ -4,6 +4,17 @@ production-ში `CARAPI_CATALOG_ENABLED=1`. მარშრუტები ი
 
 `GET /getImage` ამ კონტრაქტში არ შედის. ის ძველი გარე წყაროს მექანიზმია (`src/DromResolver.php`, `cache/`).
 
+## მიმდინარე მდგომარეობა (2026-10-22)
+
+- კოდი: Laravel 12. მარშრუტი `routes/product.php` → `App\Http\Controllers\Api\V1\CatalogController` → `App\Catalog\CatalogApi` / `PublicCatalog`. ძველი `src/` ახლა `legacy/src/`-შია (ვიჯეტის picker და კაბინეტი).
+- მარშრუტები: `/api/v1/brands`, `/brands/{slug}/models`, `/models/{id}/years`, `/models/{id}/generations`, `/generations/{id}/modifications`, `/modifications`, `/modifications/{id}`, `/modifications/{id}/specs`, `/modifications/{id}/equipment`, `/engines`, `/bodies`, `/fuel`, `/colors`, `/coverage`. სრული კონტრაქტი: `GET /api/v1/openapi.json`, Postman: `/api/v1/postman.json`, დოკუმენტაცია: `/api/v1/docs`.
+- ავტორიზაცია: `Authorization: Bearer geoapi_sk_…`. ლიმიტები და პლანები: `docs/USAGE_AND_LIMITS.md`, ბილინგი WP-11/WP-12 (`docs/TASKS.md`).
+- ფოტო: `GET /api/models/{id}/photo?generation={id}` (verified ფოტოები; უფლებები დადასტურებულია 2026-10-22).
+- ტესტები: `tests/Feature/PublicApiV1Test.php`, `PublicApiContractTest.php` (SQLite, `SeedsPublicCatalog`); CI: PHPUnit + SDK/MCP/CLI Node 20/22.
+- გარემო: Laravel `.env` იკითხება `config/`-ის გავლით; ქვემოთ მოცემული `CARAPI_*` ცვლადები ისევ მოქმედებს კატალოგის კავშირზე.
+
+ქვემოთ დარჩენილი ტექსტი წინა (pre-Laravel) ეტაპის აღწერაა და ისტორიისთვის რჩება.
+
 ## კონფიგურაცია
 
 აპლიკაცია `.env` ფაილს არ კითხულობს. კავშირი მხოლოდ პროცესის გარემოდან მოდის (`src/Catalog/Connection.php`). `.env.example` საილუსტრაციო ცარიელი მნიშვნელობებია.
