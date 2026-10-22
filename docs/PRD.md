@@ -2,6 +2,10 @@
 
 Public catalog API and Georgian/English site at https://geoapi.ge. The catalog is the property of the Global auto industry. Customers call the catalog with a secret key (`geoapi_sk_…`) or embed the picker widget with a public key (`geoapi_pk_…`). Keys belong to projects on tariff plans.
 
+## 2026-10-22 — Billing V2 live (`BILLING_V2=true`)
+
+Free $0 / 1 000 requests / 1 project / 15 rpm; Starter $19 / 25 000 / 3 / 60; Growth $59 / 150 000 / 10 / 120; Business $149 / 500 000 / 25 / 240 (not sold while `BILLING_V2_BUSINESS_RPM=false`); Enterprise custom via hello@geoapi.ge. One workspace subscription, shared monthly quota, yearly −15% with monthly reset, VAT included, GEL at the NBG rate, no automatic renewal, no unlimited plan. Packs: Starter +10 000 $9, Growth +50 000 $20, Business +100 000 $35 (90 days, after quota). Extra project $5/month. The Free 100 / Basic / Premium / −12% text below applies only with the flag off or to preserved legacy terms.
+
 ## 2026-10-20
 
 - Free plan stays 60 requests/minute and 10 000 successful requests per calendar month. Pro is shown as upcoming and is not sold.

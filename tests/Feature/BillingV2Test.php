@@ -89,6 +89,15 @@ final class BillingV2Test extends TestCase
         $this->assertStringNotContainsString('platform.project_limits', $sql);
     }
 
+    public function test_public_copy_uses_v2_numbers_when_the_flag_is_on(): void
+    {
+        config(['billing.v2' => true]);
+        $this->get('/')->assertOk()->assertSee('1 000 წარმატებული')->assertDontSee('$0 · 100 ');
+        $this->get('/terms')->assertOk()->assertSee('Starter — $19/თვე')->assertDontSee('10 000 წარმატებული მოთხოვნა. ეს კომერციული');
+        $this->withSession(['locale' => 'en'])->get('/')->assertOk()->assertSee('1 000 successful')->assertDontSee('X-Quota-Limit: 2000');
+        $this->withSession(['locale' => 'en'])->get('/terms')->assertOk()->assertSee('Starter is $19/month')->assertDontSee('Unlimited');
+    }
+
     public function test_public_pricing_lists_the_new_tiers_when_the_flag_is_on(): void
     {
         config(['billing.v2' => true]);

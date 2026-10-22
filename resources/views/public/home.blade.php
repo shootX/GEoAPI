@@ -8,13 +8,14 @@
         ['doc', $en ? 'Specifications' : 'სპეციფიკაციები', 'engine{volume_cc, fuel, power_hp}, transmission, consumption', '/modifications/{id}/specs'],
         ['chk', $en ? 'Equipment' : 'აღჭურვილობა', 'standard / optional / not_available', '/modifications/{id}/equipment'],
     ];
+    $freeQ = (\App\Billing\V2\Flag::on() ? '1 000' : '100');
     $steps = $en ? [
-        ['Sign up', 'Free plan: $0, 100 successful requests a month.'],
+        ['Sign up', 'Free plan: $0, '.$freeQ.' successful requests a month.'],
         ['Confirm your email', 'Required before you can create a secret key.'],
         ['Create a project and a key', 'geoapi_sk_ is shown only once. Save it.'],
         ['Send your first request', 'REST API or the widget, one shared counter.'],
     ] : [
-        ['დარეგისტრირდით', 'Free გეგმა — $0, 100 წარმატებული მოთხოვნა თვეში.'],
+        ['დარეგისტრირდით', 'Free გეგმა — $0, '.$freeQ.' წარმატებული მოთხოვნა თვეში.'],
         ['დაადასტურეთ ელფოსტა', 'საიდუმლო გასაღების შექმნისთვის აუცილებელია.'],
         ['შექმენით პროექტი და გასაღები', 'geoapi_sk_ ჩანს მხოლოდ ერთხელ — შეინახეთ.'],
         ['გაგზავნეთ პირველი მოთხოვნა', 'REST API ან ვიჯეტი — ერთი მრიცხველით.'],
@@ -54,7 +55,7 @@
                 <a class="btn b-pri b-lg" href="{{ route('register') }}">{{ $en ? 'Start free' : 'დაიწყე უფასოდ' }}</a>
                 <a class="btn b-sec b-lg" href="{{ url('/guide') }}"><x-ga.icon name="doc" />{{ $en ? 'Documentation' : 'დოკუმენტაცია' }}</a>
             </div>
-            <p class="sm mut" style="margin-top:14px">{{ $en ? 'Free plan · $0 · 100 successful requests a month' : 'Free გეგმა · $0 · 100 წარმატებული მოთხოვნა თვეში' }}</p>
+            <p class="sm mut" style="margin-top:14px">{{ $en ? 'Free plan · $0 · '.$freeQ.' successful requests a month' : 'Free გეგმა · $0 · '.$freeQ.' წარმატებული მოთხოვნა თვეში' }}</p>
         </div>
         <div style="position:relative;background:#fff;border:1px solid var(--line);border-radius:24px;padding:26px;box-shadow:var(--sh2);background-image:radial-gradient(#E4E3EE 1.2px,transparent 1.2px);background-size:24px 24px">
             <div style="background:#fff;border:1px solid var(--line);border-radius:14px;padding:14px 16px;box-shadow:var(--sh2);max-width:360px">
@@ -123,7 +124,7 @@
 <pre><span class="k4"># {{ $en ? 'the key goes only in the Authorization header' : 'გასაღები მხოლოდ Authorization header-ში' }}</span>
 curl https://geoapi.ge<span class="k1">/api/v1/modifications/1000/specs</span> \
   -H <span class="k2">"Authorization: Bearer $GEOAPI_API_KEY"</span></pre>
-            <div style="border-top:1px solid #26244F;padding:8px 18px;font-size:11.5px" class="row"><span class="bd" style="background:#123325;color:#7CCFA3;height:20px">200 OK</span><span class="k4">X-RateLimit-Limit: 60 · X-Quota-Limit: 2000</span></div>
+            <div style="border-top:1px solid #26244F;padding:8px 18px;font-size:11.5px" class="row"><span class="bd" style="background:#123325;color:#7CCFA3;height:20px">200 OK</span><span class="k4">X-RateLimit-Limit: {{ \App\Billing\V2\Flag::on() ? '60 · X-Quota-Limit: 25000' : '60 · X-Quota-Limit: 2000' }}</span></div>
 <pre style="padding-top:4px">{
   <span class="k1">"data"</span>: {
     <span class="k1">"modification_id"</span>: <span class="k2">"1000"</span>,
@@ -167,7 +168,7 @@ curl https://geoapi.ge<span class="k1">/api/v1/modifications/1000/specs</span> \
 </section>
 <section class="wrap" style="padding-bottom:96px">
     <div style="background:var(--soft);border-radius:24px;padding:48px;display:flex;align-items:center;gap:24px;flex-wrap:wrap" class="cta-band">
-        <div style="flex:1;min-width:260px"><h2 class="h2">{{ $en ? 'Start free' : 'დაიწყეთ უფასოდ' }}</h2><p class="mut" style="margin-top:8px">{{ $en ? '100 successful requests a month. Change the plan any time.' : '100 წარმატებული მოთხოვნა თვეში. გეგმის შეცვლა ნებისმიერ დროს.' }}</p></div>
+        <div style="flex:1;min-width:260px"><h2 class="h2">{{ $en ? 'Start free' : 'დაიწყეთ უფასოდ' }}</h2><p class="mut" style="margin-top:8px">{{ $en ? $freeQ.' successful requests a month. Change the plan any time.' : $freeQ.' წარმატებული მოთხოვნა თვეში. გეგმის შეცვლა ნებისმიერ დროს.' }}</p></div>
         <a class="btn b-pri b-lg" href="{{ route('register') }}">{{ $en ? 'Create an account' : 'ანგარიშის შექმნა' }}</a>
         <a class="btn b-sec b-lg" href="{{ route('pricing') }}">{{ $en ? 'Pricing' : 'ტარიფები' }}</a>
     </div>

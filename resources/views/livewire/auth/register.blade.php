@@ -1,7 +1,7 @@
 @php $en = app()->getLocale() === 'en'; @endphp
 <div>
     <h1>{{ __('Create an account') }}</h1>
-    <p class="mut" style="margin:6px 0 24px">{{ $en ? 'Free plan · 100 successful requests a month' : 'Free გეგმა · 100 წარმატებული მოთხოვნა თვეში' }}</p>
+    <p class="mut" style="margin:6px 0 24px">{{ $en ? 'Free plan · '.(\App\Billing\V2\Flag::on() ? '1 000' : '100').' successful requests a month' : 'Free გეგმა · '.(\App\Billing\V2\Flag::on() ? '1 000' : '100').' წარმატებული მოთხოვნა თვეში' }}</p>
     <form wire:submit="register" class="col" style="gap:16px">
         <div class="fld">
             <span style="font-size:13px;font-weight:500">{{ __('Account type') }}</span>
