@@ -184,3 +184,7 @@
 
 - [x] Light load test (20 concurrent, 60 s) on public endpoints: p95 about 2.0 s remote, ~13 rps ceiling, no 5xx. See `docs/PERFORMANCE.md`.
 - [ ] Authenticated `/api/v1` load test, FPM tuning, monitoring.
+
+## 2026-10-22 — Docs sync
+
+- [x] `docs/audits/geoapi-current-state.md` marked as historical WP-00 snapshot. `docs/CATALOG_API.md` has a current-state section. `docs/ROLLBACK.md` intro reflects the restore test and the p95 baseline.

@@ -1,4 +1,8 @@
-# GeoAPI — WP-00 მიმდინარე მდგომარეობა
+# GeoAPI — WP-00 მდგომარეობა (ისტორიული)
+
+> **ისტორიული snapshot, 2026-10-21 (WP-00).** ეს დოკუმენტი აღწერს მდგომარეობას WP-01–WP-12-მდე და აღარ არის მიმდინარე. მას შემდეგ დაემატა SDK, MCP server და CLI (`packages/`), CI მწვანეა, ბილინგი (BOG) და ინვოისები არსებობს. მიმდინარე მდგომარეობა: `docs/TASKS.md`, `docs/CATALOG_API.md`, `docs/ROLLBACK.md`, `docs/PERFORMANCE.md`.
+>
+> **Historical snapshot (WP-00, 2026-10-21). Not current.** See `docs/TASKS.md` for the current state.
 
 აუდიტის თარიღი: 2026-10-21. რეჟიმი: მხოლოდ წაკითხვა. აპლიკაციის კოდი, მიგრაცია, `.env` და სერვერი არ შეცვლილა. VIN ამ პროექტის მიზანი არ არის და ახალი VIN კოდი არ დაწერილა.
 
