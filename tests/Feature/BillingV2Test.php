@@ -321,6 +321,7 @@ final class BillingV2Test extends TestCase
         config(['billing.v2' => true]);
         $user = $this->owner();
         $this->rate();
+        DB::table('platform.projects')->where('user_id', 3)->delete();
 
         Livewire::actingAs($user)->test(Billing::class)
             ->call('checkout', 'starter', 'month')
