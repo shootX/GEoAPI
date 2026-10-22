@@ -19,7 +19,6 @@ foreach ($exact as $path) {
     Route::any($path, LegacyFrontController::class);
 }
 
-Route::any('docs/{path}', LegacyFrontController::class)->where('path', '.*');
 Route::any('account/projects/{path}', LegacyFrontController::class)->where('path', '.*');
 Route::any('admin/users/{path?}', LegacyFrontController::class)->where('path', '.*');
 Route::any('admin/projects/{path?}', LegacyFrontController::class)->where('path', '.*');

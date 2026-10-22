@@ -62,14 +62,6 @@ if (\Carapi\Catalog\VehiclePickerHttp::matches($apiPath)) {
     return;
 }
 
-$publicDoc = carapi_resolve_doc($apiPath);
-if ($publicDoc !== null) {
-    header('Content-Type: ' . carapi_doc_content_type($publicDoc));
-    header('X-Content-Type-Options: nosniff');
-    readfile($publicDoc);
-    return;
-}
-
 $path = strtolower(rtrim($uriPath, '/'));
 
 if (\Carapi\Platform\Http::enabled() && \Carapi\Platform\Http::handles($path)) {
@@ -267,95 +259,6 @@ function carapi_self_base(): string
         ?? ((!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http');
     $host = $_SERVER['HTTP_HOST'] ?? 'localhost';
     return $proto . '://' . $host;
-}
-
-/** Allowlisted file under docs/. Case-insensitive. No traversal. Other files stay on disk. */
-function carapi_resolve_doc(string $apiPath): ?string
-{
-    $apiPath = rawurldecode($apiPath);
-    if (str_contains($apiPath, "\0") || !str_starts_with(strtolower($apiPath), '/docs/')) {
-        return null;
-    }
-    $rel = trim(substr($apiPath, 6), '/');
-    if ($rel === '') {
-        return null;
-    }
-    $parts = explode('/', $rel);
-    foreach ($parts as $part) {
-        if ($part === '' || $part === '.' || $part === '..' || str_starts_with($part, '.')) {
-            return null;
-        }
-    }
-
-    $root = realpath(dirname(__DIR__) . '/docs');
-    if ($root === false || !is_dir($root)) {
-        return null;
-    }
-
-    $dir = $root;
-    $last = count($parts) - 1;
-    foreach ($parts as $i => $part) {
-        $match = null;
-        foreach (scandir($dir) ?: [] as $entry) {
-            if ($entry === '.' || $entry === '..' || str_starts_with($entry, '.')) {
-                continue;
-            }
-            if (strcasecmp($entry, $part) === 0) {
-                $match = $entry;
-                break;
-            }
-        }
-        if ($match === null) {
-            return null;
-        }
-        $next = $dir . DIRECTORY_SEPARATOR . $match;
-        if ($i === $last) {
-            if (!is_file($next)) {
-                return null;
-            }
-            $real = realpath($next);
-            $prefix = $root . DIRECTORY_SEPARATOR;
-            if ($real === false || !str_starts_with($real, $prefix)) {
-                return null;
-            }
-            $allowed = [
-                'catalog_api.md',
-                'projects_api_keys.md',
-                'usage_and_limits.md',
-                'widget_integration.md',
-            ];
-            if (!in_array(strtolower(substr($real, strlen($prefix))), $allowed, true)) {
-                return null;
-            }
-
-            return $real;
-        }
-        if (!is_dir($next)) {
-            return null;
-        }
-        $dir = $next;
-    }
-    return null;
-}
-
-function carapi_doc_content_type(string $file): string
-{
-    $ext = strtolower(pathinfo($file, PATHINFO_EXTENSION));
-    return match ($ext) {
-        'md', 'txt', 'csv', 'log' => 'text/plain; charset=utf-8',
-        'json' => 'application/json; charset=utf-8',
-        'html', 'htm' => 'text/html; charset=utf-8',
-        'css' => 'text/css; charset=utf-8',
-        'js' => 'text/javascript; charset=utf-8',
-        'svg' => 'image/svg+xml',
-        'png' => 'image/png',
-        'jpg', 'jpeg' => 'image/jpeg',
-        'gif' => 'image/gif',
-        'webp' => 'image/webp',
-        'pdf' => 'application/pdf',
-        'xml' => 'application/xml; charset=utf-8',
-        default => 'application/octet-stream',
-    };
 }
 
 /** HTTP header values must be a single line; attribution can contain anything. */
