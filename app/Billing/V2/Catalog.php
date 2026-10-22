@@ -7,7 +7,7 @@ namespace App\Billing\V2;
 use InvalidArgumentException;
 
 /**
- * Workspace plans. USD cents are the list price. GEL is the NBG conversion.
+ * Workspace plans. Prices are in GEL tetri (1 ₾ = 100 tetri); there is no other currency.
  * A year is 15% below twelve monthly prices. The price includes VAT.
  * The monthly quota still resets every month on an annual term.
  * There is no automatic charge at the end of a term.
@@ -16,26 +16,26 @@ final class Catalog
 {
     public const CREDIT_DAYS = 90;
 
-    public const EXTRA_PROJECT_CENTS = 500;
+    public const EXTRA_PROJECT_TETRI = 1400;
 
-    /** @return array<string, array{usd_cents:int, quota:int, projects:int, rpm:int, rank:int}> */
+    /** @return array<string, array{tetri:int, quota:int, projects:int, rpm:int, rank:int}> */
     public static function plans(): array
     {
         return [
-            'free' => ['usd_cents' => 0, 'quota' => 1000, 'projects' => 1, 'rpm' => 15, 'rank' => 0],
-            'starter' => ['usd_cents' => 1900, 'quota' => 25000, 'projects' => 3, 'rpm' => 60, 'rank' => 1],
-            'growth' => ['usd_cents' => 5900, 'quota' => 150000, 'projects' => 10, 'rpm' => 120, 'rank' => 2],
-            'business' => ['usd_cents' => 14900, 'quota' => 500000, 'projects' => 25, 'rpm' => 240, 'rank' => 3],
+            'free' => ['tetri' => 0, 'quota' => 1000, 'projects' => 1, 'rpm' => 15, 'rank' => 0],
+            'starter' => ['tetri' => 5100, 'quota' => 25000, 'projects' => 3, 'rpm' => 60, 'rank' => 1],
+            'growth' => ['tetri' => 15900, 'quota' => 150000, 'projects' => 10, 'rpm' => 120, 'rank' => 2],
+            'business' => ['tetri' => 40200, 'quota' => 500000, 'projects' => 25, 'rpm' => 240, 'rank' => 3],
         ];
     }
 
-    /** @return array<string, array{usd_cents:int, requests:int}> */
+    /** @return array<string, array{tetri:int, requests:int}> */
     public static function packs(): array
     {
         return [
-            'starter' => ['usd_cents' => 900, 'requests' => 10000],
-            'growth' => ['usd_cents' => 2000, 'requests' => 50000],
-            'business' => ['usd_cents' => 3500, 'requests' => 100000],
+            'starter' => ['tetri' => 2400, 'requests' => 10000],
+            'growth' => ['tetri' => 5400, 'requests' => 50000],
+            'business' => ['tetri' => 9500, 'requests' => 100000],
         ];
     }
 
@@ -61,14 +61,14 @@ final class Catalog
         return $listed;
     }
 
-    public static function usdCents(string $product, string $interval): int
+    public static function tetri(string $product, string $interval): int
     {
         if ($product === 'extra-project') {
             if ($interval !== 'month') {
                 throw new InvalidArgumentException('interval');
             }
 
-            return self::EXTRA_PROJECT_CENTS;
+            return self::EXTRA_PROJECT_TETRI;
         }
         if (str_starts_with($product, 'credits:')) {
             $pack = substr($product, 8);
@@ -76,7 +76,7 @@ final class Catalog
                 throw new InvalidArgumentException('plan');
             }
 
-            return self::packs()[$pack]['usd_cents'];
+            return self::packs()[$pack]['tetri'];
         }
         if (! isset(self::plans()[$product]) || $product === 'free') {
             throw new InvalidArgumentException('plan');
@@ -84,7 +84,7 @@ final class Catalog
         if (! in_array($interval, ['month', 'year'], true)) {
             throw new InvalidArgumentException('interval');
         }
-        $monthly = self::plans()[$product]['usd_cents'];
+        $monthly = self::plans()[$product]['tetri'];
         if ($interval === 'month') {
             return $monthly;
         }
@@ -94,7 +94,7 @@ final class Catalog
 
     public static function code(string $product, string $interval): string
     {
-        self::usdCents($product, $interval);
+        self::tetri($product, $interval);
         if ($interval === 'year') {
             return 'v2:'.$product.'-year';
         }

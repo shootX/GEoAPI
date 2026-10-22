@@ -39,11 +39,8 @@
             @unless ($configured)
                 <div class="al al-wa" data-code="payments not configured"><x-ga.icon name="warn" :size="18" /><div>{{ $en ? 'The payment provider is not connected yet. Card payment is temporarily unavailable.' : 'გადახდის პროვაიდერი ჯერ არ არის მიერთებული. ბარათით გადახდა დროებით მიუწვდომელია.' }}</div></div>
             @endunless
-            @if ($rate === null)
-                <div class="al al-wa" data-code="the rate is unavailable"><x-ga.icon name="warn" :size="18" /><div>{{ $en ? 'The National Bank rate is unavailable. A paid order is not created without it.' : 'ეროვნული ბანკის კურსი მიუწვდომელია. გადახდილი შეკვეთა კურსის გარეშე არ იქმნება.' }}</div></div>
-            @endif
             @error('checkout')
-                <div class="al al-er" data-code="{{ $message }}"><x-ga.icon name="err" :size="18" /><div>{{ $message === 'payments not configured' ? ($en ? 'The payment provider is not connected.' : 'გადახდის პროვაიდერი არ არის მიერთებული.') : ($message === 'no project' ? ($en ? 'Create a project first: the subscription is attached to your workspace through a project.' : 'ჯერ შექმენით პროექტი: გამოწერა სამუშაო სივრცეს პროექტის მეშვეობით ებმება.') : ($message === 'the rate is unavailable' ? ($en ? 'The rate is unavailable.' : 'კურსი მიუწვდომელია.') : $message)) }}</div></div>
+                <div class="al al-er" data-code="{{ $message }}"><x-ga.icon name="err" :size="18" /><div>{{ $message === 'payments not configured' ? ($en ? 'The payment provider is not connected.' : 'გადახდის პროვაიდერი არ არის მიერთებული.') : ($message === 'no project' ? ($en ? 'Create a project first: the subscription is attached to your workspace through a project.' : 'ჯერ შექმენით პროექტი: გამოწერა სამუშაო სივრცეს პროექტის მეშვეობით ებმება.') : $message) }}</div></div>
             @enderror
 
             @if (! empty($v2))
@@ -78,8 +75,8 @@
                     </article>
                     @foreach (['basic' => 'Basic', 'premium' => 'Premium'] as $code => $label)
                         @php
-                            $monthCents = \App\Billing\Plans::usdCents($code, 'month');
-                            $yearCents = \App\Billing\Plans::usdCents($code, 'year');
+                            $monthCents = \App\Billing\Plans::tetri($code, 'month');
+                            $yearCents = \App\Billing\Plans::tetri($code, 'year');
                             $off = ! $configured;
                             $isCurrent = $currentPlan === $code;
                         @endphp

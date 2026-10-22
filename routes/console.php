@@ -8,5 +8,4 @@ Artisan::command('inspire', function () {
     $this->comment(Inspiring::quote());
 })->purpose('Display an inspiring quote');
 
-Schedule::command('billing:nbg-rate')->dailyAt('09:00');
 Schedule::command('billing:expire')->hourly();

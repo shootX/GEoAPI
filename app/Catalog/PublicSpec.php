@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Catalog;
 
+use App\Billing\Plans;
+use App\Billing\V2\Catalog;
 use App\Billing\V2\Flag;
 
 /**
@@ -163,12 +165,12 @@ final class PublicSpec
                 'id' => 'guide-limits',
                 'title' => $english ? 'Limits' : 'ლიმიტები',
                 'paragraphs' => $english ? [
-                    'A project that has not chosen a commercial plan keeps 60 requests each UTC minute and 10 000 successful requests each UTC month. Choosing the free plan sets that project to 100 successful requests each UTC month. Basic is 2 000 successful requests each UTC month at '.\App\Billing\Plans::lari(\App\Billing\Plans::usdCents('basic', 'month')).'. Premium is unlimited at '.\App\Billing\Plans::lari(\App\Billing\Plans::usdCents('premium', 'month')).'. A year is 12% below twelve monthly prices. Prices are in GEL and include VAT. The 2 000 successful requests per UTC day limit is not enforced in production today. The widget and the server key share the counter.',
+                    'A project that has not chosen a commercial plan keeps 60 requests each UTC minute and 10 000 successful requests each UTC month. Choosing the free plan sets that project to 100 successful requests each UTC month. Basic is 2 000 successful requests each UTC month at '.Plans::lari(Plans::tetri('basic', 'month')).'. Premium is unlimited at '.Plans::lari(Plans::tetri('premium', 'month')).'. A year is 12% below twelve monthly prices. Prices are in GEL and include VAT. The 2 000 successful requests per UTC day limit is not enforced in production today. The widget and the server key share the counter.',
                     'The daily check runs only when platform.project_limits.per_day exists. That column is not active in production, so the daily cap is skipped. A missing limits row is 503, not unlimited. A failed meter is 503 and the body is not the catalog.',
                     'A successful response sends X-RateLimit-Limit, X-RateLimit-Remaining, and X-RateLimit-Reset for the minute, plus X-Quota-Limit, X-Quota-Remaining, and X-Quota-Reset for the month. 401 does not send quota headers.',
                     '429 is JSON with Retry-After. Codes: RATE_LIMIT_EXCEEDED, DAILY_QUOTA_EXCEEDED, MONTHLY_QUOTA_EXCEEDED. On 429 the X-RateLimit-* headers describe the window that was hit, not X-Quota-*. Wait Retry-After seconds. Do not retry 401, 403, 404, or 422. 401, 403, 404, 405, 422, 429, and 503 do not spend the month. Failures still use the minute window. A new key does not reset the counter.',
                 ] : [
-                    'პროექტი, რომელსაც კომერციული გეგმა არ აურჩევია, ინარჩუნებს UTC წუთში 60 მოთხოვნას და UTC თვეში 10 000 წარმატებულ მოთხოვნას. უფასო გეგმის არჩევა ამ პროექტს UTC თვეში 100 წარმატებულ მოთხოვნაზე აყენებს. Basic არის UTC თვეში 2 000 წარმატებული მოთხოვნა '.\App\Billing\Plans::lari(\App\Billing\Plans::usdCents('basic', 'month')).'-ად. Premium შეუზღუდავია '.\App\Billing\Plans::lari(\App\Billing\Plans::usdCents('premium', 'month')).'-ად. წელიწადი 12 თვის ფასზე 12%-ით ნაკლებია. ფასი ლარშია და დღგ-ს შეიცავს. UTC დღეში 2 000 წარმატებული მოთხოვნის ზღვარი პროდაქშენში დღეს არ მოქმედებს. ვიჯეტი და სერვერის გასაღები ერთ მრიცხველს იყოფს.',
+                    'პროექტი, რომელსაც კომერციული გეგმა არ აურჩევია, ინარჩუნებს UTC წუთში 60 მოთხოვნას და UTC თვეში 10 000 წარმატებულ მოთხოვნას. უფასო გეგმის არჩევა ამ პროექტს UTC თვეში 100 წარმატებულ მოთხოვნაზე აყენებს. Basic არის UTC თვეში 2 000 წარმატებული მოთხოვნა '.Plans::lari(Plans::tetri('basic', 'month')).'-ად. Premium შეუზღუდავია '.Plans::lari(Plans::tetri('premium', 'month')).'-ად. წელიწადი 12 თვის ფასზე 12%-ით ნაკლებია. ფასი ლარშია და დღგ-ს შეიცავს. UTC დღეში 2 000 წარმატებული მოთხოვნის ზღვარი პროდაქშენში დღეს არ მოქმედებს. ვიჯეტი და სერვერის გასაღები ერთ მრიცხველს იყოფს.',
                     'დღიური შემოწმება მხოლოდ მაშინ ეშვება, როცა platform.project_limits.per_day არსებობს. ეს სვეტი პროდაქშენში აქტიური არ არის, ამიტომ დღიური ზღვარი გამოტოვებულია. ლიმიტების სტრიქონის არყოფნა არის 503, არა შეუზღუდავი. მრიცხველის შეცდომა არის 503 და სხეული კატალოგი არ არის.',
                     'წარმატებული პასუხი აგზავნის X-RateLimit-Limit, X-RateLimit-Remaining და X-RateLimit-Reset წუთისთვის, პლუს X-Quota-Limit, X-Quota-Remaining და X-Quota-Reset თვისთვის. 401 quota სათაურებს არ აგზავნის.',
                     '429 არის JSON და Retry-After. კოდები: RATE_LIMIT_EXCEEDED, DAILY_QUOTA_EXCEEDED, MONTHLY_QUOTA_EXCEEDED. 429-ზე X-RateLimit-* იმ ფანჯარას აღწერს, რომელიც ამოიწურა, არა X-Quota-*. დაელოდეთ Retry-After წამს. 401, 403, 404 და 422 ხელახლა არ გაგზავნოთ. 401, 403, 404, 405, 422, 429 და 503 თვეს არ ხარჯავს. წარუმატებელი მოთხოვნა მაინც ხარჯავს წუთს. ახალი გასაღები მრიცხველს არ ანულებს.',
@@ -231,8 +233,8 @@ final class PublicSpec
                 if (($row['id'] ?? '') !== 'guide-limits') {
                     continue;
                 }
-                $starter = \App\Billing\Plans::lari(\App\Billing\V2\Catalog::usdCents('starter', 'month'));
-                $growth = \App\Billing\Plans::lari(\App\Billing\V2\Catalog::usdCents('growth', 'month'));
+                $starter = Plans::lari(Catalog::tetri('starter', 'month'));
+                $growth = Plans::lari(Catalog::tetri('growth', 'month'));
                 $row['paragraphs'][0] = $english
                     ? 'A workspace shares one monthly quota across its projects. Free is 1 000 successful requests each month, one active project, and 15 requests each minute. Starter is 25 000 requests, 3 projects, and 60 requests each minute at '.$starter.'. Growth is 150 000 requests, 10 projects, and 120 requests each minute at '.$growth.'. A year is 15% below twelve monthly prices and the quota still resets every month. Prices are in GEL and include VAT. Nothing is charged again unless you pay. Business is not offered until its rate limit is measured. The widget and the server key share the counter. A new project or a new key does not reset usage.'
                     : 'სამუშაო სივრცე ერთ თვიურ კვოტას იზიარებს პროექტებს შორის. უფასო არის თვეში 1 000 წარმატებული მოთხოვნა, ერთი აქტიური პროექტი და წუთში 15 მოთხოვნა. Starter არის 25 000 მოთხოვნა, 3 პროექტი და წუთში 60 მოთხოვნა '.$starter.'-ად. Growth არის 150 000 მოთხოვნა, 10 პროექტი და წუთში 120 მოთხოვნა '.$growth.'-ად. წელიწადი 12 თვის ფასზე 15%-ით ნაკლებია და კვოტა მაინც ყოველ თვე ნულდება. ფასი ლარშია და დღგ-ს შეიცავს. თანხა ხელახლა არ ჩამოიჭრება, სანამ თავად არ გადაიხდით. Business არ იყიდება, სანამ მისი სიჩქარის ზღვარი იზომება. ვიჯეტი და სერვერის გასაღები ერთ მრიცხველს იყოფს. ახალი პროექტი ან ახალი გასაღები მოხმარებას არ ანულებს.';

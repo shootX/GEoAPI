@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Tests\Unit;
 
 use App\Billing\InvoicePdf;
-use App\Billing\NbgRate;
 use App\Billing\Plans;
 use App\Billing\TrueTypeFont;
 use PHPUnit\Framework\TestCase;
@@ -14,30 +13,21 @@ final class BillingMathTest extends TestCase
 {
     public function test_yearly_price_is_twelve_months_minus_twelve_percent(): void
     {
-        $this->assertSame(5900, Plans::usdCents('basic', 'month'));
-        $this->assertSame(9900, Plans::usdCents('premium', 'month'));
-        $this->assertSame(intdiv(5900 * 12 * 88, 100), Plans::usdCents('basic', 'year'));
-        $this->assertSame(intdiv(9900 * 12 * 88, 100), Plans::usdCents('premium', 'year'));
-        $this->assertSame(62304, Plans::usdCents('basic', 'year'));
-        $this->assertSame(104544, Plans::usdCents('premium', 'year'));
+        $this->assertSame(15900, Plans::tetri('basic', 'month'));
+        $this->assertSame(26700, Plans::tetri('premium', 'month'));
+        $this->assertSame(intdiv(15900 * 12 * 88, 100), Plans::tetri('basic', 'year'));
+        $this->assertSame(intdiv(26700 * 12 * 88, 100), Plans::tetri('premium', 'year'));
+        $this->assertSame(167904, Plans::tetri('basic', 'year'));
+        $this->assertSame(281952, Plans::tetri('premium', 'year'));
     }
 
-    public function test_gel_uses_the_rate_and_rounds_half_up_to_tetri(): void
+    public function test_prices_are_lari_without_a_currency_rate(): void
     {
-        $this->assertSame(15930, Plans::gelTetri(5900, '2.7000', 1));
-        $this->assertSame('159.30', Plans::formatTetri(15930));
-        $this->assertSame(1, Plans::gelTetri(1, '0.5000', 1));
-    }
-
-    public function test_nbg_fixture_uses_the_outer_date_and_the_formatted_rate(): void
-    {
-        $parsed = NbgRate::parse((string) file_get_contents(dirname(__DIR__).'/fixtures/nbg-usd.json'));
-
-        $this->assertSame('USD', $parsed['code']);
-        $this->assertSame('2.7000', $parsed['rate']);
-        $this->assertSame(1, $parsed['quantity']);
-        $this->assertSame('2026-10-21', $parsed['rated_on']);
-        $this->assertSame('https://nbg.gov.ge/gw/api/ct/monetarypolicy/currencies/en/json/?currencies=USD', NbgRate::URL);
+        $this->assertSame('159 ₾', Plans::lari(15900));
+        $this->assertSame('1679.04 ₾', Plans::lari(Plans::tetri('basic', 'year')));
+        $this->assertSame('0 ₾', Plans::lari(0));
+        $this->assertSame('159.00', Plans::formatTetri(15900));
+        $this->assertFileDoesNotExist(dirname(__DIR__, 2).'/app/Billing/NbgRate.php');
     }
 
     public function test_invoice_pdf_contains_the_legal_entity_fields(): void
@@ -52,10 +42,7 @@ final class BillingMathTest extends TestCase
         ], [
             'number' => 'GEO-20261021-1',
             'plan' => 'basic',
-            'usd' => '59.00',
             'gel' => '159.30',
-            'rate' => '2.7000',
-            'rate_date' => '2026-10-21',
         ]);
 
         $text = InvoicePdf::plainText($pdf);
@@ -89,10 +76,7 @@ final class BillingMathTest extends TestCase
         ], [
             'number' => 'GEO-20261021-1',
             'plan' => 'basic',
-            'usd' => '59.00',
             'gel' => '159.30',
-            'rate' => '2.7000',
-            'rate_date' => '2026-10-21',
         ]);
 
         $text = InvoicePdf::plainText($pdf);

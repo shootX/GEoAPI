@@ -25,8 +25,8 @@
 <div class="bill-plans">
     @foreach (['starter' => 'Starter', 'growth' => 'Growth'] as $code => $label)
         @php
-            $monthCents = \App\Billing\V2\Catalog::usdCents($code, 'month');
-            $yearCents = \App\Billing\V2\Catalog::usdCents($code, 'year');
+            $monthCents = \App\Billing\V2\Catalog::tetri($code, 'month');
+            $yearCents = \App\Billing\V2\Catalog::tetri($code, 'year');
             $isCurrent = $planNow === $code;
             $higher = $shared && \App\Billing\V2\Catalog::rank($code) > \App\Billing\V2\Catalog::rank($planNow === 'legacy-grandfathered' ? 'free' : $planNow);
             $lower = $shared && \App\Billing\V2\Catalog::rank($code) < \App\Billing\V2\Catalog::rank($planNow);
@@ -51,12 +51,12 @@
     @endforeach
     <article class="plan">
         <h2>{{ $en ? 'Add-ons' : 'დამატებები' }}</h2>
-        <p class="muted">{{ $en ? 'Extra active project: '.$lari(\App\Billing\V2\Catalog::EXTRA_PROJECT_CENTS).' for this period. Request packs expire after 90 days and are spent after the monthly quota. No overage is billed.' : 'დამატებითი აქტიური პროექტი: '.$lari(\App\Billing\V2\Catalog::EXTRA_PROJECT_CENTS).' ამ პერიოდზე. მოთხოვნის პაკეტი 90 დღეში იწურება და თვიური კვოტის შემდეგ იხარჯება. ზედმეტი ანგარიში არ იწერება.' }}</p>
+        <p class="muted">{{ $en ? 'Extra active project: '.$lari(\App\Billing\V2\Catalog::EXTRA_PROJECT_TETRI).' for this period. Request packs expire after 90 days and are spent after the monthly quota. No overage is billed.' : 'დამატებითი აქტიური პროექტი: '.$lari(\App\Billing\V2\Catalog::EXTRA_PROJECT_TETRI).' ამ პერიოდზე. მოთხოვნის პაკეტი 90 დღეში იწურება და თვიური კვოტის შემდეგ იხარჯება. ზედმეტი ანგარიში არ იწერება.' }}</p>
         <div class="row">
-            <button type="button" class="btn" wire:click="buyExtraProject" @if (! $configured) disabled @endif>{{ $en ? 'Extra project' : 'დამატებითი პროექტი' }} · {{ $lari(\App\Billing\V2\Catalog::EXTRA_PROJECT_CENTS) }}</button>
+            <button type="button" class="btn" wire:click="buyExtraProject" @if (! $configured) disabled @endif>{{ $en ? 'Extra project' : 'დამატებითი პროექტი' }} · {{ $lari(\App\Billing\V2\Catalog::EXTRA_PROJECT_TETRI) }}</button>
             @if (isset(\App\Billing\V2\Catalog::packs()[$planNow]))
                 @php $pack = \App\Billing\V2\Catalog::packs()[$planNow]; @endphp
-                <button type="button" class="btn pine" wire:click="buyCredits('{{ $planNow }}')" @if (! $configured) disabled @endif>{{ $fmt($pack['requests']) }} · {{ $lari($pack['usd_cents']) }}</button>
+                <button type="button" class="btn pine" wire:click="buyCredits('{{ $planNow }}')" @if (! $configured) disabled @endif>{{ $fmt($pack['requests']) }} · {{ $lari($pack['tetri']) }}</button>
             @endif
         </div>
     </article>

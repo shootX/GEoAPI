@@ -49,15 +49,11 @@ final class Entitlements
         ]);
     }
 
-    /**
-     * @param  array{code:string, rate:string, quantity:int, rated_on:string}  $rate
-     * @param  array<string, mixed>  $buyer
-     */
-    public static function openOrder(int $actorUserId, int $legacyUserId, int $projectId, string $plan, string $interval, array $rate, array $buyer): string
+    /** @param  array<string, mixed>  $buyer */
+    public static function openOrder(int $actorUserId, int $legacyUserId, int $projectId, string $plan, string $interval, array $buyer): string
     {
         $code = Plans::code($plan, $interval);
-        $cents = Plans::usdCents($plan, $interval);
-        $tetri = Plans::gelTetri($cents, $rate['rate'], $rate['quantity']);
+        $tetri = Plans::tetri($plan, $interval);
         $publicId = (string) Str::uuid();
         $now = now();
         DB::table('billing_orders')->insert([
@@ -67,11 +63,12 @@ final class Entitlements
             'project_id' => $projectId,
             'plan_code' => $code,
             'interval' => $interval,
-            'usd_cents' => $cents,
+            // GEL only. usd_cents/rate* are NOT NULL legacy columns the app role cannot ALTER.
+            'usd_cents' => 0,
             'gel_amount' => Plans::formatTetri($tetri),
-            'rate' => $rate['rate'],
-            'rate_quantity' => $rate['quantity'],
-            'rate_date' => $rate['rated_on'],
+            'rate' => '1',
+            'rate_quantity' => 1,
+            'rate_date' => $now->toDateString(),
             'buyer' => json_encode($buyer, JSON_UNESCAPED_UNICODE),
             'previous' => json_encode(self::snapshot($legacyUserId, $projectId), JSON_UNESCAPED_UNICODE),
             'status' => 'pending',
@@ -82,9 +79,7 @@ final class Entitlements
         AuditLog::write($actorUserId, 'checkout', 'order', $publicId, [
             'plan' => $code,
             'project_id' => $projectId,
-            'usd_cents' => $cents,
             'gel' => Plans::formatTetri($tetri),
-            'rate_date' => $rate['rated_on'],
         ]);
 
         return $publicId;
@@ -390,10 +385,7 @@ final class Entitlements
         ], [
             'number' => $number,
             'plan' => (string) $order->plan_code.($test ? ' — TEST / სატესტო, არ არის გადახდილი' : ''),
-            'usd' => number_format(((int) $order->usd_cents) / 100, 2, '.', ''),
             'gel' => (string) $order->gel_amount,
-            'rate' => self::rateString($order->rate),
-            'rate_date' => substr((string) $order->rate_date, 0, 10),
         ]);
         DB::table('billing_invoices')->insert([
             'billing_order_id' => $order->id,
@@ -482,15 +474,5 @@ final class Entitlements
         }
 
         return number_format((float) $value, 2, '.', '');
-    }
-
-    private static function rateString(mixed $rate): string
-    {
-        $value = (string) $rate;
-        if (preg_match('/^\d+(\.\d+)?/', $value, $match)) {
-            return $match[0];
-        }
-
-        return $value;
     }
 }

@@ -115,12 +115,12 @@
                 <div class="plans">
                     @foreach (! empty($v2) ? [
                         ['Free', \App\Billing\Plans::lari(0), $en ? '1 000 successful requests a month, 1 project' : '1 000 წარმატებული მოთხოვნა თვეში, 1 პროექტი'],
-                        ['Starter', \App\Billing\Plans::lari(\App\Billing\V2\Catalog::usdCents('starter', 'month')), $en ? '25 000 successful requests a month, 3 projects' : '25 000 წარმატებული მოთხოვნა თვეში, 3 პროექტი'],
-                        ['Growth', \App\Billing\Plans::lari(\App\Billing\V2\Catalog::usdCents('growth', 'month')), $en ? '150 000 successful requests a month, 10 projects' : '150 000 წარმატებული მოთხოვნა თვეში, 10 პროექტი'],
+                        ['Starter', \App\Billing\Plans::lari(\App\Billing\V2\Catalog::tetri('starter', 'month')), $en ? '25 000 successful requests a month, 3 projects' : '25 000 წარმატებული მოთხოვნა თვეში, 3 პროექტი'],
+                        ['Growth', \App\Billing\Plans::lari(\App\Billing\V2\Catalog::tetri('growth', 'month')), $en ? '150 000 successful requests a month, 10 projects' : '150 000 წარმატებული მოთხოვნა თვეში, 10 პროექტი'],
                     ] : [
                         ['Free', \App\Billing\Plans::lari(0), $en ? '100 successful requests a month' : '100 წარმატებული მოთხოვნა თვეში'],
-                        ['Basic', \App\Billing\Plans::lari(\App\Billing\Plans::usdCents('basic', 'month')), $en ? '2 000 successful requests a month' : '2 000 წარმატებული მოთხოვნა თვეში'],
-                        ['Premium', \App\Billing\Plans::lari(\App\Billing\Plans::usdCents('premium', 'month')), $en ? 'Unlimited successful requests' : 'შეუზღუდავი წარმატებული მოთხოვნა'],
+                        ['Basic', \App\Billing\Plans::lari(\App\Billing\Plans::tetri('basic', 'month')), $en ? '2 000 successful requests a month' : '2 000 წარმატებული მოთხოვნა თვეში'],
+                        ['Premium', \App\Billing\Plans::lari(\App\Billing\Plans::tetri('premium', 'month')), $en ? 'Unlimited successful requests' : 'შეუზღუდავი წარმატებული მოთხოვნა'],
                     ] as [$name, $price, $quotaText])
                         <article class="plan {{ $plan === $name ? 'now' : '' }}">
                             <div class="row" style="justify-content:space-between"><h2>{{ $name }}</h2>@if ($plan === $name)<span class="bd bd-ac">{{ $en ? 'Current' : 'მიმდინარე' }}</span>@endif</div>

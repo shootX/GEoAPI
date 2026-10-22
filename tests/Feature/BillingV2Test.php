@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Tests\Feature;
 
 use App\Billing\Entitlements;
-use App\Billing\NbgRate;
 use App\Billing\V2\Backfill;
 use App\Billing\V2\Catalog;
 use App\Billing\V2\Checkout;
@@ -85,7 +84,7 @@ final class BillingV2Test extends TestCase
         $this->assertStringNotContainsString('USD', $limits[0]);
         $this->assertStringContainsString('GEL', $limits[0]);
         $this->assertStringNotContainsString('PROJECT_CAP_EXCEEDED', $limits[3]);
-        $this->assertSame(19380, Catalog::usdCents('starter', 'year'));
+        $this->assertSame(52020, Catalog::tetri('starter', 'year'));
         $sql = (string) file_get_contents(base_path('database/migrations/2026_12_31_930000_billing_v2.php'));
         $this->assertStringNotContainsString('ALTER TABLE', $sql);
         $this->assertStringContainsString('boolean(', $sql);
@@ -344,7 +343,7 @@ final class BillingV2Test extends TestCase
         $this->assertSame(0, DB::table('billing_orders')->where('plan_code', 'like', 'v2:overage%')->count());
 
         try {
-            Checkout::open((int) $user->id, 3, 7, 'credits:growth', 'month', $this->rate(), $this->buyer());
+            Checkout::open((int) $user->id, 3, 7, 'credits:growth', 'month', $this->buyer());
             $this->fail('A Growth pack cannot be bought on Starter.');
         } catch (InvalidArgumentException) {
         }
@@ -356,10 +355,9 @@ final class BillingV2Test extends TestCase
         $user = $this->owner();
         $this->projects();
         $this->shared($user, 'free');
-        $this->rate();
-        $publicId = Checkout::open((int) $user->id, 3, 7, 'starter', 'month', NbgRate::latest(), $this->buyer());
+        $publicId = Checkout::open((int) $user->id, 3, 7, 'starter', 'month', $this->buyer());
         $gel = (string) DB::table('billing_orders')->where('public_id', $publicId)->value('gel_amount');
-        $this->assertSame('51.30', number_format((float) $gel, 2, '.', ''));
+        $this->assertSame('51.00', number_format((float) $gel, 2, '.', ''));
 
         $completed = $this->callbackBody($publicId, 'bog-1', 'completed');
         $this->postRaw($completed, $this->sign($completed))->assertOk()->assertJsonPath('duplicate', false);
@@ -386,7 +384,6 @@ final class BillingV2Test extends TestCase
     {
         config(['billing.v2' => true]);
         $user = $this->owner();
-        $this->rate();
         DB::table('platform.projects')->where('user_id', 3)->delete();
 
         Livewire::actingAs($user)->test(Billing::class)
@@ -402,7 +399,6 @@ final class BillingV2Test extends TestCase
         config(['billing.v2' => true]);
         $user = $this->owner();
         $this->projects();
-        $this->rate();
         $this->shared($user, 'free');
 
         Livewire::actingAs($user)->test(Billing::class)
@@ -415,7 +411,6 @@ final class BillingV2Test extends TestCase
         config(['billing.v2' => true]);
         $user = $this->owner();
         $this->projects();
-        $this->rate();
 
         Livewire::actingAs($user)->test(Billing::class)
             ->assertSee('Starter')
@@ -494,13 +489,13 @@ final class BillingV2Test extends TestCase
         $this->assertFalse(Catalog::purchasable('enterprise'));
 
         try {
-            Checkout::open((int) User::query()->first()->id, 3, 7, 'business', 'month', $this->rate(), $this->buyer());
+            Checkout::open((int) User::query()->first()->id, 3, 7, 'business', 'month', $this->buyer());
             $this->fail('Business stays unsold while its rate limit is disabled.');
         } catch (InvalidArgumentException) {
         }
 
         try {
-            Checkout::open((int) User::query()->first()->id, 3, 8, 'starter', 'month', $this->rate(), $this->buyer());
+            Checkout::open((int) User::query()->first()->id, 3, 8, 'starter', 'month', $this->buyer());
             $this->fail('Another workspace project must be rejected.');
         } catch (InvalidArgumentException) {
         }
@@ -606,7 +601,6 @@ final class BillingV2Test extends TestCase
         $user = $this->owner();
         $this->projects();
         $this->shared($user, 'growth');
-        $this->rate();
 
         Livewire::actingAs($user)->test(Projects::class)
             ->set('projectId', 7)
@@ -730,8 +724,7 @@ final class BillingV2Test extends TestCase
 
     private function pay(User $user, string $product, string $interval, int $projectId = 7): void
     {
-        $this->rate();
-        $publicId = Checkout::open((int) $user->id, 3, $projectId, $product, $interval, NbgRate::latest(), $this->buyer());
+        $publicId = Checkout::open((int) $user->id, 3, $projectId, $product, $interval, $this->buyer());
         Entitlements::grant($publicId);
     }
 
@@ -746,14 +739,6 @@ final class BillingV2Test extends TestCase
             'company_address' => 'Tbilisi Rustaveli 1',
             'vat_payer' => true,
         ];
-    }
-
-    /** @return array{code:string, rate:string, quantity:int, rated_on:string} */
-    private function rate(): array
-    {
-        NbgRate::remember(NbgRate::parse((string) file_get_contents(base_path('tests/fixtures/nbg-usd.json'))));
-
-        return NbgRate::latest();
     }
 
     private function limits(int $projectId, int $quota, ?string $plan, bool $unlimited, ?string $ends): void

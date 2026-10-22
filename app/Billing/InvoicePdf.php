@@ -11,7 +11,7 @@ final class InvoicePdf
 {
     /**
      * @param  array{kind:string, name:string, company_name:string, company_code:string, company_address:string, vat_payer:bool}  $buyer
-     * @param  array{number:string, plan:string, usd:string, gel:string, rate:string, rate_date:string}  $invoice
+     * @param  array{number:string, plan:string, gel:string}  $invoice
      */
     public static function render(array $buyer, array $invoice): string
     {

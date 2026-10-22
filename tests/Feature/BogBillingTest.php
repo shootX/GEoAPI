@@ -10,7 +10,6 @@ use App\Billing\BogSignature;
 use App\Billing\Entitlements;
 use App\Billing\InvoicePdf;
 use App\Billing\MockPay;
-use App\Billing\NbgRate;
 use App\Livewire\Account\Billing;
 use App\Livewire\Auth\Register;
 use App\Models\User;
@@ -18,6 +17,7 @@ use Carapi\Platform\ApiKeys;
 use Carapi\Platform\Connection as PlatformConnection;
 use Carapi\Platform\ProjectRepository;
 use Illuminate\Foundation\Http\Middleware\ValidateCsrfToken;
+use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\URL;
@@ -97,7 +97,6 @@ final class BogBillingTest extends TestCase
     public function test_mock_mode_success_grants_through_the_callback_path_with_a_test_invoice(): void
     {
         Http::fake();
-        $this->rate();
         $user = $this->owner();
         $this->limits(7, 10000, null, false, null);
 
@@ -130,7 +129,6 @@ final class BogBillingTest extends TestCase
 
     public function test_mock_mode_fail_marks_the_order_failed_and_keeps_quota(): void
     {
-        $this->rate();
         $user = $this->owner();
         $this->limits(7, 10000, null, false, null);
         Livewire::actingAs($user)->test(Billing::class)->set('projectId', 7)->call('checkout', 'basic', 'year');
@@ -163,7 +161,6 @@ final class BogBillingTest extends TestCase
 
     public function test_in_production_only_an_admin_may_use_mock_mode(): void
     {
-        $this->rate();
         $user = $this->owner();
         $this->limits(7, 10000, null, false, null);
         $id = DB::table('billing_orders')->insertGetId(['public_id' => 'mock-prod', 'user_id' => $user->id, 'legacy_user_id' => (int) $user->legacy_platform_user_id, 'project_id' => 7, 'plan_code' => 'basic', 'interval' => 'month', 'usd_cents' => 5000, 'gel_amount' => '150.00', 'rate' => '3.0000', 'rate_quantity' => 1, 'rate_date' => '2026-10-22', 'buyer' => '{}', 'previous' => '{}', 'status' => 'pending', 'bog_order_id' => 'mock:mock-prod', 'created_at' => now(), 'updated_at' => now()]);
@@ -203,9 +200,14 @@ final class BogBillingTest extends TestCase
         $this->assertFalse((bool) DB::table('platform.project_limits')->where('project_id', $id)->value('unlimited_month'));
     }
 
+    public function test_there_is_no_exchange_rate_job_or_command(): void
+    {
+        $this->assertArrayNotHasKey('billing:nbg-rate', Artisan::all());
+        $this->assertStringNotContainsString('nbg', (string) file_get_contents(base_path('routes/console.php')));
+    }
+
     public function test_current_plan_is_marked_and_statuses_are_georgian(): void
     {
-        $this->rate();
         $user = $this->owner();
         $this->limits(7, 2000, 'basic', false, null);
         $publicId = $this->pendingOrder($user, 'basic');
@@ -222,7 +224,6 @@ final class BogBillingTest extends TestCase
 
     public function test_a_paid_checkout_waits_for_the_signed_callback(): void
     {
-        $this->rate();
         config(['services.bog.client_id' => 'sandbox-client', 'services.bog.client_secret' => 'sandbox-secret-value']);
         Http::fake([
             'https://oauth2-sandbox.bog.ge/*' => Http::response(['access_token' => 'sandbox-access-token'], 200),
@@ -245,7 +246,11 @@ final class BogBillingTest extends TestCase
         $order = DB::table('billing_orders')->first();
         $this->assertNotNull($order);
         $this->assertSame('pending', $order->status);
-        $this->assertSame('159.30', number_format((float) $order->gel_amount, 2, '.', ''));
+        $this->assertSame('159.00', number_format((float) $order->gel_amount, 2, '.', ''));
+        // GEL only (QA GEO-QA-019): no exchange-rate lookup, and the bank is asked for the lari list price.
+        Http::assertNotSent(fn ($request): bool => str_contains($request->url(), 'nbg.gov.ge'));
+        Http::assertSent(fn ($request): bool => str_contains($request->url(), '/ecommerce/orders') && str_contains($request->body(), '159'));
+        $this->assertSame(0, DB::table('billing_rates')->count());
         $this->assertStringNotContainsString('sandbox-secret-value', json_encode(DB::table('billing_audit')->get()));
 
         $this->actingAs($user)->get('/account/billing?paid=return')->assertOk()->assertSee('ბანკის დადასტურება')->assertSee('class="side"', false)->assertSee('Premium');
@@ -337,7 +342,7 @@ final class BogBillingTest extends TestCase
         $this->assertSame(2000, (int) DB::table('platform.project_limits')->where('project_id', 7)->value('monthly_quota'));
         $this->assertSame('paid', DB::table('billing_orders')->where('public_id', $publicId)->value('status'));
 
-        $over = $this->callbackBody($publicId, 'bog-partial', 'refunded_partially', null, '159.31');
+        $over = $this->callbackBody($publicId, 'bog-partial', 'refunded_partially', null, '159.01');
         $this->postRaw($over, $this->sign($over))->assertOk();
         $this->assertSame('15.50', number_format((float) DB::table('billing_orders')->where('public_id', $publicId)->value('refunded_gel'), 2, '.', ''));
         $this->assertSame(2000, (int) DB::table('platform.project_limits')->where('project_id', 7)->value('monthly_quota'));
@@ -355,7 +360,7 @@ final class BogBillingTest extends TestCase
         $this->postRaw($full, $this->sign($full))->assertOk();
         $this->assertSame(10000, (int) DB::table('platform.project_limits')->where('project_id', 7)->value('monthly_quota'));
         $this->assertSame('refunded', DB::table('billing_orders')->where('public_id', $publicId)->value('status'));
-        $this->assertSame('159.30', number_format((float) DB::table('billing_orders')->where('public_id', $publicId)->value('refunded_gel'), 2, '.', ''));
+        $this->assertSame('159.00', number_format((float) DB::table('billing_orders')->where('public_id', $publicId)->value('refunded_gel'), 2, '.', ''));
     }
 
     public function test_a_partial_refund_for_the_full_amount_does_not_revoke_the_plan(): void
@@ -431,7 +436,6 @@ final class BogBillingTest extends TestCase
 
     public function test_production_env_posts_only_to_production_hosts(): void
     {
-        $this->rate();
         config([
             'services.bog.env' => 'production',
             'services.bog.client_id' => 'prod-client',
@@ -551,26 +555,6 @@ final class BogBillingTest extends TestCase
         $this->assertSame('free', DB::table('platform.project_limits')->where('project_id', $fresh)->value('plan_code'));
     }
 
-    public function test_nbg_command_stores_a_fixture_and_falls_back_when_the_fetch_fails(): void
-    {
-        $fixture = (string) file_get_contents(base_path('tests/fixtures/nbg-usd.json'));
-        Http::preventStrayRequests();
-        Http::fake([
-            'https://nbg.gov.ge/*' => Http::sequence()
-                ->push($fixture, 200)
-                ->push('nope', 500)
-                ->push('nope', 500),
-        ]);
-        $this->artisan('billing:nbg-rate')->assertOk();
-        $this->assertSame('2026-10-21', substr((string) DB::table('billing_rates')->value('rated_on'), 0, 10));
-
-        $this->artisan('billing:nbg-rate')->assertOk();
-        $this->assertSame(1, DB::table('billing_rates')->count());
-
-        DB::table('billing_rates')->delete();
-        $this->artisan('billing:nbg-rate')->assertFailed();
-    }
-
     public function test_registration_rejects_an_identification_code_that_is_not_9_or_11_digits(): void
     {
         foreach (['12345', '4051234567', '40512345a', '405123456789'] as $code) {
@@ -688,16 +672,9 @@ final class BogBillingTest extends TestCase
         ]);
     }
 
-    private function rate(): void
-    {
-        NbgRate::remember(NbgRate::parse((string) file_get_contents(base_path('tests/fixtures/nbg-usd.json'))));
-    }
-
     private function pendingOrder(User $user, string $plan): string
     {
-        $this->rate();
-
-        return Entitlements::openOrder((int) $user->id, 3, 7, $plan, 'month', NbgRate::latest(), [
+        return Entitlements::openOrder((int) $user->id, 3, 7, $plan, 'month', [
             'kind' => 'legal',
             'name' => 'ნინო ბერიძე',
             'company_name' => 'Test LLC',

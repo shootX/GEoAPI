@@ -4,7 +4,7 @@ Public catalog API and Georgian/English site at https://geoapi.ge. The catalog i
 
 ## 2026-10-22 — Billing V2 live (`BILLING_V2=true`)
 
-Free $0 / 1 000 requests / 1 project / 15 rpm; Starter $19 / 25 000 / 3 / 60; Growth $59 / 150 000 / 10 / 120; Business $149 / 500 000 / 25 / 240 (not sold while `BILLING_V2_BUSINESS_RPM=false`); Enterprise custom via hello@geoapi.ge. One workspace subscription, shared monthly quota, yearly −15% with monthly reset, VAT included, GEL at the NBG rate, no automatic renewal, no unlimited plan. Packs: Starter +10 000 $9, Growth +50 000 $20, Business +100 000 $35 (90 days, after quota). Extra project $5/month. The Free 100 / Basic / Premium / −12% text below applies only with the flag off or to preserved legacy terms.
+Free 0 ₾ / 1 000 requests / 1 project / 15 rpm; Starter 51 ₾ / 25 000 / 3 / 60; Growth 159 ₾ / 150 000 / 10 / 120; Business 402 ₾ / 500 000 / 25 / 240 (not sold while `BILLING_V2_BUSINESS_RPM=false`); Enterprise custom via hello@geoapi.ge. One workspace subscription, shared monthly quota, yearly −15% with monthly reset, VAT included, priced in GEL only (no other currency, no exchange rate), no automatic renewal, no unlimited plan. Packs: Starter +10 000 24 ₾, Growth +50 000 54 ₾, Business +100 000 95 ₾ (90 days, after quota). Extra project 14 ₾/month. The Free 100 / Basic / Premium / −12% text below applies only with the flag off or to preserved legacy terms.
 
 ## 2026-10-20
 
@@ -24,8 +24,8 @@ Existing users keep 10 000 successful requests per UTC month until that project 
 - `BOG_CLIENT_ID` and `BOG_CLIENT_SECRET` will be supplied later through the environment. They are never committed.
 - The payment callback verifies its signature and is idempotent. A repeated callback does not grant the plan twice.
 - The existing Stripe signature check may stay in the tree and stays inactive. It does not grant a plan.
-- Plans, priced in USD before display conversion: Free is 100 requests per month; Basic is 2 000 requests per month at 59 USD; Premium is unlimited at 99 USD. Minute and day caps for these three plans were not set in this decision.
-- The price shown to the customer is in GEL. Convert the USD price with that day's official National Bank of Georgia rate. A scheduled job caches the bank's public JSON from nbg.gov.ge. If the fetch fails, use the last stored rate. Show the date of the rate.
+- Plans (legacy, flag off): Free is 100 requests per month; Basic is 2 000 requests per month at 159 ₾; Premium is unlimited at 267 ₾. Minute and day caps for these three plans were not set in this decision.
+- 2026-10-22: prices are set in GEL only. The National Bank USD rate and its daily job were removed; the bank is charged the listed lari amount.
 - A yearly purchase is 12% below twelve times the monthly price.
 - The prices include VAT. That assumption stands until the owner says otherwise.
 - Registration accepts an individual or a legal entity. A legal entity has a company name, an identification code, a legal address, and a VAT-payer flag.
