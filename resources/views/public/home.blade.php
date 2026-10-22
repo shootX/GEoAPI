@@ -36,6 +36,10 @@
         [$models, $en ? 'models' : 'მოდელი'],
         [$generations, $en ? 'generations' : 'თაობა'],
         [$modifications, $en ? 'modifications' : 'მოდიფიკაცია'],
+        [$specifications ?? null, $en ? 'specifications · engine, transmission, drive, dimensions, fuel' : 'სპეციფიკაცია · ძრავი, გადაცემათა კოლოფი, წამყვანი, ზომები, საწვავი'],
+        [$markets ?? null, $en ? 'model markets' : 'მოდელის ბაზარი'],
+        [isset($equipmentMillions) && $equipmentMillions ? ($en ? $equipmentMillions.'M+' : $equipmentMillions.' მლნ+') : null, $en ? 'trim/equipment records' : 'კომპლექტაციის ჩანაწერი'],
+        [$photos ?? null, $en ? 'photos' : 'ფოტო'],
     ];
 @endphp
 @component('components.layouts.public', [
