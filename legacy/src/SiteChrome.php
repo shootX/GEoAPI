@@ -60,7 +60,7 @@ final class SiteChrome
             . '<span>© ' . date('Y') . ' შპს „ინოვა ლაბ“ · <a href="mailto:hello@geoapi.ge">hello@geoapi.ge</a></span>'
             . '<div class="links"><a href="/guide">დოკუმენტაცია</a>' . $account
             . '<a href="/terms">გამოყენების წესები</a><a href="/privacy">კონფიდენციალურობა</a></div>'
-            . '</div></footer><script src="/assets/site.js?v=20261018f"></script>';
+            . '</div></footer><script src="/assets/site.js?v=20261022a"></script>';
     }
 
     public static function start(string $title, ?string $description = null, bool $exactTitle = false): string

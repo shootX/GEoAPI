@@ -1617,7 +1617,7 @@ JS;
             . $heading . '</h1>' . ($sub !== '' ? '<p class="sub">' . $sub . '</p>' : '') . $form . $footer . '</div><div class="foot"><span>© '
             . date('Y') . ' GeoAPI</span><a href="/terms">გამოყენების წესები</a><a href="/privacy">კონფიდენციალურობა</a>' . SiteChrome::themeButton() . '</div></div>'
             . $aside . '</main>';
-        echo '<script src="/assets/site.js?v=20261018f"></script>';
+        echo '<script src="/assets/site.js?v=20261022a"></script>';
         echo SiteChrome::end();
     }
 
@@ -1689,7 +1689,7 @@ JS;
         echo '<div class="main" id="content"><header class="top"><button class="btn menu" id="menu" type="button" aria-expanded="false" aria-controls="side" aria-label="მენიუ" data-menu-toggle>' . $icon($ic['menu']) . '</button><a class="mlogo" href="/"><img src="/assets/brand/geoapi-lockup-light.svg" alt="geoapi.ge" height="22" width="69"></a>'
             . '<div class="crumb">' . $crumb . '</div><div class="who"><a class="hide-m" href="/guide" style="color:var(--ac);font-weight:500">დოკუმენტაცია</a></div></header>'
             . '<div class="content lgc">' . ($project === null ? '' : '<div class="ph"><div><h2 class="h">' . self::e($name) . '</h2><p class="mono xs mut">' . self::e((string) ($project['website_url'] ?? '') ?: '—') . '</p></div><span class="bd ' . ($state === 'აქტიური' ? 'bd-ok' : 'bd-ne') . '"><i></i>' . self::e($state) . '</span></div>') . $tabs . $main . '</div></div></div>';
-        echo '<script src="/assets/site.js?v=20261018f"></script><script src="/assets/menu.js?v=1"></script></body></html>';
+        echo '<script src="/assets/site.js?v=20261022a"></script><script src="/assets/menu.js?v=1"></script></body></html>';
     }
 
     /** @param array<string, mixed>|null $widget @param array<string, string> $errors */
