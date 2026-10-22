@@ -18,3 +18,28 @@ Reading:
 - `/api/v1/*` catalog routes with a secret key were not load-tested (no test key was minted); the picker route exercises the same catalog database.
 
 Open: authenticated `/api/v1` baseline, server-side p95 from access logs, FPM pool tuning, and monitoring/alerting (no collector exists).
+
+## 2026-10-22 — Business 240 rpm load test (decision: keep `BILLING_V2_BUSINESS_RPM=false`)
+
+Setup: k6 0.54 on the server (to nginx on 127.0.0.1:443, real TLS + PHP-FPM 8.4 + PostgreSQL), constant arrival rate, secret key of test account 2 with temporarily raised workspace/project limits and `CARAPI_IP_PER_MINUTE` (all reverted). Mix: 15% `/api/v1/brands`, 25% `brands/{slug}/models`, 25% `models/{id}/generations`, 20% `generations/{id}/modifications`, 15% `modifications/{id}`. 4 vCPU, 7.9 GB RAM. Monitor every 5 s: CPU, RAM, php-fpm processes, PostgreSQL connections; neighbour site probed before/after each stage.
+
+| Stage | Duration | Requests | Errors | p50 | p95 | p99 | CPU avg / max | PG conns max | Neighbour site |
+|---|---|---|---|---|---|---|---|---|---|
+| 2 rps (local) | 2 min | 270 | 0% | 562 ms | 813 ms | 1.05 s | 35% / 57% | 19 | 31 ms → 32 ms |
+| 4 rps (local) | 2 min | 510 | 0% | 591 ms | 906 ms | 1.26 s | 60% / 83% | 19 | 55 ms → 33 ms |
+| 6 rps (local) | 1 min | 390 | 0% | 641 ms | 1.60 s | 1.97 s | 70% / 95% | 20 | 49 ms → 35 ms |
+| 4 rps, OPcache on (local) | 2 min | 510 | 0% | 599 ms | 1.01 s | 1.53 s | 61% / 84% | 19 | 29 ms → 43 ms |
+| 1 rps (internet, from box) | 1 min | 90 | 0% | 726 ms | 946 ms | 1.22 s | — | — | — |
+
+Stopped before 8/16/32 rps: CPU was already >85% at 6 rps and would harm other sites on this host.
+
+Findings:
+- Sustainable throughput is about **5 rps** total (~300 rpm) for the whole server. One Business workspace at 240 rpm = 4 rps would take ~80% of it, so the required 4× headroom and p95 < 1 s at 16 rps are not met.
+- The bottleneck is PHP CPU (~0.3 CPU-seconds per request, php-fpm ~130% CPU at 4 rps). PostgreSQL is light (~6% CPU, ≤20 connections). Even `/up` (no DB) takes ~300 ms, so the cost is the per-request framework/bootstrap path, not catalog queries.
+- OPcache (installed, disabled in `/www/server/php/84/etc/php.ini`) was enabled for one run and gave no measurable gain, so it was reverted (global for all php 8.4 sites). Config, routes and views are cached; events are not. `APP_ENV=local` (open question).
+
+Cheapest next steps, in order:
+1. Profile one `/up` request in php-fpm (SPX or Xdebug profiler on a copy) to find the ~300 ms; likely a middleware/service provider doing file or session work on every request.
+2. `php artisan event:cache`; `APP_ENV=production` (needs approval); session/cache to Redis instead of files.
+3. Long-running workers (Laravel Octane on FrankenPHP/Swoole) remove bootstrap cost per request; expected multi-× throughput.
+4. Re-run this test; enable Business only at ≥16 rps with p95 < 1 s.
