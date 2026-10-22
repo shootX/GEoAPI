@@ -202,6 +202,32 @@ final class ProjectAccessQuotaTest extends TestCase
             ->assertUnauthorized();
     }
 
+    public function test_sanctum_token_follows_the_same_owner_and_expiry_rules_as_a_key(): void
+    {
+        $this->useIssuedKeys();
+        $owner = $this->user(3);
+        $call = fn (string $token) => $this->withHeader('Authorization', 'Bearer '.$token)
+            ->withHeader('X-CARAPI-PROJECT', '7')
+            ->getJson('/api/v1/brands?limit=1');
+
+        $expired = $owner->createToken('old', ['cars:read'], now()->subMinute())->plainTextToken;
+        $call($expired)->assertUnauthorized();
+
+        $token = $owner->createToken('cars', ['cars:read'], now()->addDay())->plainTextToken;
+        $call($token)->assertOk();
+
+        DB::table('platform.users')->where('id', 3)->update(['status' => 'suspended']);
+        $call($token)->assertForbidden();
+
+        DB::table('platform.users')->where('id', 3)->update(['status' => 'active', 'email_verified_at' => null]);
+        $call($token)->assertForbidden();
+
+        DB::table('platform.users')->where('id', 3)->update(['email_verified_at' => '2026-01-01 00:00:00']);
+        config(['sanctum.expiration' => 60]);
+        $this->travel(2)->hours();
+        $call($token)->assertUnauthorized();
+    }
+
     public function test_cabinet_hides_another_project_and_shows_a_secret_only_on_the_create_response(): void
     {
         $owner = $this->user(3);

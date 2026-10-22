@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Access;
 
 use Carapi\Catalog\DeniedException;
+use Illuminate\Support\Facades\DB;
 use Laravel\Sanctum\PersonalAccessToken;
 
 final class SanctumCatalogAccess
@@ -19,7 +20,7 @@ final class SanctumCatalogAccess
         }
 
         $accessToken = PersonalAccessToken::findToken($token);
-        if ($accessToken === null) {
+        if ($accessToken === null || self::expired($accessToken)) {
             throw new DeniedException(401);
         }
 
@@ -33,7 +34,15 @@ final class SanctumCatalogAccess
         $legacyUserId = is_object($user) && isset($user->legacy_platform_user_id)
             ? (int) $user->legacy_platform_user_id
             : 0;
-        if ($legacyUserId < 1 || ! ProductAccess::allowsUser($legacyUserId, 'cars')) {
+        if ($legacyUserId < 1) {
+            throw new DeniedException(403);
+        }
+        // Same owner rules as a geoapi_sk_ key (Carapi\Platform\ApiKeys): active and verified.
+        $owner = DB::table('platform.users')->where('id', $legacyUserId)->first(['status', 'email_verified_at']);
+        if ($owner === null || (string) $owner->status !== 'active' || $owner->email_verified_at === null || $user->suspended_at !== null) {
+            throw new DeniedException(403);
+        }
+        if (! ProductAccess::allowsUser($legacyUserId, 'cars')) {
             throw new DeniedException(403);
         }
 
@@ -47,7 +56,7 @@ final class SanctumCatalogAccess
             throw new DeniedException(403);
         }
 
-        $owner = \Illuminate\Support\Facades\DB::table('platform.projects')
+        $owner = DB::table('platform.projects')
             ->where('id', $projectId)
             ->where('user_id', $legacyUserId)
             ->where('status', 'active')
@@ -57,5 +66,15 @@ final class SanctumCatalogAccess
         }
 
         return ['key_id' => 0, 'project_id' => $projectId];
+    }
+
+    private static function expired(PersonalAccessToken $token): bool
+    {
+        if ($token->expires_at !== null && $token->expires_at->isPast()) {
+            return true;
+        }
+        $minutes = config('sanctum.expiration');
+
+        return is_numeric($minutes) && $token->created_at !== null && $token->created_at->lte(now()->subMinutes((int) $minutes));
     }
 }
