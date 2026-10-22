@@ -83,4 +83,49 @@ final class PasswordLengthTest extends TestCase
             ->call('resetPassword')
             ->assertHasErrors('password');
     }
+
+    public function test_a_short_password_with_two_factor_is_also_sent_to_the_password_page(): void
+    {
+        $secret = (new \PragmaRX\Google2FA\Google2FA)->generateSecretKey();
+        User::factory()->create([
+            'email' => 'twofa@example.com',
+            'password' => 'nine-char',
+            'two_factor_secret' => \Illuminate\Support\Facades\Crypt::encryptString($secret),
+            'two_factor_confirmed_at' => now(),
+        ]);
+
+        $login = Livewire::test(Login::class)
+            ->set('email', 'twofa@example.com')
+            ->set('password', 'nine-char')
+            ->call('login')
+            ->assertSet('requiresTwoFactor', true);
+        $this->assertGuest();
+
+        $login->set('twoFactorCode', (new \PragmaRX\Google2FA\Google2FA)->getCurrentOtp($secret))
+            ->call('login')
+            ->assertRedirect(route('settings.security'));
+        $this->assertAuthenticated();
+        $this->get('/account')->assertRedirect(route('settings.security'));
+    }
+
+    public function test_a_long_password_with_two_factor_signs_in_normally(): void
+    {
+        $secret = (new \PragmaRX\Google2FA\Google2FA)->generateSecretKey();
+        User::factory()->create([
+            'email' => 'twofa-long@example.com',
+            'password' => 'correct-horse-battery-x',
+            'two_factor_secret' => \Illuminate\Support\Facades\Crypt::encryptString($secret),
+            'two_factor_confirmed_at' => now(),
+        ]);
+
+        Livewire::test(Login::class)
+            ->set('email', 'twofa-long@example.com')
+            ->set('password', 'correct-horse-battery-x')
+            ->call('login')
+            ->set('twoFactorCode', (new \PragmaRX\Google2FA\Google2FA)->getCurrentOtp($secret))
+            ->call('login');
+
+        $this->assertAuthenticated();
+        $this->get('/account')->assertOk();
+    }
 }
