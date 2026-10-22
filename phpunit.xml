@@ -45,5 +45,7 @@
         <env name="BOG_CLIENT_SECRET" value="" force="true"/>
         <env name="BOG_CALLBACK_PUBLIC_KEY" value="" force="true"/>
         <env name="BOG_ENV" value="sandbox" force="true"/>
+        <env name="BILLING_V2" value="false" force="true"/>
+        <env name="BILLING_V2_BUSINESS_RPM" value="false" force="true"/>
     </php>
 </phpunit>

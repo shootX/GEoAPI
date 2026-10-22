@@ -188,3 +188,10 @@ Existing access is kept by a new column, not by rewriting quotas. On PostgreSQL 
 - Billing::projects() now reads via legacy platform PDO (same as cabinet) and logs failures; root cause: Laravel default connection != platform DB.
 - Admin: 4 KPI (2 cols mobile), coming-soon + recent projects stack, project detail = name title + KPI + keys + 30-day chart, projects plan badge + usage bar, numbered pagers, nav label "პროექტები", admin.css colors as vars.
 - Panel: overview heading + 2 CTAs, mobile logo in top bar, html bg/scrollbar-gutter (right-edge strip), demo days dated. Home @if(true) removed.
+
+## 2026-10-22 — Billing V2
+- Code is behind `config('billing.v2')` (`BILLING_V2`, default false). phpunit forces the flag and `BILLING_V2_BUSINESS_RPM` false. Merging does not change live prices, quotas, or the guide.
+- New tables only: workspaces, subscriptions, entitlements, period usage, project period usage, credit ledger, project addons, project caps, refund entries. No ALTER of `platform.*` or `billing_orders`. CREATE needs a role with CREATE; if `carapi_electrik` cannot CREATE, run `2026_12_31_930000_billing_v2` as the postgres owner. Older billing migrations that ALTER still need the owner and must not be re-run.
+- Booleans are PostgreSQL boolean. V2 orders reuse `billing_orders` (`v2:starter`, `v2:credits:starter`, `v2:extra-project`). Distinct partial refunds use `body.refund_id`; without it the cumulative `refund_amount` path is unchanged.
+- Backfill is insert-only (`origin=backfill`), `shared_quota` false. `--rollback` deletes those rows only when the user has no paid `v2:%` order. It does not rewrite `project_limits`.
+- Business 240 rpm stays off (~13 req/s measured). Enterprise is `billing:v2-assign`, not checkout. Mock pay (`mock:` / TEST- invoices) still grants through `Entitlements::grant`.

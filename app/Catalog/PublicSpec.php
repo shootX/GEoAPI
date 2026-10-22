@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Catalog;
 
+use App\Billing\V2\Flag;
+
 /**
  * Public catalog contract. OpenAPI, Postman, and /guide are rendered from this class.
  */
@@ -113,7 +115,7 @@ final class PublicSpec
     {
         $english = $locale === 'en';
 
-        return [
+        $rows = [
             [
                 'id' => 'guide-quickstart',
                 'title' => $english ? 'Quickstart' : 'სწრაფი დასაწყისი',
@@ -223,6 +225,25 @@ final class PublicSpec
                 ],
             ],
         ];
+
+        if (Flag::on()) {
+            foreach ($rows as &$row) {
+                if (($row['id'] ?? '') !== 'guide-limits') {
+                    continue;
+                }
+                $row['paragraphs'][0] = $english
+                    ? 'A workspace shares one monthly quota across its projects. Free is 1 000 successful requests each month, one active project, and 15 requests each minute. Starter is 25 000 requests, 3 projects, and 60 requests each minute at 19 USD. Growth is 150 000 requests, 10 projects, and 120 requests each minute at 59 USD. A year is 15% below twelve monthly prices and the quota still resets every month. Prices include VAT. The billing page shows GEL from the National Bank of Georgia rate for that date. Nothing is charged again unless you pay. Business is not offered until its rate limit is measured. The widget and the server key share the counter. A new project or a new key does not reset usage.'
+                    : 'სამუშაო სივრცე ერთ თვიურ კვოტას იზიარებს პროექტებს შორის. უფასო არის თვეში 1 000 წარმატებული მოთხოვნა, ერთი აქტიური პროექტი და წუთში 15 მოთხოვნა. Starter არის 25 000 მოთხოვნა, 3 პროექტი და წუთში 60 მოთხოვნა 19 USD-ად. Growth არის 150 000 მოთხოვნა, 10 პროექტი და წუთში 120 მოთხოვნა 59 USD-ად. წელიწადი 12 თვის ფასზე 15%-ით ნაკლებია და კვოტა მაინც ყოველ თვე ნულდება. ფასი დღგ-ს შეიცავს. გადახდის გვერდი ლარს იმ დღის ეროვნული ბანკის კურსით აჩვენებს. თანხა ხელახლა არ ჩამოიჭრება, სანამ თავად არ გადაიხდით. Business არ იყიდება, სანამ მისი სიჩქარის ზღვარი იზომება. ვიჯეტი და სერვერის გასაღები ერთ მრიცხველს იყოფს. ახალი პროექტი ან ახალი გასაღები მოხმარებას არ ანულებს.';
+                $row['paragraphs'][3] = str_replace(
+                    'MONTHLY_QUOTA_EXCEEDED',
+                    'MONTHLY_QUOTA_EXCEEDED, PROJECT_CAP_EXCEEDED',
+                    (string) $row['paragraphs'][3],
+                );
+            }
+            unset($row);
+        }
+
+        return $rows;
     }
 
     public static function widgetText(string $locale): string

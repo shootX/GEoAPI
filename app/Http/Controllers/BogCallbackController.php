@@ -44,12 +44,19 @@ final class BogCallbackController extends Controller
         }
 
         $eventId = $bogOrderId.':'.$status;
+        $refundId = '';
         if ($status === 'refunded_partially') {
             $partialUnits = is_array($body['purchase_units'] ?? null) ? $body['purchase_units'] : [];
             $partialRaw = $partialUnits['refund_amount'] ?? null;
-            $eventId .= ':'.(is_numeric($partialRaw) ? number_format((float) $partialRaw, 2, '.', '') : 'invalid');
+            $candidate = $body['refund_id'] ?? null;
+            if (is_string($candidate) && preg_match('/^[A-Za-z0-9:_-]{1,80}$/', $candidate) === 1) {
+                $refundId = $candidate;
+            }
+            $eventId .= $refundId !== ''
+                ? ':id:'.$refundId
+                : ':'.(is_numeric($partialRaw) ? number_format((float) $partialRaw, 2, '.', '') : 'invalid');
         }
-        $result = DB::transaction(function () use ($eventId, $status, $externalId, $body, $bogOrderId): string {
+        $result = DB::transaction(function () use ($eventId, $status, $externalId, $body, $bogOrderId, $refundId): string {
             $fresh = PaymentEvents::record('bog', $eventId, 'order_payment', [
                 'status' => $status,
                 'order' => is_string($externalId) ? $externalId : null,
@@ -96,7 +103,10 @@ final class BogCallbackController extends Controller
                         return 'mismatch';
                     }
                     $amount = number_format((float) $refundRaw, 2, '.', '');
-                    if (bccomp($amount, '0.00', 2) !== 1 || ! Entitlements::recordPartialRefund($externalId, $amount)) {
+                    $recorded = $refundId !== ''
+                        ? Entitlements::recordDistinctPartial($externalId, $amount, $eventId)
+                        : Entitlements::recordPartialRefund($externalId, $amount);
+                    if (bccomp($amount, '0.00', 2) !== 1 || ! $recorded) {
                         Log::warning('bog.callback.mismatch', ['order' => $externalId]);
 
                         return 'mismatch';

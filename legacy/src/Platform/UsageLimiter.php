@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Carapi\Platform;
 
+use App\Billing\V2\Meter;
+
 final class UsageLimiter
 {
     public function __construct(private UsageStore $store) {}
@@ -88,6 +90,22 @@ final class UsageLimiter
     /** @return array{exceeded:bool,retry_after:int,missing:bool,limit:int,count:int,reset_at:int} */
     public function hitProject(int $projectId, int $now): array
     {
+        if (class_exists(Meter::class)) {
+            $rpm = Meter::rpmFor($projectId);
+            if ($rpm !== null) {
+                $hit = $this->store->bumpWindow('workspace', (string) $rpm['id'], $rpm['limit'], $now);
+                $reset = $now - ((int) gmdate('s', $now)) + 60;
+
+                return [
+                    'exceeded' => $hit['exceeded'],
+                    'retry_after' => $hit['retry_after'],
+                    'missing' => false,
+                    'limit' => $rpm['limit'],
+                    'count' => $hit['count'],
+                    'reset_at' => $reset,
+                ];
+            }
+        }
         $limit = $this->perMinute($projectId);
         if ($limit === null) {
             return ['exceeded' => true, 'retry_after' => 60, 'missing' => true, 'limit' => 0, 'count' => 0, 'reset_at' => $now + 60];
@@ -123,18 +141,50 @@ final class UsageLimiter
     /** @return array{limit:int,used:int,remaining:int,exhausted:bool,reset_at:int}|null */
     public function previewMonth(int $projectId, int $now): ?array
     {
+        if (class_exists(Meter::class)) {
+            $preview = Meter::preview($projectId, $now);
+            if ($preview !== null) {
+                return $preview;
+            }
+        }
+
         return $this->store->previewMonth($projectId, $now);
     }
 
     /** @return array{limit:int,used:int,remaining:int,exhausted:bool,reset_at:int,enforced:bool}|null */
     public function previewDay(int $projectId, int $now): ?array
     {
+        if (class_exists(Meter::class) && Meter::applies($projectId)) {
+            return [
+                'limit' => 0,
+                'used' => 0,
+                'remaining' => 0,
+                'exhausted' => false,
+                'reset_at' => $now + 86400,
+                'enforced' => false,
+            ];
+        }
+
         return $this->store->previewDay($projectId, $now);
     }
 
     /** @return array{ok:bool,limit:int,used:int,remaining:int,reset_at:int} */
     public function commitSuccess(int $projectId, string $route, int $now): array
     {
+        if (class_exists(Meter::class)) {
+            $saved = Meter::commit($projectId, $route, $now);
+            if ($saved !== null) {
+                if ($saved['ok']) {
+                    try {
+                        $this->store->recordDaily($projectId, $route, $now);
+                    } catch (\Throwable) {
+                    }
+                }
+
+                return $saved;
+            }
+        }
+
         return $this->store->commitSuccess($projectId, $route, $now);
     }
 

@@ -14,3 +14,7 @@
 - [x] Mobile: page heading + menu on billing/test checkout; no scrollbar-gutter strip on mobile.
 - Mock-mode access unchanged (awaiting owner).
 - 2026-10-22: billing orders table stacks as cards ≤640px (GEL no longer clipped).
+
+## 2026-10-22 — Billing V2
+- [x] `BILLING_V2` default off. New prices, shared workspace quota, prepaid credits, additive tables, pricing/billing/projects UI, and `billing:v2-backfill --dry-run|--rollback` are implemented and tested.
+- [ ] Enable only after the CREATE migration and a reviewed backfill. Keep `BILLING_V2_BUSINESS_RPM` off until a load test. Do not deploy from the PR.

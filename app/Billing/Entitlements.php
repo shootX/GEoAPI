@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Billing;
 
+use App\Billing\V2\Checkout;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use PDOException;
@@ -113,8 +114,12 @@ final class Entitlements
         }
         $ends = (string) $order->interval === 'year' ? now()->addYear() : now()->addMonth();
         $endsAt = $ends->utc()->format('Y-m-d H:i:s');
-        self::apply((int) $order->project_id, (string) $order->plan_code, $endsAt, Plans::unlimited((string) $order->plan_code));
-        self::setEntitlement((int) $order->legacy_user_id, (string) $order->plan_code, null, MockPay::isMock($order) ? MockPay::PROVIDER : 'bog');
+        if (str_starts_with((string) $order->plan_code, 'v2:')) {
+            Checkout::applyPaid($order);
+        } else {
+            self::apply((int) $order->project_id, (string) $order->plan_code, $endsAt, Plans::unlimited((string) $order->plan_code));
+            self::setEntitlement((int) $order->legacy_user_id, (string) $order->plan_code, null, MockPay::isMock($order) ? MockPay::PROVIDER : 'bog');
+        }
         DB::table('billing_orders')->where('id', $order->id)->update([
             'status' => 'paid',
             'updated_at' => now(),
@@ -135,21 +140,25 @@ final class Entitlements
         }
         $previous = self::jsonArray($order->previous);
         if ((string) $order->status === 'paid') {
-            self::restore((int) $order->project_id, $previous);
-            $planId = $previous['entitlement_plan_id'] ?? null;
-            if (is_numeric($planId)) {
-                self::setEntitlementById((int) $order->legacy_user_id, (int) $planId, 'bog-refund');
+            if (str_starts_with((string) $order->plan_code, 'v2:')) {
+                Checkout::reverse($order);
             } else {
-                $code = is_string($previous['plan_code'] ?? null) && $previous['plan_code'] !== ''
-                    ? (string) $previous['plan_code']
-                    : 'cars-included';
-                if ($code === 'cars-included') {
-                    $included = DB::table('api_plans')->where('code', 'cars-included')->value('id');
-                    if (is_numeric($included)) {
-                        self::setEntitlementById((int) $order->legacy_user_id, (int) $included, 'bog-refund');
-                    }
+                self::restore((int) $order->project_id, $previous);
+                $planId = $previous['entitlement_plan_id'] ?? null;
+                if (is_numeric($planId)) {
+                    self::setEntitlementById((int) $order->legacy_user_id, (int) $planId, 'bog-refund');
                 } else {
-                    self::setEntitlement((int) $order->legacy_user_id, $code, null, 'bog-refund');
+                    $code = is_string($previous['plan_code'] ?? null) && $previous['plan_code'] !== ''
+                        ? (string) $previous['plan_code']
+                        : 'cars-included';
+                    if ($code === 'cars-included') {
+                        $included = DB::table('api_plans')->where('code', 'cars-included')->value('id');
+                        if (is_numeric($included)) {
+                            self::setEntitlementById((int) $order->legacy_user_id, (int) $included, 'bog-refund');
+                        }
+                    } else {
+                        self::setEntitlement((int) $order->legacy_user_id, $code, null, 'bog-refund');
+                    }
                 }
             }
         }
@@ -200,6 +209,55 @@ final class Entitlements
             'refunded_gel' => $next,
             'plan' => (string) $order->plan_code,
             'project_id' => (int) $order->project_id,
+        ]);
+
+        return true;
+    }
+
+    /**
+     * A partial refund identified by refund_id is its own amount, even when
+     * that amount equals an earlier partial. Replaying the same event id does nothing.
+     */
+    public static function recordDistinctPartial(string $publicId, string $amount, string $eventId): bool
+    {
+        $order = DB::table('billing_orders')->where('public_id', $publicId)->first();
+        if ($order === null) {
+            return false;
+        }
+        if ((string) $order->status === 'refunded') {
+            return true;
+        }
+        if (DB::table('billing_refund_entries')->where('provider_event_id', $eventId)->exists()) {
+            return true;
+        }
+        $gel = self::money($order->gel_amount);
+        $current = self::money($order->refunded_gel ?? '0');
+        if (bccomp($amount, '0.00', 2) !== 1) {
+            return false;
+        }
+        $next = bcadd($current, $amount, 2);
+        if (bccomp($next, $gel, 2) === 1) {
+            return false;
+        }
+        $now = now();
+        DB::table('billing_refund_entries')->insert([
+            'billing_order_id' => $order->id,
+            'provider_event_id' => $eventId,
+            'amount' => $amount,
+            'kind' => 'partial',
+            'created_at' => $now,
+            'updated_at' => $now,
+        ]);
+        DB::table('billing_orders')->where('id', $order->id)->update([
+            'refunded_gel' => $next,
+            'updated_at' => $now,
+        ]);
+        AuditLog::write((int) $order->user_id, 'partial_refund', 'order', (string) $order->public_id, [
+            'amount' => $amount,
+            'refunded_gel' => $next,
+            'plan' => (string) $order->plan_code,
+            'project_id' => (int) $order->project_id,
+            'event' => $eventId,
         ]);
 
         return true;

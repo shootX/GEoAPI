@@ -74,6 +74,9 @@ final class CatalogApi
         if ($projectHit['exceeded']) {
             return $this->limited('RATE_LIMIT_EXCEEDED', max(1, $projectHit['retry_after']), $projectHit['limit'], 0, $projectHit['reset_at']);
         }
+        if (! empty($preview['cap'])) {
+            return $this->limited('PROJECT_CAP_EXCEEDED', max(1, $preview['reset_at'] - $now), $preview['limit'], 0, $preview['reset_at']);
+        }
         if (empty($preview['unlimited']) && $preview['exhausted']) {
             return $this->limited('MONTHLY_QUOTA_EXCEEDED', max(1, $preview['reset_at'] - $now), $preview['limit'], 0, $preview['reset_at']);
         }
@@ -125,6 +128,9 @@ final class CatalogApi
         if (! $saved['ok']) {
             if (($saved['reason'] ?? 'month') === 'day') {
                 return $this->limited('DAILY_QUOTA_EXCEEDED', max(1, $saved['reset_at'] - $now), $saved['limit'], 0, $saved['reset_at']);
+            }
+            if (($saved['reason'] ?? '') === 'cap') {
+                return $this->limited('PROJECT_CAP_EXCEEDED', max(1, $saved['reset_at'] - $now), $saved['limit'], 0, $saved['reset_at']);
             }
 
             return $this->limited('MONTHLY_QUOTA_EXCEEDED', max(1, $saved['reset_at'] - $now), $saved['limit'], 0, $saved['reset_at']);

@@ -18,6 +18,8 @@ interface UsageStore
     /** @return array{ok:bool,reason?:string,limit:int,used:int,remaining:int,reset_at:int} */
     public function commitSuccess(int $projectId, string $route, int $now): array;
 
+    public function recordDaily(int $projectId, string $route, int $now): void;
+
     /** @return array{limit:int,used:int,remaining:int,reset_at:string,per_minute:int,days:list<array{day:string,used:int}>,routes:list<array{route:string,used:int}>}|null */
     public function stats(int $projectId, int $now): ?array;
 }
