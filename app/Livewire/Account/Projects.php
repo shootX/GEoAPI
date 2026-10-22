@@ -154,6 +154,7 @@ final class Projects extends Component
             'days' => $emptyDays,
             'activeKeys' => 0,
             'cars' => [],
+            'usageById' => [],
         ];
         if (filter_var(env('CARAPI_CABINET_DEMO', false), FILTER_VALIDATE_BOOL)) {
             return $this->demoSnapshot($base);
@@ -168,6 +169,12 @@ final class Projects extends Component
             return $base;
         }
         $base['projects'] = $projects;
+        foreach ($projects as $row) {
+            try {
+                $base['usageById'][(int) $row['id']] = $this->usage($pdo, (int) $row['id']);
+            } catch (PDOException) {
+            }
+        }
         $project = null;
         foreach ($projects as $row) {
             if ($this->projectId !== null && (int) $row['id'] === (int) $this->projectId) {
@@ -306,6 +313,7 @@ final class Projects extends Component
         $base['demo'] = true;
         $base['project'] = ['id' => 1, 'name' => 'დემო პროექტი'];
         $base['projects'] = [$base['project']];
+        $base['usageById'] = [1 => ['used' => 2140, 'limit' => 10000, 'per_minute' => 60, 'unlimited' => false]];
         $base['used'] = 2140;
         $base['limit'] = 10000;
         $base['remaining'] = 7860;

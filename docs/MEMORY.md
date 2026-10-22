@@ -175,3 +175,10 @@ Existing access is kept by a new column, not by rewriting quotas. On PostgreSQL 
 
 ## 2026-10-22 — P8 admin shell
 - Legacy admin (overview, users, user, projects, project) and Laravel /admin/blog share View::adminShellStart/End: ink sidebar + ADMIN badge, grouped nav (only built screens; Proposed catalog/plans/billing/pages/settings/audit not shown), breadcrumb top bar, read-only lock badge/bar, status badges, card tables, mobile stacked rows. admin.css rewritten on --ga-* tokens.
+
+## 2026-10-22 — P9 designer decisions
+- Settings: "რედაქტირება" link beside name/email (settings.profile) and security (settings.security).
+- Playground/Explorer: two columns on desktop (form | dark output), one column ≤980px.
+- Admin overview: photo-reports card only when such notifications exist (shows 20+ at cap).
+- Projects list: per-project monthly usage bar + client-side name/URL search.
+- Billing/BOG untouched (owner decision pending).

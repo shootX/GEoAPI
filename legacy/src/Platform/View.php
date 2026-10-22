@@ -215,7 +215,7 @@ final class View
                 . '<p class="hint" id="hint-' . $name . '">' . self::e($hint) . '</p></div>';
         }
         $ops = (string) json_encode(Playground::clientOps(), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
-        $main = '<div class="pn"><div class="sh"><div><h1>API Playground</h1>'
+        $main = '<div class="pg2"><div class="pn"><div class="sh"><div><h1>API Playground</h1>'
             . '<p>გამოცადეთ GeoAPI-ის მოთხოვნები პროექტის კაბინეტიდან, ბრენდიდან კონკრეტულ მოდიფიკაციამდე.</p></div></div>'
             . '<p class="hint">Playground-ის წარმატებული მოთხოვნები ითვლება თქვენი პროექტის API კვოტაში.</p>'
             . '<form id="playground-form" method="post" action="/account/projects/' . $id . '/playground/run">'
@@ -224,7 +224,7 @@ final class View
             . '<p class="hint" id="playground-desc">ბრენდების სიის მიღება. მეთოდი: GET.</p></div>'
             . $fields
             . '<button class="btn btn-l" id="playground-send" type="submit">მოთხოვნის გაგზავნა</button>'
-            . '</form>'
+            . '</form><p><a href="/account/projects/' . $id . '">პროექტის კაბინეტში დაბრუნება</a></p></div><div class="pn pg-out">'
             . '<div class="fld"><div class="lbl"><span>curl</span></div><pre class="json" id="playground-curl"></pre>'
             . '<button class="btn btn-g" id="playground-copy" type="button">curl-ის კოპირება</button></div>'
             . '<div class="fld" aria-live="polite"><span class="pill" id="playground-badge">მზადაა</span> '
@@ -233,7 +233,7 @@ final class View
             . '<p class="hint" id="playground-empty">პასუხი ჯერ არ არის.</p>'
             . '<pre class="json" id="playground-json"></pre>'
             . '<button class="btn btn-g" id="playground-copy-json" type="button">JSON-ის კოპირება</button>'
-            . '<p><a href="/account/projects/' . $id . '">პროექტის კაბინეტში დაბრუნება</a></p></div>'
+            . '</div></div>'
             . '<script type="application/json" id="playground-ops">' . $ops . '</script>'
             . <<<'JS'
 <script>
@@ -384,14 +384,14 @@ JS;
                     . '<button class="btn btn-g" id="explorer-more-modifications" type="button" hidden disabled>მეტი მოდიფიკაციის ჩატვირთვა</button>';
             }
         }
-        $main = '<div class="pn explorer"><div class="sh"><div><h1>ავტომობილების კატალოგი</h1>'
+        $main = '<div class="pg2"><div class="pn explorer"><div class="sh"><div><h1>ავტომობილების კატალოგი</h1>'
             . '<p>მოძებნეთ ავტომობილი ბრენდის, მოდელის, თაობისა და მოდიფიკაციის მიხედვით.</p></div></div>'
             . '<p class="hint">Explorer-ის წარმატებული მოთხოვნები ითვლება თქვენი პროექტის API კვოტაში.</p>'
             . '<p class="hint" id="explorer-status" aria-live="polite">ბრენდები იტვირთება.</p>'
             . '<form id="explorer-form" method="post" action="/account/projects/' . $id . '/playground/run">'
             . '<input type="hidden" name="_csrf" value="' . self::e(Session::csrf()) . '">'
-            . $fields . '</form>'
-            . '<div class="pn" id="explorer-detail" hidden><h2 id="explorer-detail-title">მოდიფიკაცია</h2><dl id="explorer-detail-list" aria-labelledby="explorer-detail-title" aria-live="polite" aria-atomic="true"></dl></div></div>'
+            . $fields . '</form></div><div class="pn pg-out">'
+            . '<div id="explorer-detail" hidden><h2 id="explorer-detail-title">მოდიფიკაცია</h2><dl id="explorer-detail-list" aria-labelledby="explorer-detail-title" aria-live="polite" aria-atomic="true"></dl></div><p class="pg-ph">აირჩიეთ ბრენდი, მოდელი, თაობა და მოდიფიკაცია — აქ გამოჩნდება მახასიათებლები.</p></div></div>'
             . <<<'JS'
 <script>
 (function () {
@@ -1010,7 +1010,7 @@ JS;
         return '<!doctype html><html lang="ka"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="robots" content="noindex, nofollow">'
             . '<title>' . self::e($heading) . ' — GeoAPI ადმინი</title>'
             . '<link rel="icon" href="/favicon.ico" sizes="any"><link rel="icon" href="/assets/brand/favicon.svg" type="image/svg+xml">'
-            . '<link rel="stylesheet" href="/assets/admin.css?v=20261022gd"></head><body class="admin-app">'
+            . '<link rel="stylesheet" href="/assets/admin.css?v=20261022ge"></head><body class="admin-app">'
             . '<a class="admin-skip" href="#admin-content">შინაარსზე გადასვლა</a>'
             . '<div class="admin-shell"><aside class="admin-side" id="admin-nav"><div class="admin-brand"><a href="/admin"><img src="/assets/brand/geoapi-lockup-on-ink.svg" alt="geoapi.ge" height="24"></a><span>ADMIN</span></div>'
             . '<nav aria-label="ადმინისტრირება">' . self::adminNav($section) . '</nav>'
@@ -1319,8 +1319,13 @@ JS;
         return $row instanceof \App\Models\Setting && $row->value === true;
     }
 
-    private static function photoReports(): string
+    /** @return list<array{body:string,at:string}> */
+    private static function photoRows(): array
     {
+        static $cache = null;
+        if ($cache !== null) {
+            return $cache;
+        }
         $rows = [];
         try {
             if (class_exists(\Illuminate\Support\Facades\Schema::class) && \Illuminate\Support\Facades\Schema::hasTable('notifications')) {
@@ -1349,6 +1354,12 @@ JS;
             $rows = [];
         }
 
+        return $cache = $rows;
+    }
+
+    private static function photoReports(): string
+    {
+        $rows = self::photoRows();
         $html = '<section class="admin-group" id="photo-reports"><h2>არასწორი ფოტოები</h2>';
         if ($rows === []) {
             return $html . '<p class="admin-empty">შეტყობინება ჯერ არ არის.</p></section>';
@@ -1385,6 +1396,11 @@ JS;
             ],
         ];
         $html = '';
+        $photos = count(self::photoRows());
+        if ($photos > 0) {
+            $html .= '<section class="admin-group"><h2>ფოტოები</h2><div class="admin-cards"><article class="admin-card"><p>არასწორი ფოტოს შეტყობინება</p><strong data-stat="photo_reports">'
+                . self::e($photos >= 20 ? '20+' : (string) $photos) . '</strong><a class="admin-more" href="#photo-reports">ნახვა</a></article></div></section>';
+        }
         foreach ($groups as $title => $cards) {
             $html .= '<section class="admin-group"><h2>' . self::e($title) . '</h2><div class="admin-cards">';
             foreach ($cards as [$key, $label]) {
@@ -1557,7 +1573,7 @@ JS;
         $whoInitial = $who === '' ? 'G' : mb_strtoupper(mb_substr($who, 0, 1));
         echo '<!doctype html><html lang="ka"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="robots" content="noindex">'
             . '<title>' . self::e($title) . ' — GeoAPI</title><link rel="icon" href="/favicon.ico" sizes="any"><link rel="icon" href="/assets/brand/favicon.svg" type="image/svg+xml">'
-            . '<link rel="stylesheet" href="/assets/cabinet.css?v=20261022gc">' . $css . '</head><body class="cab ga">';
+            . '<link rel="stylesheet" href="/assets/cabinet.css?v=20261022gd">' . $css . '</head><body class="cab ga">';
         echo '<div class="app"><aside class="side" id="side"><a class="logo" href="/"><img src="/assets/brand/geoapi-lockup-light.svg" alt="geoapi.ge" height="26"></a>'
             . ($project === null ? '' : '<div class="proj"><span class="av">' . self::e($initial) . '</span><div style="flex:1;min-width:0;line-height:1.25"><div class="pn">' . self::e($name) . '</div><div class="xs mut">' . self::e($state) . '</div></div></div>')
             . '<nav class="nav" aria-label="პანელი">' . $nav . '</nav>'
