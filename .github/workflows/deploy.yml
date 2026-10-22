@@ -18,6 +18,15 @@ jobs:
   test:
     name: PHPUnit
     runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:18
+        env:
+          POSTGRES_PASSWORD: ci
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready --health-interval 5s --health-timeout 5s --health-retries 10
     steps:
       - name: Check out
         uses: actions/checkout@v4
@@ -26,7 +35,7 @@ jobs:
         uses: shivammathur/setup-php@v2
         with:
           php-version: "8.4"
-          extensions: mbstring, xml, curl, zip, bcmath, intl, sodium, pdo_sqlite, sqlite3
+          extensions: mbstring, xml, curl, zip, bcmath, intl, sodium, pdo_sqlite, sqlite3, pdo_pgsql, pgsql
           coverage: none
 
       - name: Install dependencies
@@ -35,6 +44,11 @@ jobs:
           composer install --no-interaction --prefer-dist --no-progress
 
       - name: Run PHPUnit
+        env:
+          PG_TEST_HOST: 127.0.0.1
+          PG_TEST_USER: postgres
+          PG_TEST_PASSWORD: ci
+          PG_TEST_DB: postgres
         run: |
           php artisan key:generate --force
           vendor/bin/phpunit
