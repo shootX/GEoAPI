@@ -8,6 +8,7 @@ use App\Access\LegacyGate;
 use Carapi\Catalog\Access;
 use Carapi\Catalog\Connection;
 use Carapi\Catalog\DeniedException;
+use Carapi\Catalog\Http;
 use Carapi\Catalog\UnavailableException;
 use Carapi\Platform\UnavailableException as PlatformUnavailable;
 use Carapi\Platform\UsageLimiter;
@@ -418,11 +419,7 @@ final class CatalogApi
     /** @return array{status:int, headers:array<string, string>, body:array<string, mixed>} */
     private function limited(string $code, int $retryAfter, int $limit, int $remaining, int $reset): array
     {
-        $message = $code === 'DAILY_QUOTA_EXCEEDED'
-            ? 'დღიური ლიმიტი მიღწეულია.'
-            : 'მოთხოვნების ლიმიტი მიღწეულია.';
-
-        return $this->error($code === 'RATE_LIMIT_EXCEEDED' || $code === 'DAILY_QUOTA_EXCEEDED' || $code === 'MONTHLY_QUOTA_EXCEEDED' ? 429 : 429, $code, $message, [
+        return $this->error(429, $code, Http::limitMessage($code), [
             'Retry-After' => (string) max(1, $retryAfter),
             'X-RateLimit-Limit' => (string) $limit,
             'X-RateLimit-Remaining' => (string) $remaining,

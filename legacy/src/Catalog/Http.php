@@ -185,8 +185,18 @@ final class Http
             header('X-RateLimit-Remaining: 0');
             header('X-RateLimit-Reset: '.$reset);
         }
-        $message = $code === 'DAILY_QUOTA_EXCEEDED' ? 'დღიური ლიმიტი მიღწეულია.' : 'მოთხოვნების ლიმიტი მიღწეულია.';
-        self::json(429, ['error' => ['code' => $code, 'message' => $message]]);
+        self::json(429, ['error' => ['code' => $code, 'message' => self::limitMessage($code)]]);
+    }
+
+    /** The 429 codes stay as clients already match them; the message says which limit was hit. */
+    public static function limitMessage(string $code): string
+    {
+        return match ($code) {
+            'DAILY_QUOTA_EXCEEDED' => 'დღიური ლიმიტი მიღწეულია.',
+            'MONTHLY_QUOTA_EXCEEDED' => 'თვიური კვოტა ამოიწურა. ის მომდევნო თვის დასაწყისში განახლდება.',
+            'PROJECT_CAP_EXCEEDED' => 'პროექტის თვიური ზღვარი მიღწეულია. ზღვარი პროექტის პარამეტრებში იცვლება.',
+            default => 'წუთის მოთხოვნების ლიმიტი მიღწეულია. სცადეთ Retry-After წამის შემდეგ.',
+        };
     }
 
     public static function enabled(): bool
@@ -305,7 +315,6 @@ final class Http
             'სერვისი დროებით მიუწვდომელია. სცადეთ მოთხოვნის ხელახლა გაგზავნა მოგვიანებით.' => 'The service is temporarily unavailable. Try the request again later.',
             'ეს HTTP მეთოდი დაუშვებელია. გამოიყენეთ GET.' => 'This HTTP method is not allowed. Use GET.',
             'ეს HTTP მეთოდი დაუშვებელია. გამოიყენეთ POST.' => 'This HTTP method is not allowed. Use POST.',
-            'მოთხოვნების ლიმიტი მიღწეულია.' => 'The request limit was reached.',
             'დღიური ლიმიტი მიღწეულია.' => 'The daily limit was reached.',
             'პარამეტრი limit არასწორია. მიუთითეთ მთელი რიცხვი 1-დან 1000-მდე.' => 'limit must be an integer from 1 to 1000.',
             'პარამეტრი per_page არასწორია. მიუთითეთ მთელი რიცხვი 1-დან 1000-მდე.' => 'per_page must be an integer from 1 to 1000.',
@@ -326,9 +335,10 @@ final class Http
             'not_found' => 'The requested record was not found.',
             'invalid_parameter' => 'A parameter is invalid.',
             'unavailable' => 'The service is temporarily unavailable.',
-            'RATE_LIMIT_EXCEEDED' => 'The request limit was reached.',
+            'RATE_LIMIT_EXCEEDED' => 'The per-minute request limit was reached. Retry after Retry-After seconds.',
             'DAILY_QUOTA_EXCEEDED' => 'The daily limit was reached.',
-            'MONTHLY_QUOTA_EXCEEDED' => 'The monthly quota was reached.',
+            'MONTHLY_QUOTA_EXCEEDED' => 'The monthly quota was reached. It renews at the start of next month.',
+            'PROJECT_CAP_EXCEEDED' => 'The project\'s monthly cap was reached. Change it in the project settings.',
             default => 'The request could not be completed.',
         };
     }
