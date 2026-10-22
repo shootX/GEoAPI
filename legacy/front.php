@@ -223,9 +223,12 @@ function carapi_get_image(): void
                 echo $marked['bytes'];
                 return;
             }
-            header('Content-Type: ' . $res['mime']);
-            header('Content-Length: ' . strlen($bytes));
-            echo $bytes;
+            // Fail closed like /api/models/{id}/photo: never send a photo without the watermark.
+            error_log('[geoapi] getImage watermark unavailable');
+            http_response_code(503);
+            header('Content-Type: text/plain; charset=utf-8');
+            header('Cache-Control: no-store');
+            echo 'image temporarily unavailable';
             return;
         }
         // Cache blob vanished between lookup and read — fall through to "not found".
