@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Console\Commands;
 
 use App\Billing\Entitlements;
+use App\Billing\V2\Lifecycle;
 use Illuminate\Console\Command;
 
 final class ExpirePaidPlans extends Command
@@ -16,7 +17,8 @@ final class ExpirePaidPlans extends Command
     public function handle(): int
     {
         $count = Entitlements::expireDue();
-        $this->info('Expired '.$count.' project plans.');
+        $rolled = Lifecycle::rollDue();
+        $this->info('Expired '.$count.' project plans. Rolled '.$rolled.' workspace periods.');
 
         return 0;
     }
