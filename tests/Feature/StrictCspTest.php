@@ -6,7 +6,7 @@ namespace Tests\Feature;
 
 use App\Http\Middleware\SecurityHeaders;
 use App\Models\User;
-use Carapi\Csp;
+use Geoapi\Csp;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Vite;
 use Illuminate\Testing\TestResponse;

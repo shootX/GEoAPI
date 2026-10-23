@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Billing\V2;
 
-use Carapi\Platform\UnavailableException;
+use Geoapi\Platform\UnavailableException;
 use PDOException;
 
 final class Meter

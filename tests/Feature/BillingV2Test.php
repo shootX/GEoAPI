@@ -18,11 +18,11 @@ use App\Catalog\PublicSpec;
 use App\Livewire\Account\Billing;
 use App\Livewire\Account\Projects;
 use App\Models\User;
-use Carapi\Platform\ApiKeys;
-use Carapi\Platform\Connection as PlatformConnection;
-use Carapi\Platform\MemoryUsageStore;
-use Carapi\Platform\ProjectRepository;
-use Carapi\Platform\UsageLimiter;
+use Geoapi\Platform\ApiKeys;
+use Geoapi\Platform\Connection as PlatformConnection;
+use Geoapi\Platform\MemoryUsageStore;
+use Geoapi\Platform\ProjectRepository;
+use Geoapi\Platform\UsageLimiter;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Testing\TestResponse;
@@ -61,7 +61,7 @@ final class BillingV2Test extends TestCase
     {
         PlatformConnection::reset();
         config(['billing.v2' => false, 'billing.v2_business_rpm' => false]);
-        foreach (['CARAPI_WIDGET_ENABLED', 'CARAPI_PLATFORM_ENABLED', 'CARAPI_USAGE_NOW'] as $name) {
+        foreach (['GEOAPI_WIDGET_ENABLED', 'GEOAPI_PLATFORM_ENABLED', 'GEOAPI_USAGE_NOW'] as $name) {
             unset($_ENV[$name], $_SERVER[$name]);
             putenv($name);
         }
@@ -558,9 +558,9 @@ final class BillingV2Test extends TestCase
         $user = $this->owner();
         $this->projects();
         $workspaceId = $this->shared($user, 'starter');
-        $this->env('CARAPI_CATALOG_TEST_PROJECT', null);
-        $this->env('CARAPI_WIDGET_ENABLED', '1');
-        $this->env('CARAPI_PLATFORM_ENABLED', '1');
+        $this->env('GEOAPI_CATALOG_TEST_PROJECT', null);
+        $this->env('GEOAPI_WIDGET_ENABLED', '1');
+        $this->env('GEOAPI_PLATFORM_ENABLED', '1');
         MemoryUsageStore::shared()->perMinute = 100;
 
         $issued = ApiKeys::issue();

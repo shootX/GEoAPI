@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace Carapi\Catalog;
+namespace Geoapi\Catalog;
 
 use App\Catalog\CatalogApi;
-use Carapi\Platform\UnavailableException as PlatformUnavailable;
-use Carapi\Platform\UsageLimiter;
-use Carapi\Widget\Cors;
+use Geoapi\Platform\UnavailableException as PlatformUnavailable;
+use Geoapi\Platform\UsageLimiter;
+use Geoapi\Widget\Cors;
 use PDOException;
 
 final class Http
@@ -201,7 +201,7 @@ final class Http
 
     public static function enabled(): bool
     {
-        $value = carapi_env('CARAPI_CATALOG_ENABLED');
+        $value = geoapi_env('GEOAPI_CATALOG_ENABLED');
 
         return is_string($value) && in_array(strtolower(trim($value)), ['1', 'true', 'on', 'yes'], true);
     }

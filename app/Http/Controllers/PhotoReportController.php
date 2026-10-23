@@ -6,8 +6,8 @@ namespace App\Http\Controllers;
 
 use App\Access\AdminAccess;
 use App\Models\User;
-use Carapi\Catalog\Connection;
-use Carapi\Catalog\UnavailableException;
+use Geoapi\Catalog\Connection;
+use Geoapi\Catalog\UnavailableException;
 use Electrik\Notifications\DatabaseNotification;
 use Electrik\Support\Operators;
 use Illuminate\Database\Eloquent\Collection;

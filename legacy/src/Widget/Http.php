@@ -2,21 +2,21 @@
 
 declare(strict_types=1);
 
-namespace Carapi\Widget;
+namespace Geoapi\Widget;
 
 use App\Access\LegacyGate;
-use Carapi\Catalog\Http as CatalogHttp;
-use Carapi\Platform\Connection as PlatformConnection;
-use Carapi\Platform\Origins;
-use Carapi\Platform\UnavailableException;
-use Carapi\Platform\WidgetRepository;
+use Geoapi\Catalog\Http as CatalogHttp;
+use Geoapi\Platform\Connection as PlatformConnection;
+use Geoapi\Platform\Origins;
+use Geoapi\Platform\UnavailableException;
+use Geoapi\Platform\WidgetRepository;
 use PDOException;
 
 final class Http
 {
     public static function enabled(): bool
     {
-        return self::flag('CARAPI_WIDGET_ENABLED') && self::flag('CARAPI_CATALOG_ENABLED') && self::flag('CARAPI_PLATFORM_ENABLED');
+        return self::flag('GEOAPI_WIDGET_ENABLED') && self::flag('GEOAPI_CATALOG_ENABLED') && self::flag('GEOAPI_PLATFORM_ENABLED');
     }
 
     public static function dispatch(string $path): void
@@ -137,7 +137,7 @@ final class Http
 
     private static function flag(string $name): bool
     {
-        $value = carapi_env($name);
+        $value = geoapi_env($name);
 
         return is_string($value) && in_array(strtolower(trim($value)), ['1', 'true', 'on', 'yes'], true);
     }

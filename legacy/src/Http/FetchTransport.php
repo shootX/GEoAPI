@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Carapi\Http;
+namespace Geoapi\Http;
 
 interface FetchTransport
 {

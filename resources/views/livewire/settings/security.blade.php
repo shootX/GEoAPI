@@ -1,6 +1,6 @@
 @php
     $en = app()->getLocale() === 'en';
-    $rule = \Carapi\Platform\Passwords::rule(app()->getLocale());
+    $rule = \Geoapi\Platform\Passwords::rule(app()->getLocale());
 @endphp
 <div>
 <div class="app">
@@ -24,7 +24,7 @@
                     </label>
                     @error('current_password')<p class="hint err">{{ $message }}</p>@enderror
                     <label>{{ $en ? 'New password' : 'ახალი პაროლი' }}
-                        <input wire:model="password" type="password" autocomplete="new-password" minlength="{{ \Carapi\Platform\Passwords::MIN }}" maxlength="{{ \Carapi\Platform\Passwords::MAX }}" required>
+                        <input wire:model="password" type="password" autocomplete="new-password" minlength="{{ \Geoapi\Platform\Passwords::MIN }}" maxlength="{{ \Geoapi\Platform\Passwords::MAX }}" required>
                     </label>
                     @error('password')<p class="hint err">{{ $message }}</p>@else<p class="hint">{{ $rule }}</p>@enderror
                     <label>{{ $en ? 'Repeat the new password' : 'გაიმეორეთ ახალი პაროლი' }}

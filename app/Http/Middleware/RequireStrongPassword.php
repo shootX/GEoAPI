@@ -4,14 +4,14 @@ declare(strict_types=1);
 
 namespace App\Http\Middleware;
 
-use Carapi\Platform\Passwords;
+use Geoapi\Platform\Passwords;
 use Closure;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
- * After a sign-in with a password that breaks Carapi\Platform\Passwords, every page except
+ * After a sign-in with a password that breaks Geoapi\Platform\Passwords, every page except
  * the password form, logout and the pages that form's guards send to redirects there until the password hash changes.
  */
 final class RequireStrongPassword

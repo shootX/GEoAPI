@@ -23,7 +23,7 @@ final class LegacyFrontController extends Controller
                 unset($_SERVER['HTTP_ORIGIN']);
             }
             ob_start();
-            carapi_handle_request();
+            geoapi_handle_request();
             $body = ob_get_clean();
             $status = http_response_code();
             throw new HttpResponseException(new Response(
@@ -36,7 +36,7 @@ final class LegacyFrontController extends Controller
                 header($name.': '.$value);
             }
         }
-        carapi_handle_request();
+        geoapi_handle_request();
         exit;
     }
 }

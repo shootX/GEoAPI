@@ -10,7 +10,7 @@ use App\Livewire\Auth\Register;
 use App\Livewire\Auth\ResetPassword;
 use App\Livewire\Settings\Security;
 use App\Models\User;
-use Carapi\Platform\Passwords;
+use Geoapi\Platform\Passwords;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Route;

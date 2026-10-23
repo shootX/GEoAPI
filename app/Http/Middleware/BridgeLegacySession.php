@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Http\Middleware;
 
 use App\Models\User;
-use Carapi\Platform\Session;
+use Geoapi\Platform\Session;
 use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;

@@ -51,10 +51,10 @@ final class ComingSoonTest extends TestCase
 
         $granted = $this->get('/?preview=preview-secret');
         $granted->assertOk();
-        $cookie = $granted->getCookie('carapi_preview');
+        $cookie = $granted->getCookie('geoapi_preview');
         $this->assertNotNull($cookie);
 
-        $this->withCookie('carapi_preview', $cookie->getValue())
+        $this->withCookie('geoapi_preview', $cookie->getValue())
             ->get('/guide')
             ->assertOk();
         $this->defaultCookies = [];

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Carapi\Auth;
+namespace Geoapi\Auth;
 
 use PDO;
 
@@ -16,7 +16,12 @@ final class Database
             return self::$pdo;
         }
 
-        $path = carapi_env('CARAPI_DB') ?: dirname(__DIR__, 2) . '/data/carapi.sqlite';
+        $path = geoapi_env('GEOAPI_DB') ?: dirname(__DIR__, 2) . '/data/geoapi.sqlite';
+        // Keep using the file from before the rename until the server moves it to geoapi.sqlite.
+        $old = dirname(__DIR__, 2) . '/data/carapi.sqlite';
+        if (!geoapi_env('GEOAPI_DB') && !is_file($path) && is_file($old)) {
+            $path = $old;
+        }
         $dir = dirname($path);
         if (!is_dir($dir) && !mkdir($dir, 0775, true) && !is_dir($dir)) {
             throw new \RuntimeException('Cannot create data directory');

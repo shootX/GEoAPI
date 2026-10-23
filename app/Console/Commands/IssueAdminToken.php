@@ -6,7 +6,7 @@ namespace App\Console\Commands;
 
 use App\Account\IdentitySync;
 use App\Models\User;
-use Carapi\Platform\Passwords;
+use Geoapi\Platform\Passwords;
 use Electrik\Models\Role;
 use Electrik\Support\EnsuresTeamRoles;
 use Illuminate\Console\Command;

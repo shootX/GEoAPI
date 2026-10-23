@@ -5,7 +5,7 @@
 -- stack (QA retest). Column types, defaults, indexes and constraints may differ from production;
 -- do not use it to change or recreate a production database.
 --
--- Load into the database named by CARAPI_CATALOG_DATABASE.
+-- Load into the database named by GEOAPI_CATALOG_DATABASE.
 --
 -- PostgreSQL database dump
 --
@@ -27,10 +27,10 @@ SET client_min_messages = warning;
 SET row_security = off;
 
 --
--- Name: carapi_touch_modification(); Type: FUNCTION; Schema: public; Owner: -
+-- Name: geoapi_touch_modification(); Type: FUNCTION; Schema: public; Owner: -
 --
 
-CREATE FUNCTION public.carapi_touch_modification() RETURNS trigger
+CREATE FUNCTION public.geoapi_touch_modification() RETURNS trigger
     LANGUAGE plpgsql
     AS $$
     BEGIN
@@ -41,10 +41,10 @@ CREATE FUNCTION public.carapi_touch_modification() RETURNS trigger
 
 
 --
--- Name: carapi_touch_updated_at(); Type: FUNCTION; Schema: public; Owner: -
+-- Name: geoapi_touch_updated_at(); Type: FUNCTION; Schema: public; Owner: -
 --
 
-CREATE FUNCTION public.carapi_touch_updated_at() RETURNS trigger
+CREATE FUNCTION public.geoapi_touch_updated_at() RETURNS trigger
     LANGUAGE plpgsql
     AS $$
     BEGIN
@@ -358,45 +358,45 @@ CREATE INDEX modifications_year_start_idx ON public.modifications USING btree (y
 
 
 --
--- Name: brands carapi_brands_updated_at; Type: TRIGGER; Schema: public; Owner: -
+-- Name: brands geoapi_brands_updated_at; Type: TRIGGER; Schema: public; Owner: -
 --
 
-CREATE TRIGGER carapi_brands_updated_at BEFORE UPDATE ON public.brands FOR EACH ROW EXECUTE FUNCTION public.carapi_touch_updated_at();
-
-
---
--- Name: generations carapi_generations_updated_at; Type: TRIGGER; Schema: public; Owner: -
---
-
-CREATE TRIGGER carapi_generations_updated_at BEFORE UPDATE ON public.generations FOR EACH ROW EXECUTE FUNCTION public.carapi_touch_updated_at();
+CREATE TRIGGER geoapi_brands_updated_at BEFORE UPDATE ON public.brands FOR EACH ROW EXECUTE FUNCTION public.geoapi_touch_updated_at();
 
 
 --
--- Name: model_photos carapi_model_photos_updated_at; Type: TRIGGER; Schema: public; Owner: -
+-- Name: generations geoapi_generations_updated_at; Type: TRIGGER; Schema: public; Owner: -
 --
 
-CREATE TRIGGER carapi_model_photos_updated_at BEFORE UPDATE ON public.model_photos FOR EACH ROW EXECUTE FUNCTION public.carapi_touch_updated_at();
-
-
---
--- Name: models carapi_models_updated_at; Type: TRIGGER; Schema: public; Owner: -
---
-
-CREATE TRIGGER carapi_models_updated_at BEFORE UPDATE ON public.models FOR EACH ROW EXECUTE FUNCTION public.carapi_touch_updated_at();
+CREATE TRIGGER geoapi_generations_updated_at BEFORE UPDATE ON public.generations FOR EACH ROW EXECUTE FUNCTION public.geoapi_touch_updated_at();
 
 
 --
--- Name: modifications carapi_modifications_updated_at; Type: TRIGGER; Schema: public; Owner: -
+-- Name: model_photos geoapi_model_photos_updated_at; Type: TRIGGER; Schema: public; Owner: -
 --
 
-CREATE TRIGGER carapi_modifications_updated_at BEFORE UPDATE ON public.modifications FOR EACH ROW EXECUTE FUNCTION public.carapi_touch_updated_at();
+CREATE TRIGGER geoapi_model_photos_updated_at BEFORE UPDATE ON public.model_photos FOR EACH ROW EXECUTE FUNCTION public.geoapi_touch_updated_at();
 
 
 --
--- Name: modification_specs carapi_specs_touch_modification; Type: TRIGGER; Schema: public; Owner: -
+-- Name: models geoapi_models_updated_at; Type: TRIGGER; Schema: public; Owner: -
 --
 
-CREATE TRIGGER carapi_specs_touch_modification AFTER INSERT OR UPDATE ON public.modification_specs FOR EACH ROW EXECUTE FUNCTION public.carapi_touch_modification();
+CREATE TRIGGER geoapi_models_updated_at BEFORE UPDATE ON public.models FOR EACH ROW EXECUTE FUNCTION public.geoapi_touch_updated_at();
+
+
+--
+-- Name: modifications geoapi_modifications_updated_at; Type: TRIGGER; Schema: public; Owner: -
+--
+
+CREATE TRIGGER geoapi_modifications_updated_at BEFORE UPDATE ON public.modifications FOR EACH ROW EXECUTE FUNCTION public.geoapi_touch_updated_at();
+
+
+--
+-- Name: modification_specs geoapi_specs_touch_modification; Type: TRIGGER; Schema: public; Owner: -
+--
+
+CREATE TRIGGER geoapi_specs_touch_modification AFTER INSERT OR UPDATE ON public.modification_specs FOR EACH ROW EXECUTE FUNCTION public.geoapi_touch_modification();
 
 
 --

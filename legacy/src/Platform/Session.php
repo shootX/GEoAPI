@@ -2,14 +2,14 @@
 
 declare(strict_types=1);
 
-namespace Carapi\Platform;
+namespace Geoapi\Platform;
 
 final class Session
 {
     /** The session file directory, shared with the Laravel side (ProvisionPlatformUser, BridgeLegacySession). */
     public static function path(): string
     {
-        $path = carapi_env('CARAPI_PLATFORM_SESSION_PATH');
+        $path = geoapi_env('GEOAPI_PLATFORM_SESSION_PATH');
 
         return is_string($path) && $path !== '' ? $path : dirname(__DIR__, 2).'/data/sessions';
     }
@@ -65,8 +65,8 @@ final class Session
 
     private static function restoreSessionId(): void
     {
-        $raw = $_COOKIE['geoapi_platform'] ?? $_COOKIE['carapi_platform'] ?? null;
-        $decrypted = function_exists('request') ? (request()->cookie('geoapi_platform') ?? request()->cookie('carapi_platform')) : null;
+        $raw = $_COOKIE['geoapi_platform'] ?? null;
+        $decrypted = function_exists('request') ? request()->cookie('geoapi_platform') : null;
         $sid = self::acceptSessionId($raw, $decrypted);
         if ($sid === null) {
             unset($_COOKIE['geoapi_platform']);
@@ -165,15 +165,15 @@ final class Session
     public static function expired(int $issued, int $seen): bool
     {
         $now = time();
-        $idle = self::limit('CARAPI_PLATFORM_IDLE_SECONDS', 1800);
-        $absolute = self::limit('CARAPI_PLATFORM_ABSOLUTE_SECONDS', 43200);
+        $idle = self::limit('GEOAPI_PLATFORM_IDLE_SECONDS', 1800);
+        $absolute = self::limit('GEOAPI_PLATFORM_ABSOLUTE_SECONDS', 43200);
 
         return $issued < 1 || $seen < 1 || ($now - $seen) > $idle || ($now - $issued) > $absolute;
     }
 
     private static function limit(string $name, int $default): int
     {
-        $raw = carapi_env($name);
+        $raw = geoapi_env($name);
 
         return is_string($raw) && preg_match('/^[0-9]+$/', $raw) ? (int) $raw : $default;
     }

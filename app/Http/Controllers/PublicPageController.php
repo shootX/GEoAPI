@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Http\Controllers;
 
 use App\Models\Page;
-use Carapi\Catalog\PublicCounts;
+use Geoapi\Catalog\PublicCounts;
 use Illuminate\Contracts\View\View;
 
 final class PublicPageController extends Controller

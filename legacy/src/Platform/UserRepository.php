@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Carapi\Platform;
+namespace Geoapi\Platform;
 
 use PDO;
 use PDOException;
@@ -105,9 +105,9 @@ final class UserRepository
 
     public function tooManyAttempts(string $email, string $ip): bool
     {
-        $limit = self::intEnv('CARAPI_PLATFORM_ATTEMPT_LIMIT', 8);
-        $window = self::intEnv('CARAPI_PLATFORM_ATTEMPT_WINDOW', 900);
-        $ipLimit = self::intEnv('CARAPI_PLATFORM_IP_ATTEMPT_LIMIT', 30);
+        $limit = self::intEnv('GEOAPI_PLATFORM_ATTEMPT_LIMIT', 8);
+        $window = self::intEnv('GEOAPI_PLATFORM_ATTEMPT_WINDOW', 900);
+        $ipLimit = self::intEnv('GEOAPI_PLATFORM_IP_ATTEMPT_LIMIT', 30);
         $emailCount = 0;
         if ($email !== '') {
             $stmt = $this->pdo->prepare(
@@ -132,7 +132,7 @@ final class UserRepository
 
     private static function intEnv(string $name, int $default): int
     {
-        $raw = carapi_env($name);
+        $raw = geoapi_env($name);
 
         return is_string($raw) && preg_match('/^[0-9]+$/', $raw) ? (int) $raw : $default;
     }

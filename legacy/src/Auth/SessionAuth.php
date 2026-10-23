@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Carapi\Auth;
+namespace Geoapi\Auth;
 
 final class SessionAuth
 {

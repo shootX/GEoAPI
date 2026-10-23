@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace Tests\Feature;
 
 use App\Livewire\Auth\Register;
-use Carapi\Platform\Connection as PlatformConnection;
-use Carapi\Platform\FakeMailer;
+use Geoapi\Platform\Connection as PlatformConnection;
+use Geoapi\Platform\FakeMailer;
 use Illuminate\Support\Facades\DB;
 use Livewire\Livewire;
 use Tests\TestCase;
@@ -18,7 +18,7 @@ use Tests\TestCase;
  */
 final class PlatformLettersTest extends TestCase
 {
-    private const ENV = ['CARAPI_MAIL_TRANSPORT' => 'fake', 'CARAPI_APP_URL' => 'http://localhost'];
+    private const ENV = ['GEOAPI_MAIL_TRANSPORT' => 'fake', 'GEOAPI_APP_URL' => 'http://localhost'];
 
     protected function setUp(): void
     {

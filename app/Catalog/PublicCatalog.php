@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Catalog;
 
-use Carapi\Catalog\CatalogRepository;
-use Carapi\Catalog\PickerSelection;
+use Geoapi\Catalog\CatalogRepository;
+use Geoapi\Catalog\PickerSelection;
 use PDO;
 
 /**

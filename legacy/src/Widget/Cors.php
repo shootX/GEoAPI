@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Carapi\Widget;
+namespace Geoapi\Widget;
 
 final class Cors
 {

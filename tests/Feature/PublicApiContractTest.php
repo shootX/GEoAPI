@@ -6,7 +6,7 @@ namespace Tests\Feature;
 
 use App\Catalog\CatalogApi;
 use App\Catalog\PublicSpec;
-use Carapi\Platform\MemoryUsageStore;
+use Geoapi\Platform\MemoryUsageStore;
 use Tests\TestCase;
 
 final class PublicApiContractTest extends TestCase
@@ -142,8 +142,8 @@ final class PublicApiContractTest extends TestCase
                 ->assertUnauthorized()
                 ->assertJsonPath('error.code', 'unauthorized')
                 ->assertHeader('WWW-Authenticate', 'Bearer');
-            $_ENV['CARAPI_CATALOG_TEST_PROJECT'] = '7';
-            $_SERVER['CARAPI_CATALOG_TEST_PROJECT'] = '7';
+            $_ENV['GEOAPI_CATALOG_TEST_PROJECT'] = '7';
+            $_SERVER['GEOAPI_CATALOG_TEST_PROJECT'] = '7';
         }
 
         $this->getJson('/api/v1/brands?limit=1001')->assertStatus(422)->assertJsonPath('error.code', 'invalid_parameter');
@@ -165,8 +165,8 @@ final class PublicApiContractTest extends TestCase
         foreach ($this->samples() as $url) {
             MemoryUsageStore::reset();
             MemoryUsageStore::shared()->perMinute = 1;
-            $_ENV['CARAPI_USAGE_MEMORY'] = '1';
-            $_SERVER['CARAPI_USAGE_MEMORY'] = '1';
+            $_ENV['GEOAPI_USAGE_MEMORY'] = '1';
+            $_SERVER['GEOAPI_USAGE_MEMORY'] = '1';
             $this->getJson($url)->assertOk();
             $this->getJson($url)->assertStatus(429)->assertJsonPath('error.code', 'RATE_LIMIT_EXCEEDED');
         }
@@ -184,16 +184,16 @@ final class PublicApiContractTest extends TestCase
         $this->getJson('/api/v1/modifications/999/specs')->assertNotFound();
         $this->getJson('/api/v1/modifications/999/equipment')->assertNotFound();
 
-        $_ENV['CARAPI_CATALOG_ENABLED'] = '0';
-        $_SERVER['CARAPI_CATALOG_ENABLED'] = '0';
+        $_ENV['GEOAPI_CATALOG_ENABLED'] = '0';
+        $_SERVER['GEOAPI_CATALOG_ENABLED'] = '0';
         foreach (['/api/v1/brands', '/api/v1/bodies', '/api/v1/colors', '/api/v1/coverage'] as $url) {
             $this->getJson($url)->assertNotFound()->assertJsonPath('error.code', 'not_found');
         }
 
-        $_ENV['CARAPI_CATALOG_ENABLED'] = '1';
-        $_SERVER['CARAPI_CATALOG_ENABLED'] = '1';
-        $_ENV['CARAPI_MODIFICATIONS_ENABLED'] = '0';
-        $_SERVER['CARAPI_MODIFICATIONS_ENABLED'] = '0';
+        $_ENV['GEOAPI_CATALOG_ENABLED'] = '1';
+        $_SERVER['GEOAPI_CATALOG_ENABLED'] = '1';
+        $_ENV['GEOAPI_MODIFICATIONS_ENABLED'] = '0';
+        $_SERVER['GEOAPI_MODIFICATIONS_ENABLED'] = '0';
         foreach (['/api/v1/modifications', '/api/v1/engines', '/api/v1/fuel', '/api/v1/generations/100/modifications'] as $url) {
             $this->getJson($url)->assertNotFound();
         }
@@ -238,7 +238,7 @@ final class PublicApiContractTest extends TestCase
 
     private function withoutTestProject(): void
     {
-        unset($_ENV['CARAPI_CATALOG_TEST_PROJECT'], $_SERVER['CARAPI_CATALOG_TEST_PROJECT']);
+        unset($_ENV['GEOAPI_CATALOG_TEST_PROJECT'], $_SERVER['GEOAPI_CATALOG_TEST_PROJECT']);
     }
 
     private function assertKeys(string $url, string $schema, string $pointer = 'data.0'): void

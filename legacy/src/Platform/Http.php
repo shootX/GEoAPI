@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Carapi\Platform;
+namespace Geoapi\Platform;
 
 use App\Access\LegacyGate;
 use PDOException;
@@ -12,7 +12,7 @@ final class Http
     public const TERMS_VERSION = '2026-09-26';
     public static function enabled(): bool
     {
-        $value = carapi_env('CARAPI_PLATFORM_ENABLED');
+        $value = geoapi_env('GEOAPI_PLATFORM_ENABLED');
 
         return is_string($value) && in_array(strtolower(trim($value)), ['1', 'true', 'on', 'yes'], true);
     }
@@ -487,7 +487,7 @@ final class Http
             $limiter = UsageLimiter::fromEnv();
             $now = UsageLimiter::now();
             $ipHit = $limiter->hitIp(UsageLimiter::clientIp(), $now);
-        } catch (UnavailableException | \Carapi\Catalog\UnavailableException | PDOException) {
+        } catch (UnavailableException | \Geoapi\Catalog\UnavailableException | PDOException) {
             self::playgroundUnavailable();
 
             return;
@@ -574,7 +574,7 @@ final class Http
                 return;
             }
             $saved = $limiter->commitSuccess($id, $result['route'], $now);
-        } catch (UnavailableException | \Carapi\Catalog\UnavailableException | PDOException) {
+        } catch (UnavailableException | \Geoapi\Catalog\UnavailableException | PDOException) {
             self::playgroundUnavailable();
 
             return;
@@ -626,7 +626,7 @@ final class Http
         echo '<!doctype html><html lang="ka"><head><meta charset="utf-8"><title>ვიჯეტის წინასწარი ნახვა</title></head><body>';
         echo '<script src="/widget/v1/geoapi-filter.js"></script>';
         echo '<geoapi-filter public-key="' . $key . '"></geoapi-filter>';
-        echo '<pre id="out"></pre><script' . \Carapi\Csp::attr() . '>document.querySelector("geoapi-filter").addEventListener("geoapi:change",function(e){document.getElementById("out").textContent=JSON.stringify(e.detail);});</script>';
+        echo '<pre id="out"></pre><script' . \Geoapi\Csp::attr() . '>document.querySelector("geoapi-filter").addEventListener("geoapi:change",function(e){document.getElementById("out").textContent=JSON.stringify(e.detail);});</script>';
         echo '</body></html>';
     }
 

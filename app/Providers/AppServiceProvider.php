@@ -77,7 +77,7 @@ class AppServiceProvider extends ServiceProvider
         Blade::directive('nonce', static fn (): string => '<?php echo \'nonce="\'.e((string) \Illuminate\Support\Facades\Vite::cspNonce()).\'"\'; ?>');
         // Electrik's SetLocale replaces unsupported codes, including ka, and
         // app()->setLocale() also overwrites config('app.locale').
-        config(['carapi.locale' => (string) config('app.locale')]);
+        config(['geoapi.locale' => (string) config('app.locale')]);
 
         // Registered before Electrik's /dashboard so the cabinet wins the match.
         // It must keep the name: both routes share GET /dashboard, so the
@@ -95,7 +95,7 @@ class AppServiceProvider extends ServiceProvider
         ResetPassword::createUrlUsing(static fn ($user, string $token): string => rtrim((string) config('app.url'), '/')
             .route('password.reset', ['token' => $token, 'email' => $user->getEmailForPasswordReset()], false));
 
-        // One rule (Carapi\Platform\Passwords) for registration, reset and password change.
+        // One rule (Geoapi\Platform\Passwords) for registration, reset and password change.
         Password::defaults(static fn (): Password => new StrongPassword);
         Livewire::addPersistentMiddleware(RequireStrongPassword::class);
         User::observe(UserObserver::class);

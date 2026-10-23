@@ -48,8 +48,8 @@ class PublicDesignTest extends TestCase
             'modifications' => 343640,
             'photos' => 634,
         ]));
-        $_ENV['CARAPI_CATALOG_ENABLED'] = '1';
-        $_SERVER['CARAPI_CATALOG_ENABLED'] = '1';
+        $_ENV['GEOAPI_CATALOG_ENABLED'] = '1';
+        $_SERVER['GEOAPI_CATALOG_ENABLED'] = '1';
 
         try {
             $this->withSession(['locale' => 'ka'])
@@ -66,7 +66,7 @@ class PublicDesignTest extends TestCase
                 ->assertDontSee('10 228', false)
                 ->assertDontSee('ინტეგრაციები');
         } finally {
-            unset($_ENV['CARAPI_CATALOG_ENABLED'], $_SERVER['CARAPI_CATALOG_ENABLED']);
+            unset($_ENV['GEOAPI_CATALOG_ENABLED'], $_SERVER['GEOAPI_CATALOG_ENABLED']);
             @unlink($path);
         }
     }
@@ -83,8 +83,8 @@ class PublicDesignTest extends TestCase
             'models_without_generations' => 1, 'modifications' => 420021, 'photos' => 573,
             'specifications' => 420021, 'markets' => 3070, 'equipment' => 47312000,
         ]));
-        $_ENV['CARAPI_CATALOG_ENABLED'] = '1';
-        $_SERVER['CARAPI_CATALOG_ENABLED'] = '1';
+        $_ENV['GEOAPI_CATALOG_ENABLED'] = '1';
+        $_SERVER['GEOAPI_CATALOG_ENABLED'] = '1';
 
         try {
             $this->withSession(['locale' => 'ka'])->get('/')->assertOk()
@@ -92,7 +92,7 @@ class PublicDesignTest extends TestCase
             $this->withSession(['locale' => 'en'])->get('/')->assertOk()
                 ->assertSee('47M+')->assertSee('trim/equipment')->assertSee('photos')->assertDontSee('AI photo');
         } finally {
-            unset($_ENV['CARAPI_CATALOG_ENABLED'], $_SERVER['CARAPI_CATALOG_ENABLED']);
+            unset($_ENV['GEOAPI_CATALOG_ENABLED'], $_SERVER['GEOAPI_CATALOG_ENABLED']);
             @unlink($path);
         }
     }

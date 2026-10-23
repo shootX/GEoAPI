@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Tests\Unit;
 
-use Carapi\Platform\Session;
+use Geoapi\Platform\Session;
 use PHPUnit\Framework\TestCase;
 
 final class SessionIdTest extends TestCase

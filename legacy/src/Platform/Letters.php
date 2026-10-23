@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Carapi\Platform;
+namespace Geoapi\Platform;
 
 /** Account emails, Georgian first and English below, so every caller sends the same explained text. */
 final class Letters

@@ -6,7 +6,7 @@ namespace App\Http\Controllers\Api\V1;
 
 use App\Catalog\CatalogApi;
 use App\Http\Controllers\Controller;
-use Carapi\Catalog\Http;
+use Geoapi\Catalog\Http;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
@@ -18,7 +18,8 @@ final class CatalogController extends Controller
         $_SERVER['REQUEST_METHOD'] = $request->getMethod();
         $_SERVER['HTTP_AUTHORIZATION'] = (string) $request->header('Authorization', '');
         $_SERVER['HTTP_ACCEPT_LANGUAGE'] = (string) $request->header('Accept-Language', '');
-        $_SERVER['HTTP_X_CARAPI_PROJECT'] = (string) $request->header('X-CARAPI-PROJECT', '');
+        // X-CARAPI-PROJECT is the pre-rename name; clients that still send it keep working.
+        $_SERVER['HTTP_X_GEOAPI_PROJECT'] = (string) ($request->header('X-GEOAPI-PROJECT') ?: $request->header('X-CARAPI-PROJECT', ''));
         $_SERVER['REMOTE_ADDR'] = (string) ($request->ip() ?: '127.0.0.1');
         $result = (new CatalogApi)->handle('/'.ltrim($request->path(), '/'));
 

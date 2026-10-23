@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Tests\Feature;
 
 use App\Models\User;
-use Carapi\Platform\Session;
+use Geoapi\Platform\Session;
 use Illuminate\Auth\Events\Login;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
@@ -32,16 +32,16 @@ final class LegacySessionBridgeTest extends TestCase
         DB::statement("CREATE TABLE platform.users (id integer primary key, email text, status text not null default 'active', email_verified_at text, auth_version integer not null default 1)");
         DB::table('platform.users')->insert(['id' => 70, 'email' => 'bridge@example.com', 'status' => 'active', 'auth_version' => 1]);
         User::factory()->create(['email' => 'bridge@example.com', 'legacy_platform_user_id' => 70]);
-        $this->dir = sys_get_temp_dir().'/carapi-bridge-'.bin2hex(random_bytes(4));
+        $this->dir = sys_get_temp_dir().'/geoapi-bridge-'.bin2hex(random_bytes(4));
         mkdir($this->dir, 0700, true);
-        $this->setEnv('CARAPI_PLATFORM_SESSION_PATH', $this->dir);
+        $this->setEnv('GEOAPI_PLATFORM_SESSION_PATH', $this->dir);
     }
 
     protected function tearDown(): void
     {
         array_map('unlink', glob($this->dir.'/sess_*') ?: []);
         @rmdir($this->dir);
-        $this->setEnv('CARAPI_PLATFORM_SESSION_PATH', null);
+        $this->setEnv('GEOAPI_PLATFORM_SESSION_PATH', null);
         parent::tearDown();
     }
 
@@ -93,9 +93,9 @@ final class LegacySessionBridgeTest extends TestCase
 
     public function test_a_laravel_sign_in_writes_the_legacy_session_where_the_legacy_pages_read_it(): void
     {
-        // The defaults used to differ (storage/framework/carapi-sessions here, legacy/data/sessions
+        // The defaults used to differ (storage/framework/geoapi-sessions here, legacy/data/sessions
         // in the legacy app), so without the variable the legacy pages never saw the sign-in.
-        $this->setEnv('CARAPI_PLATFORM_SESSION_PATH', null);
+        $this->setEnv('GEOAPI_PLATFORM_SESSION_PATH', null);
         $dir = base_path('legacy/data/sessions');
         $before = glob($dir.'/sess_*') ?: [];
 

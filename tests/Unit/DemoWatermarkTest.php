@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Tests\Unit;
 
-use Carapi\Catalog\DemoWatermark;
+use Geoapi\Catalog\DemoWatermark;
 use PHPUnit\Framework\TestCase;
 
 final class DemoWatermarkTest extends TestCase

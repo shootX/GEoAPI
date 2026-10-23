@@ -21,7 +21,7 @@ Open: authenticated `/api/v1` baseline, server-side p95 from access logs, FPM po
 
 ## 2026-10-22 — Business 240 rpm load test (decision: keep `BILLING_V2_BUSINESS_RPM=false`)
 
-Setup: k6 0.54 on the server (to nginx on 127.0.0.1:443, real TLS + PHP-FPM 8.4 + PostgreSQL), constant arrival rate, secret key of test account 2 with temporarily raised workspace/project limits and `CARAPI_IP_PER_MINUTE` (all reverted). Mix: 15% `/api/v1/brands`, 25% `brands/{slug}/models`, 25% `models/{id}/generations`, 20% `generations/{id}/modifications`, 15% `modifications/{id}`. 4 vCPU, 7.9 GB RAM. Monitor every 5 s: CPU, RAM, php-fpm processes, PostgreSQL connections; neighbour site probed before/after each stage.
+Setup: k6 0.54 on the server (to nginx on 127.0.0.1:443, real TLS + PHP-FPM 8.4 + PostgreSQL), constant arrival rate, secret key of test account 2 with temporarily raised workspace/project limits and `GEOAPI_IP_PER_MINUTE` (all reverted). Mix: 15% `/api/v1/brands`, 25% `brands/{slug}/models`, 25% `models/{id}/generations`, 20% `generations/{id}/modifications`, 15% `modifications/{id}`. 4 vCPU, 7.9 GB RAM. Monitor every 5 s: CPU, RAM, php-fpm processes, PostgreSQL connections; neighbour site probed before/after each stage.
 
 | Stage | Duration | Requests | Errors | p50 | p95 | p99 | CPU avg / max | PG conns max | Neighbour site |
 |---|---|---|---|---|---|---|---|---|---|

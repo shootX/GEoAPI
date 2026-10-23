@@ -18,9 +18,9 @@
 
 declare(strict_types=1);
 
-use Carapi\Cache\FilesystemCache;
-use Carapi\Http\FileRateLimiter;
-use Carapi\Service;
+use Geoapi\Cache\FilesystemCache;
+use Geoapi\Http\FileRateLimiter;
+use Geoapi\Service;
 
 // Built-in server: serve existing static files (cached images exposed manually, etc.).
 if (PHP_SAPI === 'cli-server') {
@@ -36,76 +36,76 @@ if (is_file($composer)) {
     require $composer;
 } else {
     spl_autoload_register(static function (string $class): void {
-        if (str_starts_with($class, 'Carapi\\')) {
+        if (str_starts_with($class, 'Geoapi\\')) {
             $file = __DIR__ . '/src/' . str_replace('\\', '/', substr($class, 7)) . '.php';
             if (is_file($file)) require $file;
         }
     });
 }
 
-function carapi_handle_request(): void
+function geoapi_handle_request(): void
 {
 $uriPath = parse_url($_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH) ?: '/';
 $apiPath = rtrim($uriPath, '/') ?: '/';
 if (str_starts_with(strtolower($apiPath), '/widget/v1/') && !str_ends_with(strtolower($apiPath), '.js')) {
-    \Carapi\Widget\Http::dispatch($apiPath);
+    \Geoapi\Widget\Http::dispatch($apiPath);
     return;
 }
 
 if (str_starts_with(strtolower($apiPath), '/api/v1')) {
-    \Carapi\Catalog\Http::dispatch($apiPath);
+    \Geoapi\Catalog\Http::dispatch($apiPath);
     return;
 }
 
-if (\Carapi\Catalog\VehiclePickerHttp::matches($apiPath)) {
-    \Carapi\Catalog\VehiclePickerHttp::dispatch($apiPath);
+if (\Geoapi\Catalog\VehiclePickerHttp::matches($apiPath)) {
+    \Geoapi\Catalog\VehiclePickerHttp::dispatch($apiPath);
     return;
 }
 
 $path = strtolower(rtrim($uriPath, '/'));
 
-if (\Carapi\Platform\Http::enabled() && \Carapi\Platform\Http::handles($path)) {
-    \Carapi\Platform\Http::dispatch($path);
+if (\Geoapi\Platform\Http::enabled() && \Geoapi\Platform\Http::handles($path)) {
+    \Geoapi\Platform\Http::dispatch($path);
     return;
 }
 
 if ($path === '/guide') {
-    carapi_guide();
+    geoapi_guide();
     return;
 }
 
 if ($path === '/privacy') {
-    carapi_privacy();
+    geoapi_privacy();
     return;
 }
 
 if ($path === '/terms') {
-    carapi_terms();
+    geoapi_terms();
     return;
 }
 
-if (!\Carapi\Platform\Http::enabled() && in_array($path, ['/login', '/register', '/logout', '/account', '/auth/me'], true)) {
-    carapi_closed();
+if (!\Geoapi\Platform\Http::enabled() && in_array($path, ['/login', '/register', '/logout', '/account', '/auth/me'], true)) {
+    geoapi_closed();
     return;
 }
 
 if ($path === '/getimage') {
-    carapi_get_image();
-} elseif (\Carapi\Auth\Router::dispatch($path)) {
+    geoapi_get_image();
+} elseif (\Geoapi\Auth\Router::dispatch($path)) {
     return;
 } elseif ($path === '' || $path === '/docs') {
-    carapi_landing();
+    geoapi_landing();
 } else {
     http_response_code(404);
-    echo \Carapi\SiteChrome::start('გვერდი ვერ მოიძებნა');
-    echo \Carapi\SiteChrome::header();
+    echo \Geoapi\SiteChrome::start('გვერდი ვერ მოიძებნა');
+    echo \Geoapi\SiteChrome::header();
     echo '<main id="content" class="wrap missing"><h1>გვერდი ვერ მოიძებნა</h1><p class="muted">მითითებული მისამართით გვერდი ვერ მოიძებნა.</p><a class="btn btn-l" href="/">მთავარზე დაბრუნება</a></main>';
-    echo \Carapi\SiteChrome::footer();
-    echo \Carapi\SiteChrome::end();
+    echo \Geoapi\SiteChrome::footer();
+    echo \Geoapi\SiteChrome::end();
 }
 }
 
-function carapi_get_image(): void
+function geoapi_get_image(): void
 {
     header('Vary: Accept-Encoding');
     header('X-Robots-Tag: noindex, noimageindex');
@@ -126,7 +126,7 @@ function carapi_get_image(): void
     // imagin.studio compatibility: angle, customer, zoomType, paintDescription, …
     // are accepted but ignored — real photographs come with a fixed viewpoint.
 
-    $limitDir = carapi_env('CARAPI_GETIMAGE_LIMIT_DIR');
+    $limitDir = geoapi_env('GEOAPI_GETIMAGE_LIMIT_DIR');
     if (!is_string($limitDir) || $limitDir === '') {
         $limitDir = dirname(__DIR__) . '/data/getimage-limit';
     }
@@ -165,8 +165,8 @@ function carapi_get_image(): void
     $cache = null;
     try {
         $cache = new FilesystemCache(
-            carapi_env('CARAPI_CACHE_DIR') ?: dirname(__DIR__) . '/cache',
-            carapi_env('CARAPI_CACHE_URL') ?: null
+            geoapi_env('GEOAPI_CACHE_DIR') ?: dirname(__DIR__) . '/cache',
+            geoapi_env('GEOAPI_CACHE_URL') ?: null
         );
         $res = (new Service($cache))->get($make, $model, $year);
     } catch (\Throwable $e) {
@@ -176,11 +176,11 @@ function carapi_get_image(): void
     if ($res) {
         header('X-Image-Source: ' . $res['source']);
         header('X-Image-License: ' . $res['license']);
-        header('X-Image-Attribution: ' . carapi_header_safe($res['attribution']));
+        header('X-Image-Attribution: ' . geoapi_header_safe($res['attribution']));
         if ($json) {
             header('Content-Type: application/json; charset=utf-8');
             header('Cache-Control: public, max-age=86400');
-            $self = carapi_self_base() . '/getImage?' . http_build_query(array_filter([
+            $self = geoapi_self_base() . '/getImage?' . http_build_query(array_filter([
                 'make' => $make, 'model' => $model, 'year' => $year,
             ]));
             echo json_encode([
@@ -207,7 +207,7 @@ function carapi_get_image(): void
         }
         $bytes = $cache?->readImage($res['file']);
         if ($bytes !== null) {
-            $marked = \Carapi\Catalog\DemoWatermark::apply($bytes);
+            $marked = \Geoapi\Catalog\DemoWatermark::apply($bytes);
             if ($marked !== null) {
                 header('Content-Type: ' . $marked['mime']);
                 header('Content-Length: ' . strlen($marked['bytes']));
@@ -253,7 +253,7 @@ SVG;
 }
 
 /** Scheme + host of the current request, for self-referencing JSON URLs. */
-function carapi_self_base(): string
+function geoapi_self_base(): string
 {
     $proto = $_SERVER['HTTP_X_FORWARDED_PROTO']
         ?? ((!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http');
@@ -262,15 +262,15 @@ function carapi_self_base(): string
 }
 
 /** HTTP header values must be a single line; attribution can contain anything. */
-function carapi_header_safe(string $v): string
+function geoapi_header_safe(string $v): string
 {
     return trim(preg_replace('/[\r\n]+/', ' ', $v));
 }
 
 /** @return array{status:string,brands:string,models:string,generations:string,note:string} */
-function carapi_counts_view(): array
+function geoapi_counts_view(): array
 {
-    $counts = \Carapi\Catalog\PublicCounts::read();
+    $counts = \Geoapi\Catalog\PublicCounts::read();
     $fmt = static fn (int $n): string => number_format($n, 0, '.', "\u{00A0}");
     if ($counts['status'] === 'hidden') {
         return ['status' => 'hidden', 'brands' => '—', 'models' => '—', 'generations' => '—', 'note' => ''];
@@ -294,13 +294,13 @@ function carapi_counts_view(): array
     ];
 }
 
-function carapi_demo_key(): string
+function geoapi_demo_key(): string
 {
-    if (!\Carapi\Platform\Http::enabled() || !\Carapi\Catalog\Http::enabled() || !\Carapi\Widget\Http::enabled()) {
+    if (!\Geoapi\Platform\Http::enabled() || !\Geoapi\Catalog\Http::enabled() || !\Geoapi\Widget\Http::enabled()) {
         return '';
     }
     try {
-        $stmt = \Carapi\Platform\Connection::pdo()->query(
+        $stmt = \Geoapi\Platform\Connection::pdo()->query(
             "SELECT public_key FROM platform.widgets WHERE enabled = true AND allowed_origins @> '[\"https://geoapi.ge\"]'::jsonb LIMIT 1"
         );
         $key = $stmt ? $stmt->fetchColumn() : false;
@@ -311,7 +311,7 @@ function carapi_demo_key(): string
     }
 }
 
-function carapi_closed(): void
+function geoapi_closed(): void
 {
     header('Content-Type: text/html; charset=utf-8');
     header('Cache-Control: no-cache');
@@ -320,12 +320,12 @@ function carapi_closed(): void
     echo '</body></html>';
 }
 
-function carapi_terms(): void
+function geoapi_terms(): void
 {
     header('Content-Type: text/html; charset=utf-8');
     header('Cache-Control: no-cache');
-    echo \Carapi\SiteChrome::start('გამოყენების წესები');
-    echo \Carapi\SiteChrome::header();
+    echo \Geoapi\SiteChrome::start('გამოყენების წესები');
+    echo \Geoapi\SiteChrome::header();
     echo '<main id="content" class="wrap legal">';
     echo <<<'HTML'
 <section class="panel">
@@ -348,16 +348,16 @@ function carapi_terms(): void
 </section>
 HTML;
     echo '</main>';
-    echo \Carapi\SiteChrome::footer();
-    echo \Carapi\SiteChrome::end();
+    echo \Geoapi\SiteChrome::footer();
+    echo \Geoapi\SiteChrome::end();
 }
 
-function carapi_privacy(): void
+function geoapi_privacy(): void
 {
     header('Content-Type: text/html; charset=utf-8');
     header('Cache-Control: no-cache');
-    echo \Carapi\SiteChrome::start('კონფიდენციალურობის პოლიტიკა');
-    echo \Carapi\SiteChrome::header();
+    echo \Geoapi\SiteChrome::start('კონფიდენციალურობის პოლიტიკა');
+    echo \Geoapi\SiteChrome::header();
     echo '<main id="content" class="wrap legal">';
     echo <<<'HTML'
 <section class="panel">
@@ -431,11 +431,11 @@ function carapi_privacy(): void
 </section>
 HTML;
     echo '</main>';
-    echo \Carapi\SiteChrome::footer();
-    echo \Carapi\SiteChrome::end();
+    echo \Geoapi\SiteChrome::footer();
+    echo \Geoapi\SiteChrome::end();
 }
 
-function carapi_logo(string $name): string
+function geoapi_logo(string $name): string
 {
     $path = match ($name) {
         'cursor' => 'M11.503.131 1.891 5.678a.84.84 0 0 0-.42.726v11.188c0 .3.162.575.42.724l9.609 5.55a1 1 0 0 0 .998 0l9.61-5.55a.84.84 0 0 0 .42-.724V6.404a.84.84 0 0 0-.42-.726L12.497.131a1.01 1.01 0 0 0-.996 0M2.657 6.338h18.55c.263 0 .43.287.297.515L12.23 22.918c-.062.107-.229.064-.229-.06V12.335a.59.59 0 0 0-.295-.51l-9.11-5.257c-.109-.063-.064-.23.061-.23',
@@ -446,18 +446,18 @@ function carapi_logo(string $name): string
     return '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="' . $path . '"/></svg>';
 }
 
-function carapi_guide(): void
+function geoapi_guide(): void
 {
     header('Content-Type: text/html; charset=utf-8');
     header('Cache-Control: no-cache');
-    $open = \Carapi\Platform\Http::enabled();
+    $open = \Geoapi\Platform\Http::enabled();
     $status = $open ? '' : '<p id="closed" class="err">საჯარო გაშვება ჯერ არ დაწყებულა. ქვემოთ მოცემული აღწერა საჯარო წვდომის გახსნამდე მხოლოდ ცნობისთვისაა.</p>';
-    $base = carapi_self_base();
+    $base = geoapi_self_base();
     $h = static fn (string $value): string => htmlspecialchars($value, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
-    $chev = \Carapi\SiteChrome::icon('chev');
-    $copy = \Carapi\SiteChrome::icon('copy');
-    $info = \Carapi\SiteChrome::icon('info');
-    $search = \Carapi\SiteChrome::icon('search');
+    $chev = \Geoapi\SiteChrome::icon('chev');
+    $copy = \Geoapi\SiteChrome::icon('copy');
+    $info = \Geoapi\SiteChrome::icon('info');
+    $search = \Geoapi\SiteChrome::icon('search');
     $curl = "curl " . $base . "/api/v1/brands \\\n  -H \"Authorization: Bearer <SERVER_API_KEY>\"";
     $php = "\$response = file_get_contents(\n  \"" . $base . "/api/v1/brands\",\n  false,\n  stream_context_create([\n    \"http\" => [\"header\" => \"Authorization: Bearer <SERVER_API_KEY>\"]\n  ])\n);";
     $brandJson = <<<'JSON'
@@ -601,12 +601,12 @@ TXT;
     $cursorFile = "---\ndescription: GeoAPI ვიჯეტი და სერვერული კატალოგი\nalwaysApply: true\n---\n\nეს ფაილი Cursor-ის წესია და ამ პროექტში მოქმედებს.\n\n" . trim($facts);
     $claudeFile = "ეს ფაილი Claude Code კითხულობს პროექტის ინსტრუქციად, როცა CLAUDE.md პროექტის ფესვშია.\n\n" . trim($facts);
     $codexFile = "ეს ფაილი Codex კითხულობს AGENTS.md ინსტრუქციად. Cursor-ის .mdc ფაილს ავტომატურად არ კითხულობს.\n\n" . trim($facts);
-    echo \Carapi\SiteChrome::start(
+    echo \Geoapi\SiteChrome::start(
         'GeoAPI-ის დოკუმენტაცია',
         'გაეცანით GeoAPI-ის ინტეგრაციის ინსტრუქციებს, ავტორიზაციას, API მეთოდებს, ვიჯეტის გამოყენებასა და მონაცემების მიღების მაგალითებს.',
         true
     );
-    echo \Carapi\SiteChrome::header('guide');
+    echo \Geoapi\SiteChrome::header('guide');
     echo '<div class="wrap page" id="content"><div class="mbar"><span>დოკუმენტაცია</span><b>დაწყება ' . $chev . '</b></div><div class="dk">';
     echo '<aside class="side"><div class="srch">' . $search . '<input data-doc-search type="search" placeholder="ძიება" aria-label="ძიება დოკუმენტაციაში"></div>';
     echo '<h5>დაწყება</h5><a class="on" href="#start">საწყისი ინსტრუქცია</a><a href="#auth">ავტორიზაცია და API გასაღებები</a><a href="#limits">მოთხოვნების ლიმიტები და შეცდომები</a>';
@@ -720,9 +720,9 @@ TXT;
     echo '<h2 id="agents" class="doc-sec">GeoAPI-ის ინტეგრაცია AI კოდის ასისტენტებით</h2>';
     echo '<p class="lead">შეგიძლიათ გამოიყენოთ Cursor, Claude Code ან Codex, რათა გაამარტივოთ GeoAPI-ის ინტეგრაცია თქვენს პროექტში. ასისტენტს უნდა ჰქონდეს ინფორმაცია API მეთოდების, ავტორიზაციისა და ვიჯეტის მუშაობის შესახებ.</p>';
     echo '<div class="agent-grid">';
-    echo '<article class="agent" id="cursor"><div class="mark">' . carapi_logo('cursor') . '</div><h3>GeoAPI-ის წესების ფაილის დამატება Cursor-ში</h3><span class="file">.cursor/rules/geoapi.mdc</span><p>შექმენით პროექტში შესაბამისი Cursor Rules ფაილი და დაამატეთ GeoAPI-ის ინტეგრაციის ინსტრუქციები. ფაილს აქვს frontmatter <code>alwaysApply: true</code>-ით, ამიტომ Cursor ამ წესს პროექტში იყენებს.</p></article>';
-    echo '<article class="agent" id="claude"><div class="mark">' . carapi_logo('claude') . '</div><h3>GeoAPI-ის ინსტრუქციების დამატება CLAUDE.md ფაილში</h3><span class="file">CLAUDE.md</span><p>Claude Code პროექტის ფესვში არსებულ <code>CLAUDE.md</code> ფაილს კითხულობს. ეს Cursor-ის <code>.mdc</code> ფაილი არ არის და frontmatter არ სჭირდება.</p></article>';
-    echo '<article class="agent" id="codex"><div class="mark">' . carapi_logo('openai') . '</div><h3>GeoAPI-ის ინსტრუქციების დამატება AGENTS.md ფაილში</h3><span class="file">AGENTS.md</span><p>Codex პროექტის ფესვში არსებულ <code>AGENTS.md</code> ფაილს კითხულობს. ის ავტომატურად არ კითხულობს არც <code>.cursor/rules/geoapi.mdc</code>-ს და არც <code>CLAUDE.md</code>-ს.</p></article>';
+    echo '<article class="agent" id="cursor"><div class="mark">' . geoapi_logo('cursor') . '</div><h3>GeoAPI-ის წესების ფაილის დამატება Cursor-ში</h3><span class="file">.cursor/rules/geoapi.mdc</span><p>შექმენით პროექტში შესაბამისი Cursor Rules ფაილი და დაამატეთ GeoAPI-ის ინტეგრაციის ინსტრუქციები. ფაილს აქვს frontmatter <code>alwaysApply: true</code>-ით, ამიტომ Cursor ამ წესს პროექტში იყენებს.</p></article>';
+    echo '<article class="agent" id="claude"><div class="mark">' . geoapi_logo('claude') . '</div><h3>GeoAPI-ის ინსტრუქციების დამატება CLAUDE.md ფაილში</h3><span class="file">CLAUDE.md</span><p>Claude Code პროექტის ფესვში არსებულ <code>CLAUDE.md</code> ფაილს კითხულობს. ეს Cursor-ის <code>.mdc</code> ფაილი არ არის და frontmatter არ სჭირდება.</p></article>';
+    echo '<article class="agent" id="codex"><div class="mark">' . geoapi_logo('openai') . '</div><h3>GeoAPI-ის ინსტრუქციების დამატება AGENTS.md ფაილში</h3><span class="file">AGENTS.md</span><p>Codex პროექტის ფესვში არსებულ <code>AGENTS.md</code> ფაილს კითხულობს. ის ავტომატურად არ კითხულობს არც <code>.cursor/rules/geoapi.mdc</code>-ს და არც <code>CLAUDE.md</code>-ს.</p></article>';
     echo '</div>';
     echo '<div class="codeb codeb-mt"><div class="tb"><div class="tabs"><button type="button" class="on" data-tab="cursor">Cursor</button><button type="button" data-tab="claude">Claude Code</button><button type="button" data-tab="codex">Codex</button></div><button type="button" class="copy" data-copy-block>' . $copy . 'კოდის კოპირება</button></div>';
     echo '<pre class="json" data-tab-panel="cursor">' . $h($cursorFile) . '</pre>';
@@ -740,21 +740,21 @@ TXT;
     echo '<p>წარმატებული <strong>200</strong> თვიურ კვოტას ხარჯავს და აბრუნებს <code>X-Quota-Limit</code>, <code>X-Quota-Remaining</code> და <code>X-Quota-Reset</code> სათაურებს. 401, 403, 404, 405, 422 და 429 თვიურ კვოტას არ ხარჯავს. 404 და 422 ამ კვოტის სათაურებს არ აბრუნებს.</p>';
     echo '</article><aside class="toc"><h5>ამ გვერდზე</h5><a class="on" href="#start">საწყისი ინსტრუქცია</a><a href="#auth">ავტორიზაცია</a><a href="#brands">ბრენდები</a><a href="#modifications">მოდიფიკაციები</a><a href="#widget">ვიჯეტი</a><a href="#agents">AI ასისტენტები</a><a href="#limits">ლიმიტები</a></aside>';
     echo '</div></div>';
-    echo \Carapi\SiteChrome::footer();
-    echo \Carapi\SiteChrome::end();
+    echo \Geoapi\SiteChrome::footer();
+    echo \Geoapi\SiteChrome::end();
 }
 
 
-function carapi_landing(): void
+function geoapi_landing(): void
 {
-    $counts = carapi_counts_view();
-    $open = \Carapi\Platform\Http::enabled();
+    $counts = geoapi_counts_view();
+    $open = \Geoapi\Platform\Http::enabled();
     $primary = $open
         ? '<a class="btn btn-l" href="/register">უფასო ანგარიშის შექმნა</a>'
         : '<span class="btn btn-g">მალე გაიხსნება</span>';
     $months = [1 => 'იან', 2 => 'თებ', 3 => 'მარ', 4 => 'აპრ', 5 => 'მაი', 6 => 'ივნ', 7 => 'ივლ', 8 => 'აგვ', 9 => 'სექ', 10 => 'ოქტ', 11 => 'ნოე', 12 => 'დეკ'];
     $when = $months[(int) date('n')] . '. ' . date('Y');
-    $base = htmlspecialchars(carapi_self_base(), ENT_QUOTES);
+    $base = htmlspecialchars(geoapi_self_base(), ENT_QUOTES);
     $heroNote = 'ყველა ავტომობილის მოდელისთვის თაობის მონაცემები ხელმისაწვდომი არ არის. მიმდინარე ვერსია არ შეიცავს ავტომობილების ფოტოებს. მოდიფიკაციების სია და დეტალი სერვერულ API-შია.';
     $countsId = '';
     if ($counts['status'] === 'ok') {
@@ -762,15 +762,15 @@ function carapi_landing(): void
             . $counts['generations'] . '</b> თაობა. ' . $heroNote;
         $countsId = ' id="counts"';
     }
-    $chev = \Carapi\SiteChrome::icon('chev');
-    $copy = \Carapi\SiteChrome::icon('copy');
+    $chev = \Geoapi\SiteChrome::icon('chev');
+    $copy = \Geoapi\SiteChrome::icon('copy');
     $install = '&lt;script src="' . $base . '/widget/v1/geoapi-filter.js"&gt;&lt;/script&gt;';
-    echo \Carapi\SiteChrome::start(
+    echo \Geoapi\SiteChrome::start(
         'GeoAPI — ავტომობილების კატალოგი, API და მზა ვიჯეტი',
         'GeoAPI დეველოპერებს სთავაზობს ავტომობილების ბრენდების, მოდელებისა და თაობების მონაცემებს REST API-ის საშუალებით და ავტომობილის არჩევის მზა ვიჯეტს ვებსაიტებისთვის.',
         true
     );
-    echo \Carapi\SiteChrome::header();
+    echo \Geoapi\SiteChrome::header();
     echo <<<HTML
 <main id="content">
 <section class="hero">
@@ -812,6 +812,6 @@ function carapi_landing(): void
 </section>
 </main>
 HTML;
-    echo \Carapi\SiteChrome::footer();
-    echo \Carapi\SiteChrome::end();
+    echo \Geoapi\SiteChrome::footer();
+    echo \Geoapi\SiteChrome::end();
 }

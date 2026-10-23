@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Carapi\Platform;
+namespace Geoapi\Platform;
 
-use Carapi\SiteChrome;
+use Geoapi\SiteChrome;
 
 final class View
 {
@@ -235,7 +235,7 @@ final class View
             . '<button class="btn btn-g" id="playground-copy-json" type="button">JSON-ის კოპირება</button>'
             . '</div></div>'
             . '<script type="application/json" id="playground-ops">' . $ops . '</script>'
-            . '<script' . \Carapi\Csp::attr() . '>' . <<<'JS'
+            . '<script' . \Geoapi\Csp::attr() . '>' . <<<'JS'
 
 (function () {
   var ops = JSON.parse(document.getElementById("playground-ops").textContent);
@@ -392,7 +392,7 @@ JS;
             . '<input type="hidden" name="_csrf" value="' . self::e(Session::csrf()) . '">'
             . $fields . '</form></div><div class="pn pg-out">'
             . '<div id="explorer-detail" hidden><h2 id="explorer-detail-title">მოდიფიკაცია</h2><dl id="explorer-detail-list" aria-labelledby="explorer-detail-title" aria-live="polite" aria-atomic="true"></dl></div><p class="pg-ph">აირჩიეთ ბრენდი, მოდელი, თაობა და მოდიფიკაცია — აქ გამოჩნდება მახასიათებლები.</p></div></div>'
-            . '<script' . \Carapi\Csp::attr() . '>' . <<<'JS'
+            . '<script' . \Geoapi\Csp::attr() . '>' . <<<'JS'
 
 (function () {
   var state = {brand: "", model: "", generation: "", modification: "", page: 0, total: 0, loading: false, modelPage: 0, modelTotal: 0, modelLoading: false, requestId: 0, abort: null, generationPage: 0, generationTotal: 0, generationLoading: false, generationRequestId: 0, generationAbort: null, modificationPage: 0, modificationTotal: 0, modificationLoading: false, modificationRequestId: 0, modificationAbort: null, detailRequestId: 0, detailAbort: null};
@@ -1034,7 +1034,7 @@ JS;
 
     public static function adminShellEnd(): string
     {
-        return '</main></div></div><script' . \Carapi\Csp::attr() . '>(function(){var b=document.querySelector(".admin-menu"),n=document.getElementById("admin-nav");if(!b||!n)return;var set=function(open){n.classList.toggle("is-open",open);b.setAttribute("aria-expanded",open?"true":"false");};b.addEventListener("click",function(){set(!n.classList.contains("is-open"));});document.addEventListener("keydown",function(e){if(e.key==="Escape")set(false);});})();</script></body></html>';
+        return '</main></div></div><script' . \Geoapi\Csp::attr() . '>(function(){var b=document.querySelector(".admin-menu"),n=document.getElementById("admin-nav");if(!b||!n)return;var set=function(open){n.classList.toggle("is-open",open);b.setAttribute("aria-expanded",open?"true":"false");};b.addEventListener("click",function(){set(!n.classList.contains("is-open"));});document.addEventListener("keydown",function(e){if(e.key==="Escape")set(false);});})();</script></body></html>';
     }
 
     private static function adminNav(string $section): string
@@ -1831,7 +1831,7 @@ JS;
 
     private static function countStrip(): string
     {
-        $counts = \Carapi\Catalog\PublicCounts::read();
+        $counts = \Geoapi\Catalog\PublicCounts::read();
         if (($counts['status'] ?? '') !== 'ok') {
             return '';
         }

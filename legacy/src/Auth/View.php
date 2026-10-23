@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Carapi\Auth;
+namespace Geoapi\Auth;
 
 final class View
 {
@@ -340,7 +340,7 @@ final class View
         echo '</head><body>';
         echo self::header($user);
         echo '<div class="wrap' . ($wide ? ' wide' : '') . '">' . $body . '</div>';
-        echo \Carapi\SiteFooter::html();
+        echo \Geoapi\SiteFooter::html();
         echo '</body></html>';
     }
 
@@ -423,7 +423,7 @@ final class View
 
     private static function css(): string
     {
-        return '<style' . \Carapi\Csp::attr() . '>' . <<<'CSS'
+        return '<style' . \Geoapi\Csp::attr() . '>' . <<<'CSS'
 
   :root{--bg:#f9fafa;--ink:#141719;--muted:#5c6163;--navy:#193f68;--navy-h:#4f81b7;--line:#e1e4e5;--card:#fff}
   *{box-sizing:border-box}

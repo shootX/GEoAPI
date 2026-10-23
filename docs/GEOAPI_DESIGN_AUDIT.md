@@ -33,8 +33,8 @@ GeoAPI არის PHP 8.2+ ფრონტ-კონტროლერი Lara
 
 | ფუნქცია | სტატუსი | ფაილი |
 |---|---|---|
-| საჯარო ლენდინგი და დემო არჩევანი | მუშაობს | `public/index.php` (`carapi_landing`), `public/assets/site.js` |
-| HTML დოკუმენტაცია `/guide` | მუშაობს | `public/index.php` (`carapi_guide`) |
+| საჯარო ლენდინგი და დემო არჩევანი | მუშაობს | `public/index.php` (`geoapi_landing`), `public/assets/site.js` |
+| HTML დოკუმენტაცია `/guide` | მუშაობს | `public/index.php` (`geoapi_guide`) |
 | კონფიდენციალურობა და წესები | მუშაობს | `public/index.php` |
 | რეგისტრაცია, შესვლა, გამოსვლა | მუშაობს | `src/Platform/Http.php` |
 | ელფოსტის დადასტურება და პაროლის აღდგენა | მუშაობს | `src/Platform/Http.php`, `src/Platform/Tokens.php`, `src/Platform/Mail.php` |
@@ -42,7 +42,7 @@ GeoAPI არის PHP 8.2+ ფრონტ-კონტროლერი Lara
 | API Playground | მუშაობს | `src/Platform/Playground.php`, `src/Platform/View.php` |
 | Vehicle Explorer | მუშაობს | `src/Platform/View.php` (`explorer`) |
 | კატალოგის REST `/api/v1` | მუშაობს | `src/Catalog/Http.php` |
-| მოდიფიკაციების ორი მარშრუტი | ნაწილობრივ მუშაობს | ირთვება `CARAPI_MODIFICATIONS_ENABLED` და `CARAPI_MODIFICATION_DETAILS_ENABLED`. production-ის მნიშვნელობა: უცნობია |
+| მოდიფიკაციების ორი მარშრუტი | ნაწილობრივ მუშაობს | ირთვება `GEOAPI_MODIFICATIONS_ENABLED` და `GEOAPI_MODIFICATION_DETAILS_ENABLED`. production-ის მნიშვნელობა: უცნობია |
 | ვიჯეტი და ლენდინგის დემო API | მუშაობს | `src/Widget/Http.php`, `src/Widget/Demo.php` |
 | ადმინის მიმოხილვა | მუშაობს | `src/Platform/AdminOverview.php` |
 | ადმინის დანარჩენი მენიუ | დაგეგმილია | `src/Platform/View.php` (`adminNav`, ტექსტი „მალე“) |
@@ -53,14 +53,14 @@ GeoAPI არის PHP 8.2+ ფრონტ-კონტროლერი Lara
 
 რიგი `public/index.php`-ში:
 
-1. `/widget/v1/…` (გარდა `.js` ფაილისა) → `Carapi\Widget\Http`
-2. `/api/v1…` → `Carapi\Catalog\Http`
+1. `/widget/v1/…` (გარდა `.js` ფაილისა) → `Geoapi\Widget\Http`
+2. `/api/v1…` → `Geoapi\Catalog\Http`
 3. `/docs/{ფაილი}` → მხოლოდ ოთხი ნებადართული Markdown, `text/plain`
-4. თუ `CARAPI_PLATFORM_ENABLED` ჩართულია და გზა პლატფორმის სიაშია → `Carapi\Platform\Http`
+4. თუ `GEOAPI_PLATFORM_ENABLED` ჩართულია და გზა პლატფორმის სიაშია → `Geoapi\Platform\Http`
 5. `/guide`, `/privacy`, `/terms`
-6. თუ პლატფორმა გამორთულია: `/login`, `/register`, `/logout`, `/account`, `/auth/me` → `carapi_closed()`
+6. თუ პლატფორმა გამორთულია: `/login`, `/register`, `/logout`, `/account`, `/auth/me` → `geoapi_closed()`
 7. `/getImage`
-8. `Carapi\Auth\Router` — ამ ეტაპზე პრაქტიკულად მკვდარია, რადგან იგივე გზები უკვე ან პლატფორმამ აიღო, ან დაიხურა
+8. `Geoapi\Auth\Router` — ამ ეტაპზე პრაქტიკულად მკვდარია, რადგან იგივე გზები უკვე ან პლატფორმამ აიღო, ან დაიხურა
 9. `/` და `/docs` → ლენდინგი
 10. სხვა HTML გზა → 404
 
@@ -109,7 +109,7 @@ GeoAPI არის PHP 8.2+ ფრონტ-კონტროლერი Lara
 
 ### დოკუმენტაციის ქვესექციები
 
-`/guide` ერთი გვერდია. გვერდითი მენიუ ღუზებია, ცალკე მარშრუტი არა. წყარო: `carapi_guide()`:
+`/guide` ერთი გვერდია. გვერდითი მენიუ ღუზებია, ცალკე მარშრუტი არა. წყარო: `geoapi_guide()`:
 
 - `#start` საწყისი ინსტრუქცია
 - `#auth` ავტორიზაცია და გასაღებები
@@ -122,7 +122,7 @@ GeoAPI არის PHP 8.2+ ფრონტ-კონტროლერი Lara
 
 მობილურზე გვერდითი მენიუ იმალება და ჩნდება ზოლი „დაწყება“. ძიება `data-doc-search` ფილტრავს გვერდითი ბმულების ტექსტს. წყარო: `public/assets/site.js`, `public/assets/site.css` (≤760px).
 
-ნედლი Markdown, მხოლოდ ეს ოთხი ფაილი (`carapi_resolve_doc`):
+ნედლი Markdown, მხოლოდ ეს ოთხი ფაილი (`geoapi_resolve_doc`):
 
 - `/docs/catalog_api.md`
 - `/docs/projects_api_keys.md`
@@ -135,11 +135,11 @@ GeoAPI არის PHP 8.2+ ფრონტ-კონტროლერი Lara
 
 ### 3.1 ლენდინგი `/` და `/docs`
 
-სტატუსი: მუშაობს. ფაილი: `public/index.php` (`carapi_landing`), `public/assets/site.js`, `public/assets/site.css`.
+სტატუსი: მუშაობს. ფაილი: `public/index.php` (`geoapi_landing`), `public/assets/site.js`, `public/assets/site.css`.
 
 სექციები:
 
-- თარიღის ზოლი: `carapi`, `API v1`, მიმდინარე თვე ქართულად
+- თარიღის ზოლი: `geoapi`, `API v1`, მიმდინარე თვე ქართულად
 - H1 და მოკლე აღწერა
 - ძირითადი მოწოდება: „უფასო ანგარიშის შექმნა“ → `/register`, ან „მალე გაიხსნება“ თუ პლატფორმა გამორთულია
 - მეორე ღილაკი: „დოკუმენტაციის ნახვა“ → `/guide`
@@ -181,7 +181,7 @@ H1 „გვერდი ვერ მოიძებნა“, ტექსტ�
 
 ### 3.5 დახურული რეგისტრაცია
 
-სტატუსი: მუშაობს მხოლოდ მაშინ, თუ `CARAPI_PLATFORM_ENABLED` გამორთულია. ფაილი: `carapi_closed()`.
+სტატუსი: მუშაობს მხოლოდ მაშინ, თუ `GEOAPI_PLATFORM_ENABLED` გამორთულია. ფაილი: `geoapi_closed()`.
 
 შიშველი HTML, საიტის CSS-ის გარეშე: „საჯარო გაშვება ჯერ არ დაწყებულა“, ბმულები მთავარზე და დოკუმენტაციაზე.
 
@@ -382,7 +382,7 @@ POST `/admin` არაფერს ცვლის: 405 და `Allow: GET`. �
 
 პაროლი: Argon2id, 15–128 სიმბოლო. წყარო: `src/Platform/Passwords.php`.
 
-შესვლის მცდელობა, ნაგულისხმევი თუ გარემო არ გადაფარავს: 8 ერთ ელფოსტაზე და 30 ერთ IP-ზე, ფანჯარა 900 წამი. ცვლადები: `CARAPI_PLATFORM_ATTEMPT_LIMIT`, `CARAPI_PLATFORM_ATTEMPT_WINDOW`, `CARAPI_PLATFORM_IP_ATTEMPT_LIMIT`. წყარო: `UserRepository::tooManyAttempts`.
+შესვლის მცდელობა, ნაგულისხმევი თუ გარემო არ გადაფარავს: 8 ერთ ელფოსტაზე და 30 ერთ IP-ზე, ფანჯარა 900 წამი. ცვლადები: `GEOAPI_PLATFORM_ATTEMPT_LIMIT`, `GEOAPI_PLATFORM_ATTEMPT_WINDOW`, `GEOAPI_PLATFORM_IP_ATTEMPT_LIMIT`. წყარო: `UserRepository::tooManyAttempts`.
 
 ელფოსტა უნდა იყოს დადასტურებული საიდუმლო გასაღების შესაქმნელად, ვიჯეტის ჩასართავად და კატალოგის გამოსაყენებლად. პროექტის შექმნა დადასტურებამდეც შეიძლება.
 
@@ -391,7 +391,7 @@ POST `/admin` არაფერს ცვლის: 405 და `Allow: GET`. �
 ძველი `src/Auth/*` (SQLite, ფიზიკური/იურიდიული პირი, ტელეფონი, ფოტოს ძებნა) `public/index.php`-ის მიმდინარე რიგით არ სრულდება:
 
 - პლატფორმა ჩართულია → გზას იღებს `Platform\Http`
-- პლატფორმა გამორთულია → იგივე ხუთი გზა მიდის `carapi_closed()`-ში `Auth\Router`-მდე
+- პლატფორმა გამორთულია → იგივე ხუთი გზა მიდის `geoapi_closed()`-ში `Auth\Router`-მდე
 
 სტატუსი: placeholder კოდში. ახალი დიზაინის ეკრანად არ ითვლება.
 
@@ -447,8 +447,8 @@ POST `/admin` არაფერს ცვლის: 405 და `Allow: GET`. �
 | `GET /api/v1/brands` | მუშაობს | `id`, `slug`, `name`, `synonyms`, `is_lcv_or_commercial`, `logo_url_light`, `logo_url_dark` |
 | `GET /api/v1/brands/{slug}/models` | მუშაობს | `id`, `brand_id`, `slug`, `name`, `markets`, `generations_count` |
 | `GET /api/v1/models/{id}/generations` | მუშაობს | `id`, `model_id`, `slug`, `name`, `year_start`, `year_end`, `period_text`, `body_type`, `chassis_code`, `steering_wheel`, `market` (ყოველთვის null), `display_label` |
-| `GET /api/v1/generations/{id}/modifications` | ნაწილობრივ მუშაობს | `id`, `generation_id`, `name`, `engine_volume_cc`, `transmission`, `year_start`, `year_end`. დროშა `CARAPI_MODIFICATIONS_ENABLED` |
-| `GET /api/v1/modifications/{id}` | ნაწილობრივ მუშაობს | ზემოთ ჩამოთვლილი პლუს `drive_type`, `body_type`, `brand`, `model`, `generation`. დროშა `CARAPI_MODIFICATION_DETAILS_ENABLED` |
+| `GET /api/v1/generations/{id}/modifications` | ნაწილობრივ მუშაობს | `id`, `generation_id`, `name`, `engine_volume_cc`, `transmission`, `year_start`, `year_end`. დროშა `GEOAPI_MODIFICATIONS_ENABLED` |
+| `GET /api/v1/modifications/{id}` | ნაწილობრივ მუშაობს | ზემოთ ჩამოთვლილი პლუს `drive_type`, `body_type`, `brand`, `model`, `generation`. დროშა `GEOAPI_MODIFICATION_DETAILS_ENABLED` |
 | `GET /api/v1/coverage` | მუშაობს | რვა რიცხვი და `measured_at`, `data` კონვერტის გარეშე |
 
 სიის კონვერტი: `{ data, meta:{ page, per_page, total } }`. `page` 1…1000000, `per_page` 1…100, ნაგულისხმევი 50. კურსორი არ არის.
@@ -487,7 +487,7 @@ Origin უნდა ემთხვეოდეს შენახულ სი�
 
 ### 8.4 `/getImage`
 
-სტატუსი: ნაწილობრივ მუშაობს. პარამეტრები: `make`, `model` ან `modelFamily`, `year` ან `modelYear`, `format=json`. სხვა imagin-ის პარამეტრები მიიღება და იგნორირდება. ავტორიზაცია არ სჭირდება. CORS `*`. IP ლიმიტი ფაილური, 30. წყარო: `carapi_get_image`, `src/Http/FileRateLimiter.php`.
+სტატუსი: ნაწილობრივ მუშაობს. პარამეტრები: `make`, `model` ან `modelFamily`, `year` ან `modelYear`, `format=json`. სხვა imagin-ის პარამეტრები მიიღება და იგნორირდება. ავტორიზაცია არ სჭირდება. CORS `*`. IP ლიმიტი ფაილური, 30. წყარო: `geoapi_get_image`, `src/Http/FileRateLimiter.php`.
 
 ეს კატალოგის ლიმიტში არ შედის და კატალოგის `photos` ცხრილს არ კითხულობს.
 
@@ -518,7 +518,7 @@ Origin უნდა ემთხვეოდეს შენახულ სი�
 8. ადმინი შედის და ხვდება `/admin`. იქიდან შეუძლია `/account`. სხვა ადმინის გვერდი არ იხსნება.
 9. პაროლის აღდგენა: ფოსტა → `/reset-password` → შეტყობინება → შესვლა. ძველი სესია `auth_version`-ით წყდება.
 
-ლიმიტის დეტალი, რომელიც UI-ში უნდა დარჩეს: პროექტი 60 წარმატებული ან წარუმატებელი მოთხოვნა UTC წუთში, 10 000 წარმატებული UTC თვეში, IP 300 კატალოგის მოთხოვნა წუთში (`CARAPI_IP_PER_MINUTE`). ვიჯეტი და სერვერული API ერთ მრიცხველს იყენებს. 401, 403, 404, 405, 422, 429, 503 და კაბინეტის გვერდი თვიურ კვოტას არ ხარჯავს. წარუმატებელი მოთხოვნა წუთის ლიმიტში რჩება. წყარო: `docs/USAGE_AND_LIMITS.md`.
+ლიმიტის დეტალი, რომელიც UI-ში უნდა დარჩეს: პროექტი 60 წარმატებული ან წარუმატებელი მოთხოვნა UTC წუთში, 10 000 წარმატებული UTC თვეში, IP 300 კატალოგის მოთხოვნა წუთში (`GEOAPI_IP_PER_MINUTE`). ვიჯეტი და სერვერული API ერთ მრიცხველს იყენებს. 401, 403, 404, 405, 422, 429, 503 და კაბინეტის გვერდი თვიურ კვოტას არ ხარჯავს. წარუმატებელი მოთხოვნა წუთის ლიმიტში რჩება. წყარო: `docs/USAGE_AND_LIMITS.md`.
 
 ## 9. საჭირო ეკრანები: desktop, tablet, mobile
 
@@ -529,7 +529,7 @@ Origin უნდა ემთხვეოდეს შენახულ სი�
 
 დიზაინისთვის სამი სიგანე საკმარისია: desktop (>1100px საიტზე, >1279px ადმინში), tablet (761–1100 და ადმინში 901–1279), mobile (≤760 საიტზე, ≤900 კაბინეტსა და ადმინში).
 
-უნიკალური ეკრანი 20-ია. აქედან 18-ს სჭირდება სამივე სიგანე. ორი შიშველი HTML (`carapi_closed`, preview) საკუთარ ბრეიქფოინტს არ იყენებს.
+უნიკალური ეკრანი 20-ია. აქედან 18-ს სჭირდება სამივე სიგანე. ორი შიშველი HTML (`geoapi_closed`, preview) საკუთარ ბრეიქფოინტს არ იყენებს.
 
 | # | ეკრანი | desktop | tablet | mobile | სტატუსი |
 |---|---|---|---|---|---|
@@ -575,8 +575,8 @@ Origin უნდა ემთხვეოდეს შენახულ სი�
 
 | თემა | სტატუსი | რატომ |
 |---|---|---|
-| `CARAPI_CATALOG_ENABLED`, `CARAPI_PLATFORM_ENABLED`, `CARAPI_WIDGET_ENABLED` production-ში | უცნობია | გარემო ამ სესიაში არ წაკითხულა |
-| `CARAPI_MODIFICATIONS_ENABLED`, `CARAPI_MODIFICATION_DETAILS_ENABLED` | უცნობია | კოდი მზადაა, ცოცხალი დროშა არ შემოწმებულა |
+| `GEOAPI_CATALOG_ENABLED`, `GEOAPI_PLATFORM_ENABLED`, `GEOAPI_WIDGET_ENABLED` production-ში | უცნობია | გარემო ამ სესიაში არ წაკითხულა |
+| `GEOAPI_MODIFICATIONS_ENABLED`, `GEOAPI_MODIFICATION_DETAILS_ENABLED` | უცნობია | კოდი მზადაა, ცოცხალი დროშა არ შემოწმებულა |
 | კატალოგის ცოცხალი რაოდენობა და ლოგოების შევსება | უცნობია | `cache/public-counts.json` და ბაზა არ გადამოწმებულა |
 | `/getImage` გარე წყარო | უცნობია | მოთხოვნა არ გაგზავნილა |
 | ფოსტის რეალური მიწოდება | უცნობია | SMTP ამ სესიაში არ შემოწმებულა. კოდის გზა მუშაობს |
@@ -597,10 +597,10 @@ Origin უნდა ემთხვეოდეს შენახულ სი�
 - [ ] 3. ჰედერი სტუმარი / შესული / დახურული. `src/SiteChrome.php`
 - [ ] 4. ფუტერი. `src/SiteChrome.php`
 - [ ] 5. 404. `public/index.php`
-- [ ] 6. `/guide` სამ სიგანეზე, ძიება, მიმდინარე ღუზა. `carapi_guide`
-- [ ] 7. `/privacy`. `carapi_privacy`
-- [ ] 8. `/terms`. `carapi_terms`
-- [ ] 9. დახურული რეგისტრაცია, თუ დროშა გამორთულია. `carapi_closed`
+- [ ] 6. `/guide` სამ სიგანეზე, ძიება, მიმდინარე ღუზა. `geoapi_guide`
+- [ ] 7. `/privacy`. `geoapi_privacy`
+- [ ] 8. `/terms`. `geoapi_terms`
+- [ ] 9. დახურული რეგისტრაცია, თუ დროშა გამორთულია. `geoapi_closed`
 - [ ] 10. შესვლა და შეცდომები. `src/Platform/View.php`
 - [ ] 11. რეგისტრაცია და შეცდომები. `src/Platform/View.php`
 - [ ] 12. პაროლის აღდგენა, გაგზავნილი მდგომარეობა. `View::forgot`

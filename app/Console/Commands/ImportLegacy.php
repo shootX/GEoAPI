@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\DB;
 
 final class ImportLegacy extends Command
 {
-    protected $signature = 'carapi:import-legacy';
+    protected $signature = 'geoapi:import-legacy';
 
     protected $description = 'Import platform users into Electrik and grant existing cars access';
 

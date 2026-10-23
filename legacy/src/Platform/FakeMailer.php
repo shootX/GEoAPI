@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Carapi\Platform;
+namespace Geoapi\Platform;
 
 final class FakeMailer implements Mailer
 {
@@ -17,7 +17,7 @@ final class FakeMailer implements Mailer
             throw new UnavailableException();
         }
         self::$messages[] = ['to' => $to, 'subject' => $subject, 'text' => $text];
-        $path = carapi_env('CARAPI_MAIL_FAKE_PATH');
+        $path = geoapi_env('GEOAPI_MAIL_FAKE_PATH');
         if (is_string($path) && $path !== '') {
             file_put_contents($path, json_encode(['to' => $to, 'subject' => $subject, 'text' => $text], JSON_UNESCAPED_UNICODE) . "\n", FILE_APPEND);
         }

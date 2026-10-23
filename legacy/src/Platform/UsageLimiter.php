@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Carapi\Platform;
+namespace Geoapi\Platform;
 
 use App\Billing\V2\Meter;
 
@@ -39,14 +39,14 @@ final class UsageLimiter
 
     private static function memoryFlag(): bool
     {
-        $flag = carapi_env('CARAPI_USAGE_MEMORY');
+        $flag = geoapi_env('GEOAPI_USAGE_MEMORY');
 
         return is_string($flag) && in_array(strtolower(trim($flag)), ['1', 'true', 'on', 'yes'], true);
     }
 
     private static function sqlitePath(): ?string
     {
-        $path = carapi_env('CARAPI_USAGE_SQLITE');
+        $path = geoapi_env('GEOAPI_USAGE_SQLITE');
         if (! is_string($path)) {
             return null;
         }
@@ -60,7 +60,7 @@ final class UsageLimiter
 
     public static function now(): int
     {
-        $raw = carapi_env('CARAPI_USAGE_NOW');
+        $raw = geoapi_env('GEOAPI_USAGE_NOW');
 
         return is_string($raw) && preg_match('/^[0-9]+$/', $raw) ? (int) $raw : time();
     }
@@ -74,7 +74,7 @@ final class UsageLimiter
 
     public static function ipLimit(): int
     {
-        $raw = carapi_env('CARAPI_IP_PER_MINUTE');
+        $raw = geoapi_env('GEOAPI_IP_PER_MINUTE');
 
         return is_string($raw) && preg_match('/^[0-9]+$/', $raw) ? (int) $raw : 300;
     }

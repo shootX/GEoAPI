@@ -1,6 +1,6 @@
 <?php
 
-namespace Carapi;
+namespace GeoAPI;
 
 /**
  * Resolve a car make/model[/year] to a REAL photograph from Wikimedia Commons
@@ -8,7 +8,7 @@ namespace Carapi;
  * studio 3D renders (imagin.studio etc.).
  *
  * Dependency-light on purpose (plain HTTP via file_get_contents, no SDK/DB).
- * The caching/serving layer lives in Carapi\Service + Carapi\Cache\*.
+ * The caching/serving layer lives in Geoapi\Service + Geoapi\Cache\*.
  *
  * Flow: Wikidata wbsearchentities("make model") -> keep the first candidate that is a
  * manufactured vehicle (has manufacturer P176) with an image (P18) -> Commons imageinfo
@@ -23,8 +23,8 @@ final class WikimediaResolver
 {
     /**
      * Wikimedia API etiquette requires a descriptive User-Agent with contact info.
-     * Override via the CARAPI_USER_AGENT env var with YOUR project URL + email, e.g.
-     *   CARAPI_USER_AGENT="MyCarImages/1.0 (https://example.com; ops@example.com)"
+     * Override via the GEOAPI_USER_AGENT env var with YOUR project URL + email, e.g.
+     *   GEOAPI_USER_AGENT="MyCarImages/1.0 (https://example.com; ops@example.com)"
      * See https://meta.wikimedia.org/wiki/User-Agent_policy
      */
     private const DEFAULT_UA = 'GeoAPI/1.0 (https://geoapi.ge)';
@@ -33,10 +33,10 @@ final class WikimediaResolver
     private const COMMONS = 'https://commons.wikimedia.org/w/api.php';
     private const TIMEOUT = 12;
 
-    /** The User-Agent sent to Wikimedia APIs (CARAPI_USER_AGENT env or a default). */
+    /** The User-Agent sent to Wikimedia APIs (GEOAPI_USER_AGENT env or a default). */
     public static function userAgent(): string
     {
-        $ua = carapi_env('CARAPI_USER_AGENT');
+        $ua = geoapi_env('GEOAPI_USER_AGENT');
         return is_string($ua) && trim($ua) !== '' ? trim($ua) : self::DEFAULT_UA;
     }
 

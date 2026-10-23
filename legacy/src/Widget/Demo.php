@@ -2,14 +2,14 @@
 
 declare(strict_types=1);
 
-namespace Carapi\Widget;
+namespace Geoapi\Widget;
 
-use Carapi\Catalog\CatalogRepository;
-use Carapi\Catalog\Connection as CatalogConnection;
-use Carapi\Catalog\Http as CatalogHttp;
-use Carapi\Catalog\PickerSelection;
-use Carapi\Catalog\UnavailableException;
-use Carapi\Platform\Origins;
+use Geoapi\Catalog\CatalogRepository;
+use Geoapi\Catalog\Connection as CatalogConnection;
+use Geoapi\Catalog\Http as CatalogHttp;
+use Geoapi\Catalog\PickerSelection;
+use Geoapi\Catalog\UnavailableException;
+use Geoapi\Platform\Origins;
 use PDOException;
 
 final class Demo

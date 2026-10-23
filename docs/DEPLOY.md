@@ -31,9 +31,9 @@ php artisan up
 # runner: curl -fsS https://geoapi.ge/up must be HTTP 200
 ```
 
-`php artisan migrate --force` uses the credentials already in `.env` and the SSH user's environment. Catalog migrations need `CARAPI_CATALOG_ADMIN_*` in that environment (the table owner, not `carapi_catalog_reader`). Variables that exist only in the PHP-FPM pool are not visible to this SSH session. Do not copy them into `.env` from the workflow.
+`php artisan migrate --force` uses the credentials already in `.env` and the SSH user's environment. Catalog migrations need `GEOAPI_CATALOG_ADMIN_*` in that environment (the table owner, not `geoapi_catalog_reader`). Variables that exist only in the PHP-FPM pool are not visible to this SSH session. Do not copy them into `.env` from the workflow.
 
-PHP-FPM for this site runs as `carapi`. The checkout is owned by `www`. The pool, socket and secret files are documented in the internal operations notes, not in this repository.
+PHP-FPM for this site runs as `geoapi`. The checkout is owned by `www`. The pool, socket and secret files are documented in the internal operations notes, not in this repository.
 
 ## One-time server setup
 
@@ -136,21 +136,21 @@ sudo -u www git --version
 
 `php -v` must report PHP 8.4.
 
-Make `www` the owner of the checkout. Leave `.env` in place and mode `640`. Keep `storage/`, `bootstrap/cache/`, `data/`, and `cache/` writable by `carapi` (the FPM user). A group-writable tree plus `umask 002` in the workflow is what makes new cache files usable by both users.
+Make `www` the owner of the checkout. Leave `.env` in place and mode `640`. Keep `storage/`, `bootstrap/cache/`, `data/`, and `cache/` writable by `geoapi` (the FPM user). A group-writable tree plus `umask 002` in the workflow is what makes new cache files usable by both users.
 
 ```sh
 DEPLOY_PATH=/www/wwwroot/geoapi.ge
 cd "$DEPLOY_PATH"
 chown -R www:www .
 chmod 640 .env
-usermod -aG www carapi
+usermod -aG www geoapi
 for dir in storage bootstrap/cache data cache; do
   [ -d "$dir" ] || continue
   chgrp -R www "$dir"
   find "$dir" -type d -exec chmod 2775 {} \;
   find "$dir" -type f -exec chmod 664 {} \;
 done
-systemctl restart carapi-php-fpm.service carapi-fpm-proxy.service
+systemctl restart geoapi-php-fpm.service geoapi-fpm-proxy.service
 ```
 
 The workflow sets `umask 002` before the artisan commands so files it creates stay group-writable.
@@ -179,7 +179,7 @@ ssh -i /path/to/github-actions -p 22 www@DEPLOY_HOST 'cd /www/wwwroot/geoapi.ge 
 
 Merge to `main`. The Actions tab runs **PHPUnit**, then **Deploy**. A red test run does not SSH. A failed deploy turns maintenance mode off.
 
-There is no new PHP-FPM variable. After a deploy that includes catalog migrations, `CARAPI_CATALOG_ADMIN_USER` must already be visible to `php artisan migrate --force` under the `www` SSH session.
+There is no new PHP-FPM variable. After a deploy that includes catalog migrations, `GEOAPI_CATALOG_ADMIN_USER` must already be visible to `php artisan migrate --force` under the `www` SSH session.
 
 ## Queue worker and scheduler (server, one-time)
 
