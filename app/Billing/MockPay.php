@@ -30,8 +30,8 @@ final class MockPay
     }
 
     /**
-     * In production a mock "payment" would hand out paid plans for free, so only admins and
-     * operators may use it there (QA GEO-QA-005). Other environments keep it open for testing.
+     * Outside local and test runs a mock "payment" would hand out paid plans for free, so only admins
+     * and operators may use it there (QA GEO-QA-005). A mistyped APP_ENV must not open it to everyone.
      */
     public static function allowedFor(?User $user): bool
     {
@@ -39,7 +39,7 @@ final class MockPay
             return false;
         }
 
-        return ! app()->environment('production') || AdminAccess::allows($user);
+        return app()->environment(['local', 'testing']) || AdminAccess::allows($user);
     }
 
     /** Mock orders carry bog_order_id "mock:<public_id>" (no schema change; a real BOG callback can never match it). */

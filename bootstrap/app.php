@@ -23,6 +23,9 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware): void {
 
+        // Only APP_URL's host (and its subdomains) may reach the app: absolute URLs, signed links and
+        // emails are built from the Host header. Laravel skips this check in local and test runs.
+        $middleware->trustHosts();
         $middleware->append(RequestId::class);
         $middleware->encryptCookies(except: [
             'geoapi_platform',

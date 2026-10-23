@@ -143,7 +143,12 @@ final class Billing extends Component
         [$user, $projectId] = $this->ownedProject();
         try {
             $publicId = Checkout::open((int) $user->id, (int) $user->legacy_platform_user_id, $projectId, $plan, $interval, $this->buyer($user));
-        } catch (InvalidArgumentException) {
+        } catch (InvalidArgumentException $e) {
+            if ($e->getMessage() === 'term') {
+                $this->addError('checkout', 'term');
+
+                return null;
+            }
             abort(404);
         }
         if ($mock) {
@@ -174,7 +179,10 @@ final class Billing extends Component
     public function render()
     {
         $currentPlan = null;
-        if ($this->projectId !== null) {
+        $projects = $this->projects();
+        $ownedIds = array_map(static fn ($p): int => (int) $p['id'], $projects);
+        // projectId is a client-writable Livewire property: read plans only for the caller's own projects.
+        if ($this->projectId !== null && in_array((int) $this->projectId, $ownedIds, true)) {
             try {
                 $currentPlan = Entitlements::currentPlan((int) $this->projectId);
             } catch (\Throwable) {
@@ -197,7 +205,7 @@ final class Billing extends Component
         }
 
         return view('livewire.account.billing', [
-            'projects' => $this->projects(),
+            'projects' => $projects,
             'configured' => BogClient::configured() || MockPay::allowedFor(auth()->user()),
             'mock' => MockPay::allowedFor(auth()->user()),
             'currentPlan' => $currentPlan,

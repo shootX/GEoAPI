@@ -21,6 +21,7 @@ use Illuminate\Auth\Events\Login;
 use Illuminate\Auth\Events\Logout;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Auth\Events\Verified;
+use Illuminate\Auth\Notifications\ResetPassword;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Route;
@@ -89,6 +90,10 @@ class AppServiceProvider extends ServiceProvider
             require base_path('routes/product.php');
             Route::middleware('web')->group(base_path('routes/legacy.php'));
         });
+
+        // Reset links always point at APP_URL, never at the request's Host header (reset-link poisoning).
+        ResetPassword::createUrlUsing(static fn ($user, string $token): string => rtrim((string) config('app.url'), '/')
+            .route('password.reset', ['token' => $token, 'email' => $user->getEmailForPasswordReset()], false));
 
         // One rule (Carapi\Platform\Passwords) for registration, reset and password change.
         Password::defaults(static fn (): Password => new StrongPassword);

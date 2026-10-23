@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Carapi\Platform;
 
+use App\Access\LegacyGate;
 use PDOException;
 
 final class Http
@@ -518,6 +519,15 @@ final class Http
             self::json(403, ['ok' => false, 'error' => ['code' => 'forbidden', 'message' => 'მოთხოვნა არ არის დაშვებული. საჭიროა დადასტურებული ელფოსტა და აქტიური პროექტი.']]);
 
             return;
+        }
+        // Same product entitlement gate as /api/v1 and the widget.
+        if (class_exists(LegacyGate::class)) {
+            $denial = LegacyGate::catalog($id);
+            if ($denial !== null) {
+                self::json($denial['status'], ['ok' => false] + $denial['body']);
+
+                return;
+            }
         }
         $ready = Playground::parse($input);
         if (!$ready['ok']) {

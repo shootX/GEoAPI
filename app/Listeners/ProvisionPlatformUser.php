@@ -113,6 +113,12 @@ final class ProvisionPlatformUser
         if (! is_dir($dir) && ! mkdir($dir, 0700, true) && ! is_dir($dir)) {
             return;
         }
+        // Rotate, never duplicate: the sid this browser came in with (e.g. through BridgeLegacySession)
+        // must stop working, or logout could only revoke the newest copy.
+        $old = request()->cookie('geoapi_platform');
+        if (is_string($old) && preg_match('/^[a-f0-9]{32}$/', $old) === 1) {
+            @unlink($dir.'/sess_'.$old);
+        }
         $sid = bin2hex(random_bytes(16));
         $now = time();
         $payload = 'user_id|i:'.$legacyId.';auth_version|i:'.$version.';issued_at|i:'.$now.';last_seen|i:'.$now.';csrf|s:64:"'.bin2hex(random_bytes(32)).'";';
