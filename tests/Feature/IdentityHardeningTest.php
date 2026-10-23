@@ -48,8 +48,8 @@ final class IdentityHardeningTest extends TestCase
         return Livewire::test(Register::class)
             ->set('name', 'Mallory Tester')
             ->set('email', $email)
-            ->set('password', 'correct-horse-battery-x')
-            ->set('password_confirmation', 'correct-horse-battery-x')
+            ->set('password', 'Correct-horse-battery-7')
+            ->set('password_confirmation', 'Correct-horse-battery-7')
             ->set('accept_terms', true)
             ->call('register');
     }

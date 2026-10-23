@@ -11,16 +11,16 @@ use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
- * After a sign-in with a password shorter than Passwords::MIN, every page except
+ * After a sign-in with a password that breaks Carapi\Platform\Passwords, every page except
  * the password form, logout and the pages that form's guards send to redirects there until the password hash changes.
  */
-final class RequireLongPassword
+final class RequireStrongPassword
 {
-    private const KEY = 'password.too_short';
+    private const KEY = 'password.weak';
 
-    public static function tooShort(string $password): bool
+    public static function weak(string $password): bool
     {
-        return mb_strlen($password, 'UTF-8') < Passwords::MIN;
+        return Passwords::error($password) !== null;
     }
 
     public static function flag(Authenticatable $user): void
@@ -44,9 +44,14 @@ final class RequireLongPassword
         if ($request->routeIs('settings.security', 'logout', 'verification.*', 'teams.create', 'onboarding')) {
             return $next($request);
         }
+        // A Livewire call runs this again as persistent middleware, against the page the component is on.
+        // Redirecting the call itself here blocked the password form's own submit.
+        if ($request->routeIs('*livewire.update')) {
+            return $next($request);
+        }
 
         return redirect()->route('settings.security')
-            ->with('status', __('Your password is shorter than 15 characters. Set a new one to continue.'));
+            ->with('password_notice', __('Your password does not meet the new rules. Set a new one to continue.'));
     }
 
     private static function fingerprint(Authenticatable $user): string

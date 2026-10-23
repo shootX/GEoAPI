@@ -213,7 +213,7 @@
                         <label><span class="lrow"><span>{{ $en ? 'Email' : 'ელფოსტა' }} @if ($verified)<span class="bd bd-ok">{{ $en ? 'verified' : 'დადასტურებული' }}</span>@else<span class="bd bd-wa">{{ $en ? 'not verified' : 'დაუდასტურებელი' }}</span>@endif</span>@if ($editUrl)<a class="edit" href="{{ $editUrl }}">{{ $editTxt }}</a>@endif</span><input value="{{ $me?->email }}" readonly></label>
                     </div></div>
                 <div class="set-row"><div><h2>{{ $en ? 'Security' : 'უსაფრთხოება' }}</h2><p class="xs mut">{{ $en ? 'Password, 2FA, sessions' : 'პაროლი, 2FA, სესიები' }}</p></div>
-                    <div class="s-a562f4 panel row"><div class="row"><span class="ic"><x-ga.icon name="lock" :size="18" /></span><div><b>{{ $en ? 'Password and two-factor' : 'პაროლი და ორსაფეხურიანი ავთენტიფიკაცია' }}</b><p class="xs mut">{{ $en ? 'Password at least 15 characters · TOTP app' : 'პაროლი მინიმუმ 15 სიმბოლო · TOTP აპი' }}</p></div></div>
+                    <div class="s-a562f4 panel row"><div class="row"><span class="ic"><x-ga.icon name="lock" :size="18" /></span><div><b>{{ $en ? 'Password and two-factor' : 'პაროლი და ორსაფეხურიანი ავთენტიფიკაცია' }}</b><p class="xs mut">{{ $en ? 'Password: 8+ characters, uppercase, digit, symbol · TOTP app' : 'პაროლი: 8+ სიმბოლო, დიდი ასო, ციფრი, სიმბოლო · TOTP აპი' }}</p></div></div>
                         @if (\Illuminate\Support\Facades\Route::has('settings.security'))<a class="edit" href="{{ route('settings.security') }}">{{ $en ? 'Edit' : 'რედაქტირება' }}</a>@endif</div></div>
                 <form method="post" action="{{ url('/logout') }}" class="s-455f8c row">@csrf<button class="btn" type="submit">{{ $en ? 'Log out' : 'გასვლა' }}</button></form>
             </section>

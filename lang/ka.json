@@ -586,7 +586,7 @@
     "Free, Starter, and Growth. Prices include VAT. A year is 15% less and does not renew by itself.": "Free, Starter და Growth. ფასები დღგ-ს შეიცავს. წლიური 15%-ით იაფია და თავისით არ განახლდება.",
     "Free, Basic, and Premium. Prices include VAT.": "Free, Basic და Premium. ფასები დღგ-ს შეიცავს.",
     "Code sample": "კოდის მაგალითი",
-    "Your password is shorter than 15 characters. Set a new one to continue.": "თქვენი პაროლი 15 სიმბოლოზე მოკლეა. გასაგრძელებლად დააყენეთ ახალი.",
+    "Your password does not meet the new rules. Set a new one to continue.": "თქვენი პაროლი ახალ წესებს არ აკმაყოფილებს: მინიმუმ 8 სიმბოლო, მათ შორის დიდი ასო, ციფრი და სიმბოლო. გასაგრძელებლად დააყენეთ ახალი.",
     "Page Expired": "გვერდის ვადა ამოიწურა",
     "Too Many Requests": "ძალიან ბევრი მოთხოვნა",
     "Server Error": "სერვერის შეცდომა",
