@@ -30,7 +30,7 @@
         @if ($spa)
             <button type="button" data-screen="settings"><x-ga.icon name="user" :size="18" /><span>{{ $en ? 'Settings' : 'პარამეტრები' }}</span></button>
         @else
-            <a href="{{ route('account.home') }}#settings"><x-ga.icon name="user" :size="18" /><span>{{ $en ? 'Settings' : 'პარამეტრები' }}</span></a>
+            <a href="{{ route('account.home') }}#settings" @if ($active === 'settings') aria-current="page" @endif><x-ga.icon name="user" :size="18" /><span>{{ $en ? 'Settings' : 'პარამეტრები' }}</span></a>
         @endif
         <a href="{{ url('/guide') }}"><x-ga.icon name="doc" :size="18" /><span class="s-97445a">{{ $en ? 'Documentation' : 'დოკუმენტაცია' }}</span><x-ga.icon name="ext" :size="12" /></a>
     </nav>

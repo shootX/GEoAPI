@@ -49,8 +49,8 @@ final class PlatformLettersTest extends TestCase
         Livewire::test(Register::class)
             ->set('name', 'Letter Tester')
             ->set('email', 'letter@example.com')
-            ->set('password', 'correct-horse-battery-x')
-            ->set('password_confirmation', 'correct-horse-battery-x')
+            ->set('password', 'Correct-horse-battery-7')
+            ->set('password_confirmation', 'Correct-horse-battery-7')
             ->set('accept_terms', true)
             ->call('register')
             ->assertHasNoErrors();

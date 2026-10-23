@@ -134,15 +134,17 @@
     pass.insertAdjacentElement('afterend', meter);
     pass.addEventListener('input', function () {
       var value = pass.value;
-      var score = 0;
-      if (value.length >= 15) score++;
-      if (/[a-zა-ჰ]/.test(value) && /[A-Zა-ჰ]/.test(value)) score++;
-      if (/\d/.test(value)) score++;
-      if (/[^A-Za-z0-9ა-ჰ]/.test(value)) score++;
+      // Same checks as Carapi\Platform\Passwords::error().
+      var missing = [];
+      if (value.length < 8) missing.push('მინიმუმ 8 სიმბოლო');
+      if (!/\p{Lu}/u.test(value)) missing.push('დიდი ასო');
+      if (!/\p{Nd}/u.test(value)) missing.push('ციფრი');
+      if (!/[^\p{L}\p{N}\s]/u.test(value)) missing.push('სიმბოლო');
+      var score = 4 - missing.length;
       Array.prototype.forEach.call(meter.children, function (bar, index) {
         bar.classList.toggle('on', index < score);
       });
-      hint.textContent = value.length >= 15 ? 'სიგრძე საკმარისია.' : 'პაროლი უნდა შეიცავდეს მინიმუმ 15 სიმბოლოს.';
+      hint.textContent = missing.length === 0 ? 'პაროლი წესებს აკმაყოფილებს.' : 'აკლია: ' + missing.join(', ') + '.';
     });
   }
 

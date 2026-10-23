@@ -39,7 +39,7 @@ final class View
             . self::field('სახელი', 'first_name', 'text', $old, $errors, 'given-name')
             . self::field('გვარი', 'last_name', 'text', $old, $errors, 'family-name')
             . self::field('ელფოსტა', 'email', 'email', $old, $errors, 'email')
-            . self::field('პაროლი', 'password', 'password', [], $errors, 'new-password', 'პაროლი უნდა შეიცავდეს მინიმუმ 15 სიმბოლოს.')
+            . self::field('პაროლი', 'password', 'password', [], $errors, 'new-password', Passwords::rule())
             . self::field('გაიმეორეთ პაროლი', 'password_confirmation', 'password', [], $errors, 'new-password')
             . '<label class="chk"><input type="checkbox" name="accept_terms" value="1"' . $checked . '> <span>ვეთანხმები <a href="/terms">გამოყენების წესებს</a>. ეს მარკეტინგის ან მონაცემთა ყველა დამუშავების თანხმობა არ არის.</span></label>'
             . (isset($errors['accept_terms']) ? '<p class="hint err">' . self::e($errors['accept_terms']) . '</p>' : '');
@@ -942,7 +942,7 @@ JS;
     {
         $error = isset($errors['form']) ? '<p class="err">' . self::e($errors['form']) . '</p>' : '';
         $fields = $error . '<input type="hidden" name="token" value="' . self::e($token) . '">'
-            . self::field('პაროლი', 'password', 'password', [], $errors, 'new-password', 'პაროლი უნდა შეიცავდეს მინიმუმ 15 სიმბოლოს.')
+            . self::field('პაროლი', 'password', 'password', [], $errors, 'new-password', Passwords::rule())
             . self::field('გაიმეორეთ პაროლი', 'password_confirmation', 'password', [], $errors, 'new-password');
         self::auth('ახალი პაროლი', '03', 'ახალი პაროლი', 'ახალი <span>პაროლი</span>', 'შეიყვანეთ ახალი პაროლი. ძველი პაროლით შესვლა აღარ მოხდება.', $fields, '/reset-password', 'პაროლის შენახვა', [], '', self::loginAside());
     }
@@ -1617,7 +1617,7 @@ JS;
             . $heading . '</h1>' . ($sub !== '' ? '<p class="sub">' . $sub . '</p>' : '') . $form . $footer . '</div><div class="foot"><span>© '
             . date('Y') . ' შპს „ინოვა ლაბ“</span><a href="/terms">გამოყენების წესები</a><a href="/privacy">კონფიდენციალურობა</a>' . SiteChrome::themeButton() . '</div></div>'
             . $aside . '</main>';
-        echo '<script src="/assets/site.js?v=20261022a"></script>';
+        echo '<script src="/assets/site.js?v=20261023a"></script>';
         echo SiteChrome::end();
     }
 
@@ -1681,7 +1681,7 @@ JS;
         $whoInitial = $who === '' ? 'G' : mb_strtoupper(mb_substr($who, 0, 1));
         echo '<!doctype html><html lang="ka"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="robots" content="noindex">'
             . '<title>' . self::e($title) . ' — GeoAPI</title><link rel="icon" href="/favicon.ico" sizes="any"><link rel="icon" href="/assets/brand/favicon.svg" type="image/svg+xml">'
-            . '<link rel="stylesheet" href="/assets/cabinet.css?v=20261022r4">' . $css . '</head><body class="cab ga">';
+            . '<link rel="stylesheet" href="/assets/cabinet.css?v=20261023r1">' . $css . '</head><body class="cab ga">';
         echo '<div class="app"><aside class="side" id="side"><a class="logo" href="/"><img src="/assets/brand/geoapi-lockup-light.svg" alt="geoapi.ge" height="26"></a>'
             . ($project === null ? '' : '<div class="proj"><span class="av">' . self::e($initial) . '</span><div class="s-dd6ec3"><div class="pn">' . self::e($name) . '</div><div class="xs mut">' . self::e($state) . '</div></div></div>')
             . '<nav class="nav" aria-label="პანელი">' . $nav . '</nav>'
@@ -1689,7 +1689,7 @@ JS;
         echo '<div class="main" id="content"><header class="top"><button class="btn menu" id="menu" type="button" aria-expanded="false" aria-controls="side" aria-label="მენიუ" data-menu-toggle>' . $icon($ic['menu']) . '</button><a class="mlogo" href="/"><img src="/assets/brand/geoapi-lockup-light.svg" alt="geoapi.ge" height="22" width="69"></a>'
             . '<div class="crumb">' . $crumb . '</div><div class="who"><a class="hide-m s-8d3abb" href="/guide">დოკუმენტაცია</a></div></header>'
             . '<div class="content lgc">' . ($project === null ? '' : '<div class="ph"><div><h2 class="h">' . self::e($name) . '</h2><p class="mono xs mut">' . self::e((string) ($project['website_url'] ?? '') ?: '—') . '</p></div><span class="bd ' . ($state === 'აქტიური' ? 'bd-ok' : 'bd-ne') . '"><i></i>' . self::e($state) . '</span></div>') . $tabs . $main . '</div></div></div>';
-        echo '<script src="/assets/site.js?v=20261022a"></script><script src="/assets/menu.js?v=1"></script></body></html>';
+        echo '<script src="/assets/site.js?v=20261023a"></script><script src="/assets/menu.js?v=1"></script></body></html>';
     }
 
     /** @param array<string, mixed>|null $widget @param array<string, string> $errors */

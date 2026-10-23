@@ -7,7 +7,7 @@ use App\Http\Middleware\EnsureAdmin;
 use App\Http\Middleware\EnsureAdminPanel;
 use App\Http\Middleware\EnsureInternalDocs;
 use App\Http\Middleware\RequestId;
-use App\Http\Middleware\RequireLongPassword;
+use App\Http\Middleware\RequireStrongPassword;
 use App\Http\Middleware\SecurityHeaders;
 use Electrik\Http\Middleware\BindTeamFromAccessToken;
 use Electrik\Http\Middleware\SetLocale;
@@ -34,7 +34,7 @@ return Application::configure(basePath: dirname(__DIR__))
             SetLocale::class,
             ApplyChosenLocale::class,
             ComingSoonGate::class,
-            RequireLongPassword::class,
+            RequireStrongPassword::class,
         ]);
         $middleware->validateCsrfTokens(except: [
             'login',

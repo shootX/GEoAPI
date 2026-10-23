@@ -43,8 +43,8 @@
         </div>
         <div class="fld">
             <label for="reg-password">{{ __('Password') }}</label>
-            <input id="reg-password" class="inp @error('password') err @enderror" wire:model="password" type="password" autocomplete="new-password" minlength="15" required>
-            @error('password')<span class="emsg"><x-ga.icon name="err" :size="14" />{{ $message }}</span>@else<span class="hint">{{ $en ? 'At least 15 characters' : 'მინიმუმ 15 სიმბოლო' }}</span>@enderror
+            <input id="reg-password" class="inp @error('password') err @enderror" wire:model="password" type="password" autocomplete="new-password" minlength="8" required>
+            @error('password')<span class="emsg"><x-ga.icon name="err" :size="14" />{{ $message }}</span>@else<span class="hint">{{ \Carapi\Platform\Passwords::rule(app()->getLocale()) }}</span>@enderror
         </div>
         <div class="fld">
             <label for="reg-password2">{{ __('Repeat the password') }}</label>

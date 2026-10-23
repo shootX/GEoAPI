@@ -237,3 +237,16 @@ html:has(body.cab) { background: #F7F7FB; scrollbar-gutter: stable; }
   .cab.ga table.orders td { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 4px 0; border: 0; text-align: right !important; }
   .cab.ga table.orders td::before { content: attr(data-label); color: var(--ink3); font: 500 12px FiraGO, sans-serif; text-align: left; }
 }
+/* Settings: profile and security */
+.cab.ga .tabs-set { display: flex; gap: 4px; padding: 0 32px; background: #fff; border-bottom: 1px solid var(--line); overflow-x: auto; }
+.cab.ga .tabs-set a { display: inline-flex; align-items: center; gap: 6px; padding: 12px 10px; font-size: 13.5px; font-weight: 500; color: var(--ink2); border-bottom: 2px solid transparent; margin-bottom: -1px; white-space: nowrap; }
+.cab.ga .tabs-set a:hover { color: var(--ink); }
+.cab.ga .tabs-set a[aria-current="page"] { color: var(--ac); border-bottom-color: var(--ac); }
+.cab.ga .set-line { justify-content: space-between; padding-bottom: 12px; border-bottom: 1px solid var(--line); }
+.cab.ga .btn.danger { background: #B3261E; color: #fff; border-color: #B3261E; }
+.cab.ga .btn.danger:hover { background: #8F1E18; }
+.cab.ga .qr { width: 180px; border: 1px solid var(--line); border-radius: 10px; overflow: hidden; }
+.cab.ga .qr svg { display: block; width: 100%; height: auto; }
+.cab.ga .codes { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px 16px; list-style: none; padding: 0; margin: 0; font-size: 13px; }
+.cab.ga [x-cloak] { display: none !important; }
+@media (max-width: 980px) { .cab.ga .tabs-set { padding: 0 16px; } }

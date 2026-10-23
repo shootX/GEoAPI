@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Livewire\Auth;
 
-use App\Http\Middleware\RequireLongPassword;
+use App\Http\Middleware\RequireStrongPassword;
 use Illuminate\Support\Facades\Auth;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Title;
@@ -13,7 +13,7 @@ use Livewire\Attributes\Title;
 #[Title('შესვლა')]
 final class Login extends \Electrik\Livewire\Auth\Login
 {
-    /** Accounts made before the 15-character rule still sign in, but only to change the password. */
+    /** Accounts whose password breaks the current rule still sign in, but only to change the password. */
     public function login(): void
     {
         if ($this->requiresTwoFactor) {
@@ -22,27 +22,27 @@ final class Login extends \Electrik\Livewire\Auth\Login
 
             return;
         }
-        $short = RequireLongPassword::tooShort($this->password);
+        $weak = RequireStrongPassword::weak($this->password);
 
         parent::login();
 
         if ($this->requiresTwoFactor) {
-            session(['login.password_too_short' => $short]);
+            session(['login.password_weak' => $weak]);
         }
-        $this->restrictShortPassword($short);
+        $this->restrictWeakPassword($weak);
     }
 
     public function verifyTwoFactor(): void
     {
         parent::verifyTwoFactor();
 
-        $this->restrictShortPassword((bool) session()->pull('login.password_too_short', false));
+        $this->restrictWeakPassword((bool) session()->pull('login.password_weak', false));
     }
 
-    private function restrictShortPassword(bool $short): void
+    private function restrictWeakPassword(bool $weak): void
     {
-        if ($short && Auth::check()) {
-            RequireLongPassword::flag(Auth::user());
+        if ($weak && Auth::check()) {
+            RequireStrongPassword::flag(Auth::user());
             $this->redirectRoute('settings.security', navigate: true);
         }
     }

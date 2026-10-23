@@ -13,6 +13,7 @@ use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\QueryException;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\Rules\Password;
 use Illuminate\Validation\ValidationException;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Title;
@@ -47,7 +48,7 @@ final class Register extends \Electrik\Livewire\Auth\Register
         $validated = $this->validate([
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'email', 'max:255', $this->emailIsFree(...)],
-            'password' => ['required', 'string', 'min:15', 'confirmed'],
+            'password' => ['required', 'string', Password::defaults(), 'confirmed'],
             'accept_terms' => ['accepted'],
             'buyer_kind' => ['required', 'in:individual,legal'],
             'company_name' => ['required_if:buyer_kind,legal', 'nullable', 'string', 'max:255'],
@@ -120,7 +121,7 @@ final class Register extends \Electrik\Livewire\Auth\Register
     {
         return view('livewire.auth.register')->layoutData([
             'title' => __('Create account').' — GeoAPI',
-            'description' => __('Password must be at least 15 characters.'),
+            'description' => \Carapi\Platform\Passwords::rule(app()->getLocale()),
         ]);
     }
 }

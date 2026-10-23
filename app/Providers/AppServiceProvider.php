@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Providers;
 
-use App\Http\Middleware\RequireLongPassword;
+use App\Http\Middleware\RequireStrongPassword;
 use App\Http\Middleware\SecurityHeaders;
 use App\Listeners\ProvisionPlatformUser;
 use App\Livewire\Account\Errors;
@@ -16,7 +16,7 @@ use App\Livewire\Pricing;
 use App\Livewire\Settings\ApiTokens;
 use App\Models\User;
 use App\Observers\UserObserver;
-use Carapi\Platform\Passwords as PlatformPasswords;
+use App\Rules\StrongPassword;
 use Illuminate\Auth\Events\Login;
 use Illuminate\Auth\Events\Logout;
 use Illuminate\Auth\Events\Registered;
@@ -46,6 +46,7 @@ class AppServiceProvider extends ServiceProvider
         View::composer([
             'electrik::livewire.auth.login',
             'electrik::livewire.settings.security',
+            'livewire.settings.security',
             'electrik::livewire.clients.index',
             'electrik::livewire.projects.index',
             'slate::components.toaster',
@@ -89,9 +90,9 @@ class AppServiceProvider extends ServiceProvider
             Route::middleware('web')->group(base_path('routes/legacy.php'));
         });
 
-        // Same 15-128 rule as registration and Carapi\Platform\Passwords, for password change and reset.
-        Password::defaults(static fn (): Password => Password::min(PlatformPasswords::MIN)->max(PlatformPasswords::MAX));
-        Livewire::addPersistentMiddleware(RequireLongPassword::class);
+        // One rule (Carapi\Platform\Passwords) for registration, reset and password change.
+        Password::defaults(static fn (): Password => new StrongPassword);
+        Livewire::addPersistentMiddleware(RequireStrongPassword::class);
         User::observe(UserObserver::class);
         $platform = ProvisionPlatformUser::class;
         Event::listen(Registered::class, [$platform, 'registered']);
@@ -100,6 +101,8 @@ class AppServiceProvider extends ServiceProvider
         Event::listen(Verified::class, [$platform, 'verified']);
         Livewire::component('electrik.dashboard', Dashboard::class);
         Livewire::component('electrik.settings.api-tokens', ApiTokens::class);
+        Livewire::component('electrik.settings.profile', \App\Livewire\Settings\Profile::class);
+        Livewire::component('electrik.settings.security', \App\Livewire\Settings\Security::class);
         Livewire::component('electrik.auth.login', \App\Livewire\Auth\Login::class);
         Livewire::component('electrik.auth.register', Register::class);
         Livewire::component('electrik.auth.forgot-password', \App\Livewire\Auth\ForgotPassword::class);
