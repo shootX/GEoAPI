@@ -49,7 +49,7 @@ final class BogBillingTest extends TestCase
         openssl_pkey_export($key, $private);
         $this->privateKey = $private;
         $details = openssl_pkey_get_details($key);
-        config(['services.bog.public_key' => $details['key']]);
+        config(['services.bog.public_key' => $details['key'], 'services.bog.mock' => true]);
     }
 
     protected function tearDown(): void
@@ -200,6 +200,24 @@ final class BogBillingTest extends TestCase
         } finally {
             $this->app['env'] = 'testing';
         }
+    }
+
+    public function test_mock_mode_is_off_unless_bog_mock_is_true(): void
+    {
+        $user = $this->owner();
+        $this->limits(7, 10000, null, false, null);
+        $id = DB::table('billing_orders')->insertGetId(['public_id' => 'mock-off', 'user_id' => $user->id, 'legacy_user_id' => (int) $user->legacy_platform_user_id, 'project_id' => 7, 'plan_code' => 'basic', 'interval' => 'month', 'usd_cents' => 5000, 'gel_amount' => '150.00', 'rate' => '3.0000', 'rate_quantity' => 1, 'rate_date' => '2026-10-22', 'buyer' => '{}', 'previous' => '{}', 'status' => 'pending', 'bog_order_id' => 'mock:mock-off', 'created_at' => now(), 'updated_at' => now()]);
+        config(['electrik.operators.emails' => [$user->email]]);
+
+        foreach ([null, false, 'true'] as $value) {
+            config(['services.bog.mock' => $value]);
+            $this->assertFalse(MockPay::enabled());
+            $this->assertFalse(MockPay::allowedFor($user->fresh()));
+        }
+        Livewire::actingAs($user->fresh())->test(Billing::class)
+            ->assertSee('data-code="payments not configured"', false);
+        $this->actingAs($user)->post('/billing/test/mock-off', ['result' => 'success'])->assertNotFound();
+        $this->assertSame('pending', DB::table('billing_orders')->where('id', $id)->value('status'));
     }
 
     public function test_billing_does_not_reveal_the_plan_of_someone_elses_project(): void

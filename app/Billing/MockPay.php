@@ -9,6 +9,7 @@ use App\Models\User;
 
 /**
  * Local TEST payment mode (owner-approved 2026-10-22) for when no BOG credentials exist.
+ * Off by default since 2026-10-23: only BOG_MOCK=true turns it on.
  *
  * It is impossible to enable while real BOG credentials are configured or BOG_ENV=production:
  * then every checkout goes to the bank (or fails closed) exactly as before.
@@ -26,7 +27,7 @@ final class MockPay
             return false;
         }
 
-        return config('services.bog.mock', true) !== false;
+        return config('services.bog.mock') === true;
     }
 
     /**

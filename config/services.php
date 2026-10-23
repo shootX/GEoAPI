@@ -45,8 +45,8 @@ return [
         'public_key' => env('BOG_CALLBACK_PUBLIC_KEY'),
         // Exact "production" selects the live hosts. Anything else stays on the sandbox.
         'env' => env('BOG_ENV', 'sandbox'),
-        // TEST payment page when no credentials exist. Never active with credentials or BOG_ENV=production (App\Billing\MockPay).
-        'mock' => env('BOG_MOCK', true),
+        // TEST payment page, off unless BOG_MOCK=true (owner, 2026-10-23). Never active with credentials or BOG_ENV=production (App\Billing\MockPay).
+        'mock' => filter_var(env('BOG_MOCK', false), FILTER_VALIDATE_BOOL),
         'sandbox' => [
             'token_url' => 'https://oauth2-sandbox.bog.ge/auth/realms/bog/protocol/openid-connect/token',
             'order_url' => 'https://api-sandbox.bog.ge/payments/v1/ecommerce/orders',

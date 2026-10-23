@@ -54,7 +54,7 @@ final class BillingV2Test extends TestCase
         openssl_pkey_export($key, $private);
         $this->privateKey = $private;
         $details = openssl_pkey_get_details($key);
-        config(['services.bog.public_key' => $details['key']]);
+        config(['services.bog.public_key' => $details['key'], 'services.bog.mock' => true]);
     }
 
     protected function tearDown(): void
