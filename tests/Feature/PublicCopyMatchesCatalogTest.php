@@ -63,8 +63,18 @@ final class PublicCopyMatchesCatalogTest extends TestCase
         $this->withSession(['locale' => 'en'])->get('/')->assertOk()
             ->assertSee('X-RateLimit-Limit: '.Catalog::rpm('free').' · X-Quota-Limit: '.Catalog::plans()['free']['quota'])
             ->assertDontSee('X-Quota-Limit: 25000')
-            ->assertSee('/api/v1/docs#tag/Catalog/operation/getCoverage', false)
-            ->assertSee('photos · demo only');
+            ->assertSee('/api/v1/docs#tag/Catalog/operation/getCoverage', false);
+    }
+
+    public function test_home_labels_the_photo_count_as_demo_only(): void
+    {
+        app()->setLocale('en');
+        $counts = ['brands' => '1', 'models' => '1', 'generations' => '1', 'modifications' => '1', 'photos' => '1 234', 'specifications' => null, 'markets' => null, 'equipmentMillions' => null, 'generationGroups' => '1', 'catalogUp' => true, 'measuredAt' => '2026-10-23'];
+
+        $this->view('public.home', $counts)
+            ->assertSee('1 234')
+            ->assertSee('photos · demo only')
+            ->assertSee('Not in API v1');
     }
 
     public function test_headings_do_not_skip_a_level(): void
