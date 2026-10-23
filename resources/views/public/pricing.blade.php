@@ -46,7 +46,7 @@
                 @php $hi = ! empty($plan['hi']); @endphp
                 <div class="fc plan-card {{ $hi ? 'plan-card-hi' : '' }}">
                     @if ($hi)<span class="s-aa8940 bd">{{ $en ? 'Recommended' : 'რეკომენდებული' }}</span>@endif
-                    <h3>{{ $plan['name'] }}</h3>
+                    <h2 class="h3">{{ $plan['name'] }}</h2>
                     <div data-show="month">
                         <div class="s-47a3c2"><span class="s-3d01a4 tabular">{{ $lari($plan['month']) }}</span><span class="mut">{{ $perMonth }}</span></div>
                     </div>
@@ -98,7 +98,7 @@
             ['გეგმის შეცვლა', 'გეგმის არჩევა და გადახდა ხდება კაბინეტში, ბილინგის გვერდზე. ინვოისი PDF ფორმატშია.'],
             ['ერთი მრიცხველი', 'ვიჯეტი და სერვერის API ერთსა და იმავე პროექტის ლიმიტს იყენებს.'],
         ] as [$q, $a])
-            <div class="fc"><h4>{{ $q }}</h4><p class="s-fe7b49 sm mut">{{ $a }}</p></div>
+            <div class="fc"><h3 class="h4">{{ $q }}</h3><p class="s-fe7b49 sm mut">{{ $a }}</p></div>
         @endforeach
     </div>
 </section>

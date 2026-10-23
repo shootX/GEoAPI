@@ -18,20 +18,20 @@
         @unless ($requiresTwoFactor)
             <div class="fld">
                 <label for="login-email">{{ __('Email') }}</label>
-                <input id="login-email" class="inp @error('email') err @enderror" wire:model="email" type="email" autocomplete="username" required @if ($inviteLockedEmail) readonly @endif>
-                @error('email')<span class="emsg"><x-ga.icon name="err" :size="14" />{{ $message }}</span>@enderror
+                <input id="login-email" class="inp @error('email') err @enderror" @error('email') aria-invalid="true" aria-describedby="login-email-error" @enderror wire:model="email" type="email" autocomplete="username" required @if ($inviteLockedEmail) readonly @endif>
+                @error('email')<span class="emsg" id="login-email-error" role="alert"><x-ga.icon name="err" :size="14" />{{ $message }}</span>@enderror
             </div>
             <div class="fld">
                 <div class="s-a562f4 row"><label for="login-password">{{ __('Password') }}</label><a href="{{ route('password.request') }}" class="sm lnk">{{ __('Forgot password?') }}</a></div>
-                <input id="login-password" class="inp @error('password') err @enderror" wire:model="password" type="password" autocomplete="current-password" required>
-                @error('password')<span class="emsg"><x-ga.icon name="err" :size="14" />{{ $message }}</span>@enderror
+                <input id="login-password" class="inp @error('password') err @enderror" @error('password') aria-invalid="true" aria-describedby="login-password-error" @enderror wire:model="password" type="password" autocomplete="current-password" required>
+                @error('password')<span class="emsg" id="login-password-error" role="alert"><x-ga.icon name="err" :size="14" />{{ $message }}</span>@enderror
             </div>
             <label class="chk-l"><input type="checkbox" wire:model="remember"> {{ __('Remember me') }}</label>
         @else
             <div class="fld">
                 <label for="login-code">კოდი</label>
-                <input id="login-code" class="s-4c3751 inp mono @error('twoFactorCode') err @enderror" wire:model="twoFactorCode" inputmode="numeric" autocomplete="one-time-code" maxlength="10" required>
-                @error('twoFactorCode')<span class="emsg"><x-ga.icon name="err" :size="14" />{{ $message }}</span>@enderror
+                <input id="login-code" class="s-4c3751 inp mono @error('twoFactorCode') err @enderror" @error('twoFactorCode') aria-invalid="true" aria-describedby="login-code-error" @enderror wire:model="twoFactorCode" inputmode="numeric" autocomplete="one-time-code" maxlength="10" required>
+                @error('twoFactorCode')<span class="emsg" id="login-code-error" role="alert"><x-ga.icon name="err" :size="14" />{{ $message }}</span>@enderror
             </div>
         @endunless
         <button type="submit" class="s-e6a3b7 btn b-pri b-lg">{{ $requiresTwoFactor ? 'დადასტურება' : __('Sign in') }}</button>

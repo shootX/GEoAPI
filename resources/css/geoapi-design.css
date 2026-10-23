@@ -11,8 +11,9 @@
 .ga .lab{font:500 11px "JetBrains Mono","FiraGO",ui-monospace,monospace;color:var(--ink3);letter-spacing:.06em;text-transform:uppercase;margin-bottom:14px;display:flex;gap:8px;align-items:center}
 .ga .row{display:flex;gap:12px;align-items:center;flex-wrap:wrap}
 .ga .col{display:flex;flex-direction:column;gap:12px}
-.ga h3{font-size:20px;font-weight:600;line-height:1.4}
-.ga h4{font-size:16px;font-weight:600}
+.ga h3,.ga .h3{font-size:20px;font-weight:600;line-height:1.4}
+.ga h4,.ga .h4{font-size:16px;font-weight:600}
+.ga h3.h4{line-height:inherit}
 .ga .mut{color:var(--ink2)}
 .ga .sm{font-size:13px}
 .ga .xs{font-size:12px}

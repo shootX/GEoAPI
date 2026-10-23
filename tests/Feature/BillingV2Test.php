@@ -430,6 +430,21 @@ final class BillingV2Test extends TestCase
         $this->assertSame(0, DB::table('billing_orders')->count());
     }
 
+    public function test_the_plan_chosen_on_pricing_is_marked_after_sign_in(): void
+    {
+        config(['billing.v2' => true]);
+        $user = $this->owner();
+        $this->projects();
+
+        Livewire::withQueryParams(['plan' => 'growth'])->actingAs($user)->test(Billing::class)
+            ->assertSet('chosen', 'growth')
+            ->assertSeeHtml('data-code="picked"')
+            ->assertSee('თქვენი არჩევანი');
+        Livewire::withQueryParams(['plan' => '<b>x'])->actingAs($user)->test(Billing::class)
+            ->assertSet('chosen', null)
+            ->assertDontSeeHtml('data-code="picked"');
+    }
+
     public function test_free_plan_hides_paid_through_and_times_are_tbilisi(): void
     {
         config(['billing.v2' => true]);

@@ -41,7 +41,7 @@
         [$specifications ?? null, $en ? 'specifications · engine, transmission, drive, dimensions, fuel' : 'სპეციფიკაცია · ძრავი, გადაცემათა კოლოფი, წამყვანი, ზომები, საწვავი'],
         [$markets ?? null, $en ? 'model markets' : 'მოდელის ბაზარი'],
         [isset($equipmentMillions) && $equipmentMillions ? ($en ? $equipmentMillions.'M+' : $equipmentMillions.' მლნ+') : null, $en ? 'trim/equipment records' : 'კომპლექტაციის ჩანაწერი'],
-        [$photos ?? null, $en ? 'photos' : 'ფოტო'],
+        [$photos ?? null, $en ? 'photos · demo only, not in API v1' : 'ფოტო · მხოლოდ დემოში, API v1-ში არა'],
     ];
 @endphp
 @component('components.layouts.public', [
@@ -93,7 +93,7 @@
                     <div class="s-b7c21f"><div class="s-8cfc29 tabular">{{ ($n === null || $n === '' || $n === '0' || $n === 0) ? '—' : $n }}</div><div class="sm mut">{{ $label }}</div></div>
                 @endforeach
             </div>
-            <p class="s-2e3ee8 xs mut">{{ $en ? 'Catalog counts' : 'კატალოგის მოცულობა' }} · {{ $measuredAt }} · <a class="mono" href="{{ url('/api/v1/docs') }}">/api/v1/coverage</a></p>
+            <p class="s-2e3ee8 xs mut">{{ $en ? 'Catalog counts' : 'კატალოგის მოცულობა' }} · {{ $measuredAt }} · <a class="mono" href="{{ url('/api/v1/docs') }}#tag/Catalog/operation/getCoverage">GET /api/v1/coverage</a></p>
         </div>
 </section>
 <section class="sec" id="features">
@@ -103,7 +103,7 @@
             @foreach ($levels as $k => [$icon, $title, $fields, $path])
                 <div class="fc">
                     <div class="s-d5dbc8 row"><div class="s-116966 fi"><x-ga.icon :name="$icon" :size="20" /></div><span class="mono xs mut">0{{ $k + 1 }}</span></div>
-                    <h4 class="s-d6f2af">{{ $title }}</h4>
+                    <h3 class="s-d6f2af h4">{{ $title }}</h3>
                     <p class="s-7596e8 mono">{{ $fields }}</p>
                     <div class="s-289355 mono">GET {{ $path }}</div>
                 </div>
@@ -130,7 +130,7 @@
 <pre><span class="k4"># {{ $en ? 'the key goes only in the Authorization header' : 'გასაღები მხოლოდ Authorization header-ში' }}</span>
 curl https://geoapi.ge<span class="k1">/api/v1/modifications/1000/specs</span> \
   -H <span class="k2">"Authorization: Bearer $GEOAPI_API_KEY"</span></pre>
-            <div class="s-6b438b row"><span class="s-d73c66 bd">200 OK</span><span class="k4">X-RateLimit-Limit: {{ \App\Billing\V2\Flag::on() ? '60 · X-Quota-Limit: 25000' : '60 · X-Quota-Limit: 2000' }}</span></div>
+            <div class="s-6b438b row"><span class="s-d73c66 bd">200 OK</span><span class="k4">X-RateLimit-Limit: {{ \App\Billing\V2\Flag::on() ? \App\Billing\V2\Catalog::rpm('free').' · X-Quota-Limit: '.\App\Billing\V2\Catalog::plans()['free']['quota'] : '60 · X-Quota-Limit: 2000' }}</span></div>
 <pre class="s-0b1435">{
   <span class="k1">"data"</span>: {
     <span class="k1">"modification_id"</span>: <span class="k2">"1000"</span>,
@@ -146,9 +146,9 @@ curl https://geoapi.ge<span class="k1">/api/v1/modifications/1000/specs</span> \
     <div class="wrap">
         <div class="sec-t"><div class="eyebrow">{{ $en ? 'Integration' : 'ინტეგრაცია' }}</div><h2 class="s-d2c171 h2">{{ $en ? 'Pick the way that suits you' : 'აირჩიეთ თქვენთვის მოსახერხებელი გზა' }}</h2></div>
         <div class="g3">
-            <div class="fc"><div class="fi"><x-ga.icon name="glob" :size="20" /></div><h4 class="s-d6f2af">REST API</h4><p class="s-fe7b49 sm mut">{{ $en ? '14 GET endpoints, JSON, Bearer auth, pagination and filters.' : '14 GET endpoint, JSON, Bearer ავტორიზაცია, pagination და ფილტრები.' }}</p></div>
-            <div class="fc"><div class="fi"><x-ga.icon name="mobile" :size="20" /></div><h4 class="s-d6f2af">{{ $en ? 'Embeddable widget' : 'ჩასაშენებელი ვიჯეტი' }}</h4><p class="s-fe7b49 sm mut">{{ $en ? 'A ready cascading picker on your site. Public key geoapi_pk_ and allowed origins.' : 'მზა კასკადური არჩევა თქვენს საიტზე. საჯარო გასაღები geoapi_pk_ და დაშვებული origin-ები.' }}</p></div>
-            <div class="s-12296c fc"><div class="s-a562f4 row"><div class="s-116966 fi"><x-ga.icon name="box" :size="20" /></div><span class="prop">◇ {{ $en ? 'COMING' : 'მზადდება' }}</span></div><h4 class="s-d6f2af">SDK · MCP · CLI</h4><p class="s-fe7b49 sm mut">{{ $en ? 'JavaScript SDK, MCP Server and CLI. Guide pages are being prepared.' : 'JavaScript SDK, MCP Server და CLI — ინსტრუქციების გვერდები მზადდება.' }}</p></div>
+            <div class="fc"><div class="fi"><x-ga.icon name="glob" :size="20" /></div><h3 class="s-d6f2af h4">REST API</h3><p class="s-fe7b49 sm mut">{{ $en ? '14 GET endpoints, JSON, Bearer auth, pagination and filters.' : '14 GET endpoint, JSON, Bearer ავტორიზაცია, pagination და ფილტრები.' }}</p></div>
+            <div class="fc"><div class="fi"><x-ga.icon name="mobile" :size="20" /></div><h3 class="s-d6f2af h4">{{ $en ? 'Embeddable widget' : 'ჩასაშენებელი ვიჯეტი' }}</h3><p class="s-fe7b49 sm mut">{{ $en ? 'A ready cascading picker on your site. Public key geoapi_pk_ and allowed origins.' : 'მზა კასკადური არჩევა თქვენს საიტზე. საჯარო გასაღები geoapi_pk_ და დაშვებული origin-ები.' }}</p></div>
+            <div class="s-12296c fc"><div class="s-a562f4 row"><div class="s-116966 fi"><x-ga.icon name="box" :size="20" /></div><span class="prop">◇ {{ $en ? 'COMING' : 'მზადდება' }}</span></div><h3 class="s-d6f2af h4">SDK · MCP · CLI</h3><p class="s-fe7b49 sm mut">{{ $en ? 'JavaScript SDK, MCP Server and CLI. Guide pages are being prepared.' : 'JavaScript SDK, MCP Server და CLI — ინსტრუქციების გვერდები მზადდება.' }}</p></div>
         </div>
     </div>
 </section>
@@ -157,7 +157,7 @@ curl https://geoapi.ge<span class="k1">/api/v1/modifications/1000/specs</span> \
         <div class="sec-t"><div class="eyebrow">{{ $en ? 'Getting started' : 'როგორ დავიწყოთ' }}</div><h2 class="s-d2c171 h2">{{ $en ? 'Four steps to the first response' : 'ოთხი ნაბიჯი პირველ პასუხამდე' }}</h2></div>
         <div class="g4">
             @foreach ($steps as $i => [$title, $text])
-                <div class="s-9099a8 fc"><div class="s-5d7eb4 mono">0{{ $i + 1 }}</div><h4 class="s-8a77e5">{{ $title }}</h4><p class="s-96ad60 sm mut">{{ $text }}</p></div>
+                <div class="s-9099a8 fc"><div class="s-5d7eb4 mono">0{{ $i + 1 }}</div><h3 class="s-8a77e5 h4">{{ $title }}</h3><p class="s-96ad60 sm mut">{{ $text }}</p></div>
             @endforeach
         </div>
     </div>
