@@ -33,16 +33,20 @@
         ['შემიძლია ვიჯეტის და API-ს ერთად გამოყენება?', $v2 ? 'დიახ. ორივე ერთ მრიცხველს იყენებს, რომელსაც ანგარიშის ყველა პროექტი იზიარებს.' : 'დიახ. ორივე ერთ პროექტის მრიცხველს იყენებს.'],
         ['VIN დეკოდირება გაქვთ?', 'არა — ეს მიმდინარე მოცულობაში არ შედის.'],
     ];
-    $stats = [
-        [$brands, $en ? 'brands' : 'ბრენდი'],
-        [$models, $en ? 'models' : 'მოდელი'],
-        [$generations, $en ? 'generations' : 'თაობა'],
-        [$modifications, $en ? 'modifications' : 'მოდიფიკაცია'],
-        [$specifications ?? null, $en ? 'specifications · engine, transmission, drive, dimensions, fuel' : 'სპეციფიკაცია · ძრავი, გადაცემათა კოლოფი, წამყვანი, ზომები, საწვავი'],
-        [$markets ?? null, $en ? 'model markets' : 'მოდელის ბაზარი'],
-        [isset($equipmentMillions) && $equipmentMillions ? ($en ? $equipmentMillions.'M+' : $equipmentMillions.' მლნ+') : null, $en ? 'trim/equipment records' : 'კომპლექტაციის ჩანაწერი'],
-        [$photos ?? null, $en ? 'photos · demo only, not in API v1' : 'ფოტო · მხოლოდ დემოში, API v1-ში არა'],
+    $dash = '—';
+    $show = fn ($n) => ($n === null || $n === '' || $n === '0' || $n === 0) ? $dash : $n;
+    $chain = [
+        [$show($brands), $en ? 'brands' : 'ბრენდი'],
+        [$show($models), $en ? 'models' : 'მოდელი'],
+        [$show($generations), $en ? 'generations' : 'თაობა'],
+        [$show($modifications), $en ? 'modifications' : 'მოდიფიკაცია'],
     ];
+    $more = array_values(array_filter([
+        [$specifications ?? null, $en ? 'specifications ·' : 'სპეციფიკაცია ·', $en ? 'engine, transmission, drive, dimensions, fuel' : 'ძრავი, გადაცემათა კოლოფი, წამყვანი, ზომები, საწვავი'],
+        [$markets ?? null, $en ? 'model markets' : 'მოდელის ბაზარი', null],
+        [isset($equipmentMillions) && $equipmentMillions ? ($en ? $equipmentMillions.'M+' : $equipmentMillions.' მლნ+') : null, $en ? 'trim/equipment records' : 'კომპლექტაციის ჩანაწერი', null],
+        [$photos ?? null, $en ? 'photos · demo only' : 'ფოტო · მხოლოდ დემოში', $en ? 'Not in API v1' : 'API v1-ში არა'],
+    ], fn ($row) => $row[0] !== null && $row[0] !== '' && $row[0] !== '0' && $row[0] !== 0));
 @endphp
 @component('components.layouts.public', [
     'title' => 'GeoAPI.ge — '.($en ? 'Vehicle data API' : 'ავტომობილების მონაცემების API'),
@@ -88,12 +92,24 @@
         </div>
     </div>
         <div class="wrap">
-            <div class="s-56e5af g4 stats">
-                @foreach ($stats as [$n, $label])
-                    <div class="s-b7c21f"><div class="s-8cfc29 tabular">{{ ($n === null || $n === '' || $n === '0' || $n === 0) ? '—' : $n }}</div><div class="sm mut">{{ $label }}</div></div>
-                @endforeach
+            <div class="cat">
+                <div class="cat-h">
+                    <span class="eyebrow">{{ $en ? 'Catalog' : 'კატალოგი' }}</span>
+                    <p class="xs mut">@if ($measuredAt){{ $measuredAt }} · @endif<a class="mono" href="{{ url('/api/v1/docs') }}#tag/Catalog/operation/getCoverage">GET /api/v1/coverage</a></p>
+                </div>
+                <ol class="cat-chain">
+                    @foreach ($chain as [$n, $label])
+                        <li><b class="tabular">{{ $n }}</b><span>{{ $label }}</span></li>
+                    @endforeach
+                </ol>
+                @if ($more)
+                    <ul class="cat-more">
+                        @foreach ($more as [$n, $label, $detail])
+                            <li><b class="tabular">{{ $n }}</b> <span class="k">{{ $label }}</span>@if ($detail)<span class="d">{{ $detail }}</span>@endif</li>
+                        @endforeach
+                    </ul>
+                @endif
             </div>
-            <p class="s-2e3ee8 xs mut">{{ $en ? 'Catalog counts' : 'კატალოგის მოცულობა' }} · {{ $measuredAt }} · <a class="mono" href="{{ url('/api/v1/docs') }}#tag/Catalog/operation/getCoverage">GET /api/v1/coverage</a></p>
         </div>
 </section>
 <section class="sec" id="features">
