@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Http\Middleware;
 
 use App\Models\User;
+use Carapi\Platform\Session;
 use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -17,7 +18,7 @@ final class BridgeLegacySession
     {
         if (! Auth::check()) {
             $sid = $request->cookie('geoapi_platform');
-            $legacyId = is_string($sid) ? $this->legacyUserId($sid) : null;
+            $legacyId = is_string($sid) && $this->live($sid) ? $this->legacyUserId($sid) : null;
             if ($legacyId !== null) {
                 $platform = DB::table('platform.users')->where('id', $legacyId)->first(['status', 'auth_version']);
                 $user = User::query()->where('legacy_platform_user_id', $legacyId)->first();
@@ -68,11 +69,30 @@ final class BridgeLegacySession
         return (int) $match[1];
     }
 
+    /** An expired session file is deleted, so the copied cookie can never sign in again. */
+    private function live(string $sid): bool
+    {
+        if (preg_match('/^[a-f0-9]{32}$/', $sid) !== 1) {
+            return false;
+        }
+        $file = $this->sessionFile($sid);
+        if (! is_file($file)) {
+            return false;
+        }
+        $raw = (string) file_get_contents($file);
+        $issued = preg_match('/issued_at\|i:(\d+);/', $raw, $match) === 1 ? (int) $match[1] : 0;
+        $seen = preg_match('/last_seen\|i:(\d+);/', $raw, $match) === 1 ? (int) $match[1] : 0;
+        if (Session::expired($issued, $seen)) {
+            @unlink($file);
+
+            return false;
+        }
+
+        return true;
+    }
+
     private function sessionFile(string $sid): string
     {
-        $dir = env('CARAPI_PLATFORM_SESSION_PATH');
-        $dir = is_string($dir) && $dir !== '' ? $dir : storage_path('framework/carapi-sessions');
-
-        return $dir.'/sess_'.$sid;
+        return Session::path().'/sess_'.$sid;
     }
 }

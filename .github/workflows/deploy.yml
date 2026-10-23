@@ -35,7 +35,7 @@ jobs:
         uses: shivammathur/setup-php@v2
         with:
           php-version: "8.4"
-          extensions: mbstring, xml, curl, zip, bcmath, intl, sodium, pdo_sqlite, sqlite3, pdo_pgsql, pgsql
+          extensions: mbstring, xml, curl, zip, bcmath, gd, intl, sodium, pdo_sqlite, sqlite3, pdo_pgsql, pgsql
           coverage: none
 
       - name: Install dependencies
@@ -189,6 +189,8 @@ jobs:
             trap bring_up EXIT
             git pull origin main
             composer install --no-dev --optimize-autoloader --no-interaction
+            # /getimage watermarks with GD and answers 503 without it; warn, do not fail.
+            php -r 'exit(extension_loaded("gd") ? 0 : 1);' || echo "::warning::PHP CLI on the server has no GD extension; /getimage will answer 503. Check php-fpm too."
             php artisan migrate --force
             php artisan storage:link || true
             php artisan optimize:clear

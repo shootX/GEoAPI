@@ -53,4 +53,13 @@ final class HardeningTest extends TestCase
     {
         $this->withHeader('X-Request-Id', 'health-1')->get('/up')->assertOk()->assertHeader('X-Request-Id', 'health-1');
     }
+
+    public function test_engineering_notes_under_docs_are_not_served(): void
+    {
+        // QA retest L5: they named env vars, the database role and files that do not exist.
+        foreach (['/docs/CATALOG_API.md', '/docs/usage_and_limits.md', '/docs/PROJECTS_API_KEYS.md', '/docs/WIDGET_INTEGRATION.md'] as $path) {
+            $this->get($path)->assertNotFound();
+        }
+        $this->get('/docs')->assertRedirect('/guide');
+    }
 }

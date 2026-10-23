@@ -202,7 +202,8 @@ final class Http
         }
         try {
             $token = (new Tokens(Connection::pdo()))->issue((int) $result['id'], 'verify_email', UserRepository::email((string) $input['email']));
-            Mail::make()->send(UserRepository::email((string) $input['email']), 'ელფოსტის დადასტურება', Mail::appUrl() . '/email/verify?token=' . $token);
+            [$subject, $text] = Letters::verifyEmail(Mail::appUrl() . '/email/verify?token=' . $token);
+            Mail::make()->send(UserRepository::email((string) $input['email']), $subject, $text);
         } catch (\Throwable $e) {
             error_log('[platform] verification mail failed ' . $e::class);
         }
@@ -829,7 +830,8 @@ final class Http
         }
         try {
             $token = (new Tokens(Connection::pdo()))->issue((int) $user['id'], 'verify_email', (string) $user['email']);
-                Mail::make()->send((string) $user['email'], 'ელფოსტის დადასტურება', "დაადასტურეთ GeoAPI ანგარიშის ელფოსტა ამ ბმულით. ბმული 24 საათი მოქმედებს.\n" . Mail::appUrl() . '/email/verify?token=' . $token);
+            [$subject, $text] = Letters::verifyEmail(Mail::appUrl() . '/email/verify?token=' . $token);
+            Mail::make()->send((string) $user['email'], $subject, $text);
         } catch (UnavailableException) {
             error_log('[platform] verification mail failed');
             View::account($user, (new ProjectRepository(Connection::pdo()))->forUser((int) $user['id']), ['form' => 'დადასტურების წერილი ვერ გაიგზავნა. სცადეთ მოგვიანებით.'], []);
@@ -873,6 +875,11 @@ final class Http
         if (isset($result['user_id']) && class_exists(\App\Account\IdentitySync::class)) {
             \App\Account\IdentitySync::markLaravelVerified((int) $result['user_id']);
         }
+        // The owner is usually still signed in from registration: send them back instead of asking to sign in.
+        $signedIn = function_exists('auth') ? auth()->user() : null;
+        if (isset($result['user_id']) && $signedIn !== null && (int) ($signedIn->legacy_platform_user_id ?? 0) === (int) $result['user_id']) {
+            self::redirect('/account');
+        }
         View::notice('ელფოსტა დადასტურდა', 'ელფოსტა დადასტურდა. შედით ანგარიშში. API გასაღები ავტომატურად არ იქმნება — პროექტს კაბინეტში დაამატებთ.');
     }
 
@@ -903,7 +910,8 @@ final class Http
         if ($row !== null && $tokens->limited($email, self::ip(), 'reset_password') === null) {
             try {
                 $token = $tokens->issue((int) $row['id'], 'reset_password', (string) $row['email']);
-                Mail::make()->send((string) $row['email'], 'პაროლის აღდგენა', "პაროლის აღდგენის ბმული 30 წუთი მოქმედებს. თუ აღდგენა თქვენ არ მოგითხოვიათ, ამ წერილს არ უპასუხოთ.\n" . Mail::appUrl() . '/reset-password?token=' . $token);
+                [$subject, $text] = Letters::resetPassword(Mail::appUrl() . '/reset-password?token=' . $token);
+                Mail::make()->send((string) $row['email'], $subject, $text);
             } catch (UnavailableException) {
                 error_log('[platform] reset mail failed');
             }
@@ -957,7 +965,8 @@ final class Http
         try {
             $sentTo = self::emailForResetToken((string) ($input['token'] ?? ''));
             if ($sentTo !== null) {
-                Mail::make()->send($sentTo, 'პაროლი შეიცვალა', 'თქვენი GeoAPI ანგარიშის პაროლი შეიცვალა. თუ ეს ცვლილება თქვენ არ განგიხორციელებიათ, დაგვიკავშირდით: hello@geoapi.ge.');
+                [$subject, $text] = Letters::passwordChanged();
+                Mail::make()->send($sentTo, $subject, $text);
             }
         } catch (UnavailableException) {
             error_log('[platform] reset notice failed');

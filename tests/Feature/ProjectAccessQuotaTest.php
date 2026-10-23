@@ -366,7 +366,8 @@ final class ProjectAccessQuotaTest extends TestCase
         $this->getJson('/api/v1/brands?limit=1')->assertOk();
         $this->getJson('/api/v1/coverage')
             ->assertStatus(429)
-            ->assertJsonPath('error.code', 'MONTHLY_QUOTA_EXCEEDED');
+            ->assertJsonPath('error.code', 'MONTHLY_QUOTA_EXCEEDED')
+            ->assertJsonPath('error.message', 'The monthly quota was reached. It renews at the start of next month.');
         $this->env('CARAPI_USAGE_NOW', (string) gmmktime(0, 0, 30, 2, 1, 2026));
         $this->getJson('/api/v1/coverage')->assertOk();
         $stats = MemoryUsageStore::shared()->stats(7, gmmktime(0, 0, 30, 2, 1, 2026));

@@ -585,5 +585,12 @@
     "This email is already registered. Sign in or reset your password.": "ეს ელფოსტა უკვე რეგისტრირებულია. შედით ან აღადგინეთ პაროლი.",
     "Free, Starter, and Growth. Prices include VAT. A year is 15% less and does not renew by itself.": "Free, Starter და Growth. ფასები დღგ-ს შეიცავს. წლიური 15%-ით იაფია და თავისით არ განახლდება.",
     "Free, Basic, and Premium. Prices include VAT.": "Free, Basic და Premium. ფასები დღგ-ს შეიცავს.",
-    "Code sample": "კოდის მაგალითი"
+    "Code sample": "კოდის მაგალითი",
+    "Your password is shorter than 15 characters. Set a new one to continue.": "თქვენი პაროლი 15 სიმბოლოზე მოკლეა. გასაგრძელებლად დააყენეთ ახალი.",
+    "Page Expired": "გვერდის ვადა ამოიწურა",
+    "Too Many Requests": "ძალიან ბევრი მოთხოვნა",
+    "Server Error": "სერვერის შეცდომა",
+    "Service Unavailable": "სერვისი დროებით მიუწვდომელია",
+    "Unauthorized": "ავტორიზაცია საჭიროა",
+    "Payment Required": "საჭიროა გადახდა"
 }

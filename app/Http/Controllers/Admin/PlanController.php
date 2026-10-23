@@ -25,7 +25,7 @@ final class PlanController extends CrudController
             'per_minute' => [$req, 'integer', 'min:1', 'max:100000'],
             'monthly_quota' => [$req, 'integer', 'min:1', 'max:100000000'],
             'price_minor' => ['nullable', 'integer', 'min:0'],
-            'currency' => ['sometimes', 'string', 'size:3'],
+            'currency' => ['sometimes', 'in:GEL'],
             'interval' => ['sometimes', 'in:month,year'],
             'status' => [$req, 'in:draft,published'],
             'features' => ['sometimes', 'array'],

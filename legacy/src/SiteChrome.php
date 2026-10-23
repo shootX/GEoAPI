@@ -9,7 +9,7 @@ final class SiteChrome
     public static function assets(): string
     {
         return '<link rel="stylesheet" href="/assets/fonts/fonts.css?v=20261018">'
-            . '<link rel="stylesheet" href="/assets/site.css?v=20261020r">';
+            . '<link rel="stylesheet" href="/assets/site.css?v=20261022s">';
     }
 
     public static function logo(string $href = '/'): string
@@ -60,7 +60,7 @@ final class SiteChrome
             . '<span>© ' . date('Y') . ' შპს „ინოვა ლაბ“ · <a href="mailto:hello@geoapi.ge">hello@geoapi.ge</a></span>'
             . '<div class="links"><a href="/guide">დოკუმენტაცია</a>' . $account
             . '<a href="/terms">გამოყენების წესები</a><a href="/privacy">კონფიდენციალურობა</a></div>'
-            . '</div></footer><script src="/assets/site.js?v=20261018f"></script>';
+            . '</div></footer><script src="/assets/site.js?v=20261022a"></script>';
     }
 
     public static function start(string $title, ?string $description = null, bool $exactTitle = false): string
@@ -86,7 +86,7 @@ final class SiteChrome
 
     public static function themeButton(): string
     {
-        return '<button class="btn btn-g" type="button" data-theme-toggle aria-label="ღია და მუქი რეჟიმის შეცვლა" style="width:40px;padding:0">'
+        return '<button class="btn btn-g btn-sq" type="button" data-theme-toggle aria-label="ღია და მუქი რეჟიმის შეცვლა">'
             . self::icon('sun') . '</button>';
     }
 

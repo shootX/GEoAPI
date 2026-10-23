@@ -44,7 +44,6 @@ final class DemoWatermarkTest extends TestCase
                 }
             }
         }
-        imagedestroy($image);
 
         foreach ($changed as $region => $count) {
             $share = $count / $samples[$region];
@@ -81,7 +80,6 @@ final class DemoWatermarkTest extends TestCase
         ob_start();
         imagejpeg($image, null, 90);
         $bytes = ob_get_clean();
-        imagedestroy($image);
 
         return is_string($bytes) ? $bytes : '';
     }

@@ -1,4 +1,4 @@
-@props(['name', 'size' => 16, 'style' => ''])
+@props(['name', 'size' => 16])
 @php
     $paths = [
         'chk' => '<path d="M4 10.5l4 4 8-9"/>',
@@ -37,4 +37,5 @@
         'left' => '<path d="M12 5l-5 5 5 5"/>'
     ];
 @endphp
-<svg class="ic" viewBox="0 0 20 20" aria-hidden="true" style="width:{{ $size }}px;height:{{ $size }}px;{{ $style }}">{!! $paths[$name] ?? '' !!}</svg>
+{{-- Sizes are classes in geoapi-inline.css (no style attribute under the CSP); add a new size there. --}}
+<svg {{ $attributes->merge(['class' => 'ic ic-'.$size]) }} viewBox="0 0 20 20" aria-hidden="true">{!! $paths[$name] ?? '' !!}</svg>

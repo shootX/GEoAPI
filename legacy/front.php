@@ -62,14 +62,6 @@ if (\Carapi\Catalog\VehiclePickerHttp::matches($apiPath)) {
     return;
 }
 
-$publicDoc = carapi_resolve_doc($apiPath);
-if ($publicDoc !== null) {
-    header('Content-Type: ' . carapi_doc_content_type($publicDoc));
-    header('X-Content-Type-Options: nosniff');
-    readfile($publicDoc);
-    return;
-}
-
 $path = strtolower(rtrim($uriPath, '/'));
 
 if (\Carapi\Platform\Http::enabled() && \Carapi\Platform\Http::handles($path)) {
@@ -223,9 +215,12 @@ function carapi_get_image(): void
                 echo $marked['bytes'];
                 return;
             }
-            header('Content-Type: ' . $res['mime']);
-            header('Content-Length: ' . strlen($bytes));
-            echo $bytes;
+            // Fail closed like /api/models/{id}/photo: never send a photo without the watermark.
+            error_log('[geoapi] getImage watermark unavailable');
+            http_response_code(503);
+            header('Content-Type: text/plain; charset=utf-8');
+            header('Cache-Control: no-store');
+            echo 'image temporarily unavailable';
             return;
         }
         // Cache blob vanished between lookup and read — fall through to "not found".
@@ -264,95 +259,6 @@ function carapi_self_base(): string
         ?? ((!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http');
     $host = $_SERVER['HTTP_HOST'] ?? 'localhost';
     return $proto . '://' . $host;
-}
-
-/** Allowlisted file under docs/. Case-insensitive. No traversal. Other files stay on disk. */
-function carapi_resolve_doc(string $apiPath): ?string
-{
-    $apiPath = rawurldecode($apiPath);
-    if (str_contains($apiPath, "\0") || !str_starts_with(strtolower($apiPath), '/docs/')) {
-        return null;
-    }
-    $rel = trim(substr($apiPath, 6), '/');
-    if ($rel === '') {
-        return null;
-    }
-    $parts = explode('/', $rel);
-    foreach ($parts as $part) {
-        if ($part === '' || $part === '.' || $part === '..' || str_starts_with($part, '.')) {
-            return null;
-        }
-    }
-
-    $root = realpath(dirname(__DIR__) . '/docs');
-    if ($root === false || !is_dir($root)) {
-        return null;
-    }
-
-    $dir = $root;
-    $last = count($parts) - 1;
-    foreach ($parts as $i => $part) {
-        $match = null;
-        foreach (scandir($dir) ?: [] as $entry) {
-            if ($entry === '.' || $entry === '..' || str_starts_with($entry, '.')) {
-                continue;
-            }
-            if (strcasecmp($entry, $part) === 0) {
-                $match = $entry;
-                break;
-            }
-        }
-        if ($match === null) {
-            return null;
-        }
-        $next = $dir . DIRECTORY_SEPARATOR . $match;
-        if ($i === $last) {
-            if (!is_file($next)) {
-                return null;
-            }
-            $real = realpath($next);
-            $prefix = $root . DIRECTORY_SEPARATOR;
-            if ($real === false || !str_starts_with($real, $prefix)) {
-                return null;
-            }
-            $allowed = [
-                'catalog_api.md',
-                'projects_api_keys.md',
-                'usage_and_limits.md',
-                'widget_integration.md',
-            ];
-            if (!in_array(strtolower(substr($real, strlen($prefix))), $allowed, true)) {
-                return null;
-            }
-
-            return $real;
-        }
-        if (!is_dir($next)) {
-            return null;
-        }
-        $dir = $next;
-    }
-    return null;
-}
-
-function carapi_doc_content_type(string $file): string
-{
-    $ext = strtolower(pathinfo($file, PATHINFO_EXTENSION));
-    return match ($ext) {
-        'md', 'txt', 'csv', 'log' => 'text/plain; charset=utf-8',
-        'json' => 'application/json; charset=utf-8',
-        'html', 'htm' => 'text/html; charset=utf-8',
-        'css' => 'text/css; charset=utf-8',
-        'js' => 'text/javascript; charset=utf-8',
-        'svg' => 'image/svg+xml',
-        'png' => 'image/png',
-        'jpg', 'jpeg' => 'image/jpeg',
-        'gif' => 'image/gif',
-        'webp' => 'image/webp',
-        'pdf' => 'application/pdf',
-        'xml' => 'application/xml; charset=utf-8',
-        default => 'application/octet-stream',
-    };
 }
 
 /** HTTP header values must be a single line; attribution can contain anything. */
@@ -818,7 +724,7 @@ TXT;
     echo '<article class="agent" id="claude"><div class="mark">' . carapi_logo('claude') . '</div><h3>GeoAPI-ის ინსტრუქციების დამატება CLAUDE.md ფაილში</h3><span class="file">CLAUDE.md</span><p>Claude Code პროექტის ფესვში არსებულ <code>CLAUDE.md</code> ფაილს კითხულობს. ეს Cursor-ის <code>.mdc</code> ფაილი არ არის და frontmatter არ სჭირდება.</p></article>';
     echo '<article class="agent" id="codex"><div class="mark">' . carapi_logo('openai') . '</div><h3>GeoAPI-ის ინსტრუქციების დამატება AGENTS.md ფაილში</h3><span class="file">AGENTS.md</span><p>Codex პროექტის ფესვში არსებულ <code>AGENTS.md</code> ფაილს კითხულობს. ის ავტომატურად არ კითხულობს არც <code>.cursor/rules/geoapi.mdc</code>-ს და არც <code>CLAUDE.md</code>-ს.</p></article>';
     echo '</div>';
-    echo '<div class="codeb" style="margin-top:20px"><div class="tb"><div class="tabs"><button type="button" class="on" data-tab="cursor">Cursor</button><button type="button" data-tab="claude">Claude Code</button><button type="button" data-tab="codex">Codex</button></div><button type="button" class="copy" data-copy-block>' . $copy . 'კოდის კოპირება</button></div>';
+    echo '<div class="codeb codeb-mt"><div class="tb"><div class="tabs"><button type="button" class="on" data-tab="cursor">Cursor</button><button type="button" data-tab="claude">Claude Code</button><button type="button" data-tab="codex">Codex</button></div><button type="button" class="copy" data-copy-block>' . $copy . 'კოდის კოპირება</button></div>';
     echo '<pre class="json" data-tab-panel="cursor">' . $h($cursorFile) . '</pre>';
     echo '<pre class="json" data-tab-panel="claude" hidden>' . $h($claudeFile) . '</pre>';
     echo '<pre class="json" data-tab-panel="codex" hidden>' . $h($codexFile) . '</pre></div>';

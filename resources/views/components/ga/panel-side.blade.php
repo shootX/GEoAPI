@@ -15,7 +15,7 @@
 <aside class="side" id="side">
     <a class="logo" href="{{ url('/') }}"><img src="{{ asset('assets/brand/geoapi-lockup-light.svg') }}" alt="geoapi.ge" height="26"></a>
     @if ($project)
-        <div class="proj"><span class="av">{{ mb_strtoupper(mb_substr((string) $project, 0, 1)) }}</span><div style="flex:1;min-width:0;line-height:1.25"><div class="pn">{{ $project }}</div><div class="xs mut">{{ $plan }}</div></div></div>
+        <div class="proj"><span class="av">{{ mb_strtoupper(mb_substr((string) $project, 0, 1)) }}</span><div class="s-dd6ec3"><div class="pn">{{ $project }}</div><div class="xs mut">{{ $plan }}</div></div></div>
     @endif
     <nav class="nav" aria-label="{{ $en ? 'Cabinet' : 'პანელი' }}">
         @foreach ($items as [$key, $icon, $label])
@@ -32,9 +32,9 @@
         @else
             <a href="{{ route('account.home') }}#settings"><x-ga.icon name="user" :size="18" /><span>{{ $en ? 'Settings' : 'პარამეტრები' }}</span></a>
         @endif
-        <a href="{{ url('/guide') }}"><x-ga.icon name="doc" :size="18" /><span style="flex:1">{{ $en ? 'Documentation' : 'დოკუმენტაცია' }}</span><x-ga.icon name="ext" :size="12" /></a>
+        <a href="{{ url('/guide') }}"><x-ga.icon name="doc" :size="18" /><span class="s-97445a">{{ $en ? 'Documentation' : 'დოკუმენტაცია' }}</span><x-ga.icon name="ext" :size="12" /></a>
     </nav>
     @if ($user)
-        <div class="me"><span class="av round">{{ $initials }}</span><div style="min-width:0;line-height:1.3"><div class="pn">{{ $user->name }}</div><div class="xs mut" style="overflow:hidden;text-overflow:ellipsis">{{ $user->email }}</div></div></div>
+        <div class="me"><span class="av round">{{ $initials }}</span><div class="s-24f19e"><div class="pn">{{ $user->name }}</div><div class="s-7e56e5 xs mut">{{ $user->email }}</div></div></div>
     @endif
 </aside>

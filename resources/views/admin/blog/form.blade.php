@@ -70,9 +70,9 @@
     </form>
     <section class="admin-group" id="snippet">
         <h2>Google-ის ესკიზი</h2>
-        <p id="snippet-title" style="color:#1a0dab;font-size:18px;margin:0"></p>
-        <p id="snippet-url" style="color:#006621;font-size:13px;margin:2px 0"></p>
-        <p id="snippet-desc" style="color:#545454;font-size:13px;margin:0"></p>
+        <p id="snippet-title" class="s-460915"></p>
+        <p id="snippet-url" class="s-4b1385"></p>
+        <p id="snippet-desc" class="s-0a3d57"></p>
     </section>
     <script @nonce>
         (function () {

@@ -23,14 +23,14 @@
 <body class="site ga min-h-screen antialiased {{ $homeNav ? 'is-home' : '' }}">
     <header class="hd">
         <div class="wrap">
-            <a href="{{ url('/') }}" aria-label="GeoAPI.ge"><img src="{{ asset('assets/brand/geoapi-lockup-light.svg') }}" alt="geoapi.ge" style="height:30px;display:block" width="94" height="30"></a>
+            <a href="{{ url('/') }}" aria-label="GeoAPI.ge"><img src="{{ asset('assets/brand/geoapi-lockup-light.svg') }}" alt="geoapi.ge" class="s-afbfcd" width="94" height="30"></a>
             <nav class="nav" aria-label="{{ __('Menu') }}">
                 @foreach ($nav as $item)
                     <a href="{{ $item['href'] }}" class="{{ $active === $item['key'] ? 'on' : '' }}" @if ($active === $item['key']) aria-current="page" @endif>{{ $item['label'] }}</a>
                 @endforeach
             </nav>
             <div class="hd-r">
-                <span class="seg hide-m" style="padding:3px" aria-label="{{ __('Language') }}">
+                <span class="s-cda68d seg hide-m" aria-label="{{ __('Language') }}">
                     <a href="{{ route('locale.switch', 'ka') }}" class="{{ $en ? '' : 'on' }}" @unless ($en) aria-current="true" @endunless>KA</a>
                     <a href="{{ route('locale.switch', 'en') }}" class="{{ $en ? 'on' : '' }}" @if ($en) aria-current="true" @endif>EN</a>
                 </span>
@@ -53,26 +53,26 @@
                 <a href="{{ url('/account') }}">{{ $en ? 'Cabinet' : 'კაბინეტი' }}</a>
             @else
                 <a href="{{ route('login') }}">{{ $en ? 'Sign in' : 'შესვლა' }}</a>
-                <a class="btn b-pri" style="justify-content:center;margin-top:6px;color:#fff" href="{{ route('register') }}">{{ $en ? 'Start free' : 'დაიწყე უფასოდ' }}</a>
+                <a class="s-d12ea1 btn b-pri" href="{{ route('register') }}">{{ $en ? 'Start free' : 'დაიწყე უფასოდ' }}</a>
             @endauth
-            <span class="seg" style="padding:3px;margin-top:8px;align-self:flex-start">
+            <span class="s-662632 seg">
                 <a href="{{ route('locale.switch', 'ka') }}" class="{{ $en ? '' : 'on' }}">KA</a>
                 <a href="{{ route('locale.switch', 'en') }}" class="{{ $en ? 'on' : '' }}">EN</a>
             </span>
         </div>
     </nav>
-    <main class="site-main {{ !empty($bleed) || $homeNav ? 'is-bleed' : 'wrap' }}" style="{{ !empty($bleed) || $homeNav ? '' : 'padding-block:56px 96px' }}">
+    <main class="site-main {{ !empty($bleed) || $homeNav ? 'is-bleed' : 'wrap site-main-pad' }}">
         @if (session('coming_soon_saved'))
-            <p class="al al-ok" style="margin-bottom:24px">{{ __('Thanks. We will write when Pro opens.') }}</p>
+            <p class="s-867774 al al-ok">{{ __('Thanks. We will write when Pro opens.') }}</p>
         @endif
         {{ $slot }}
     </main>
     <footer class="ft">
         <div class="wrap">
             <div>
-                <img src="{{ asset('assets/brand/geoapi-lockup-light.svg') }}" alt="geoapi.ge" style="height:28px" width="88" height="28">
-                <p class="sm mut" style="margin-top:10px;max-width:300px">{{ $slogan }}</p>
-                <p class="sm" style="margin-top:12px"><a href="mailto:hello@geoapi.ge" style="color:var(--ac)">hello@geoapi.ge</a></p>
+                <img src="{{ asset('assets/brand/geoapi-lockup-light.svg') }}" alt="geoapi.ge" class="s-3a8bc5" width="88" height="28">
+                <p class="s-7c43fb sm mut">{{ $slogan }}</p>
+                <p class="s-56f435 sm"><a href="mailto:hello@geoapi.ge" class="s-2bf96e">hello@geoapi.ge</a></p>
             </div>
             <div class="cols">
                 <div><b>{{ $en ? 'Product' : 'პროდუქტი' }}</b><a href="{{ route('pricing') }}">{{ $en ? 'Pricing' : 'ტარიფები' }}</a><a href="{{ url('/demo') }}">{{ $en ? 'Demo' : 'დემო' }}</a></div>
@@ -80,7 +80,7 @@
                 <div><b>{{ $en ? 'Company' : 'კომპანია' }}</b>@if ($showBlog)<a href="{{ url('/blog') }}">{{ $en ? 'Blog' : 'ბლოგი' }}</a>@endif<a href="{{ url('/terms') }}">{{ $en ? 'Terms' : 'წესები' }}</a><a href="{{ url('/privacy') }}">{{ $en ? 'Privacy' : 'კონფიდენციალურობა' }}</a></div>
             </div>
         </div>
-        <div class="wrap xs mut" style="margin-top:28px;display:flex;justify-content:space-between"><span>© {{ date('Y') }} GeoAPI.ge</span><span>KA · EN</span></div>
+        <div class="s-e8f6d1 wrap xs mut"><span>© {{ date('Y') }} GeoAPI.ge</span><span>KA · EN</span></div>
     </footer>
     <script @nonce>
         (function () {

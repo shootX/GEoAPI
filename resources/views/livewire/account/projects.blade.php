@@ -23,7 +23,7 @@
         <header class="top">
             <button class="btn menu" id="menu" type="button" aria-expanded="false" aria-controls="side" aria-label="{{ __('Menu') }}"><x-ga.icon name="menu" :size="20" /></button><a class="mlogo" href="{{ url('/') }}"><img src="{{ asset('assets/brand/geoapi-lockup-light.svg') }}" alt="geoapi.ge" height="22" width="69"></a>
             <h1 id="title">{{ $en ? 'Overview' : 'მიმოხილვა' }}</h1>
-            <div class="who"><span class="seg hide-m" style="padding:3px"><a href="{{ route('locale.switch', 'ka') }}" class="{{ $en ? '' : 'on' }}">KA</a><a href="{{ route('locale.switch', 'en') }}" class="{{ $en ? 'on' : '' }}">EN</a></span><span class="bd {{ $planBd }}">{{ $plan }}</span></div>
+            <div class="who"><span class="s-cda68d seg hide-m"><a href="{{ route('locale.switch', 'ka') }}" class="{{ $en ? '' : 'on' }}">KA</a><a href="{{ route('locale.switch', 'en') }}" class="{{ $en ? 'on' : '' }}">EN</a></span><span class="bd {{ $planBd }}">{{ $plan }}</span></div>
         </header>
         <div class="content">
             @if ($unavailable)
@@ -53,19 +53,19 @@
                             <rect x="{{ 3 + $index * 20 }}" y="{{ 165 - $h }}" width="14" height="{{ $h }}" rx="3"></rect>
                         @endforeach
                     </svg>
-                    <p class="xs mut" style="margin-top:8px">{{ $en ? 'HTTP 200 only · widget and API share one counter' : 'მხოლოდ HTTP 200 · ვიჯეტი და API ერთ მრიცხველზე' }}</p>
+                    <p class="s-8a77e5 xs mut">{{ $en ? 'HTTP 200 only · widget and API share one counter' : 'მხოლოდ HTTP 200 · ვიჯეტი და API ერთ მრიცხველზე' }}</p>
                 </section>
                 <section class="panel">
-                    <div class="row" style="justify-content:space-between;margin-bottom:14px"><h2 style="margin:0">{{ $en ? 'Plan' : 'გეგმა' }}</h2><span class="bd {{ $planBd }}">{{ $plan }}</span></div>
-                    <div class="row" style="justify-content:space-between;margin-bottom:8px"><span style="font-weight:500">{{ $en ? 'Monthly quota' : 'თვიური კვოტა' }}</span><span class="mono sm"><b>{{ $fmt($used) }}</b> <span class="mut">/ {{ ! empty($unlimited) ? '∞' : $fmt($limit) }}</span></span></div>
-                    <div class="quota" aria-label="{{ $fmt($used) }} / {{ $fmt($limit) }}"><span style="width: {{ ! empty($unlimited) ? 0 : $quota }}%"></span></div>
-                    <p class="muted" style="margin-top:8px">@if (! empty($v2)){{ $en ? $fmt($used).' successful requests of '.$fmt($limit).'. Shared by the projects on this account.' : $fmt($used).' წარმატებული მოთხოვნა '.$fmt($limit).'-დან. ანგარიშის პროექტები ერთ კვოტას იყოფენ.' }}@elseif (! empty($unlimited)){{ $en ? $fmt($used).' successful requests. Unlimited for this project.' : $fmt($used).' წარმატებული მოთხოვნა. ამ პროექტზე შეუზღუდავია.' }}@else{{ $en ? $fmt($used).' successful requests of '.$fmt($limit).'. '.$plan.' plan, per project.' : $fmt($used).' წარმატებული მოთხოვნა '.$fmt($limit).'-დან. '.$plan.' გეგმა, პროექტზე.' }}@endif</p>
+                    <div class="s-db3675 row"><h2 class="s-116966">{{ $en ? 'Plan' : 'გეგმა' }}</h2><span class="bd {{ $planBd }}">{{ $plan }}</span></div>
+                    <div class="s-c1cf7f row"><span class="s-02a2d3">{{ $en ? 'Monthly quota' : 'თვიური კვოტა' }}</span><span class="mono sm"><b>{{ $fmt($used) }}</b> <span class="mut">/ {{ ! empty($unlimited) ? '∞' : $fmt($limit) }}</span></span></div>
+                    <div class="quota" aria-label="{{ $fmt($used) }} / {{ $fmt($limit) }}"><span class="qw-{{ ! empty($unlimited) ? 0 : (int) round($quota) }}"></span></div>
+                    <p class="s-8a77e5 muted">@if (! empty($v2)){{ $en ? $fmt($used).' successful requests of '.$fmt($limit).'. Shared by the projects on this account.' : $fmt($used).' წარმატებული მოთხოვნა '.$fmt($limit).'-დან. ანგარიშის პროექტები ერთ კვოტას იყოფენ.' }}@elseif (! empty($unlimited)){{ $en ? $fmt($used).' successful requests. Unlimited for this project.' : $fmt($used).' წარმატებული მოთხოვნა. ამ პროექტზე შეუზღუდავია.' }}@else{{ $en ? $fmt($used).' successful requests of '.$fmt($limit).'. '.$plan.' plan, per project.' : $fmt($used).' წარმატებული მოთხოვნა '.$fmt($limit).'-დან. '.$plan.' გეგმა, პროექტზე.' }}@endif</p>
                     <div class="mini-plans">
                         @foreach (! empty($v2) ? [['Free', '1 000'], ['Starter', '25 000'], ['Growth', '150 000']] : [['Free', '100'], ['Basic', '2 000'], ['Premium', '∞']] as [$n, $q])
                             <div class="{{ $plan === $n ? 'on' : '' }}"><b>{{ $n }}</b><span class="xs mut">{{ $q }} / {{ $en ? 'mo' : 'თვე' }}</span></div>
                         @endforeach
                     </div>
-                    <a class="btn" style="width:100%;justify-content:center;margin-top:14px" href="{{ route('account.billing') }}">{{ $en ? 'Change the plan' : 'გეგმის შეცვლა' }}</a>
+                    <a class="s-8c3743 btn" href="{{ route('account.billing') }}">{{ $en ? 'Change the plan' : 'გეგმის შეცვლა' }}</a>
                 </section>
                 </div>
             </section>
@@ -87,7 +87,7 @@
                 @error('key_name') <p class="err">{{ $message }}</p> @enderror
                 <div class="panel flush">
                     <div class="ph"><h2>{{ $en ? 'API keys' : 'API გასაღებები' }}</h2><span class="bd bd-out">{{ count($keys) + (is_array($widget) && ! empty($widget['public_key']) ? 1 : 0) }}</span></div>
-                    <div class="tw"><table>
+                    <div class="tw" tabindex="0" role="region" aria-label="{{ $en ? 'API keys' : 'API გასაღებები' }}"><table>
                         <thead><tr><th>{{ $en ? 'Name' : 'სახელი' }}</th><th>{{ $en ? 'Key' : 'გასაღები' }}</th><th>{{ $en ? 'Last used' : 'ბოლო გამოყენება' }}</th><th>{{ $en ? 'Expires' : 'ვადა' }}</th><th>{{ $en ? 'Status' : 'სტატუსი' }}</th><th></th></tr></thead>
                         <tbody>
                         @if (is_array($widget) && ! empty($widget['public_key']))
@@ -103,7 +103,7 @@
                                 <td>@unless ($off)@if (empty($demo))<button class="lnk-er" type="button" wire:click="revokeKey({{ (int) $key['id'] }})" wire:confirm="{{ $en ? 'Revoke this key?' : 'გავაუქმოთ გასაღები?' }}">{{ $en ? 'Revoke' : 'გაუქმება' }}</button>@else<span class="lnk-er">{{ $en ? 'Revoke' : 'გაუქმება' }}</span>@endif @endunless</td></tr>
                         @empty
                             @unless (is_array($widget) && ! empty($widget['public_key']))
-                                <tr><td colspan="6" class="mut" style="text-align:center;height:64px">{{ $en ? 'No keys yet.' : 'გასაღები ჯერ არ არის.' }}</td></tr>
+                                <tr><td colspan="6" class="s-9f0c97 mut">{{ $en ? 'No keys yet.' : 'გასაღები ჯერ არ არის.' }}</td></tr>
                             @endunless
                         @endforelse
                         </tbody>
@@ -123,7 +123,7 @@
                         ['Premium', \App\Billing\Plans::lari(\App\Billing\Plans::tetri('premium', 'month')), $en ? 'Unlimited successful requests' : 'შეუზღუდავი წარმატებული მოთხოვნა'],
                     ] as [$name, $price, $quotaText])
                         <article class="plan {{ $plan === $name ? 'now' : '' }}">
-                            <div class="row" style="justify-content:space-between"><h2>{{ $name }}</h2>@if ($plan === $name)<span class="bd bd-ac">{{ $en ? 'Current' : 'მიმდინარე' }}</span>@endif</div>
+                            <div class="s-a562f4 row"><h2>{{ $name }}</h2>@if ($plan === $name)<span class="bd bd-ac">{{ $en ? 'Current' : 'მიმდინარე' }}</span>@endif</div>
                             <p class="price">{{ $price }} <span class="muted">/ {{ $en ? 'month' : 'თვე' }}</span></p>
                             <ul>
                                 <li>{{ $quotaText }}</li>
@@ -133,7 +133,7 @@
                         </article>
                     @endforeach
                 </div>
-                <div class="panel row" style="justify-content:space-between">
+                <div class="s-a562f4 panel row">
                     <p class="muted">@if (! empty($v2)){{ $en ? 'One subscription covers the workspace. Prices include VAT. A year is 15% less and does not renew by itself.' : 'ერთი გამოწერა ფარავს სამუშაო სივრცეს. ფასი დღგ-ს შეიცავს. წელიწადი 15%-ით ნაკლებია და თავისით არ გრძელდება.' }}@else{{ $en ? 'The plan applies to this project. Prices include VAT; a year is 12% cheaper.' : 'გეგმა მოქმედებს ამ პროექტზე. ფასი დღგ-ს შეიცავს; წლიური 12%-ით იაფია.' }}@endif</p>
                     <a class="btn pine" href="{{ route('account.billing') }}">{{ $en ? 'Change the plan' : 'გეგმის შეცვლა' }}</a>
                 </div>
@@ -148,7 +148,7 @@
                         @error('capInput') <p class="err">{{ $message }}</p> @enderror
                     </form>
                 @endif
-                <div class="panel flush"><div class="ph"><label class="srch"><x-ga.icon name="search" :size="16" /><input type="search" id="proj-q" placeholder="{{ $en ? 'Search' : 'ძიება' }}" aria-label="{{ $en ? 'Search projects' : 'პროექტების ძიება' }}" autocomplete="off"></label></div><div class="tw"><table id="proj-t">
+                <div class="panel flush"><div class="ph"><label class="srch"><x-ga.icon name="search" :size="16" /><input type="search" id="proj-q" placeholder="{{ $en ? 'Search' : 'ძიება' }}" aria-label="{{ $en ? 'Search projects' : 'პროექტების ძიება' }}" autocomplete="off"></label></div><div class="tw" tabindex="0" role="region" aria-label="{{ $en ? 'Projects' : 'პროექტები' }}"><table id="proj-t">
                     <thead><tr><th>{{ $en ? 'Project' : 'პროექტი' }}</th><th>{{ $en ? 'This month' : 'ამ თვის მოხმარება' }}</th><th>{{ $en ? 'Status' : 'სტატუსი' }}</th><th>{{ $en ? 'Created' : 'შექმნა' }}</th><th></th></tr></thead>
                     <tbody>
                     @forelse ($projects as $row)
@@ -157,15 +157,15 @@
                             $u = $usageById[(int) $row['id']] ?? null;
                             $uPct = $u && ! $u['unlimited'] && $u['limit'] > 0 ? min(100, round($u['used'] / $u['limit'] * 100)) : 0;
                         @endphp
-                        <tr data-name="{{ mb_strtolower($rowName.' '.($row['website_url'] ?? '')) }}"><td><div class="row" style="flex-wrap:nowrap"><span class="av">{{ mb_strtoupper(mb_substr($rowName, 0, 1)) }}</span><div style="min-width:0"><b>{{ $rowName }}</b>@if ((int) $row['id'] === (int) ($project['id'] ?? 0)) <span class="bd bd-ac">{{ $en ? 'selected' : 'არჩეული' }}</span>@endif<div class="xs mut mono">{{ $row['website_url'] ?? '' ?: '—' }}</div></div></div></td>
-                            <td>@if ($u)<div class="ubar"><div class="quota"><span style="width:{{ $uPct }}%;{{ $uPct >= 90 ? 'background:#B3261E' : '' }}"></span></div><span class="mono xs">{{ $fmt((int) $u['used']) }} / {{ $u['unlimited'] ? '∞' : $fmt((int) $u['limit']) }}</span></div>@else<span class="mut">—</span>@endif</td>
+                        <tr data-name="{{ mb_strtolower($rowName.' '.($row['website_url'] ?? '')) }}"><td><div class="s-2aca6d row"><span class="av">{{ mb_strtoupper(mb_substr($rowName, 0, 1)) }}</span><div class="s-3922d3"><b>{{ $rowName }}</b>@if ((int) $row['id'] === (int) ($project['id'] ?? 0)) <span class="bd bd-ac">{{ $en ? 'selected' : 'არჩეული' }}</span>@endif<div class="xs mut mono">{{ $row['website_url'] ?? '' ?: '—' }}</div></div></div></td>
+                            <td>@if ($u)<div class="ubar"><div class="quota"><span class="qw-{{ (int) $uPct }} {{ $uPct >= 90 ? 'quota-hot' : '' }}"></span></div><span class="mono xs">{{ $fmt((int) $u['used']) }} / {{ $u['unlimited'] ? '∞' : $fmt((int) $u['limit']) }}</span></div>@else<span class="mut">—</span>@endif</td>
                             <td>@if ($on)<span class="bd bd-ok">{{ $en ? 'Active' : 'აქტიური' }}</span>@else<span class="bd bd-out">{{ $en ? 'Disabled' : 'გამორთული' }}</span>@endif</td>
                             <td class="mono xs">{{ $dayFmt($row['created_at'] ?? null) }}</td>
-                            <td style="text-align:right;white-space:nowrap">@if (empty($demo))<button class="btn sm" type="button" wire:click="selectProject({{ (int) $row['id'] }})" data-go="overview">{{ $en ? 'Select' : 'არჩევა' }}</button> <a class="btn sm" href="{{ url('/account/projects/'.(int) $row['id']) }}">{{ $en ? 'Open' : 'გახსნა' }} <x-ga.icon name="chev" :size="14" /></a>@endif</td></tr>
+                            <td class="s-4ede69">@if (empty($demo))<button class="btn sm" type="button" wire:click="selectProject({{ (int) $row['id'] }})" data-go="overview">{{ $en ? 'Select' : 'არჩევა' }}</button> <a class="btn sm" href="{{ url('/account/projects/'.(int) $row['id']) }}">{{ $en ? 'Open' : 'გახსნა' }} <x-ga.icon name="chev" :size="14" /></a>@endif</td></tr>
                     @empty
                         <tr><td colspan="5"><div class="empty"><span class="ic"><x-ga.icon name="fold" :size="22" /></span><h2>{{ $en ? 'No projects yet' : 'პროექტი ჯერ არ გაქვთ' }}</h2><button class="btn pine" type="button" data-go="new"><x-ga.icon name="plus" :size="16" />{{ $en ? 'New project' : 'ახალი პროექტი' }}</button></div></td></tr>
                     @endforelse
-                    <tr id="proj-none" hidden><td colspan="5" class="mut" style="text-align:center;height:64px">{{ $en ? 'Nothing found.' : 'ვერაფერი მოიძებნა.' }}</td></tr>
+                    <tr id="proj-none" hidden><td colspan="5" class="s-9f0c97 mut">{{ $en ? 'Nothing found.' : 'ვერაფერი მოიძებნა.' }}</td></tr>
                     </tbody>
                 </table></div></div>
             </section>
@@ -177,7 +177,7 @@
                     @error('name') <p class="err">{{ $message }}</p> @enderror
                     <label>{{ $en ? 'Website' : 'საიტის მისამართი' }} <span class="xs mut">{{ $en ? 'optional' : 'არასავალდებულო' }}</span><input wire:model="website_url" class="mono" placeholder="https://example.com"></label>
                     @error('website_url') <p class="err">{{ $message }}</p> @enderror
-                    <div class="row" style="justify-content:flex-end"><button class="btn" type="button" data-go="projects">{{ $en ? 'Cancel' : 'გაუქმება' }}</button><button class="btn pine" type="submit" @if (! empty($demo)) disabled @endif><span wire:loading.remove wire:target="create">{{ $en ? 'Create project' : 'პროექტის შექმნა' }}</span><span wire:loading wire:target="create">…</span></button></div>
+                    <div class="s-455f8c row"><button class="btn" type="button" data-go="projects">{{ $en ? 'Cancel' : 'გაუქმება' }}</button><button class="btn pine" type="submit" @if (! empty($demo)) disabled @endif><span wire:loading.remove wire:target="create">{{ $en ? 'Create project' : 'პროექტის შექმნა' }}</span><span wire:loading wire:target="create">…</span></button></div>
                 </form>
             </section>
 
@@ -197,11 +197,11 @@
                             <rect x="{{ 3 + $index * 20 }}" y="{{ 165 - $h }}" width="14" height="{{ $h }}" rx="3"><title>{{ $day['day'] }}: {{ $day['used'] }}</title></rect>
                         @endforeach
                     </svg>
-                    <p class="xs mut" style="margin-top:8px">{{ $en ? 'HTTP 200 only · widget and API share one counter · resets on the 1st (UTC)' : 'მხოლოდ HTTP 200 · ვიჯეტი და API ერთ მრიცხველზე · ნულდება თვის 1-ს (UTC)' }}</p>
+                    <p class="s-8a77e5 xs mut">{{ $en ? 'HTTP 200 only · widget and API share one counter · resets on the 1st (UTC)' : 'მხოლოდ HTTP 200 · ვიჯეტი და API ერთ მრიცხველზე · ნულდება თვის 1-ს (UTC)' }}</p>
                 </section>
-                <div class="panel flush"><div class="ph"><h2>{{ $en ? 'By day' : 'დღეების მიხედვით' }}</h2></div><div class="tw" style="max-height:360px;overflow:auto"><table>
-                    <thead><tr><th>{{ $en ? 'Day (UTC)' : 'დღე (UTC)' }}</th><th style="text-align:right">{{ $en ? 'Requests' : 'მოთხოვნები' }}</th><th style="width:45%"></th></tr></thead>
-                    <tbody>@foreach (array_reverse($days) as $day)<tr><td class="mono xs">{{ $day['day'] ?: '—' }}</td><td class="mono" style="text-align:right">{{ $fmt((int) $day['used']) }}</td><td><div class="quota"><span style="width:{{ round(((int) $day['used'] / $max) * 100) }}%"></span></div></td></tr>@endforeach</tbody>
+                <div class="panel flush"><div class="ph"><h2>{{ $en ? 'By day' : 'დღეების მიხედვით' }}</h2></div><div class="s-901059 tw" tabindex="0" role="region" aria-label="{{ $en ? 'By day' : 'დღეების მიხედვით' }}"><table>
+                    <thead><tr><th>{{ $en ? 'Day (UTC)' : 'დღე (UTC)' }}</th><th class="s-54c2af">{{ $en ? 'Requests' : 'მოთხოვნები' }}</th><th class="s-a9c5e7"></th></tr></thead>
+                    <tbody>@foreach (array_reverse($days) as $day)<tr><td class="mono xs">{{ $day['day'] ?: '—' }}</td><td class="s-54c2af mono">{{ $fmt((int) $day['used']) }}</td><td><div class="quota"><span class="qw-{{ (int) round(((int) $day['used'] / $max) * 100) }}"></span></div></td></tr>@endforeach</tbody>
                 </table></div></div>
             </section>
 
@@ -213,9 +213,9 @@
                         <label><span class="lrow"><span>{{ $en ? 'Email' : 'ელფოსტა' }} @if ($verified)<span class="bd bd-ok">{{ $en ? 'verified' : 'დადასტურებული' }}</span>@else<span class="bd bd-wa">{{ $en ? 'not verified' : 'დაუდასტურებელი' }}</span>@endif</span>@if ($editUrl)<a class="edit" href="{{ $editUrl }}">{{ $editTxt }}</a>@endif</span><input value="{{ $me?->email }}" readonly></label>
                     </div></div>
                 <div class="set-row"><div><h2>{{ $en ? 'Security' : 'უსაფრთხოება' }}</h2><p class="xs mut">{{ $en ? 'Password, 2FA, sessions' : 'პაროლი, 2FA, სესიები' }}</p></div>
-                    <div class="panel row" style="justify-content:space-between"><div class="row"><span class="ic"><x-ga.icon name="lock" :size="18" /></span><div><b>{{ $en ? 'Password and two-factor' : 'პაროლი და ორსაფეხურიანი ავთენტიფიკაცია' }}</b><p class="xs mut">{{ $en ? 'Password at least 15 characters · TOTP app' : 'პაროლი მინიმუმ 15 სიმბოლო · TOTP აპი' }}</p></div></div>
+                    <div class="s-a562f4 panel row"><div class="row"><span class="ic"><x-ga.icon name="lock" :size="18" /></span><div><b>{{ $en ? 'Password and two-factor' : 'პაროლი და ორსაფეხურიანი ავთენტიფიკაცია' }}</b><p class="xs mut">{{ $en ? 'Password at least 15 characters · TOTP app' : 'პაროლი მინიმუმ 15 სიმბოლო · TOTP აპი' }}</p></div></div>
                         @if (\Illuminate\Support\Facades\Route::has('settings.security'))<a class="edit" href="{{ route('settings.security') }}">{{ $en ? 'Edit' : 'რედაქტირება' }}</a>@endif</div></div>
-                <form method="post" action="{{ url('/logout') }}" class="row" style="justify-content:flex-end">@csrf<button class="btn" type="submit">{{ $en ? 'Log out' : 'გასვლა' }}</button></form>
+                <form method="post" action="{{ url('/logout') }}" class="s-455f8c row">@csrf<button class="btn" type="submit">{{ $en ? 'Log out' : 'გასვლა' }}</button></form>
             </section>
 
             <section class="screen" id="catalog">

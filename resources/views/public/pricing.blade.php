@@ -30,63 +30,64 @@
     ];
 @endphp
 <div>
-<section class="sec" style="padding-top:56px;padding-bottom:56px;background:linear-gradient(180deg,#F7F7FB,#fff)" data-billing="month">
+<section class="s-c6eb23 sec" data-billing="month">
     <div class="wrap">
         <div class="sec-t">
             <div class="eyebrow">{{ $en ? 'Pricing' : 'ტარიფები' }}</div>
-            <h1 class="h1" style="margin-top:10px">{{ $en ? 'Pay for what you use' : 'გადაიხადეთ იმისთვის, რასაც იყენებთ' }}</h1>
-            <p class="lead" style="margin-top:12px">{{ $en ? 'Only successful (HTTP 200) responses count toward the limit.' : 'ლიმიტში ითვლება მხოლოდ წარმატებული (HTTP 200) პასუხები.' }}</p>
-            <div class="seg" style="margin-top:24px" role="group" aria-label="{{ $en ? 'Billing period' : 'გადახდის პერიოდი' }}">
+            <h1 class="s-d2c171 h1">{{ $en ? 'Pay for what you use' : 'გადაიხადეთ იმისთვის, რასაც იყენებთ' }}</h1>
+            <p class="s-56f435 lead">{{ $en ? 'Only successful (HTTP 200) responses count toward the limit.' : 'ლიმიტში ითვლება მხოლოდ წარმატებული (HTTP 200) პასუხები.' }}</p>
+            <div class="s-49fcd8 seg" role="group" aria-label="{{ $en ? 'Billing period' : 'გადახდის პერიოდი' }}">
                 <button type="button" class="seg-b on" data-period="month" aria-pressed="true">{{ $en ? 'Monthly' : 'თვიური' }}</button>
-                <button type="button" class="seg-b" data-period="year" aria-pressed="false">{{ $en ? 'Yearly' : 'წლიური' }} <span class="bd bd-ok" style="height:18px;font-size:11px;margin-left:4px">−12%</span></button>
+                <button type="button" class="seg-b" data-period="year" aria-pressed="false">{{ $en ? 'Yearly' : 'წლიური' }} <span class="s-6cb639 bd bd-ok">−12%</span></button>
             </div>
         </div>
-        <div class="g3" style="align-items:start">
+        <div class="s-dfb216 g3">
             @foreach ($plans as $key => $plan)
                 @php $hi = ! empty($plan['hi']); @endphp
-                <div class="fc" style="padding:28px;position:relative;{{ $hi ? 'border:2px solid var(--ac);box-shadow:var(--sh2);' : '' }}">
-                    @if ($hi)<span class="bd" style="position:absolute;top:-12px;left:24px;background:var(--ac);color:#fff">{{ $en ? 'Recommended' : 'რეკომენდებული' }}</span>@endif
+                <div class="fc plan-card {{ $hi ? 'plan-card-hi' : '' }}">
+                    @if ($hi)<span class="s-aa8940 bd">{{ $en ? 'Recommended' : 'რეკომენდებული' }}</span>@endif
                     <h3>{{ $plan['name'] }}</h3>
                     <div data-show="month">
-                        <div style="margin-top:14px;display:flex;align-items:baseline;gap:6px"><span class="tabular" style="font-size:42px;font-weight:700;letter-spacing:-.02em">{{ $lari($plan['month']) }}</span><span class="mut">{{ $perMonth }}</span></div>
+                        <div class="s-47a3c2"><span class="s-3d01a4 tabular">{{ $lari($plan['month']) }}</span><span class="mut">{{ $perMonth }}</span></div>
                     </div>
                     <div data-show="year" hidden>
-                        <div style="margin-top:14px;display:flex;align-items:baseline;gap:6px"><span class="tabular" style="font-size:42px;font-weight:700;letter-spacing:-.02em">{{ $lari($plan['year']) }}</span><span class="mut">{{ $plan['year'] === 0 ? $perMonth : $perYear }}</span></div>
+                        <div class="s-47a3c2"><span class="s-3d01a4 tabular">{{ $lari($plan['year']) }}</span><span class="mut">{{ $plan['year'] === 0 ? $perMonth : $perYear }}</span></div>
                         @if ($plan['year'] !== 0)
                             <div class="sm mut">{{ $lari(intdiv($plan['year'], 12)) }} {{ $perMonth }}<br><s>{{ $lari($plan['month'] * 12) }}</s> −12%</div>
                         @endif
                     </div>
-                    <div style="font-weight:600;margin:14px 0">{{ $plan['quota'] }}</div>
-                    <a class="btn {{ $hi ? 'b-pri' : 'b-sec' }}" style="width:100%;justify-content:center" href="{{ $plan['href'] }}">{{ $plan['cta'] }}</a>
-                    <div class="col sm" style="gap:10px;margin-top:20px">
+                    <div class="s-5008a2">{{ $plan['quota'] }}</div>
+                    <a class="s-4a2700 btn {{ $hi ? 'b-pri' : 'b-sec' }}" href="{{ $plan['href'] }}">{{ $plan['cta'] }}</a>
+                    <div class="s-27510f col sm">
                         @foreach ($plan['features'] as $f)
-                            <span class="row" style="gap:10px;flex-wrap:nowrap"><x-ga.icon name="chk" style="color:#4338CA" />{{ $f }}</span>
+                            <span class="s-8d7302 row"><x-ga.icon name="chk" class="s-1b397b" />{{ $f }}</span>
                         @endforeach
                     </div>
                 </div>
             @endforeach
         </div>
-        <p class="sm mut" style="text-align:center;margin-top:20px">
+        <p class="s-c7b101 sm mut">
             {{ $en ? 'Prices are in GEL and include VAT.' : 'ფასები ლარშია და დღგ-ს შეიცავს.' }}
             {{ $en ? 'Payment: Bank of Georgia.' : 'გადახდა: Bank of Georgia.' }}
         </p>
-        <p class="xs mut" style="text-align:center;margin-top:6px">{{ $en ? 'An existing project keeps 10 000 requests a month until a plan is chosen.' : 'არსებული პროექტი 10 000 მოთხოვნას ინარჩუნებს, სანამ გეგმას აირჩევს.' }}</p>
+        <p class="s-ed74eb xs mut">{{ $en ? 'An existing project keeps 10 000 requests a month until a plan is chosen.' : 'არსებული პროექტი 10 000 მოთხოვნას ინარჩუნებს, სანამ გეგმას აირჩევს.' }}</p>
     </div>
 </section>
-<section class="wrap" style="padding-bottom:72px">
-    <h2 class="h2" style="margin-bottom:20px">{{ $en ? 'Comparison' : 'შედარება' }}</h2>
-    <div class="tw">
-        <table style="font-size:14px">
-            <thead><tr><th style="width:40%"></th><th class="num">Free</th><th class="num" style="color:var(--ac)">Basic</th><th class="num">Premium</th></tr></thead>
+<section class="s-8855dd wrap">
+    <h2 class="s-49f14f h2">{{ $en ? 'Comparison' : 'შედარება' }}</h2>
+    {{-- Scrolls sideways on narrow screens, so keyboard users must be able to focus it. --}}
+    <div class="tw" tabindex="0" role="region" aria-label="{{ $en ? 'Plan comparison' : 'გეგმების შედარება' }}">
+        <table class="s-433de3">
+            <thead><tr><th class="s-dc39b8"></th><th class="num">Free</th><th class="s-2bf96e num">Basic</th><th class="num">Premium</th></tr></thead>
             <tbody>
                 @foreach ($compare as [$a, $b, $c, $d])
-                    <tr><td>{{ $a }}</td><td class="num">{{ $b }}</td><td class="num" style="background:#FAFAFE;font-weight:500">{{ $c }}</td><td class="num">{{ $d }}</td></tr>
+                    <tr><td>{{ $a }}</td><td class="num">{{ $b }}</td><td class="s-03bdc8 num">{{ $c }}</td><td class="num">{{ $d }}</td></tr>
                 @endforeach
             </tbody>
         </table>
     </div>
 </section>
-<section class="wrap" style="padding-bottom:96px">
+<section class="s-3a4c3f wrap">
     <div class="g3">
         @foreach ($en ? [
             ['When the limit runs out', 'After the monthly limit the API returns 429 MONTHLY_QUOTA_EXCEEDED until a new month starts or you change the plan.'],
@@ -97,7 +98,7 @@
             ['გეგმის შეცვლა', 'გეგმის არჩევა და გადახდა ხდება კაბინეტში, ბილინგის გვერდზე. ინვოისი PDF ფორმატშია.'],
             ['ერთი მრიცხველი', 'ვიჯეტი და სერვერის API ერთსა და იმავე პროექტის ლიმიტს იყენებს.'],
         ] as [$q, $a])
-            <div class="fc"><h4>{{ $q }}</h4><p class="sm mut" style="margin-top:6px">{{ $a }}</p></div>
+            <div class="fc"><h4>{{ $q }}</h4><p class="s-fe7b49 sm mut">{{ $a }}</p></div>
         @endforeach
     </div>
 </section>

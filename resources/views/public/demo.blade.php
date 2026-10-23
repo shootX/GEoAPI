@@ -8,12 +8,12 @@
     'active' => 'demo',
     'bleed' => true,
 ])
-<section class="sec" style="padding-top:56px">
+<section class="s-ed929b sec">
     <div class="wrap">
-        <div style="max-width:720px">
+        <div class="s-b12974">
             <div class="eyebrow">{{ $en ? 'Demo' : 'დემო' }}</div>
-            <h1 class="h1" style="margin-top:10px">{{ __('Vehicle picker') }}</h1>
-            <p class="lead" style="margin-top:12px">{{ $en ? 'Cascading choice: brand → model → year → generation → modification. This is how it looks on your site.' : 'კასკადური არჩევა: ბრენდი → მოდელი → წელი → თაობა → მოდიფიკაცია. ასე გამოჩნდება თქვენს საიტზე.' }}</p>
+            <h1 class="s-d2c171 h1">{{ __('Vehicle picker') }}</h1>
+            <p class="s-56f435 lead">{{ $en ? 'Cascading choice: brand → model → year → generation → modification. This is how it looks on your site.' : 'კასკადური არჩევა: ბრენდი → მოდელი → წელი → თაობა → მოდიფიკაცია. ასე გამოჩნდება თქვენს საიტზე.' }}</p>
         </div>
         @php
             $c = \Carapi\Catalog\PublicCounts::read();
@@ -31,29 +31,29 @@
             ], fn ($r) => $r[0] !== null && $r[0] !== '0');
         @endphp
         @if ($totals)
-            <div class="row demo-totals" style="flex-wrap:wrap;gap:10px 28px;margin-top:28px" data-demo-totals>
+            <div class="s-b852a3 row demo-totals" data-demo-totals>
                 @foreach ($totals as [$n, $label])
-                    <div><span class="tabular" style="font-size:20px;font-weight:700">{{ $n }}</span> <span class="sm mut">{{ $label }}</span></div>
+                    <div><span class="s-62ba2f tabular">{{ $n }}</span> <span class="sm mut">{{ $label }}</span></div>
                 @endforeach
             </div>
         @endif
-        <div class="split demo-split" style="margin-top:28px;align-items:start">
-            <div class="fc demo-card" style="padding:28px;box-shadow:var(--sh2)">
+        <div class="s-67de55 split demo-split">
+            <div class="s-fe4549 fc demo-card">
                 @include('public.partials.vehicle-picker')
-                <details id="vp-response" class="api-fold" style="margin-top:18px">
-                    <summary class="sm" style="cursor:pointer;color:var(--ac);font-weight:500">{{ __('View the API response') }}</summary>
-                    <div class="code" style="margin-top:10px"><pre id="vp-json" style="max-height:360px;overflow:auto"></pre></div>
+                <details id="vp-response" class="s-86de7a api-fold">
+                    <summary class="s-3b802c sm">{{ __('View the API response') }}</summary>
+                    <div class="s-d2c171 code"><pre id="vp-json" class="s-901059"></pre></div>
                 </details>
-                <p class="xs mut" style="margin-top:14px">{{ $en ? 'Live data from the GeoAPI catalog: specifications, trim/equipment, and an approved photo when one exists.' : 'ცოცხალი მონაცემები GeoAPI-ის კატალოგიდან: სპეციფიკაცია, კომპლექტაცია და დადასტურებული ფოტო, თუ არსებობს.' }}</p>
+                <p class="s-d6f2af xs mut">{{ $en ? 'Live data from the GeoAPI catalog: specifications, trim/equipment, and an approved photo when one exists.' : 'ცოცხალი მონაცემები GeoAPI-ის კატალოგიდან: სპეციფიკაცია, კომპლექტაცია და დადასტურებული ფოტო, თუ არსებობს.' }}</p>
             </div>
-            <div class="col" style="gap:16px">
-                <div class="row" style="justify-content:space-between"><h3>{{ __('Embed code') }}</h3></div>
+            <div class="s-f6ce4d col">
+                <div class="s-a562f4 row"><h3>{{ __('Embed code') }}</h3></div>
                 <div class="code">
-                    <div class="ch"><span class="on">HTML</span><button type="button" style="margin-left:auto;color:#A5A0F0" class="row" data-copy-target="vp-embed" data-copied="{{ __('Copied') }}">{{ __('Copy') }}</button></div>
-                    <pre id="vp-embed" style="white-space:pre-wrap;word-break:break-all">{{ $embed }}</pre>
+                    <div class="ch"><span class="on">HTML</span><button type="button" class="s-0bc09c row" data-copy-target="vp-embed" data-copied="{{ __('Copied') }}">{{ __('Copy') }}</button></div>
+                    <pre id="vp-embed" class="s-3f3a6c">{{ $embed }}</pre>
                 </div>
                 <div class="al al-in"><x-ga.icon name="info" :size="18" /><div><b>{{ $en ? 'Allowed origins' : 'დაშვებული origin-ები' }}</b>{{ $en ? 'The widget works only on the https domains listed in your cabinet. Use your own public key geoapi_pk_….' : 'ვიჯეტი მუშაობს მხოლოდ კაბინეტში მითითებულ https დომენებზე. გამოიყენეთ საკუთარი საჯარო გასაღები geoapi_pk_….' }}</div></div>
-                <a class="btn b-pri b-lg" style="justify-content:center" href="{{ route('register') }}">{{ $en ? 'Get your own key' : 'მიიღე საკუთარი გასაღები' }}</a>
+                <a class="s-03c4bb btn b-pri b-lg" href="{{ route('register') }}">{{ $en ? 'Get your own key' : 'მიიღე საკუთარი გასაღები' }}</a>
             </div>
         </div>
     </div>

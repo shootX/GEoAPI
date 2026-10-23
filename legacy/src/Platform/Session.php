@@ -6,6 +6,14 @@ namespace Carapi\Platform;
 
 final class Session
 {
+    /** The session file directory, shared with the Laravel side (ProvisionPlatformUser, BridgeLegacySession). */
+    public static function path(): string
+    {
+        $path = carapi_env('CARAPI_PLATFORM_SESSION_PATH');
+
+        return is_string($path) && $path !== '' ? $path : dirname(__DIR__, 2).'/data/sessions';
+    }
+
     public static function start(): void
     {
         if (session_status() === PHP_SESSION_ACTIVE && session_name() === 'geoapi_platform') {
@@ -17,8 +25,7 @@ final class Session
             session_write_close();
         }
 
-        $path = carapi_env('CARAPI_PLATFORM_SESSION_PATH');
-        $path = is_string($path) && $path !== '' ? $path : dirname(__DIR__, 2).'/data/sessions';
+        $path = self::path();
         if (! is_dir($path) && ! mkdir($path, 0700, true) && ! is_dir($path)) {
             throw new UnavailableException;
         }
@@ -145,18 +152,23 @@ final class Session
         if (! is_numeric($id)) {
             return;
         }
-        $now = time();
-        $issued = (int) ($_SESSION['issued_at'] ?? 0);
-        $seen = (int) ($_SESSION['last_seen'] ?? 0);
-        $idle = self::limit('CARAPI_PLATFORM_IDLE_SECONDS', 1800);
-        $absolute = self::limit('CARAPI_PLATFORM_ABSOLUTE_SECONDS', 43200);
-        if ($issued < 1 || $seen < 1 || ($now - $seen) > $idle || ($now - $issued) > $absolute) {
+        if (self::expired((int) ($_SESSION['issued_at'] ?? 0), (int) ($_SESSION['last_seen'] ?? 0))) {
             $_SESSION = [];
             session_regenerate_id(true);
 
             return;
         }
-        $_SESSION['last_seen'] = $now;
+        $_SESSION['last_seen'] = time();
+    }
+
+    /** Idle and absolute limits of a signed-in session; also applied by App\Http\Middleware\BridgeLegacySession. */
+    public static function expired(int $issued, int $seen): bool
+    {
+        $now = time();
+        $idle = self::limit('CARAPI_PLATFORM_IDLE_SECONDS', 1800);
+        $absolute = self::limit('CARAPI_PLATFORM_ABSOLUTE_SECONDS', 43200);
+
+        return $issued < 1 || $seen < 1 || ($now - $seen) > $idle || ($now - $issued) > $absolute;
     }
 
     private static function limit(string $name, int $default): int

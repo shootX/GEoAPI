@@ -51,12 +51,12 @@
     'active' => 'blog',
     'bleed' => true,
 ])
-<div class="sec" style="padding-top:48px">
-    <div class="wrap" style="max-width:800px">
-        <div class="sm mut row" style="gap:6px"><a href="{{ url('/'.$locale.'/blog') }}">{{ $en ? 'Blog' : 'ბლოგი' }}</a>@if ($post->categories->isNotEmpty())<x-ga.icon name="chev" :size="12" />{{ $post->categories->first()->label($locale) }}@endif</div>
-        <h1 class="h1" style="margin-top:14px;font-size:42px">{{ $translation['title'] }}</h1>
-        <div class="row sm mut" style="margin:16px 0 28px;gap:10px">
-            <span style="width:32px;height:32px;border-radius:50%;background:var(--soft);color:var(--ac);display:grid;place-items:center;font-weight:600;font-size:12px">G</span>
+<div class="s-bae40f sec">
+    <div class="s-3f7efa wrap">
+        <div class="s-f0abc1 sm mut row"><a href="{{ url('/'.$locale.'/blog') }}">{{ $en ? 'Blog' : 'ბლოგი' }}</a>@if ($post->categories->isNotEmpty())<x-ga.icon name="chev" :size="12" />{{ $post->categories->first()->label($locale) }}@endif</div>
+        <h1 class="s-1d914c h1">{{ $translation['title'] }}</h1>
+        <div class="s-1e64d0 row sm mut">
+            <span class="s-1100f9">G</span>
             {{ $en ? 'GeoAPI team' : 'GeoAPI გუნდი' }} · {{ optional($post->publish_at ?? $post->created_at)->toDateString() }} · {{ $post->readingMinutes($locale) }} {{ $en ? 'min read' : 'წთ კითხვა' }}
             @if ($draft)
                 · <span class="bd bd-wa">{{ $en ? 'Draft' : 'შავი' }}</span>
@@ -65,9 +65,9 @@
         @if ($post->coverUrl())
             <div class="cover"><img src="{{ $post->coverUrl() }}" alt="{{ $post->cover_alt ?: $translation['title'] }}"></div>
         @endif
-        <div class="post-body" style="margin-top:36px">{!! $body !!}</div>
+        <div class="s-d34d92 post-body">{!! $body !!}</div>
         @if ($post->categories->isNotEmpty() || $post->tags->isNotEmpty())
-            <p class="row chips" style="margin-top:24px;gap:8px">
+            <p class="s-196905 row chips">
                 @foreach ($post->categories as $item)
                     <a href="{{ url('/'.$locale.'/blog?category='.$item->slug) }}">{{ $item->label($locale) }}</a>
                 @endforeach
@@ -77,11 +77,11 @@
             </p>
         @endif
         @if ($related->isNotEmpty())
-            <section style="border-top:1px solid var(--line);margin-top:40px;padding-top:28px">
+            <section class="s-f0aa63">
                 <h3>{{ $en ? 'Related posts' : 'მსგავსი ჩანაწერები' }}</h3>
-                <div class="g2" style="margin-top:16px">
+                <div class="s-1b0f49 g2">
                     @foreach ($related as $item)
-                        <a class="fc" href="{{ $item->publicUrl($locale) }}"><span class="xs mut">{{ optional($item->publish_at ?? $item->created_at)->toDateString() }}</span><h4 style="margin-top:4px">{{ $item->translation($locale)['title'] }}</h4></a>
+                        <a class="fc" href="{{ $item->publicUrl($locale) }}"><span class="xs mut">{{ optional($item->publish_at ?? $item->created_at)->toDateString() }}</span><h4 class="s-96ad60">{{ $item->translation($locale)['title'] }}</h4></a>
                     @endforeach
                 </div>
             </section>

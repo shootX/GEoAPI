@@ -20,7 +20,7 @@
         <header class="top">
             <button class="btn menu" id="menu" type="button" aria-expanded="false" aria-controls="side" aria-label="{{ __('Menu') }}" data-menu-toggle><x-ga.icon name="menu" :size="20" /></button><a class="mlogo" href="{{ url('/') }}"><img src="{{ asset('assets/brand/geoapi-lockup-light.svg') }}" alt="geoapi.ge" height="22" width="69"></a>
             <h1>{{ $en ? 'Billing' : 'ბილინგი' }}</h1>
-            <div class="who"><span class="seg hide-m" style="padding:3px"><a href="{{ route('locale.switch', 'ka') }}" class="{{ $en ? '' : 'on' }}">KA</a><a href="{{ route('locale.switch', 'en') }}" class="{{ $en ? 'on' : '' }}">EN</a></span></div>
+            <div class="who"><span class="s-cda68d seg hide-m"><a href="{{ route('locale.switch', 'ka') }}" class="{{ $en ? '' : 'on' }}">KA</a><a href="{{ route('locale.switch', 'en') }}" class="{{ $en ? 'on' : '' }}">EN</a></span></div>
         </header>
         <div class="content">
             <h1 class="mh">{{ $en ? 'Billing' : 'ბილინგი' }}</h1>
@@ -49,10 +49,10 @@
             <p class="muted">{{ $en ? 'Prices are in GEL and include VAT. A year costs 12% less than 12 months.' : 'ფასი ლარშია და დღგ-ს შეიცავს. წელიწადი 12 თვის ფასზე 12%-ით ნაკლებია.' }}</p>
 
             @if ($projects === [])
-                <div class="panel"><h2>{{ $en ? 'Create a project first' : 'ჯერ შექმენით პროექტი' }}</h2><p class="muted">{{ $en ? 'You have no project yet.' : 'პროექტი ჯერ არ არის.' }}</p><p style="margin-top:12px"><a class="btn pine" href="{{ route('account.home') }}">{{ $en ? 'Projects' : 'პროექტები' }}</a></p></div>
+                <div class="panel"><h2>{{ $en ? 'Create a project first' : 'ჯერ შექმენით პროექტი' }}</h2><p class="muted">{{ $en ? 'You have no project yet.' : 'პროექტი ჯერ არ არის.' }}</p><p class="s-56f435"><a class="btn pine" href="{{ route('account.home') }}">{{ $en ? 'Projects' : 'პროექტები' }}</a></p></div>
             @else
-                <div class="panel row" style="justify-content:space-between">
-                    <label style="min-width:260px">{{ $en ? 'Project' : 'პროექტი' }}
+                <div class="s-a562f4 panel row">
+                    <label class="s-bec7b1">{{ $en ? 'Project' : 'პროექტი' }}
                         <select wire:model.live="projectId">
                             @foreach ($projects as $project)
                                 <option value="{{ $project['id'] }}">{{ $project['name'] }}</option>
@@ -63,7 +63,7 @@
 
                 <div class="bill-plans">
                     <article class="plan">
-                        <div class="row" style="justify-content:space-between"><h2>Free</h2>@if ($currentPlan === 'free'){!! $currentBadge !!}@endif</div>
+                        <div class="s-a562f4 row"><h2>Free</h2>@if ($currentPlan === 'free'){!! $currentBadge !!}@endif</div>
                         <p class="price">{{ \App\Billing\Plans::lari(0) }}</p>
                         <p class="muted">{{ $en ? '100 successful requests a month.' : '100 წარმატებული მოთხოვნა თვეში.' }}</p>
                         <p class="xs mut">{{ $en ? 'Choosing it lowers this project\'s monthly limit to 100, even if it has 10 000 now.' : 'არჩევა ამ პროექტის თვიურ ზღვარს 100-მდე დაწევს, მათ შორის მაშინაც, თუ ახლა 10 000 აქვს.' }}</p>
@@ -81,7 +81,7 @@
                             $isCurrent = $currentPlan === $code;
                         @endphp
                         <article class="plan {{ $isCurrent ? 'now' : '' }}">
-                            <div class="row" style="justify-content:space-between"><h2>{{ $label }}</h2>@if ($isCurrent){!! $currentBadge !!}@elseif ($code === 'basic')<span class="bd bd-ac">{{ $en ? 'Recommended' : 'რეკომენდებული' }}</span>@endif</div>
+                            <div class="s-a562f4 row"><h2>{{ $label }}</h2>@if ($isCurrent){!! $currentBadge !!}@elseif ($code === 'basic')<span class="bd bd-ac">{{ $en ? 'Recommended' : 'რეკომენდებული' }}</span>@endif</div>
                             <p class="price">{{ \App\Billing\Plans::lari($monthCents) }} <span class="muted">/ {{ $en ? 'month' : 'თვე' }}</span></p>
                             <p class="muted">@if ($code === 'premium') {{ $en ? 'Unlimited successful requests a month.' : 'შეუზღუდავი წარმატებული მოთხოვნა თვეში.' }} @else {{ $en ? '2 000 successful requests a month.' : '2 000 წარმატებული მოთხოვნა თვეში.' }} @endif</p>
                             <p class="xs mut">{{ $en ? 'Year' : 'წელი' }}: {{ \App\Billing\Plans::lari($yearCents) }} · −12%</p>
@@ -105,14 +105,14 @@
             @endif
 
             @if (count($orders) > 0)
-                <div class="panel" style="padding:0;overflow:hidden">
-                    <h2 style="padding:18px 20px 0">{{ $en ? 'Orders' : 'შეკვეთები' }}</h2>
-                    <div style="overflow-x:auto;margin-top:12px;border-top:1px solid var(--line)">
+                <div class="s-22a267 panel">
+                    <h2 class="s-bb9e9f">{{ $en ? 'Orders' : 'შეკვეთები' }}</h2>
+                    <div class="s-c7d5b9">
                         <table class="orders">
-                            <thead><tr><th>{{ $en ? 'Plan' : 'გეგმა' }}</th><th>{{ $en ? 'Status' : 'სტატუსი' }}</th><th style="text-align:right">GEL</th></tr></thead>
+                            <thead><tr><th>{{ $en ? 'Plan' : 'გეგმა' }}</th><th>{{ $en ? 'Status' : 'სტატუსი' }}</th><th class="s-54c2af">GEL</th></tr></thead>
                             <tbody>
                                 @foreach ($orders as $order)
-                                    <tr><td class="mono" data-label="{{ $en ? 'Plan' : 'გეგმა' }}"><span>{{ $order->plan_code }}@if (\App\Billing\MockPay::isMock($order)) <span class="bd bd-wa">TEST</span>@endif</span></td><td data-label="{{ $en ? 'Status' : 'სტატუსი' }}"><span class="bd bd-{{ $statusTone[$order->status] ?? 'ne' }}"><i></i>{{ $statusLabel[$order->status] ?? $order->status }}</span></td><td style="text-align:right" class="mono" data-label="GEL">{{ $order->gel_amount }} GEL</td></tr>
+                                    <tr><td class="mono" data-label="{{ $en ? 'Plan' : 'გეგმა' }}"><span>{{ $order->plan_code }}@if (\App\Billing\MockPay::isMock($order)) <span class="bd bd-wa">TEST</span>@endif</span></td><td data-label="{{ $en ? 'Status' : 'სტატუსი' }}"><span class="bd bd-{{ $statusTone[$order->status] ?? 'ne' }}"><i></i>{{ $statusLabel[$order->status] ?? $order->status }}</span></td><td class="s-54c2af mono" data-label="GEL">{{ $order->gel_amount }} GEL</td></tr>
                                 @endforeach
                             </tbody>
                         </table>

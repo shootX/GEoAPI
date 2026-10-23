@@ -75,7 +75,7 @@ final class AuditFixesTest extends TestCase
 
         $this->withSession(['locale' => 'ka'])->get('/forgot-password')->assertOk();
         $this->assertSame(
-            'პაროლის აღდგენის ბმული ელფოსტაზე გაიგზავნა.',
+            'თუ ეს ელფოსტა რეგისტრირებულია, პაროლის აღდგენის ბმულს რამდენიმე წუთში მიიღებთ.',
             __('passwords.sent'),
         );
     }
