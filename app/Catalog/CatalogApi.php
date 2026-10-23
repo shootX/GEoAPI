@@ -5,13 +5,13 @@ declare(strict_types=1);
 namespace App\Catalog;
 
 use App\Access\LegacyGate;
-use Carapi\Catalog\Access;
-use Carapi\Catalog\Connection;
-use Carapi\Catalog\DeniedException;
-use Carapi\Catalog\Http;
-use Carapi\Catalog\UnavailableException;
-use Carapi\Platform\UnavailableException as PlatformUnavailable;
-use Carapi\Platform\UsageLimiter;
+use Geoapi\Catalog\Access;
+use Geoapi\Catalog\Connection;
+use Geoapi\Catalog\DeniedException;
+use Geoapi\Catalog\Http;
+use Geoapi\Catalog\UnavailableException;
+use Geoapi\Platform\UnavailableException as PlatformUnavailable;
+use Geoapi\Platform\UsageLimiter;
 use PDOException;
 
 /**
@@ -24,10 +24,10 @@ final class CatalogApi
      */
     public function handle(string $path): array
     {
-        if (! $this->enabled('CARAPI_CATALOG_ENABLED')) {
+        if (! $this->enabled('GEOAPI_CATALOG_ENABLED')) {
             return $this->error(404, 'not_found', 'მითითებული მისამართით მონაცემები ვერ მოიძებნა.');
         }
-        if ($this->modificationDetail($path) && ! $this->enabled('CARAPI_MODIFICATION_DETAILS_ENABLED')) {
+        if ($this->modificationDetail($path) && ! $this->enabled('GEOAPI_MODIFICATION_DETAILS_ENABLED')) {
             return $this->error(404, 'not_found', 'მითითებული მისამართით მონაცემები ვერ მოიძებნა.');
         }
 
@@ -345,14 +345,14 @@ final class CatalogApi
             ['template' => '/api/v1/brands/{slug}/models', 'kind' => 'models', 'pattern' => '#^/api/v1/brands/([^/]+)/models$#u', 'param' => 'slug'],
             ['template' => '/api/v1/models/{id}/years', 'kind' => 'years', 'pattern' => '#^/api/v1/models/([^/]+)/years$#', 'param' => 'id', 'id' => true],
             ['template' => '/api/v1/models/{id}/generations', 'kind' => 'generations', 'pattern' => '#^/api/v1/models/([^/]+)/generations$#', 'param' => 'id', 'id' => true],
-            ['template' => '/api/v1/generations/{id}/modifications', 'kind' => 'modifications', 'pattern' => '#^/api/v1/generations/([^/]+)/modifications$#', 'param' => 'id', 'id' => true, 'gate' => 'CARAPI_MODIFICATIONS_ENABLED'],
-            ['template' => '/api/v1/modifications/{id}/specs', 'kind' => 'modification_specs', 'pattern' => '#^/api/v1/modifications/([^/]+)/specs$#', 'param' => 'id', 'id' => true, 'gate' => 'CARAPI_MODIFICATION_DETAILS_ENABLED'],
-            ['template' => '/api/v1/modifications/{id}/equipment', 'kind' => 'modification_equipment', 'pattern' => '#^/api/v1/modifications/([^/]+)/equipment$#', 'param' => 'id', 'id' => true, 'gate' => 'CARAPI_MODIFICATION_DETAILS_ENABLED'],
-            ['template' => '/api/v1/modifications/{id}', 'kind' => 'modification', 'pattern' => '#^/api/v1/modifications/([^/]+)$#', 'param' => 'id', 'id' => true, 'gate' => 'CARAPI_MODIFICATION_DETAILS_ENABLED'],
-            ['template' => '/api/v1/modifications', 'kind' => 'modification_search', 'pattern' => '#^/api/v1/modifications$#', 'gate' => 'CARAPI_MODIFICATIONS_ENABLED'],
-            ['template' => '/api/v1/engines', 'kind' => 'engines', 'pattern' => '#^/api/v1/engines$#', 'gate' => 'CARAPI_MODIFICATIONS_ENABLED'],
+            ['template' => '/api/v1/generations/{id}/modifications', 'kind' => 'modifications', 'pattern' => '#^/api/v1/generations/([^/]+)/modifications$#', 'param' => 'id', 'id' => true, 'gate' => 'GEOAPI_MODIFICATIONS_ENABLED'],
+            ['template' => '/api/v1/modifications/{id}/specs', 'kind' => 'modification_specs', 'pattern' => '#^/api/v1/modifications/([^/]+)/specs$#', 'param' => 'id', 'id' => true, 'gate' => 'GEOAPI_MODIFICATION_DETAILS_ENABLED'],
+            ['template' => '/api/v1/modifications/{id}/equipment', 'kind' => 'modification_equipment', 'pattern' => '#^/api/v1/modifications/([^/]+)/equipment$#', 'param' => 'id', 'id' => true, 'gate' => 'GEOAPI_MODIFICATION_DETAILS_ENABLED'],
+            ['template' => '/api/v1/modifications/{id}', 'kind' => 'modification', 'pattern' => '#^/api/v1/modifications/([^/]+)$#', 'param' => 'id', 'id' => true, 'gate' => 'GEOAPI_MODIFICATION_DETAILS_ENABLED'],
+            ['template' => '/api/v1/modifications', 'kind' => 'modification_search', 'pattern' => '#^/api/v1/modifications$#', 'gate' => 'GEOAPI_MODIFICATIONS_ENABLED'],
+            ['template' => '/api/v1/engines', 'kind' => 'engines', 'pattern' => '#^/api/v1/engines$#', 'gate' => 'GEOAPI_MODIFICATIONS_ENABLED'],
             ['template' => '/api/v1/bodies', 'kind' => 'bodies', 'pattern' => '#^/api/v1/bodies$#'],
-            ['template' => '/api/v1/fuel', 'kind' => 'fuel', 'pattern' => '#^/api/v1/fuel$#', 'gate' => 'CARAPI_MODIFICATIONS_ENABLED'],
+            ['template' => '/api/v1/fuel', 'kind' => 'fuel', 'pattern' => '#^/api/v1/fuel$#', 'gate' => 'GEOAPI_MODIFICATIONS_ENABLED'],
             ['template' => '/api/v1/colors', 'kind' => 'colors', 'pattern' => '#^/api/v1/colors$#'],
             ['template' => '/api/v1/coverage', 'kind' => 'coverage', 'pattern' => '#^/api/v1/coverage$#'],
         ];
@@ -395,7 +395,7 @@ final class CatalogApi
 
     private function enabled(string $name): bool
     {
-        $value = carapi_env($name);
+        $value = geoapi_env($name);
 
         return is_string($value) && in_array(strtolower(trim($value)), ['1', 'true', 'on', 'yes'], true);
     }

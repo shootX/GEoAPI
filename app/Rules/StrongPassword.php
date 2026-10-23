@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace App\Rules;
 
-use Carapi\Platform\Passwords;
+use Geoapi\Platform\Passwords;
 use Illuminate\Validation\Rules\Password;
 
 /**
  * Password::defaults() for every Laravel form (register, reset, change): the rule in
- * Carapi\Platform\Passwords, with its message in the page language.
+ * Geoapi\Platform\Passwords, with its message in the page language.
  */
 final class StrongPassword extends Password
 {

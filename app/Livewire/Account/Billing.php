@@ -15,8 +15,8 @@ use App\Billing\V2\Flag;
 use App\Billing\V2\Lifecycle;
 use App\Billing\V2\Workspace;
 use App\Models\User;
-use Carapi\Platform\Connection;
-use Carapi\Platform\ProjectRepository;
+use Geoapi\Platform\Connection;
+use Geoapi\Platform\ProjectRepository;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Schema;
@@ -245,7 +245,7 @@ final class Billing extends Component
     private function projects(): array
     {
         $user = auth()->user();
-        $demo = filter_var(env('CARAPI_CABINET_DEMO', false), FILTER_VALIDATE_BOOL);
+        $demo = filter_var(env('GEOAPI_CABINET_DEMO', false), FILTER_VALIDATE_BOOL);
         if (! $user instanceof User || $user->legacy_platform_user_id === null) {
             return $demo && $user instanceof User ? [['id' => 1, 'name' => 'დემო პროექტი']] : [];
         }

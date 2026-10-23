@@ -44,7 +44,7 @@
         <div class="fld">
             <label for="reg-password">{{ __('Password') }}</label>
             <input id="reg-password" class="inp @error('password') err @enderror" @error('password') aria-invalid="true" aria-describedby="reg-password-error" @enderror wire:model="password" type="password" autocomplete="new-password" minlength="8" required>
-            @error('password')<span class="emsg" id="reg-password-error" role="alert"><x-ga.icon name="err" :size="14" />{{ $message }}</span>@else<span class="hint">{{ \Carapi\Platform\Passwords::rule(app()->getLocale()) }}</span>@enderror
+            @error('password')<span class="emsg" id="reg-password-error" role="alert"><x-ga.icon name="err" :size="14" />{{ $message }}</span>@else<span class="hint">{{ \Geoapi\Platform\Passwords::rule(app()->getLocale()) }}</span>@enderror
         </div>
         <div class="fld">
             <label for="reg-password2">{{ __('Repeat the password') }}</label>

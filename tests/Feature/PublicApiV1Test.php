@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Tests\Feature;
 
-use Carapi\Platform\MemoryUsageStore;
+use Geoapi\Platform\MemoryUsageStore;
 use Tests\TestCase;
 
 final class PublicApiV1Test extends TestCase
@@ -157,8 +157,8 @@ final class PublicApiV1Test extends TestCase
         MemoryUsageStore::reset();
         MemoryUsageStore::shared()->perMinute = 100;
         MemoryUsageStore::shared()->perDay = 1;
-        $_ENV['CARAPI_USAGE_MEMORY'] = '1';
-        $_SERVER['CARAPI_USAGE_MEMORY'] = '1';
+        $_ENV['GEOAPI_USAGE_MEMORY'] = '1';
+        $_SERVER['GEOAPI_USAGE_MEMORY'] = '1';
         $this->getJson('/api/v1/brands?limit=1')->assertOk();
         $this->getJson('/api/v1/brands?limit=1')
             ->assertStatus(429)

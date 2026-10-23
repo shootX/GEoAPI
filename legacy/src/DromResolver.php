@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Carapi;
+namespace GeoAPI;
 
-use Carapi\Http\ImagePolicy;
-use Carapi\Http\SafeFetch;
+use Geoapi\Http\ImagePolicy;
+use Geoapi\Http\SafeFetch;
 
 /**
  * Resolve make/model[/year] to a generation photo and its card

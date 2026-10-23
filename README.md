@@ -14,7 +14,7 @@ npm run build
 php artisan serve
 ```
 
-Requirements: PHP 8.4+ with `ext-bcmath` (the lockfile needs them) and PostgreSQL. `php artisan migrate` also changes the catalog and `platform` schemas, so `.env` needs the catalog connection (`CARAPI_CATALOG_HOST`, `CARAPI_CATALOG_DATABASE`) and the table owner in `CARAPI_CATALOG_ADMIN_USER` / `CARAPI_CATALOG_ADMIN_PASSWORD`; without them migrate stops with "Catalog migration needs CARAPI_CATALOG_ADMIN_USER".
+Requirements: PHP 8.4+ with `ext-bcmath` (the lockfile needs them) and PostgreSQL. `php artisan migrate` also changes the catalog and `platform` schemas, so `.env` needs the catalog connection (`GEOAPI_CATALOG_HOST`, `GEOAPI_CATALOG_DATABASE`) and the table owner in `GEOAPI_CATALOG_ADMIN_USER` / `GEOAPI_CATALOG_ADMIN_PASSWORD`; without them migrate stops with "Catalog migration needs GEOAPI_CATALOG_ADMIN_USER".
 
 `vendor/bin/phpunit` runs the test suite. Do not commit `.env` or payment secrets.
 

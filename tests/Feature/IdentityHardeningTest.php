@@ -7,7 +7,7 @@ namespace Tests\Feature;
 use App\Access\AdminAccess;
 use App\Livewire\Auth\Register;
 use App\Models\User;
-use Carapi\Platform\Connection as PlatformConnection;
+use Geoapi\Platform\Connection as PlatformConnection;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;

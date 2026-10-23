@@ -1,6 +1,6 @@
 <?php
 
-namespace Carapi\Cache;
+namespace Geoapi\Cache;
 
 /**
  * @author Anovo.Ge https://anovo.ge
@@ -11,12 +11,12 @@ namespace Carapi\Cache;
  *   <dir>/img/<md5-of-bytes>.<ext>        content-addressed image blobs
  *
  * The directory defaults to ./cache in the project root (see public/index.php,
- * CARAPI_CACHE_DIR env) and must be writable by the web server user.
+ * GEOAPI_CACHE_DIR env) and must be writable by the web server user.
  *
  * If the img/ subdirectory is additionally exposed over HTTP (e.g. an nginx alias
  * or a CDN pulling from it), pass its public base URL as $publicBaseUrl — the
  * endpoint will then 302-redirect to "<publicBaseUrl>/<file>" instead of
- * streaming the bytes through PHP (CARAPI_CACHE_URL env).
+ * streaming the bytes through PHP (GEOAPI_CACHE_URL env).
  */
 final class FilesystemCache implements CacheInterface
 {
@@ -79,7 +79,7 @@ final class FilesystemCache implements CacheInterface
 
     private function imgPath(string $file): string
     {
-        // $file is "<md5>.<ext>" produced by Carapi\Service — never user input —
+        // $file is "<md5>.<ext>" produced by Geoapi\Service — never user input —
         // but sanitise anyway so a custom caller can't traverse paths.
         return $this->dir . '/img/' . basename($file);
     }

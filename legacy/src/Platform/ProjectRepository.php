@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Carapi\Platform;
+namespace Geoapi\Platform;
 
 use App\Billing\V2\Gate;
 use App\Billing\V2\ProjectLimitReached;

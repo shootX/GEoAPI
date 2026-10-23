@@ -9,11 +9,11 @@ use App\Billing\V2\Flag;
 use App\Billing\V2\Gate;
 use App\Billing\V2\ProjectLimitReached;
 use App\Billing\V2\Workspace;
-use Carapi\Platform\ApiKeys;
-use Carapi\Platform\Connection;
-use Carapi\Platform\ProjectRepository;
-use Carapi\Platform\UnavailableException;
-use Carapi\Platform\WidgetRepository;
+use Geoapi\Platform\ApiKeys;
+use Geoapi\Platform\Connection;
+use Geoapi\Platform\ProjectRepository;
+use Geoapi\Platform\UnavailableException;
+use Geoapi\Platform\WidgetRepository;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Title;
 use Livewire\Component;
@@ -189,7 +189,7 @@ final class Projects extends Component
             'usageById' => [],
             'v2' => null,
         ];
-        if (filter_var(env('CARAPI_CABINET_DEMO', false), FILTER_VALIDATE_BOOL)) {
+        if (filter_var(env('GEOAPI_CABINET_DEMO', false), FILTER_VALIDATE_BOOL)) {
             return $this->demoSnapshot($base);
         }
         try {

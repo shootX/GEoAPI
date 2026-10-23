@@ -121,7 +121,7 @@ final class Register extends \Electrik\Livewire\Auth\Register
     {
         return view('livewire.auth.register')->layoutData([
             'title' => __('Create account').' — GeoAPI',
-            'description' => \Carapi\Platform\Passwords::rule(app()->getLocale()),
+            'description' => \Geoapi\Platform\Passwords::rule(app()->getLocale()),
         ]);
     }
 }

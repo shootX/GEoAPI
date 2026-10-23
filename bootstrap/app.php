@@ -12,10 +12,11 @@ use App\Http\Middleware\SecurityHeaders;
 use Electrik\Http\Middleware\BindTeamFromAccessToken;
 use Electrik\Http\Middleware\SetLocale;
 use Illuminate\Foundation\Application;
+use Illuminate\Foundation\Bootstrap\LoadEnvironmentVariables;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
 
-return Application::configure(basePath: dirname(__DIR__))
+$app = Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
         web: __DIR__.'/../routes/web.php',
         commands: __DIR__.'/../routes/console.php',
@@ -29,7 +30,6 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->append(RequestId::class);
         $middleware->encryptCookies(except: [
             'geoapi_platform',
-            'carapi_platform',
         ]);
         $middleware->web(append: [
             SecurityHeaders::class,
@@ -44,7 +44,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'register',
             'logout',
             // Legacy platform pages check their own session `_csrf` token
-            // (Carapi\Platform\Http) and answer 419 without it. Laravel pages
+            // (Geoapi\Platform\Http) and answer 419 without it. Laravel pages
             // under /admin/blog, /admin/coming-soon and /account/* use @csrf.
             'account',
             'account/projects/*',
@@ -74,3 +74,8 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withExceptions(function (Exceptions $exceptions): void {
         //
     })->create();
+
+// Old CARAPI_* names in .env still work until the server's env files use GEOAPI_* (legacy/src/env.php).
+$app->afterBootstrapping(LoadEnvironmentVariables::class, static fn () => geoapi_env_compat());
+
+return $app;

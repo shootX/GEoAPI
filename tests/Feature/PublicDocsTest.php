@@ -6,7 +6,7 @@ namespace Tests\Feature;
 
 use App\Catalog\CatalogApi;
 use App\Catalog\PublicSpec;
-use Carapi\Platform\MemoryUsageStore;
+use Geoapi\Platform\MemoryUsageStore;
 use JsonSchema\Validator;
 use Symfony\Component\Process\Process;
 use Tests\TestCase;
@@ -219,8 +219,8 @@ final class PublicDocsTest extends TestCase
         $unauthorized = $this->getJson('/api/v1/brands')->assertUnauthorized();
         $this->assertMatchesSchema($unauthorized->json(), $schema, PublicSpec::document(), '401');
         $this->assertSame(['code', 'message'], array_keys($unauthorized->json('error')));
-        $_ENV['CARAPI_CATALOG_TEST_PROJECT'] = '7';
-        $_SERVER['CARAPI_CATALOG_TEST_PROJECT'] = '7';
+        $_ENV['GEOAPI_CATALOG_TEST_PROJECT'] = '7';
+        $_SERVER['GEOAPI_CATALOG_TEST_PROJECT'] = '7';
 
         $invalid = $this->getJson('/api/v1/brands?limit=1001')->assertStatus(422);
         $this->assertMatchesSchema($invalid->json(), $schema, PublicSpec::document(), '422');
@@ -246,8 +246,8 @@ final class PublicDocsTest extends TestCase
         $this->postJson('/api/v1/brands')
             ->assertUnauthorized()
             ->assertJsonPath('error.code', 'unauthorized');
-        $_ENV['CARAPI_CATALOG_TEST_PROJECT'] = '7';
-        $_SERVER['CARAPI_CATALOG_TEST_PROJECT'] = '7';
+        $_ENV['GEOAPI_CATALOG_TEST_PROJECT'] = '7';
+        $_SERVER['GEOAPI_CATALOG_TEST_PROJECT'] = '7';
         $this->postJson('/api/v1/brands')
             ->assertStatus(405)
             ->assertHeader('Allow', 'GET')
@@ -370,7 +370,7 @@ final class PublicDocsTest extends TestCase
 
     private function withoutTestProject(): void
     {
-        unset($_ENV['CARAPI_CATALOG_TEST_PROJECT'], $_SERVER['CARAPI_CATALOG_TEST_PROJECT']);
+        unset($_ENV['GEOAPI_CATALOG_TEST_PROJECT'], $_SERVER['GEOAPI_CATALOG_TEST_PROJECT']);
     }
 
     /** @param array<string, mixed> $schema @param array<string, mixed> $document */

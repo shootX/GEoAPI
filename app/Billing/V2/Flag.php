@@ -16,7 +16,7 @@ final class Flag
             } catch (\Throwable) {
             }
         }
-        $raw = function_exists('carapi_env') ? carapi_env('BILLING_V2') : getenv('BILLING_V2');
+        $raw = function_exists('geoapi_env') ? geoapi_env('BILLING_V2') : getenv('BILLING_V2');
 
         return is_string($raw) && in_array(strtolower($raw), ['1', 'true', 'on', 'yes'], true);
     }
@@ -31,7 +31,7 @@ final class Flag
             } catch (\Throwable) {
             }
         }
-        $raw = function_exists('carapi_env') ? carapi_env('BILLING_V2_BUSINESS_RPM') : getenv('BILLING_V2_BUSINESS_RPM');
+        $raw = function_exists('geoapi_env') ? geoapi_env('BILLING_V2_BUSINESS_RPM') : getenv('BILLING_V2_BUSINESS_RPM');
 
         return is_string($raw) && in_array(strtolower($raw), ['1', 'true', 'on', 'yes'], true);
     }

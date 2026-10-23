@@ -6,12 +6,12 @@ namespace Tests\Feature;
 
 use App\Livewire\Account\Projects;
 use App\Models\User;
-use Carapi\Platform\ApiKeys;
-use Carapi\Platform\Connection as PlatformConnection;
-use Carapi\Platform\MemoryUsageStore;
-use Carapi\Platform\ProjectRepository;
-use Carapi\Platform\SqliteUsageStore;
-use Carapi\Platform\UsageLimiter;
+use Geoapi\Platform\ApiKeys;
+use Geoapi\Platform\Connection as PlatformConnection;
+use Geoapi\Platform\MemoryUsageStore;
+use Geoapi\Platform\ProjectRepository;
+use Geoapi\Platform\SqliteUsageStore;
+use Geoapi\Platform\UsageLimiter;
 use Illuminate\Support\Facades\DB;
 use Livewire\Livewire;
 use PDO;
@@ -70,10 +70,10 @@ final class ProjectAccessQuotaTest extends TestCase
     {
         PlatformConnection::reset();
         foreach ([
-            'CARAPI_USAGE_NOW',
-            'CARAPI_USAGE_SQLITE',
-            'CARAPI_WIDGET_ENABLED',
-            'CARAPI_PLATFORM_ENABLED',
+            'GEOAPI_USAGE_NOW',
+            'GEOAPI_USAGE_SQLITE',
+            'GEOAPI_WIDGET_ENABLED',
+            'GEOAPI_PLATFORM_ENABLED',
         ] as $name) {
             $this->env($name, null);
         }
@@ -164,34 +164,34 @@ final class ProjectAccessQuotaTest extends TestCase
             ->assertUnauthorized()
             ->assertJsonPath('error.code', 'unauthorized');
         $this->actingAs($other)
-            ->withHeader('X-CARAPI-PROJECT', '7')
+            ->withHeader('X-GEOAPI-PROJECT', '7')
             ->getJson('/api/v1/brands')
             ->assertUnauthorized();
 
         $this->withHeader('Authorization', 'Bearer '.$token)
-            ->withHeader('X-CARAPI-PROJECT', '8')
+            ->withHeader('X-GEOAPI-PROJECT', '8')
             ->getJson('/api/v1/brands')
             ->assertForbidden()
             ->assertDontSee('Other project');
 
         $this->withHeader('Authorization', 'Bearer '.$token)
-            ->withHeader('X-CARAPI-PROJECT', '7')
+            ->withHeader('X-GEOAPI-PROJECT', '7')
             ->getJson('/api/v1/brands?limit=1')
             ->assertOk();
 
         $this->withHeader('Authorization', 'Bearer '.$star)
-            ->withHeader('X-CARAPI-PROJECT', '7')
+            ->withHeader('X-GEOAPI-PROJECT', '7')
             ->getJson('/api/v1/coverage')
             ->assertOk();
 
         $empty = $owner->createToken('none', [])->plainTextToken;
         $this->withHeader('Authorization', 'Bearer '.$empty)
-            ->withHeader('X-CARAPI-PROJECT', '7')
+            ->withHeader('X-GEOAPI-PROJECT', '7')
             ->getJson('/api/v1/brands')
             ->assertForbidden();
 
         $this->withHeader('Authorization', 'Bearer '.$issued['token'])
-            ->withHeader('X-CARAPI-PROJECT', '8')
+            ->withHeader('X-GEOAPI-PROJECT', '8')
             ->getJson('/api/v1/brands?limit=1')
             ->assertOk();
         $this->assertSame(3, MemoryUsageStore::shared()->previewMonth(7, UsageLimiter::now())['used']);
@@ -202,12 +202,28 @@ final class ProjectAccessQuotaTest extends TestCase
             ->assertUnauthorized();
     }
 
+    public function test_the_pre_rename_project_header_still_selects_the_project(): void
+    {
+        $this->useIssuedKeys();
+        $owner = $this->user(3);
+        $token = $owner->createToken('cars', ['cars:read'])->plainTextToken;
+
+        $this->withHeader('Authorization', 'Bearer '.$token)
+            ->withHeader('X-CARAPI-PROJECT', '8')
+            ->getJson('/api/v1/brands')
+            ->assertForbidden();
+        $this->withHeader('Authorization', 'Bearer '.$token)
+            ->withHeader('X-CARAPI-PROJECT', '7')
+            ->getJson('/api/v1/brands?limit=1')
+            ->assertOk();
+    }
+
     public function test_sanctum_token_follows_the_same_owner_and_expiry_rules_as_a_key(): void
     {
         $this->useIssuedKeys();
         $owner = $this->user(3);
         $call = fn (string $token) => $this->withHeader('Authorization', 'Bearer '.$token)
-            ->withHeader('X-CARAPI-PROJECT', '7')
+            ->withHeader('X-GEOAPI-PROJECT', '7')
             ->getJson('/api/v1/brands?limit=1');
 
         $expired = $owner->createToken('old', ['cars:read'], now()->subMinute())->plainTextToken;
@@ -324,7 +340,7 @@ final class ProjectAccessQuotaTest extends TestCase
     public function test_utc_windows_headers_and_shared_widget_counter(): void
     {
         $now = gmmktime(23, 59, 30, 1, 31, 2026);
-        $this->env('CARAPI_USAGE_NOW', (string) $now);
+        $this->env('GEOAPI_USAGE_NOW', (string) $now);
         MemoryUsageStore::shared()->perMinute = 60;
 
         $ok = $this->getJson('/api/v1/brands?limit=1')->assertOk();
@@ -336,7 +352,7 @@ final class ProjectAccessQuotaTest extends TestCase
         $ok->assertHeader('X-RateLimit-Reset', (string) ($now - 30 + 60));
 
         MemoryUsageStore::reset();
-        $this->env('CARAPI_USAGE_NOW', (string) gmmktime(12, 0, 30, 6, 15, 2026));
+        $this->env('GEOAPI_USAGE_NOW', (string) gmmktime(12, 0, 30, 6, 15, 2026));
         MemoryUsageStore::shared()->perMinute = 1;
         $this->getJson('/api/v1/brands?limit=1')->assertOk();
         $this->getJson('/api/v1/brands?limit=1')
@@ -348,7 +364,7 @@ final class ProjectAccessQuotaTest extends TestCase
             ->assertHeaderMissing('X-Quota-Limit');
 
         MemoryUsageStore::reset();
-        $this->env('CARAPI_USAGE_NOW', (string) $now);
+        $this->env('GEOAPI_USAGE_NOW', (string) $now);
         MemoryUsageStore::shared()->perMinute = 100;
         MemoryUsageStore::shared()->perDay = 1;
         $this->getJson('/api/v1/brands?limit=1')->assertOk();
@@ -356,11 +372,11 @@ final class ProjectAccessQuotaTest extends TestCase
             ->assertStatus(429)
             ->assertJsonPath('error.code', 'DAILY_QUOTA_EXCEEDED')
             ->assertHeader('Retry-After');
-        $this->env('CARAPI_USAGE_NOW', (string) gmmktime(0, 0, 30, 2, 1, 2026));
+        $this->env('GEOAPI_USAGE_NOW', (string) gmmktime(0, 0, 30, 2, 1, 2026));
         $this->getJson('/api/v1/brands?limit=1')->assertOk()->assertHeader('X-Quota-Remaining', '9999');
 
         MemoryUsageStore::reset();
-        $this->env('CARAPI_USAGE_NOW', (string) $now);
+        $this->env('GEOAPI_USAGE_NOW', (string) $now);
         MemoryUsageStore::shared()->perDay = 2000;
         MemoryUsageStore::shared()->monthlyQuota = 1;
         $this->getJson('/api/v1/brands?limit=1')->assertOk();
@@ -368,7 +384,7 @@ final class ProjectAccessQuotaTest extends TestCase
             ->assertStatus(429)
             ->assertJsonPath('error.code', 'MONTHLY_QUOTA_EXCEEDED')
             ->assertJsonPath('error.message', 'The monthly quota was reached. It renews at the start of next month.');
-        $this->env('CARAPI_USAGE_NOW', (string) gmmktime(0, 0, 30, 2, 1, 2026));
+        $this->env('GEOAPI_USAGE_NOW', (string) gmmktime(0, 0, 30, 2, 1, 2026));
         $this->getJson('/api/v1/coverage')->assertOk();
         $stats = MemoryUsageStore::shared()->stats(7, gmmktime(0, 0, 30, 2, 1, 2026));
         $this->assertSame(1, $stats['used']);
@@ -396,8 +412,8 @@ final class ProjectAccessQuotaTest extends TestCase
 
     public function test_widget_origin_is_rejected_when_missing_and_shares_the_project_quota(): void
     {
-        $this->env('CARAPI_WIDGET_ENABLED', '1');
-        $this->env('CARAPI_PLATFORM_ENABLED', '1');
+        $this->env('GEOAPI_WIDGET_ENABLED', '1');
+        $this->env('GEOAPI_PLATFORM_ENABLED', '1');
         $key = 'geoapi_pk_'.str_repeat('ab', 16);
         DB::table('platform.widgets')->insert([
             'project_id' => 7,
@@ -428,7 +444,7 @@ final class ProjectAccessQuotaTest extends TestCase
     {
         $this->useIssuedKeys();
         $now = gmmktime(12, 0, 10, 6, 15, 2026);
-        $this->env('CARAPI_USAGE_NOW', (string) $now);
+        $this->env('GEOAPI_USAGE_NOW', (string) $now);
         $issued = $this->issueKey(3, 7);
 
         $this->withHeader('Authorization', 'Bearer '.$issued['token'])
@@ -437,14 +453,14 @@ final class ProjectAccessQuotaTest extends TestCase
         $first = (string) DB::table('platform.api_keys')->where('key_selector', $issued['selector'])->value('last_used_at');
         $this->assertSame(gmdate('Y-m-d H:i:s', $now), $first);
 
-        $this->env('CARAPI_USAGE_NOW', (string) ($now + 30));
+        $this->env('GEOAPI_USAGE_NOW', (string) ($now + 30));
         $this->withHeader('Authorization', 'Bearer '.$issued['token'])
             ->getJson('/api/v1/brands/missing/models')
             ->assertNotFound();
         $this->assertSame($first, (string) DB::table('platform.api_keys')->where('key_selector', $issued['selector'])->value('last_used_at'));
         $this->assertSame(1, MemoryUsageStore::shared()->previewMonth(7, $now + 30)['used']);
 
-        $this->env('CARAPI_USAGE_NOW', (string) ($now + 61));
+        $this->env('GEOAPI_USAGE_NOW', (string) ($now + 61));
         $this->withHeader('Authorization', 'Bearer '.$issued['token'])
             ->getJson('/api/v1/brands?limit=1')
             ->assertOk();
@@ -509,8 +525,8 @@ final class ProjectAccessQuotaTest extends TestCase
 
     public function test_a_broken_meter_returns_503_instead_of_an_unmetered_200(): void
     {
-        $this->env('CARAPI_USAGE_SQLITE', sys_get_temp_dir().'/geoapi-missing-'.bin2hex(random_bytes(3)).'/quota.sqlite');
-        $this->env('CARAPI_USAGE_MEMORY', '0');
+        $this->env('GEOAPI_USAGE_SQLITE', sys_get_temp_dir().'/geoapi-missing-'.bin2hex(random_bytes(3)).'/quota.sqlite');
+        $this->env('GEOAPI_USAGE_MEMORY', '0');
         $response = $this->getJson('/api/v1/brands?limit=1');
         $response->assertStatus(503)->assertJsonPath('error.code', 'unavailable');
         $this->assertStringNotContainsString('toyota', (string) $response->getContent());
@@ -518,7 +534,7 @@ final class ProjectAccessQuotaTest extends TestCase
 
     private function useIssuedKeys(): void
     {
-        $this->env('CARAPI_CATALOG_TEST_PROJECT', null);
+        $this->env('GEOAPI_CATALOG_TEST_PROJECT', null);
     }
 
     /** @return array{selector:string,secret:string,token:string,hash:string} */

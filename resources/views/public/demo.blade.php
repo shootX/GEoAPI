@@ -16,7 +16,7 @@
             <p class="s-56f435 lead">{{ $en ? 'Cascading choice: brand → model → year → generation → modification. This is how it looks on your site.' : 'კასკადური არჩევა: ბრენდი → მოდელი → წელი → თაობა → მოდიფიკაცია. ასე გამოჩნდება თქვენს საიტზე.' }}</p>
         </div>
         @php
-            $c = \Carapi\Catalog\PublicCounts::read();
+            $c = \Geoapi\Catalog\PublicCounts::read();
             $fmtN = fn ($k) => isset($c[$k]) && ($c['status'] ?? '') === 'ok' ? number_format((int) $c[$k], 0, '.', ' ') : null;
             $eqM = isset($c['equipment']) && (int) $c['equipment'] >= 1000000 ? intdiv((int) $c['equipment'], 1000000) : null;
             $totals = array_filter([

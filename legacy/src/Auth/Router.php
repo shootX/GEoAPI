@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Carapi\Auth;
+namespace Geoapi\Auth;
 
-use Carapi\Cache\FilesystemCache;
-use Carapi\Service;
+use Geoapi\Cache\FilesystemCache;
+use Geoapi\Service;
 
 final class Router
 {
@@ -240,8 +240,8 @@ final class Router
 
         try {
             $cache = new FilesystemCache(
-                carapi_env('CARAPI_CACHE_DIR') ?: dirname(__DIR__, 2) . '/cache',
-                carapi_env('CARAPI_CACHE_URL') ?: null
+                geoapi_env('GEOAPI_CACHE_DIR') ?: dirname(__DIR__, 2) . '/cache',
+                geoapi_env('GEOAPI_CACHE_URL') ?: null
             );
             $photo = (new Service($cache))->get($make, $model, $year);
         } catch (\Throwable $e) {

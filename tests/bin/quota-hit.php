@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 use App\Catalog\CatalogApi;
-use Carapi\Catalog\Connection;
+use Geoapi\Catalog\Connection;
 use Illuminate\Contracts\Console\Kernel;
 use Illuminate\Support\Facades\DB;
 
@@ -26,12 +26,12 @@ foreach ([
     'SESSION_DRIVER' => 'array',
     'QUEUE_CONNECTION' => 'sync',
     'MAIL_MAILER' => 'array',
-    'CARAPI_CATALOG_ENABLED' => '1',
-    'CARAPI_MODIFICATIONS_ENABLED' => '1',
-    'CARAPI_MODIFICATION_DETAILS_ENABLED' => '1',
-    'CARAPI_CATALOG_TEST_PROJECT' => '7',
-    'CARAPI_USAGE_SQLITE' => $sqlite,
-    'CARAPI_USAGE_MEMORY' => '0',
+    'GEOAPI_CATALOG_ENABLED' => '1',
+    'GEOAPI_MODIFICATIONS_ENABLED' => '1',
+    'GEOAPI_MODIFICATION_DETAILS_ENABLED' => '1',
+    'GEOAPI_CATALOG_TEST_PROJECT' => '7',
+    'GEOAPI_USAGE_SQLITE' => $sqlite,
+    'GEOAPI_USAGE_MEMORY' => '0',
 ] as $name => $value) {
     $_ENV[$name] = $value;
     $_SERVER[$name] = $value;

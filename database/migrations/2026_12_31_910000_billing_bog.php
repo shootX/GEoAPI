@@ -199,16 +199,16 @@ return new class extends Migration
 
     private function platformPdo(): PDO
     {
-        $host = $this->env('CARAPI_PLATFORM_HOST');
-        $database = $this->env('CARAPI_PLATFORM_DATABASE');
-        $user = $this->env('CARAPI_PLATFORM_USER');
-        $password = $this->env('CARAPI_PLATFORM_PASSWORD');
-        $port = $this->env('CARAPI_PLATFORM_PORT');
+        $host = $this->env('GEOAPI_PLATFORM_HOST');
+        $database = $this->env('GEOAPI_PLATFORM_DATABASE');
+        $user = $this->env('GEOAPI_PLATFORM_USER');
+        $password = $this->env('GEOAPI_PLATFORM_PASSWORD');
+        $port = $this->env('GEOAPI_PLATFORM_PORT');
         if ($port === '') {
             $port = '5432';
         }
         if ($host === '' || $database === '' || $user === '') {
-            throw new RuntimeException('Platform migration needs CARAPI_PLATFORM_HOST, CARAPI_PLATFORM_DATABASE, and CARAPI_PLATFORM_USER.');
+            throw new RuntimeException('Platform migration needs GEOAPI_PLATFORM_HOST, GEOAPI_PLATFORM_DATABASE, and GEOAPI_PLATFORM_USER.');
         }
 
         return new PDO(

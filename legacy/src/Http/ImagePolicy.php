@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Carapi\Http;
+namespace Geoapi\Http;
 
 /**
  * New downloads and public redistribution stay off until a source and a license are approved.

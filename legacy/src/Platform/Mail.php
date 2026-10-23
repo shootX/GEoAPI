@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-namespace Carapi\Platform;
+namespace Geoapi\Platform;
 
 final class Mail
 {
     public static function make(): Mailer
     {
-        $transport = carapi_env('CARAPI_MAIL_TRANSPORT');
+        $transport = geoapi_env('GEOAPI_MAIL_TRANSPORT');
         $transport = is_string($transport) ? strtolower(trim($transport)) : '';
         if ($transport === 'fake') {
             return new FakeMailer();
@@ -22,7 +22,7 @@ final class Mail
 
     public static function appUrl(): string
     {
-        $url = carapi_env('CARAPI_APP_URL');
+        $url = geoapi_env('GEOAPI_APP_URL');
         $url = is_string($url) ? rtrim(trim($url), '/') : '';
         $parts = parse_url($url);
         $host = is_array($parts) ? (string) ($parts['host'] ?? '') : '';

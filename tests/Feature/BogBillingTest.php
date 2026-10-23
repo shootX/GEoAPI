@@ -13,9 +13,9 @@ use App\Billing\MockPay;
 use App\Livewire\Account\Billing;
 use App\Livewire\Auth\Register;
 use App\Models\User;
-use Carapi\Platform\ApiKeys;
-use Carapi\Platform\Connection as PlatformConnection;
-use Carapi\Platform\ProjectRepository;
+use Geoapi\Platform\ApiKeys;
+use Geoapi\Platform\Connection as PlatformConnection;
+use Geoapi\Platform\ProjectRepository;
 use Illuminate\Foundation\Http\Middleware\ValidateCsrfToken;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\DB;
@@ -55,7 +55,7 @@ final class BogBillingTest extends TestCase
     protected function tearDown(): void
     {
         PlatformConnection::reset();
-        foreach (['CARAPI_USAGE_NOW', 'CARAPI_USAGE_SQLITE', 'CARAPI_USAGE_MEMORY', 'CARAPI_CATALOG_TEST_PROJECT'] as $name) {
+        foreach (['GEOAPI_USAGE_NOW', 'GEOAPI_USAGE_SQLITE', 'GEOAPI_USAGE_MEMORY', 'GEOAPI_CATALOG_TEST_PROJECT'] as $name) {
             unset($_ENV[$name], $_SERVER[$name]);
             putenv($name);
         }
@@ -775,10 +775,10 @@ final class BogBillingTest extends TestCase
 
     private function useStore(): void
     {
-        $_ENV['CARAPI_USAGE_MEMORY'] = '0';
-        $_SERVER['CARAPI_USAGE_MEMORY'] = '0';
-        putenv('CARAPI_USAGE_MEMORY=0');
-        unset($_ENV['CARAPI_CATALOG_TEST_PROJECT'], $_SERVER['CARAPI_CATALOG_TEST_PROJECT']);
-        putenv('CARAPI_CATALOG_TEST_PROJECT');
+        $_ENV['GEOAPI_USAGE_MEMORY'] = '0';
+        $_SERVER['GEOAPI_USAGE_MEMORY'] = '0';
+        putenv('GEOAPI_USAGE_MEMORY=0');
+        unset($_ENV['GEOAPI_CATALOG_TEST_PROJECT'], $_SERVER['GEOAPI_CATALOG_TEST_PROJECT']);
+        putenv('GEOAPI_CATALOG_TEST_PROJECT');
     }
 }

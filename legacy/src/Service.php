@@ -1,10 +1,10 @@
 <?php
 
-namespace Carapi;
+namespace GeoAPI;
 
-use Carapi\Cache\CacheInterface;
-use Carapi\Http\ImagePolicy;
-use Carapi\Http\SafeFetch;
+use Geoapi\Cache\CacheInterface;
+use Geoapi\Http\ImagePolicy;
+use Geoapi\Http\SafeFetch;
 
 /**
  * Orchestration behind /getImage. Cached files stay on disk.
@@ -31,6 +31,7 @@ final class Service
         $key = self::key($make, $model, $year);
 
         $meta = $this->cache->getMeta($key);
+        // 'carapi' marks photo cache entries written before the project was renamed.
         if (is_array($meta) && in_array(($meta['source'] ?? ''), ['geoapi', 'carapi'], true) && empty($meta['catalog_url'])) {
             $status = (int)($meta['status'] ?? -1);
             if ($status === 1 && !empty($meta['file']) && $this->cache->hasImage((string) $meta['file'])

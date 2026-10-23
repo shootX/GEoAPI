@@ -24,7 +24,7 @@ production-ში სამივე დროშა ჩართულია. �
 Authorization: Bearer geoapi_sk_selector_secret
 ```
 
-ეს placeholder-ია, რეალური გასაღები არა. Query string და cookie არ მიიღება. კაბინეტის სესია გასაღებს არ ცვლის. შემოწმება platform კავშირით მთავრდება კატალოგის `SELECT`-მდე. კატალოგს კითხულობს `carapi_catalog_reader`.
+ეს placeholder-ია, რეალური გასაღები არა. Query string და cookie არ მიიღება. კაბინეტის სესია გასაღებს არ ცვლის. შემოწმება platform კავშირით მთავრდება კატალოგის `SELECT`-მდე. კატალოგს კითხულობს `geoapi_catalog_reader`.
 
 | სტატუსი | შემთხვევა |
 |---|---|
@@ -35,4 +35,4 @@ Authorization: Bearer geoapi_sk_selector_secret
 
 `last_used_at` ახლდება წარმატებული მოთხოვნის შემდეგ, თითო გასაღებზე არა უმეტეს წუთში ერთხელ. დადებითი შედეგი არ ქეშდება. კვოტა და სტატისტიკა: `docs/USAGE_AND_LIMITS.md`.
 
-მიგრაცია: `php bin/migrate.php` ადმინისტრაციული `CARAPI_PLATFORM_ADMIN_*` ცვლადებით. ფაილი `migrations/002_projects_api_keys.sql` არსებულ `001`-ს არ ცვლის.
+მიგრაცია: `php bin/migrate.php` ადმინისტრაციული `GEOAPI_PLATFORM_ADMIN_*` ცვლადებით. ფაილი `migrations/002_projects_api_keys.sql` არსებულ `001`-ს არ ცვლის.

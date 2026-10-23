@@ -6,9 +6,9 @@ namespace Tests\Unit;
 
 use App\Catalog\ListQuery;
 use App\Catalog\PublicCatalog;
-use Carapi\Catalog\Http as CatalogHttp;
-use Carapi\Catalog\PickerSelection;
-use Carapi\Widget\Demo;
+use Geoapi\Catalog\Http as CatalogHttp;
+use Geoapi\Catalog\PickerSelection;
+use Geoapi\Widget\Demo;
 use PDO;
 use PHPUnit\Framework\TestCase;
 use ReflectionMethod;

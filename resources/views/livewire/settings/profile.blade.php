@@ -33,7 +33,7 @@
 
             <div class="set-row">
                 <div><h2>{{ $en ? 'Password and security' : 'პაროლი და უსაფრთხოება' }}</h2><p class="xs mut">{{ $en ? 'Password, two-factor authentication, passkeys.' : 'პაროლი, ორსაფეხურიანი ავთენტიფიკაცია, passkey.' }}</p></div>
-                <div class="s-a562f4 panel row"><div class="row"><span class="ic"><x-ga.icon name="lock" :size="18" /></span><div><b>{{ $en ? 'Change the password' : 'პაროლის შეცვლა' }}</b><p class="xs mut">{{ \Carapi\Platform\Passwords::rule(app()->getLocale()) }}</p></div></div>
+                <div class="s-a562f4 panel row"><div class="row"><span class="ic"><x-ga.icon name="lock" :size="18" /></span><div><b>{{ $en ? 'Change the password' : 'პაროლის შეცვლა' }}</b><p class="xs mut">{{ \Geoapi\Platform\Passwords::rule(app()->getLocale()) }}</p></div></div>
                     <a class="edit" href="{{ route('settings.security') }}">{{ $en ? 'Open' : 'გახსნა' }}</a></div>
             </div>
 

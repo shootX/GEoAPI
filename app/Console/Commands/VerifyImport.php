@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\DB;
 
 final class VerifyImport extends Command
 {
-    protected $signature = 'carapi:verify-import';
+    protected $signature = 'geoapi:verify-import';
 
     protected $description = 'Compare legacy platform rows with Electrik identities and entitlements';
 

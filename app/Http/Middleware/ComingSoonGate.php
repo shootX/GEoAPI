@@ -15,7 +15,7 @@ use Throwable;
 
 final class ComingSoonGate
 {
-    public const COOKIE = 'carapi_preview';
+    public const COOKIE = 'geoapi_preview';
 
     public function handle(Request $request, Closure $next): Response
     {

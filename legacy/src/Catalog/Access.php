@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace Carapi\Catalog;
+namespace Geoapi\Catalog;
 
 use App\Access\SanctumCatalogAccess;
-use Carapi\Platform\ApiKeys;
-use Carapi\Platform\Connection as PlatformConnection;
-use Carapi\Platform\UnavailableException as PlatformUnavailable;
+use Geoapi\Platform\ApiKeys;
+use Geoapi\Platform\Connection as PlatformConnection;
+use Geoapi\Platform\UnavailableException as PlatformUnavailable;
 use PDOException;
 
 final class Access
@@ -68,7 +68,7 @@ final class Access
         } catch (\Throwable) {
             return null;
         }
-        $raw = carapi_env('CARAPI_CATALOG_TEST_PROJECT');
+        $raw = geoapi_env('GEOAPI_CATALOG_TEST_PROJECT');
         if (! is_string($raw) || preg_match('/^[1-9][0-9]*$/', $raw) !== 1) {
             return null;
         }
@@ -78,8 +78,8 @@ final class Access
 
     private static function platformReady(): bool
     {
-        foreach (['CARAPI_PLATFORM_HOST', 'CARAPI_PLATFORM_DATABASE', 'CARAPI_PLATFORM_USER'] as $name) {
-            $value = carapi_env($name);
+        foreach (['GEOAPI_PLATFORM_HOST', 'GEOAPI_PLATFORM_DATABASE', 'GEOAPI_PLATFORM_USER'] as $name) {
+            $value = geoapi_env($name);
             if (! is_string($value) || trim($value) === '') {
                 return false;
             }

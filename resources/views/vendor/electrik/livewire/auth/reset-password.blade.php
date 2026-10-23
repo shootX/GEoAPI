@@ -11,7 +11,7 @@
         <div class="fld">
             <label for="rp-password">{{ __('New password') }}</label>
             <input id="rp-password" class="inp @error('password') err @enderror" @error('password') aria-invalid="true" aria-describedby="rp-password-error" @enderror wire:model="password" type="password" autocomplete="new-password" required>
-            @error('password')<span class="emsg" id="rp-password-error" role="alert"><x-ga.icon name="err" :size="14" />{{ $message }}</span>@else<span class="hint">{{ \Carapi\Platform\Passwords::rule(app()->getLocale()) }}</span>@enderror
+            @error('password')<span class="emsg" id="rp-password-error" role="alert"><x-ga.icon name="err" :size="14" />{{ $message }}</span>@else<span class="hint">{{ \Geoapi\Platform\Passwords::rule(app()->getLocale()) }}</span>@enderror
         </div>
         <div class="fld">
             <label for="rp-password2">{{ __('Confirm password') }}</label>

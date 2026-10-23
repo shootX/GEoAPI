@@ -134,7 +134,7 @@
     pass.insertAdjacentElement('afterend', meter);
     pass.addEventListener('input', function () {
       var value = pass.value;
-      // Same checks as Carapi\Platform\Passwords::error().
+      // Same checks as Geoapi\Platform\Passwords::error().
       var missing = [];
       if (value.length < 8) missing.push('მინიმუმ 8 სიმბოლო');
       if (!/\p{Lu}/u.test(value)) missing.push('დიდი ასო');

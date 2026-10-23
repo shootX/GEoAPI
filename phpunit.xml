@@ -36,11 +36,11 @@
         <env name="PULSE_ENABLED" value="false"/>
         <env name="TELESCOPE_ENABLED" value="false"/>
         <env name="NIGHTWATCH_ENABLED" value="false"/>
-        <env name="CARAPI_CATALOG_ADMIN_DRIVER" value="sqlite"/>
-        <env name="CARAPI_CATALOG_ADMIN_DATABASE" value=":memory:"/>
-        <env name="CARAPI_CATALOG_ADMIN_USER" value=""/>
-        <env name="CARAPI_CATALOG_ADMIN_PASSWORD" value=""/>
-        <env name="CARAPI_CABINET_DEMO" value="false"/>
+        <env name="GEOAPI_CATALOG_ADMIN_DRIVER" value="sqlite"/>
+        <env name="GEOAPI_CATALOG_ADMIN_DATABASE" value=":memory:"/>
+        <env name="GEOAPI_CATALOG_ADMIN_USER" value=""/>
+        <env name="GEOAPI_CATALOG_ADMIN_PASSWORD" value=""/>
+        <env name="GEOAPI_CABINET_DEMO" value="false"/>
         <env name="STRIPE_WEBHOOK_SECRET" value="" force="true"/>
         <env name="BOG_CLIENT_ID" value="" force="true"/>
         <env name="BOG_CLIENT_SECRET" value="" force="true"/>

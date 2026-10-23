@@ -58,7 +58,7 @@ return new class extends Migration
         $pdo = $this->catalogPdo();
         $pdo->exec("SET statement_timeout = '120s'");
         $pdo->exec(<<<'SQL'
-            CREATE OR REPLACE FUNCTION public.carapi_touch_updated_at()
+            CREATE OR REPLACE FUNCTION public.geoapi_touch_updated_at()
             RETURNS trigger
             LANGUAGE plpgsql
             AS $$
@@ -72,11 +72,11 @@ return new class extends Migration
             $pdo->exec('ALTER TABLE public.'.$table.' ADD COLUMN IF NOT EXISTS updated_at timestamp with time zone');
             $pdo->exec('ALTER TABLE public.'.$table.' ALTER COLUMN updated_at SET DEFAULT CURRENT_TIMESTAMP');
             $pdo->exec('UPDATE public.'.$table.' SET updated_at = CURRENT_TIMESTAMP WHERE updated_at IS NULL');
-            $pdo->exec('DROP TRIGGER IF EXISTS carapi_'.$table.'_updated_at ON public.'.$table);
-            $pdo->exec('CREATE TRIGGER carapi_'.$table.'_updated_at BEFORE UPDATE ON public.'.$table.' FOR EACH ROW EXECUTE PROCEDURE public.carapi_touch_updated_at()');
+            $pdo->exec('DROP TRIGGER IF EXISTS geoapi_'.$table.'_updated_at ON public.'.$table);
+            $pdo->exec('CREATE TRIGGER geoapi_'.$table.'_updated_at BEFORE UPDATE ON public.'.$table.' FOR EACH ROW EXECUTE PROCEDURE public.geoapi_touch_updated_at()');
         }
         $pdo->exec(<<<'SQL'
-            CREATE OR REPLACE FUNCTION public.carapi_touch_modification()
+            CREATE OR REPLACE FUNCTION public.geoapi_touch_modification()
             RETURNS trigger
             LANGUAGE plpgsql
             AS $$
@@ -86,8 +86,8 @@ return new class extends Migration
             END;
             $$
         SQL);
-        $pdo->exec('DROP TRIGGER IF EXISTS carapi_specs_touch_modification ON public.modification_specs');
-        $pdo->exec('CREATE TRIGGER carapi_specs_touch_modification AFTER INSERT OR UPDATE ON public.modification_specs FOR EACH ROW EXECUTE PROCEDURE public.carapi_touch_modification()');
+        $pdo->exec('DROP TRIGGER IF EXISTS geoapi_specs_touch_modification ON public.modification_specs');
+        $pdo->exec('CREATE TRIGGER geoapi_specs_touch_modification AFTER INSERT OR UPDATE ON public.modification_specs FOR EACH ROW EXECUTE PROCEDURE public.geoapi_touch_modification()');
         foreach ([
             'CREATE INDEX IF NOT EXISTS modifications_year_start_idx ON public.modifications (year_start)',
             'CREATE INDEX IF NOT EXISTS modifications_year_end_idx ON public.modifications (year_end)',
@@ -118,16 +118,16 @@ return new class extends Migration
 
     private function catalogPdo(): PDO
     {
-        $host = $this->env('CARAPI_CATALOG_ADMIN_HOST', 'CARAPI_CATALOG_HOST');
-        $database = $this->env('CARAPI_CATALOG_ADMIN_DATABASE', 'CARAPI_CATALOG_DATABASE');
-        $user = $this->env('CARAPI_CATALOG_ADMIN_USER');
-        $password = $this->env('CARAPI_CATALOG_ADMIN_PASSWORD');
-        $port = $this->env('CARAPI_CATALOG_ADMIN_PORT', 'CARAPI_CATALOG_PORT');
+        $host = $this->env('GEOAPI_CATALOG_ADMIN_HOST', 'GEOAPI_CATALOG_HOST');
+        $database = $this->env('GEOAPI_CATALOG_ADMIN_DATABASE', 'GEOAPI_CATALOG_DATABASE');
+        $user = $this->env('GEOAPI_CATALOG_ADMIN_USER');
+        $password = $this->env('GEOAPI_CATALOG_ADMIN_PASSWORD');
+        $port = $this->env('GEOAPI_CATALOG_ADMIN_PORT', 'GEOAPI_CATALOG_PORT');
         if ($port === '') {
             $port = '5432';
         }
         if ($host === '' || $database === '' || $user === '') {
-            throw new RuntimeException('Catalog migration needs CARAPI_CATALOG_ADMIN_USER, the table owner. Do not use carapi_catalog_reader.');
+            throw new RuntimeException('Catalog migration needs GEOAPI_CATALOG_ADMIN_USER, the table owner. Do not use geoapi_catalog_reader.');
         }
 
         return $this->pdo($host, $port, $database, $user, $password);
@@ -135,16 +135,16 @@ return new class extends Migration
 
     private function platformPdo(): PDO
     {
-        $host = $this->env('CARAPI_PLATFORM_HOST');
-        $database = $this->env('CARAPI_PLATFORM_DATABASE');
-        $user = $this->env('CARAPI_PLATFORM_USER');
-        $password = $this->env('CARAPI_PLATFORM_PASSWORD');
-        $port = $this->env('CARAPI_PLATFORM_PORT');
+        $host = $this->env('GEOAPI_PLATFORM_HOST');
+        $database = $this->env('GEOAPI_PLATFORM_DATABASE');
+        $user = $this->env('GEOAPI_PLATFORM_USER');
+        $password = $this->env('GEOAPI_PLATFORM_PASSWORD');
+        $port = $this->env('GEOAPI_PLATFORM_PORT');
         if ($port === '') {
             $port = '5432';
         }
         if ($host === '' || $database === '' || $user === '') {
-            throw new RuntimeException('Platform migration needs CARAPI_PLATFORM_HOST, CARAPI_PLATFORM_DATABASE, and CARAPI_PLATFORM_USER.');
+            throw new RuntimeException('Platform migration needs GEOAPI_PLATFORM_HOST, GEOAPI_PLATFORM_DATABASE, and GEOAPI_PLATFORM_USER.');
         }
 
         return $this->pdo($host, $port, $database, $user, $password);

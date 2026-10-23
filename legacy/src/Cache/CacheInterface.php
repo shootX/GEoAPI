@@ -1,6 +1,6 @@
 <?php
 
-namespace Carapi\Cache;
+namespace Geoapi\Cache;
 
 /**
  * @author Anovo.Ge https://anovo.ge

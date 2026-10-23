@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Carapi\Platform;
+namespace Geoapi\Platform;
 
-use Carapi\Catalog\CatalogRepository;
-use Carapi\Catalog\Connection as CatalogConnection;
+use Geoapi\Catalog\CatalogRepository;
+use Geoapi\Catalog\Connection as CatalogConnection;
 
 final class Playground
 {
@@ -63,7 +63,7 @@ final class Playground
 
     public static function catalogEnabled(): bool
     {
-        return self::flag('CARAPI_CATALOG_ENABLED');
+        return self::flag('GEOAPI_CATALOG_ENABLED');
     }
 
     public static function operationEnabled(string $route): bool
@@ -72,10 +72,10 @@ final class Playground
             return false;
         }
         if ($route === 'modifications') {
-            return self::flag('CARAPI_MODIFICATIONS_ENABLED');
+            return self::flag('GEOAPI_MODIFICATIONS_ENABLED');
         }
         if ($route === 'modification') {
-            return self::flag('CARAPI_MODIFICATION_DETAILS_ENABLED');
+            return self::flag('GEOAPI_MODIFICATION_DETAILS_ENABLED');
         }
 
         return true;
@@ -244,7 +244,7 @@ final class Playground
 
     private static function flag(string $name): bool
     {
-        $value = carapi_env($name);
+        $value = geoapi_env($name);
 
         return is_string($value) && in_array(strtolower(trim($value)), ['1', 'true', 'on', 'yes'], true);
     }

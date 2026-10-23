@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Carapi;
+namespace GeoAPI;
 
 final class SiteFooter
 {

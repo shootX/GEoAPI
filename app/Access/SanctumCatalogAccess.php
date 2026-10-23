@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Access;
 
-use Carapi\Catalog\DeniedException;
+use Geoapi\Catalog\DeniedException;
 use Illuminate\Support\Facades\DB;
 use Laravel\Sanctum\PersonalAccessToken;
 
@@ -37,7 +37,7 @@ final class SanctumCatalogAccess
         if ($legacyUserId < 1) {
             throw new DeniedException(403);
         }
-        // Same owner rules as a geoapi_sk_ key (Carapi\Platform\ApiKeys): active and verified.
+        // Same owner rules as a geoapi_sk_ key (Geoapi\Platform\ApiKeys): active and verified.
         $owner = DB::table('platform.users')->where('id', $legacyUserId)->first(['status', 'email_verified_at']);
         if ($owner === null || (string) $owner->status !== 'active' || $owner->email_verified_at === null || $user->suspended_at !== null) {
             throw new DeniedException(403);
@@ -46,7 +46,7 @@ final class SanctumCatalogAccess
             throw new DeniedException(403);
         }
 
-        $projectHeader = $_SERVER['HTTP_X_CARAPI_PROJECT'] ?? '';
+        $projectHeader = $_SERVER['HTTP_X_GEOAPI_PROJECT'] ?? '';
         if (! is_string($projectHeader) || preg_match('/^[1-9][0-9]*$/', $projectHeader) !== 1) {
             throw new DeniedException(403);
         }

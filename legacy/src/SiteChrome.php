@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Carapi;
+namespace GeoAPI;
 
 final class SiteChrome
 {
@@ -22,8 +22,8 @@ final class SiteChrome
 
     public static function header(?string $active = null): string
     {
-        $open = \Carapi\Platform\Http::enabled();
-        $account = $open ? \Carapi\Platform\Http::accountLink() : null;
+        $open = \Geoapi\Platform\Http::enabled();
+        $account = $open ? \Geoapi\Platform\Http::accountLink() : null;
         $links = [
             'demo' => ['/#demo', 'დემო'],
             'guide' => ['/guide', 'დოკუმენტაცია'],
@@ -51,7 +51,7 @@ final class SiteChrome
 
     public static function footer(): string
     {
-        $open = \Carapi\Platform\Http::enabled();
+        $open = \Geoapi\Platform\Http::enabled();
         $account = $open
             ? '<a href="/login">შესვლა</a><a href="/register">რეგისტრაცია</a>'
             : '';
@@ -70,7 +70,7 @@ final class SiteChrome
         $summary = $description ?? 'GeoAPI დეველოპერებს სთავაზობს ავტომობილების ბრენდების, მოდელებისა და თაობების მონაცემებს REST API-ის საშუალებით და ავტომობილის არჩევის მზა ვიჯეტს ვებსაიტებისთვის.';
 
         return '<!doctype html><html lang="ka"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">'
-            . '<script' . \Carapi\Csp::attr() . '>(function(){try{var t=localStorage.getItem("geoapi-theme")||localStorage.getItem("carapi-theme");if(t==="light")document.documentElement.dataset.theme="light"}catch(e){}})()</script>'
+            . '<script' . \Geoapi\Csp::attr() . '>(function(){try{var t=localStorage.getItem("geoapi-theme");if(t==="light")document.documentElement.dataset.theme="light"}catch(e){}})()</script>'
             . '<title>' . $pageTitle . '</title>'
             . '<meta name="description" content="' . htmlspecialchars($summary, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') . '">'
             . '<link rel="icon" href="/favicon.ico" sizes="any">'

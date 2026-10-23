@@ -18,7 +18,7 @@ final class ApplyChosenLocale
             $choice = is_object($user) ? ($user->locale ?? null) : null;
         }
         if (! is_string($choice) || ! in_array($choice, ['ka', 'en'], true)) {
-            $choice = (string) config('carapi.locale');
+            $choice = (string) config('geoapi.locale');
         }
         // Electrik only knows en/es/fr/ar/hi and would replace ka with en.
         if (in_array($choice, ['ka', 'en'], true)) {

@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Tests\Feature;
 
-use Carapi\Catalog\Connection;
-use Carapi\Platform\MemoryUsageStore;
+use Geoapi\Catalog\Connection;
+use Geoapi\Platform\MemoryUsageStore;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
 use PDO;
@@ -45,11 +45,11 @@ trait SeedsPublicCatalog
         $this->schema();
         Connection::use($this->pdo);
         foreach ([
-            'CARAPI_CATALOG_ENABLED' => '1',
-            'CARAPI_MODIFICATIONS_ENABLED' => '1',
-            'CARAPI_MODIFICATION_DETAILS_ENABLED' => '1',
-            'CARAPI_CATALOG_TEST_PROJECT' => '7',
-            'CARAPI_USAGE_MEMORY' => '1',
+            'GEOAPI_CATALOG_ENABLED' => '1',
+            'GEOAPI_MODIFICATIONS_ENABLED' => '1',
+            'GEOAPI_MODIFICATION_DETAILS_ENABLED' => '1',
+            'GEOAPI_CATALOG_TEST_PROJECT' => '7',
+            'GEOAPI_USAGE_MEMORY' => '1',
         ] as $name => $value) {
             $_ENV[$name] = $value;
             $_SERVER[$name] = $value;
@@ -61,11 +61,11 @@ trait SeedsPublicCatalog
         Connection::reset();
         MemoryUsageStore::reset();
         foreach ([
-            'CARAPI_CATALOG_ENABLED',
-            'CARAPI_MODIFICATIONS_ENABLED',
-            'CARAPI_MODIFICATION_DETAILS_ENABLED',
-            'CARAPI_CATALOG_TEST_PROJECT',
-            'CARAPI_USAGE_MEMORY',
+            'GEOAPI_CATALOG_ENABLED',
+            'GEOAPI_MODIFICATIONS_ENABLED',
+            'GEOAPI_MODIFICATION_DETAILS_ENABLED',
+            'GEOAPI_CATALOG_TEST_PROJECT',
+            'GEOAPI_USAGE_MEMORY',
         ] as $name) {
             unset($_ENV[$name], $_SERVER[$name]);
         }

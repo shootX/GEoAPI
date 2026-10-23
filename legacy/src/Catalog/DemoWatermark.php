@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Carapi\Catalog;
+namespace Geoapi\Catalog;
 
 final class DemoWatermark
 {

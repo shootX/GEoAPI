@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Carapi\Platform;
+namespace Geoapi\Platform;
 
 use PDO;
 use PDOException;
@@ -17,14 +17,14 @@ final class Connection
             return self::$pdo;
         }
 
-        $host = self::env('CARAPI_PLATFORM_HOST');
-        $database = self::env('CARAPI_PLATFORM_DATABASE');
-        $user = self::env('CARAPI_PLATFORM_USER');
-        $password = carapi_env('CARAPI_PLATFORM_PASSWORD');
+        $host = self::env('GEOAPI_PLATFORM_HOST');
+        $database = self::env('GEOAPI_PLATFORM_DATABASE');
+        $user = self::env('GEOAPI_PLATFORM_USER');
+        $password = geoapi_env('GEOAPI_PLATFORM_PASSWORD');
         $password = is_string($password) ? $password : '';
-        $port = self::intEnv('CARAPI_PLATFORM_PORT', 5432, 1, 65535);
-        $connectTimeout = self::intEnv('CARAPI_PLATFORM_CONNECT_TIMEOUT', 3, 1, 10);
-        $statementTimeout = self::intEnv('CARAPI_PLATFORM_STATEMENT_TIMEOUT_MS', 3000, 100, 10000);
+        $port = self::intEnv('GEOAPI_PLATFORM_PORT', 5432, 1, 65535);
+        $connectTimeout = self::intEnv('GEOAPI_PLATFORM_CONNECT_TIMEOUT', 3, 1, 10);
+        $statementTimeout = self::intEnv('GEOAPI_PLATFORM_STATEMENT_TIMEOUT_MS', 3000, 100, 10000);
 
         if ($host === '' || $database === '' || $user === '') {
             throw new UnavailableException;
@@ -73,14 +73,14 @@ final class Connection
 
     private static function env(string $name): string
     {
-        $value = carapi_env($name);
+        $value = geoapi_env($name);
 
         return is_string($value) ? trim($value) : '';
     }
 
     private static function intEnv(string $name, int $default, int $min, int $max): int
     {
-        $raw = carapi_env($name);
+        $raw = geoapi_env($name);
         if (! is_string($raw) || ! preg_match('/^[0-9]+$/', $raw)) {
             return $default;
         }

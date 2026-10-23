@@ -23,8 +23,8 @@
 !/storage/logs/.gitignore
 /storage/framework/sessions/*
 !/storage/framework/sessions/.gitignore
-/storage/framework/carapi-sessions/*
-!/storage/framework/carapi-sessions/.gitignore
+/storage/framework/geoapi-sessions/*
+!/storage/framework/geoapi-sessions/.gitignore
 /storage/framework/cache/*
 !/storage/framework/cache/.gitignore
 !/storage/framework/cache/data/

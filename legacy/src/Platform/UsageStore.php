@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Carapi\Platform;
+namespace Geoapi\Platform;
 
 interface UsageStore
 {

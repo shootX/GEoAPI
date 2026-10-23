@@ -1,8 +1,8 @@
 # პლატფორმის ავტორიზაცია
 
-production-ში `CARAPI_PLATFORM_ENABLED=1`. საჯარო რეგისტრაცია PostgreSQL-ის ნაკადია. ძველი SQLite ფორმა საჯაროდ აღარ იხსნება. ისტორიულად, ჩართვამდე, საიტი ამ ნაკადს არ იყენებდა.
+production-ში `GEOAPI_PLATFORM_ENABLED=1`. საჯარო რეგისტრაცია PostgreSQL-ის ნაკადია. ძველი SQLite ფორმა საჯაროდ აღარ იხსნება. ისტორიულად, ჩართვამდე, საიტი ამ ნაკადს არ იყენებდა.
 
-`CARAPI_CATALOG_ENABLED` production-ში 1-ია.
+`GEOAPI_CATALOG_ENABLED` production-ში 1-ია.
 
 ## სქემა
 
@@ -15,17 +15,17 @@ production-ში `CARAPI_PLATFORM_ENABLED=1`. საჯარო რეგი�
 გაშვება ადმინისტრაციული კავშირით, არა runtime როლით:
 
 ```bash
-export CARAPI_PLATFORM_ADMIN_HOST=127.0.0.1
-export CARAPI_PLATFORM_ADMIN_PORT=5432
-export CARAPI_PLATFORM_ADMIN_DATABASE=carbase
-export CARAPI_PLATFORM_ADMIN_USER=...
-export CARAPI_PLATFORM_ADMIN_PASSWORD=...
+export GEOAPI_PLATFORM_ADMIN_HOST=127.0.0.1
+export GEOAPI_PLATFORM_ADMIN_PORT=5432
+export GEOAPI_PLATFORM_ADMIN_DATABASE=carbase
+export GEOAPI_PLATFORM_ADMIN_USER=...
+export GEOAPI_PLATFORM_ADMIN_PASSWORD=...
 php bin/migrate.php
 ```
 
 განმეორებითი გაშვება უსაფრთხოა. ცხრილები გვერდის გახსნისას არ იქმნება.
 
-სამუშაო `carbase`-ზე მიგრაცია გაშვებულია. `platform.users` ცარიელია. `data/carapi.sqlite` არ არსებობს, გადასატანი მომხმარებელი არ არის.
+სამუშაო `carbase`-ზე მიგრაცია გაშვებულია. `platform.users` ცარიელია. `data/geoapi.sqlite` არ არსებობს, გადასატანი მომხმარებელი არ არის.
 
 ## კონფიგურაცია
 
@@ -33,21 +33,21 @@ php bin/migrate.php
 
 | ცვლადი | აზრი |
 |---|---|
-| `CARAPI_PLATFORM_ENABLED` | `0` ნაგულისხმევი |
-| `CARAPI_PLATFORM_HOST` | ჰოსტი |
-| `CARAPI_PLATFORM_PORT` | პორტი |
-| `CARAPI_PLATFORM_DATABASE` | ბაზა |
-| `CARAPI_PLATFORM_USER` | runtime როლი |
-| `CARAPI_PLATFORM_PASSWORD` | პაროლი |
-| `CARAPI_PLATFORM_SESSION_PATH` | სესიის ცალკე დირექტორია |
-| `CARAPI_PLATFORM_IDLE_SECONDS` | უმოქმედობა, ნაგულისხმევი 1800 |
-| `CARAPI_PLATFORM_ABSOLUTE_SECONDS` | სრული ვადა, ნაგულისხმევი 43200 |
-| `CARAPI_PLATFORM_ATTEMPT_LIMIT` | ელფოსტაზე, ნაგულისხმევი 8 / 900 წამი |
-| `CARAPI_PLATFORM_IP_ATTEMPT_LIMIT` | IP-ზე, ნაგულისხმევი 30 |
+| `GEOAPI_PLATFORM_ENABLED` | `0` ნაგულისხმევი |
+| `GEOAPI_PLATFORM_HOST` | ჰოსტი |
+| `GEOAPI_PLATFORM_PORT` | პორტი |
+| `GEOAPI_PLATFORM_DATABASE` | ბაზა |
+| `GEOAPI_PLATFORM_USER` | runtime როლი |
+| `GEOAPI_PLATFORM_PASSWORD` | პაროლი |
+| `GEOAPI_PLATFORM_SESSION_PATH` | სესიის ცალკე დირექტორია |
+| `GEOAPI_PLATFORM_IDLE_SECONDS` | უმოქმედობა, ნაგულისხმევი 1800 |
+| `GEOAPI_PLATFORM_ABSOLUTE_SECONDS` | სრული ვადა, ნაგულისხმევი 43200 |
+| `GEOAPI_PLATFORM_ATTEMPT_LIMIT` | ელფოსტაზე, ნაგულისხმევი 8 / 900 წამი |
+| `GEOAPI_PLATFORM_IP_ATTEMPT_LIMIT` | IP-ზე, ნაგულისხმევი 30 |
 
-ადმინისტრაციული მიგრაციის ცვლადებია `CARAPI_PLATFORM_ADMIN_*`. ისინი runtime პულში არ არის. საიდუმლოები GeoAPI-ის ცალკე FPM გარემოშია (შიდა ოპერაციულ ჩანაწერებში), საერთო პულში არა.
+ადმინისტრაციული მიგრაციის ცვლადებია `GEOAPI_PLATFORM_ADMIN_*`. ისინი runtime პულში არ არის. საიდუმლოები GeoAPI-ის ცალკე FPM გარემოშია (შიდა ოპერაციულ ჩანაწერებში), საერთო პულში არა.
 
-runtime როლია `geoapi_platform_app`: `LOGIN`, არა სუპერმომხმარებელი და არა მფლობელი, DDL არ შეუძლია. აქვს `SELECT`, `INSERT`, `UPDATE` `platform.users`-ზე, `SELECT`, `INSERT`, `DELETE` `platform.login_attempts`-ზე და შესაბამისი sequence-ის `USAGE`. კატალოგზე `INSERT` არ აქვს. `carapi_catalog_reader`-ს `platform.users` არ ხსნის.
+runtime როლია `geoapi_platform_app`: `LOGIN`, არა სუპერმომხმარებელი და არა მფლობელი, DDL არ შეუძლია. აქვს `SELECT`, `INSERT`, `UPDATE` `platform.users`-ზე, `SELECT`, `INSERT`, `DELETE` `platform.login_attempts`-ზე და შესაბამისი sequence-ის `USAGE`. კატალოგზე `INSERT` არ აქვს. `geoapi_catalog_reader`-ს `platform.users` არ ხსნის.
 
 ## მარშრუტები და სესია
 
@@ -59,7 +59,7 @@ runtime როლია `geoapi_platform_app`: `LOGIN`, არა სუპე�
 - `GET /account`
 - `GET /auth/me`
 
-ველები: სახელი, გვარი, ელფოსტა, პაროლი, გამეორება. პირადი ნომერი, ტელეფონი და კომპანიის ველები ამ ნაკადში არ არის. ელფოსტა იჭრება და `lowercase` ხდება. პაროლი არ იჭრება: 8–128 სიმბოლო, მინიმუმ ერთი დიდი ასო, ერთი ციფრი და ერთი სიმბოლო (`Carapi\Platform\Passwords::error`). Unicode და ჰარები დაშვებულია. ძველი, ამ წესის დამრღვევი პაროლით შესულ მომხმარებელს `RequireStrongPassword` პაროლის შეცვლამდე მხოლოდ `/settings/security`-ზე უშვებს. ჰეში არის `PASSWORD_ARGON2ID`. რეგისტრაციისას `email_verified_at` ცარიელი რჩება, სანამ მომხმარებელი ბმულს არ დაადასტურებს. წერილის გაგზავნა: `docs/EMAIL_AND_PASSWORD_RESET.md`. Production-ში SMTP მიერთებულია (`docs/EMAIL_AND_PASSWORD_RESET.md`). სამი ფუნქციური დროშა production-ში 1-ია.
+ველები: სახელი, გვარი, ელფოსტა, პაროლი, გამეორება. პირადი ნომერი, ტელეფონი და კომპანიის ველები ამ ნაკადში არ არის. ელფოსტა იჭრება და `lowercase` ხდება. პაროლი არ იჭრება: 8–128 სიმბოლო, მინიმუმ ერთი დიდი ასო, ერთი ციფრი და ერთი სიმბოლო (`Geoapi\Platform\Passwords::error`). Unicode და ჰარები დაშვებულია. ძველი, ამ წესის დამრღვევი პაროლით შესულ მომხმარებელს `RequireStrongPassword` პაროლის შეცვლამდე მხოლოდ `/settings/security`-ზე უშვებს. ჰეში არის `PASSWORD_ARGON2ID`. რეგისტრაციისას `email_verified_at` ცარიელი რჩება, სანამ მომხმარებელი ბმულს არ დაადასტურებს. წერილის გაგზავნა: `docs/EMAIL_AND_PASSWORD_RESET.md`. Production-ში SMTP მიერთებულია (`docs/EMAIL_AND_PASSWORD_RESET.md`). სამი ფუნქციური დროშა production-ში 1-ია.
 
 სესიის cookie-ის სახელია `geoapi_platform`. `HttpOnly`, `SameSite=Lax`, HTTPS-ზე `Secure`. სესიაში მხოლოდ მომხმარებლის id და ვადის ნიშნულებია. შესვლისას session id ახლდება. უმოქმედობა 30 წუთი, სრული ვადა 12 საათი. `suspended` მომხმარებელი არსებული სესიითაც ვერ შედის. `GET /logout` არ გამოდის. უცნობი ელფოსტა და არასწორი პაროლი ერთნაირ შეტყობინებას იძლევა. ბაზის შეცდომა არის 503, SQL-ის გარეშე, SQLite-ზე გადართვის გარეშე.
 
