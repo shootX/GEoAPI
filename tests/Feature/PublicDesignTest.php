@@ -120,7 +120,7 @@ class PublicDesignTest extends TestCase
             ->get('/guide')
             ->assertOk()
             ->assertSee('curl')
-            ->assertSee('JavaScript')
+            ->assertSee('Node.js')
             ->assertSee('PHP')
             ->assertSee('ბრენდები');
     }

@@ -3,7 +3,7 @@
     "info": {
         "title": "GeoAPI",
         "version": "1.2.0",
-        "description": "Public catalog API. Send Authorization: Bearer geoapi_sk_… from your server. List responses keep data and meta, and add collection. limit defaults to 100 and cannot exceed 1000. per_page is an alias used only when limit is absent. Fuel consumption is litres per 100 km. Dimensions and performance groups are null because those columns are not stored. Colors return every stored row with a verified flag. Document version 1.2.0 matches the deployed catalog. The TypeScript SDK is packages/sdk-js 0.1.0 in this repository and is not on the public npm registry. The MCP server is packages/mcp-server 0.1.0 in this repository and is not on the public npm registry. The CLI is packages/cli 0.1.0 in this repository and is not published on the public npm registry. The host is https://geoapi.ge."
+        "description": "Public catalog API. Send Authorization: Bearer geoapi_sk_… from your server. List responses keep data and meta, and add collection. limit defaults to 100 and cannot exceed 1000. per_page is an alias used only when limit is absent. Fuel consumption is litres per 100 km. The dimensions and performance groups are always null because this data is not collected yet. Colors returns every stored color with a verified flag. Document version 1.2.0 matches the deployed catalog. The TypeScript SDK, the MCP server, and the CLI (all 0.1.0) are not published yet. The host is https://geoapi.ge."
     },
     "servers": [
         {
@@ -21,7 +21,7 @@
             "secretKey": {
                 "type": "http",
                 "scheme": "bearer",
-                "description": "Server key geoapi_sk_…. geoapi_pk_, query strings, cookies, and a cabinet session are not this credential."
+                "description": "Secret server key geoapi_sk_…. geoapi_pk_, a key in the URL query, a cookie, and a cabinet session are not accepted."
             }
         },
         "parameters": {
@@ -39,7 +39,7 @@
             "limit": {
                 "name": "limit",
                 "in": "query",
-                "description": "Page size. Default 100. per_page is ignored when limit is present.",
+                "description": "Page size, from 1 to 1000. Default 100. per_page is ignored when limit is present.",
                 "schema": {
                     "type": "integer",
                     "minimum": 1,
@@ -73,7 +73,7 @@
             "q": {
                 "name": "q",
                 "in": "query",
-                "description": "Case-insensitive name search, 1 to 100 characters. Control characters are rejected. Not accepted on years.",
+                "description": "Case-insensitive search, 1 to 100 characters. It searches the name; on generations also the chassis code, and on colors the color name. Control characters are rejected. Not accepted on years.",
                 "schema": {
                     "type": "string",
                     "minLength": 1,
@@ -92,7 +92,7 @@
             "yearFrom": {
                 "name": "year_from",
                 "in": "query",
-                "description": "Inclusive overlap with stored year_start and year_end. Integer from 1886 to 2100. Not a column.",
+                "description": "Inclusive. Matches rows whose year_start to year_end range reaches this year or later. Rows without years always match. Integer from 1886 to 2100. A filter, not a field.",
                 "schema": {
                     "type": "integer",
                     "minimum": 1886,
@@ -102,7 +102,7 @@
             "yearTo": {
                 "name": "year_to",
                 "in": "query",
-                "description": "Inclusive overlap with stored year_start and year_end. Integer from 1886 to 2100. Use with year_from.",
+                "description": "Inclusive. Matches rows whose year_start to year_end range starts in this year or earlier. Works alone or with year_from. Rows without years always match. Integer from 1886 to 2100.",
                 "schema": {
                     "type": "integer",
                     "minimum": 1886,
@@ -413,7 +413,8 @@
                     },
                     "market": {
                         "type": "string",
-                        "nullable": true
+                        "nullable": true,
+                        "description": "Always null for now."
                     },
                     "display_label": {
                         "type": "string"
@@ -725,12 +726,12 @@
                     "dimensions": {
                         "type": "object",
                         "nullable": true,
-                        "description": "Always null. Dimension columns are not stored."
+                        "description": "Always null. Dimensions are not collected yet."
                     },
                     "performance": {
                         "type": "object",
                         "nullable": true,
-                        "description": "Always null. Performance columns are not stored. power_hp stays on engine."
+                        "description": "Always null. Performance data is not collected yet. power_hp is in engine."
                     },
                     "consumption": {
                         "type": "object",
@@ -950,7 +951,8 @@
                 ],
                 "properties": {
                     "id": {
-                        "type": "string"
+                        "type": "string",
+                        "description": "The model id. Several colors of one model share it, so it is not unique."
                     },
                     "model_id": {
                         "type": "string"
@@ -1029,7 +1031,7 @@
                 ],
                 "operationId": "listBrands",
                 "summary": "Brands",
-                "description": "Brand list.\n\nPagination: page defaults to 1 (maximum 1000000). limit defaults to 100 and cannot exceed 1000. per_page is used only when limit is absent. direction defaults to asc and applies when sort is set. Omitting sort keeps this resource's default order. REST year lists are ascending. The widget list is newest-first.\n\nAuthentication: Authorization: Bearer geoapi_sk_… from your server. Query strings, cookies, and a cabinet session are not credentials. geoapi_pk_ is the widget key, not a catalog bearer. Sanctum cars:read or * also requires X-CARAPI-PROJECT naming that user's active project. A secret key ignores X-CARAPI-PROJECT.\n\nErrors, JSON error.code and error.message only, no request id: 401 unauthorized, 403 forbidden, 404 not_found, 405 method_not_allowed, 422 invalid_parameter, 429 RATE_LIMIT_EXCEEDED or DAILY_QUOTA_EXCEEDED or MONTHLY_QUOTA_EXCEEDED, 503 unavailable. Authentication runs before the method check. A non-GET request without an accepted key is 401, not 405. 405 is returned only after the key is accepted. Use GET.\n\nLimits: one project shares 60 requests each UTC minute and 10 000 successful requests each UTC month with the widget. Those caps are active. A project that has not chosen a commercial plan keeps 10 000 successful requests each UTC month. Choosing the free plan sets that project to 100 successful requests each UTC month. An unlimited plan sends X-Quota-Limit: unlimited. The 2 000 successful requests per UTC day limit is not enforced in production today, because the daily check runs only when platform.project_limits.per_day exists. A missing limits row or a failed meter is 503, not an unmetered success. 401, 403, 404, 405, 422, 429, and 503 do not spend the month. Failures still use the minute window. On 429, wait Retry-After seconds. Do not retry 401, 403, 404, or 422. Success sends X-RateLimit-* for the minute and X-Quota-* for the month. 429 sends X-RateLimit-* for the window that was hit.\n\nCoverage: JSON ids are strings. null means the stored value is missing. dimensions and performance are null. Colors include unverified rows with verified false. Photo files and VIN are not on these routes. Photo rights are cleared; photo files are served by /api/models/{id}/photo, not by these routes.\n\nVersion 1.2.0 at https://geoapi.ge. The TypeScript SDK is packages/sdk-js 0.1.0 in this repository and is not on the public npm registry. The MCP server is packages/mcp-server 0.1.0 in this repository, speaks stdio, and is not on the public npm registry. The CLI is packages/cli 0.1.0 in this repository and is not published on the public npm registry. The widget is the browser embed and uses geoapi_pk_.",
+                "description": "Brand list. page defaults to 1. limit defaults to 100 and cannot exceed 1000. per_page is the same parameter when limit is omitted. sort is name, id, or modified. direction is asc or desc. q searches the name.\n\nPagination: page defaults to 1 (maximum 1000000). limit defaults to 100 and cannot exceed 1000. per_page is used only when limit is absent. direction defaults to asc and applies when sort is set. Without sort, this resource keeps its default order. REST year lists are ascending. The widget list starts with the newest year.\n\nAuthentication: send Authorization: Bearer geoapi_sk_… from your server. A key in the URL query, a cookie, or a cabinet session is not accepted. geoapi_pk_ is the widget key and does not work here. A cabinet personal access token with cars:read or * also needs X-CARAPI-PROJECT with the id of one of your active projects. A secret key ignores X-CARAPI-PROJECT. Before using a key, confirm your email and turn on the Cars API at /account/products, or the key gets 403.\n\nErrors are JSON with only error.code and error.message, and no request id: 401 unauthorized, 403 forbidden, 404 not_found, 405 method_not_allowed, 422 invalid_parameter, 429 RATE_LIMIT_EXCEEDED, DAILY_QUOTA_EXCEEDED, or MONTHLY_QUOTA_EXCEEDED, 503 unavailable. The key is checked before the method, so a non-GET request without a valid key returns 401, not 405. 405 is returned only after the key is accepted. Use GET. One IP address may send 300 requests a minute. That limit is checked before the key, so it can return 429 before 401.\n\nLimits: a project shares 60 requests per UTC minute and its monthly quota with the widget. A project that has not chosen a paid plan has 10 000 successful requests per UTC month. Choosing the free plan sets that to 100. An unlimited plan sends X-Quota-Limit: unlimited. The daily limit of 2 000 successful requests is not enforced in production today. If the request cannot be counted, the API returns 503, never an unmetered success. Errors are not counted against the monthly quota. 404 and 422 still count toward the minute limit. On 429, wait Retry-After seconds. Do not retry 401, 403, 404, or 422. A success sends X-RateLimit-* for the minute and X-Quota-* for the month. 429 sends X-RateLimit-* for the limit that was hit.\n\nData: ids are strings. null means the value is unknown. dimensions and performance are always null. Colors include unchecked rows with verified false, and a color id is the model id. Photo rights are cleared, but the v1 API does not return photos yet. VIN lookup is not available.\n\nVersion 1.2.0 at https://geoapi.ge. The TypeScript SDK, the MCP server (stdio), and the CLI (all 0.1.0) are not published yet. The widget is the browser embed and uses geoapi_pk_.",
                 "parameters": [
                     {
                         "$ref": "#/components/parameters/page"
@@ -1083,13 +1085,35 @@
                                 }
                             },
                             "X-Quota-Limit": {
+                                "description": "An integer, or the word unlimited on an unlimited plan.",
                                 "schema": {
-                                    "type": "integer"
+                                    "oneOf": [
+                                        {
+                                            "type": "integer"
+                                        },
+                                        {
+                                            "type": "string",
+                                            "enum": [
+                                                "unlimited"
+                                            ]
+                                        }
+                                    ]
                                 }
                             },
                             "X-Quota-Remaining": {
+                                "description": "An integer, or the word unlimited on an unlimited plan.",
                                 "schema": {
-                                    "type": "integer"
+                                    "oneOf": [
+                                        {
+                                            "type": "integer"
+                                        },
+                                        {
+                                            "type": "string",
+                                            "enum": [
+                                                "unlimited"
+                                            ]
+                                        }
+                                    ]
                                 }
                             },
                             "X-Quota-Reset": {
@@ -1145,7 +1169,7 @@
                         }
                     },
                     "403": {
-                        "description": "The key is valid, but the project, owner, or email does not allow the call.",
+                        "description": "The key is valid, but the project is disabled, the account is suspended, the email is not confirmed, or the Cars API is not turned on.",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -1161,7 +1185,7 @@
                         }
                     },
                     "404": {
-                        "description": "The record was not found.",
+                        "description": "The record or the address was not found.",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -1254,7 +1278,7 @@
                         }
                     },
                     "503": {
-                        "description": "The catalog or the meter is temporarily unavailable.",
+                        "description": "The catalog or the request counter is temporarily unavailable.",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -1273,15 +1297,11 @@
                 "x-codeSamples": [
                     {
                         "lang": "curl",
-                        "source": "curl https://geoapi.ge/api/v1/brands?limit=1 \\\n  -H \"Authorization: Bearer geoapi_sk_…\""
-                    },
-                    {
-                        "lang": "JavaScript",
-                        "source": "// Server-side only: a geoapi_sk_ key must never reach the browser. In a web page use the widget (geoapi_pk_).\nconst response = await fetch(\"https://geoapi.ge/api/v1/brands?limit=1\", {\n  headers: { Authorization: 'Bearer geoapi_sk_…' },\n});\nconst data = await response.json();"
+                        "source": "curl \"https://geoapi.ge/api/v1/brands?limit=1\" \\\n  -H \"Authorization: Bearer geoapi_sk_…\""
                     },
                     {
                         "lang": "Node.js",
-                        "source": "const response = await fetch(\"https://geoapi.ge/api/v1/brands?limit=1\", {\n  headers: { Authorization: 'Bearer geoapi_sk_…' },\n});\nconsole.log(await response.json());"
+                        "source": "// Server-side only: a geoapi_sk_ key must never reach the browser. In a web page use the widget (geoapi_pk_).\nconst response = await fetch(\"https://geoapi.ge/api/v1/brands?limit=1\", {\n  headers: { Authorization: 'Bearer geoapi_sk_…' },\n});\nconsole.log(await response.json());"
                     },
                     {
                         "lang": "Python",
@@ -1304,13 +1324,13 @@
                 ],
                 "operationId": "listBrandModels",
                 "summary": "Models for one brand slug",
-                "description": "Models for one brand. The slug comes from the brands response. body filters the stored body type.\n\nPagination: page defaults to 1 (maximum 1000000). limit defaults to 100 and cannot exceed 1000. per_page is used only when limit is absent. direction defaults to asc and applies when sort is set. Omitting sort keeps this resource's default order. REST year lists are ascending. The widget list is newest-first.\n\nAuthentication: Authorization: Bearer geoapi_sk_… from your server. Query strings, cookies, and a cabinet session are not credentials. geoapi_pk_ is the widget key, not a catalog bearer. Sanctum cars:read or * also requires X-CARAPI-PROJECT naming that user's active project. A secret key ignores X-CARAPI-PROJECT.\n\nErrors, JSON error.code and error.message only, no request id: 401 unauthorized, 403 forbidden, 404 not_found, 405 method_not_allowed, 422 invalid_parameter, 429 RATE_LIMIT_EXCEEDED or DAILY_QUOTA_EXCEEDED or MONTHLY_QUOTA_EXCEEDED, 503 unavailable. Authentication runs before the method check. A non-GET request without an accepted key is 401, not 405. 405 is returned only after the key is accepted. Use GET.\n\nLimits: one project shares 60 requests each UTC minute and 10 000 successful requests each UTC month with the widget. Those caps are active. A project that has not chosen a commercial plan keeps 10 000 successful requests each UTC month. Choosing the free plan sets that project to 100 successful requests each UTC month. An unlimited plan sends X-Quota-Limit: unlimited. The 2 000 successful requests per UTC day limit is not enforced in production today, because the daily check runs only when platform.project_limits.per_day exists. A missing limits row or a failed meter is 503, not an unmetered success. 401, 403, 404, 405, 422, 429, and 503 do not spend the month. Failures still use the minute window. On 429, wait Retry-After seconds. Do not retry 401, 403, 404, or 422. Success sends X-RateLimit-* for the minute and X-Quota-* for the month. 429 sends X-RateLimit-* for the window that was hit.\n\nCoverage: JSON ids are strings. null means the stored value is missing. dimensions and performance are null. Colors include unverified rows with verified false. Photo files and VIN are not on these routes. Photo rights are cleared; photo files are served by /api/models/{id}/photo, not by these routes.\n\nVersion 1.2.0 at https://geoapi.ge. The TypeScript SDK is packages/sdk-js 0.1.0 in this repository and is not on the public npm registry. The MCP server is packages/mcp-server 0.1.0 in this repository, speaks stdio, and is not on the public npm registry. The CLI is packages/cli 0.1.0 in this repository and is not published on the public npm registry. The widget is the browser embed and uses geoapi_pk_.",
+                "description": "Models for one brand. The slug comes from the brands response. body filters by body type.\n\nPagination: page defaults to 1 (maximum 1000000). limit defaults to 100 and cannot exceed 1000. per_page is used only when limit is absent. direction defaults to asc and applies when sort is set. Without sort, this resource keeps its default order. REST year lists are ascending. The widget list starts with the newest year.\n\nAuthentication: send Authorization: Bearer geoapi_sk_… from your server. A key in the URL query, a cookie, or a cabinet session is not accepted. geoapi_pk_ is the widget key and does not work here. A cabinet personal access token with cars:read or * also needs X-CARAPI-PROJECT with the id of one of your active projects. A secret key ignores X-CARAPI-PROJECT. Before using a key, confirm your email and turn on the Cars API at /account/products, or the key gets 403.\n\nErrors are JSON with only error.code and error.message, and no request id: 401 unauthorized, 403 forbidden, 404 not_found, 405 method_not_allowed, 422 invalid_parameter, 429 RATE_LIMIT_EXCEEDED, DAILY_QUOTA_EXCEEDED, or MONTHLY_QUOTA_EXCEEDED, 503 unavailable. The key is checked before the method, so a non-GET request without a valid key returns 401, not 405. 405 is returned only after the key is accepted. Use GET. One IP address may send 300 requests a minute. That limit is checked before the key, so it can return 429 before 401.\n\nLimits: a project shares 60 requests per UTC minute and its monthly quota with the widget. A project that has not chosen a paid plan has 10 000 successful requests per UTC month. Choosing the free plan sets that to 100. An unlimited plan sends X-Quota-Limit: unlimited. The daily limit of 2 000 successful requests is not enforced in production today. If the request cannot be counted, the API returns 503, never an unmetered success. Errors are not counted against the monthly quota. 404 and 422 still count toward the minute limit. On 429, wait Retry-After seconds. Do not retry 401, 403, 404, or 422. A success sends X-RateLimit-* for the minute and X-Quota-* for the month. 429 sends X-RateLimit-* for the limit that was hit.\n\nData: ids are strings. null means the value is unknown. dimensions and performance are always null. Colors include unchecked rows with verified false, and a color id is the model id. Photo rights are cleared, but the v1 API does not return photos yet. VIN lookup is not available.\n\nVersion 1.2.0 at https://geoapi.ge. The TypeScript SDK, the MCP server (stdio), and the CLI (all 0.1.0) are not published yet. The widget is the browser embed and uses geoapi_pk_.",
                 "parameters": [
                     {
                         "name": "slug",
                         "in": "path",
                         "required": true,
-                        "description": "Brand slug from the brands response.",
+                        "description": "Brand slug from the brands response. An unknown slug returns 404.",
                         "schema": {
                             "type": "string"
                         }
@@ -1370,13 +1390,35 @@
                                 }
                             },
                             "X-Quota-Limit": {
+                                "description": "An integer, or the word unlimited on an unlimited plan.",
                                 "schema": {
-                                    "type": "integer"
+                                    "oneOf": [
+                                        {
+                                            "type": "integer"
+                                        },
+                                        {
+                                            "type": "string",
+                                            "enum": [
+                                                "unlimited"
+                                            ]
+                                        }
+                                    ]
                                 }
                             },
                             "X-Quota-Remaining": {
+                                "description": "An integer, or the word unlimited on an unlimited plan.",
                                 "schema": {
-                                    "type": "integer"
+                                    "oneOf": [
+                                        {
+                                            "type": "integer"
+                                        },
+                                        {
+                                            "type": "string",
+                                            "enum": [
+                                                "unlimited"
+                                            ]
+                                        }
+                                    ]
                                 }
                             },
                             "X-Quota-Reset": {
@@ -1432,7 +1474,7 @@
                         }
                     },
                     "403": {
-                        "description": "The key is valid, but the project, owner, or email does not allow the call.",
+                        "description": "The key is valid, but the project is disabled, the account is suspended, the email is not confirmed, or the Cars API is not turned on.",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -1448,7 +1490,7 @@
                         }
                     },
                     "404": {
-                        "description": "The record was not found.",
+                        "description": "The record or the address was not found.",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -1541,7 +1583,7 @@
                         }
                     },
                     "503": {
-                        "description": "The catalog or the meter is temporarily unavailable.",
+                        "description": "The catalog or the request counter is temporarily unavailable.",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -1560,15 +1602,11 @@
                 "x-codeSamples": [
                     {
                         "lang": "curl",
-                        "source": "curl https://geoapi.ge/api/v1/brands/toyota/models?limit=1 \\\n  -H \"Authorization: Bearer geoapi_sk_…\""
-                    },
-                    {
-                        "lang": "JavaScript",
-                        "source": "// Server-side only: a geoapi_sk_ key must never reach the browser. In a web page use the widget (geoapi_pk_).\nconst response = await fetch(\"https://geoapi.ge/api/v1/brands/toyota/models?limit=1\", {\n  headers: { Authorization: 'Bearer geoapi_sk_…' },\n});\nconst data = await response.json();"
+                        "source": "curl \"https://geoapi.ge/api/v1/brands/toyota/models?limit=1\" \\\n  -H \"Authorization: Bearer geoapi_sk_…\""
                     },
                     {
                         "lang": "Node.js",
-                        "source": "const response = await fetch(\"https://geoapi.ge/api/v1/brands/toyota/models?limit=1\", {\n  headers: { Authorization: 'Bearer geoapi_sk_…' },\n});\nconsole.log(await response.json());"
+                        "source": "// Server-side only: a geoapi_sk_ key must never reach the browser. In a web page use the widget (geoapi_pk_).\nconst response = await fetch(\"https://geoapi.ge/api/v1/brands/toyota/models?limit=1\", {\n  headers: { Authorization: 'Bearer geoapi_sk_…' },\n});\nconsole.log(await response.json());"
                     },
                     {
                         "lang": "Python",
@@ -1590,14 +1628,14 @@
                     "Catalog"
                 ],
                 "operationId": "listModelYears",
-                "summary": "Years covered by one model. An open year_end stops at the current UTC year.",
-                "description": "Years for one model, from generation and modification year_start and year_end. A null year_end stops at the current UTC year. q, modified_after, year_from, and year_to are rejected.\n\nPagination: page defaults to 1 (maximum 1000000). limit defaults to 100 and cannot exceed 1000. per_page is used only when limit is absent. direction defaults to asc and applies when sort is set. Omitting sort keeps this resource's default order. REST year lists are ascending. The widget list is newest-first.\n\nAuthentication: Authorization: Bearer geoapi_sk_… from your server. Query strings, cookies, and a cabinet session are not credentials. geoapi_pk_ is the widget key, not a catalog bearer. Sanctum cars:read or * also requires X-CARAPI-PROJECT naming that user's active project. A secret key ignores X-CARAPI-PROJECT.\n\nErrors, JSON error.code and error.message only, no request id: 401 unauthorized, 403 forbidden, 404 not_found, 405 method_not_allowed, 422 invalid_parameter, 429 RATE_LIMIT_EXCEEDED or DAILY_QUOTA_EXCEEDED or MONTHLY_QUOTA_EXCEEDED, 503 unavailable. Authentication runs before the method check. A non-GET request without an accepted key is 401, not 405. 405 is returned only after the key is accepted. Use GET.\n\nLimits: one project shares 60 requests each UTC minute and 10 000 successful requests each UTC month with the widget. Those caps are active. A project that has not chosen a commercial plan keeps 10 000 successful requests each UTC month. Choosing the free plan sets that project to 100 successful requests each UTC month. An unlimited plan sends X-Quota-Limit: unlimited. The 2 000 successful requests per UTC day limit is not enforced in production today, because the daily check runs only when platform.project_limits.per_day exists. A missing limits row or a failed meter is 503, not an unmetered success. 401, 403, 404, 405, 422, 429, and 503 do not spend the month. Failures still use the minute window. On 429, wait Retry-After seconds. Do not retry 401, 403, 404, or 422. Success sends X-RateLimit-* for the minute and X-Quota-* for the month. 429 sends X-RateLimit-* for the window that was hit.\n\nCoverage: JSON ids are strings. null means the stored value is missing. dimensions and performance are null. Colors include unverified rows with verified false. Photo files and VIN are not on these routes. Photo rights are cleared; photo files are served by /api/models/{id}/photo, not by these routes.\n\nVersion 1.2.0 at https://geoapi.ge. The TypeScript SDK is packages/sdk-js 0.1.0 in this repository and is not on the public npm registry. The MCP server is packages/mcp-server 0.1.0 in this repository, speaks stdio, and is not on the public npm registry. The CLI is packages/cli 0.1.0 in this repository and is not published on the public npm registry. The widget is the browser embed and uses geoapi_pk_.",
+                "summary": "Years covered by one model. The list stops at the current UTC year.",
+                "description": "Years for one model, from the year_start and year_end of its generations and modifications. The list stops at the current UTC year. q, modified_after, year_from, and year_to return 422.\n\nPagination: page defaults to 1 (maximum 1000000). limit defaults to 100 and cannot exceed 1000. per_page is used only when limit is absent. direction defaults to asc and applies when sort is set. Without sort, this resource keeps its default order. REST year lists are ascending. The widget list starts with the newest year.\n\nAuthentication: send Authorization: Bearer geoapi_sk_… from your server. A key in the URL query, a cookie, or a cabinet session is not accepted. geoapi_pk_ is the widget key and does not work here. A cabinet personal access token with cars:read or * also needs X-CARAPI-PROJECT with the id of one of your active projects. A secret key ignores X-CARAPI-PROJECT. Before using a key, confirm your email and turn on the Cars API at /account/products, or the key gets 403.\n\nErrors are JSON with only error.code and error.message, and no request id: 401 unauthorized, 403 forbidden, 404 not_found, 405 method_not_allowed, 422 invalid_parameter, 429 RATE_LIMIT_EXCEEDED, DAILY_QUOTA_EXCEEDED, or MONTHLY_QUOTA_EXCEEDED, 503 unavailable. The key is checked before the method, so a non-GET request without a valid key returns 401, not 405. 405 is returned only after the key is accepted. Use GET. One IP address may send 300 requests a minute. That limit is checked before the key, so it can return 429 before 401.\n\nLimits: a project shares 60 requests per UTC minute and its monthly quota with the widget. A project that has not chosen a paid plan has 10 000 successful requests per UTC month. Choosing the free plan sets that to 100. An unlimited plan sends X-Quota-Limit: unlimited. The daily limit of 2 000 successful requests is not enforced in production today. If the request cannot be counted, the API returns 503, never an unmetered success. Errors are not counted against the monthly quota. 404 and 422 still count toward the minute limit. On 429, wait Retry-After seconds. Do not retry 401, 403, 404, or 422. A success sends X-RateLimit-* for the minute and X-Quota-* for the month. 429 sends X-RateLimit-* for the limit that was hit.\n\nData: ids are strings. null means the value is unknown. dimensions and performance are always null. Colors include unchecked rows with verified false, and a color id is the model id. Photo rights are cleared, but the v1 API does not return photos yet. VIN lookup is not available.\n\nVersion 1.2.0 at https://geoapi.ge. The TypeScript SDK, the MCP server (stdio), and the CLI (all 0.1.0) are not published yet. The widget is the browser embed and uses geoapi_pk_.",
                 "parameters": [
                     {
                         "name": "id",
                         "in": "path",
                         "required": true,
-                        "description": "Positive model id. Zero or a non-numeric id is 422. An unknown id is 404.",
+                        "description": "Positive model id. Zero or a non-numeric id returns 422. An unknown id returns 404.",
                         "schema": {
                             "type": "integer",
                             "minimum": 1
@@ -1648,13 +1686,35 @@
                                 }
                             },
                             "X-Quota-Limit": {
+                                "description": "An integer, or the word unlimited on an unlimited plan.",
                                 "schema": {
-                                    "type": "integer"
+                                    "oneOf": [
+                                        {
+                                            "type": "integer"
+                                        },
+                                        {
+                                            "type": "string",
+                                            "enum": [
+                                                "unlimited"
+                                            ]
+                                        }
+                                    ]
                                 }
                             },
                             "X-Quota-Remaining": {
+                                "description": "An integer, or the word unlimited on an unlimited plan.",
                                 "schema": {
-                                    "type": "integer"
+                                    "oneOf": [
+                                        {
+                                            "type": "integer"
+                                        },
+                                        {
+                                            "type": "string",
+                                            "enum": [
+                                                "unlimited"
+                                            ]
+                                        }
+                                    ]
                                 }
                             },
                             "X-Quota-Reset": {
@@ -1710,7 +1770,7 @@
                         }
                     },
                     "403": {
-                        "description": "The key is valid, but the project, owner, or email does not allow the call.",
+                        "description": "The key is valid, but the project is disabled, the account is suspended, the email is not confirmed, or the Cars API is not turned on.",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -1726,7 +1786,7 @@
                         }
                     },
                     "404": {
-                        "description": "The record was not found.",
+                        "description": "The record or the address was not found.",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -1819,7 +1879,7 @@
                         }
                     },
                     "503": {
-                        "description": "The catalog or the meter is temporarily unavailable.",
+                        "description": "The catalog or the request counter is temporarily unavailable.",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -1838,15 +1898,11 @@
                 "x-codeSamples": [
                     {
                         "lang": "curl",
-                        "source": "curl https://geoapi.ge/api/v1/models/10/years?limit=1 \\\n  -H \"Authorization: Bearer geoapi_sk_…\""
-                    },
-                    {
-                        "lang": "JavaScript",
-                        "source": "// Server-side only: a geoapi_sk_ key must never reach the browser. In a web page use the widget (geoapi_pk_).\nconst response = await fetch(\"https://geoapi.ge/api/v1/models/10/years?limit=1\", {\n  headers: { Authorization: 'Bearer geoapi_sk_…' },\n});\nconst data = await response.json();"
+                        "source": "curl \"https://geoapi.ge/api/v1/models/10/years?limit=1\" \\\n  -H \"Authorization: Bearer geoapi_sk_…\""
                     },
                     {
                         "lang": "Node.js",
-                        "source": "const response = await fetch(\"https://geoapi.ge/api/v1/models/10/years?limit=1\", {\n  headers: { Authorization: 'Bearer geoapi_sk_…' },\n});\nconsole.log(await response.json());"
+                        "source": "// Server-side only: a geoapi_sk_ key must never reach the browser. In a web page use the widget (geoapi_pk_).\nconst response = await fetch(\"https://geoapi.ge/api/v1/models/10/years?limit=1\", {\n  headers: { Authorization: 'Bearer geoapi_sk_…' },\n});\nconsole.log(await response.json());"
                     },
                     {
                         "lang": "Python",
@@ -1869,13 +1925,13 @@
                 ],
                 "operationId": "listModelGenerations",
                 "summary": "Generations grouped by chassis for one model id",
-                "description": "Generations for one model, grouped by chassis. The public id is the smallest sibling id. Filter with year_from, year_to, and body.\n\nPagination: page defaults to 1 (maximum 1000000). limit defaults to 100 and cannot exceed 1000. per_page is used only when limit is absent. direction defaults to asc and applies when sort is set. Omitting sort keeps this resource's default order. REST year lists are ascending. The widget list is newest-first.\n\nAuthentication: Authorization: Bearer geoapi_sk_… from your server. Query strings, cookies, and a cabinet session are not credentials. geoapi_pk_ is the widget key, not a catalog bearer. Sanctum cars:read or * also requires X-CARAPI-PROJECT naming that user's active project. A secret key ignores X-CARAPI-PROJECT.\n\nErrors, JSON error.code and error.message only, no request id: 401 unauthorized, 403 forbidden, 404 not_found, 405 method_not_allowed, 422 invalid_parameter, 429 RATE_LIMIT_EXCEEDED or DAILY_QUOTA_EXCEEDED or MONTHLY_QUOTA_EXCEEDED, 503 unavailable. Authentication runs before the method check. A non-GET request without an accepted key is 401, not 405. 405 is returned only after the key is accepted. Use GET.\n\nLimits: one project shares 60 requests each UTC minute and 10 000 successful requests each UTC month with the widget. Those caps are active. A project that has not chosen a commercial plan keeps 10 000 successful requests each UTC month. Choosing the free plan sets that project to 100 successful requests each UTC month. An unlimited plan sends X-Quota-Limit: unlimited. The 2 000 successful requests per UTC day limit is not enforced in production today, because the daily check runs only when platform.project_limits.per_day exists. A missing limits row or a failed meter is 503, not an unmetered success. 401, 403, 404, 405, 422, 429, and 503 do not spend the month. Failures still use the minute window. On 429, wait Retry-After seconds. Do not retry 401, 403, 404, or 422. Success sends X-RateLimit-* for the minute and X-Quota-* for the month. 429 sends X-RateLimit-* for the window that was hit.\n\nCoverage: JSON ids are strings. null means the stored value is missing. dimensions and performance are null. Colors include unverified rows with verified false. Photo files and VIN are not on these routes. Photo rights are cleared; photo files are served by /api/models/{id}/photo, not by these routes.\n\nVersion 1.2.0 at https://geoapi.ge. The TypeScript SDK is packages/sdk-js 0.1.0 in this repository and is not on the public npm registry. The MCP server is packages/mcp-server 0.1.0 in this repository, speaks stdio, and is not on the public npm registry. The CLI is packages/cli 0.1.0 in this repository and is not published on the public npm registry. The widget is the browser embed and uses geoapi_pk_.",
+                "description": "Generations for one model, grouped by chassis. The public id is the smallest id in the chassis group. Filter with year_from, year_to, and body.\n\nPagination: page defaults to 1 (maximum 1000000). limit defaults to 100 and cannot exceed 1000. per_page is used only when limit is absent. direction defaults to asc and applies when sort is set. Without sort, this resource keeps its default order. REST year lists are ascending. The widget list starts with the newest year.\n\nAuthentication: send Authorization: Bearer geoapi_sk_… from your server. A key in the URL query, a cookie, or a cabinet session is not accepted. geoapi_pk_ is the widget key and does not work here. A cabinet personal access token with cars:read or * also needs X-CARAPI-PROJECT with the id of one of your active projects. A secret key ignores X-CARAPI-PROJECT. Before using a key, confirm your email and turn on the Cars API at /account/products, or the key gets 403.\n\nErrors are JSON with only error.code and error.message, and no request id: 401 unauthorized, 403 forbidden, 404 not_found, 405 method_not_allowed, 422 invalid_parameter, 429 RATE_LIMIT_EXCEEDED, DAILY_QUOTA_EXCEEDED, or MONTHLY_QUOTA_EXCEEDED, 503 unavailable. The key is checked before the method, so a non-GET request without a valid key returns 401, not 405. 405 is returned only after the key is accepted. Use GET. One IP address may send 300 requests a minute. That limit is checked before the key, so it can return 429 before 401.\n\nLimits: a project shares 60 requests per UTC minute and its monthly quota with the widget. A project that has not chosen a paid plan has 10 000 successful requests per UTC month. Choosing the free plan sets that to 100. An unlimited plan sends X-Quota-Limit: unlimited. The daily limit of 2 000 successful requests is not enforced in production today. If the request cannot be counted, the API returns 503, never an unmetered success. Errors are not counted against the monthly quota. 404 and 422 still count toward the minute limit. On 429, wait Retry-After seconds. Do not retry 401, 403, 404, or 422. A success sends X-RateLimit-* for the minute and X-Quota-* for the month. 429 sends X-RateLimit-* for the limit that was hit.\n\nData: ids are strings. null means the value is unknown. dimensions and performance are always null. Colors include unchecked rows with verified false, and a color id is the model id. Photo rights are cleared, but the v1 API does not return photos yet. VIN lookup is not available.\n\nVersion 1.2.0 at https://geoapi.ge. The TypeScript SDK, the MCP server (stdio), and the CLI (all 0.1.0) are not published yet. The widget is the browser embed and uses geoapi_pk_.",
                 "parameters": [
                     {
                         "name": "id",
                         "in": "path",
                         "required": true,
-                        "description": "Positive model id. Zero or a non-numeric id is 422. An unknown id is 404.",
+                        "description": "Positive model id. Zero or a non-numeric id returns 422. An unknown id returns 404.",
                         "schema": {
                             "type": "integer",
                             "minimum": 1
@@ -1943,13 +1999,35 @@
                                 }
                             },
                             "X-Quota-Limit": {
+                                "description": "An integer, or the word unlimited on an unlimited plan.",
                                 "schema": {
-                                    "type": "integer"
+                                    "oneOf": [
+                                        {
+                                            "type": "integer"
+                                        },
+                                        {
+                                            "type": "string",
+                                            "enum": [
+                                                "unlimited"
+                                            ]
+                                        }
+                                    ]
                                 }
                             },
                             "X-Quota-Remaining": {
+                                "description": "An integer, or the word unlimited on an unlimited plan.",
                                 "schema": {
-                                    "type": "integer"
+                                    "oneOf": [
+                                        {
+                                            "type": "integer"
+                                        },
+                                        {
+                                            "type": "string",
+                                            "enum": [
+                                                "unlimited"
+                                            ]
+                                        }
+                                    ]
                                 }
                             },
                             "X-Quota-Reset": {
@@ -2005,7 +2083,7 @@
                         }
                     },
                     "403": {
-                        "description": "The key is valid, but the project, owner, or email does not allow the call.",
+                        "description": "The key is valid, but the project is disabled, the account is suspended, the email is not confirmed, or the Cars API is not turned on.",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -2021,7 +2099,7 @@
                         }
                     },
                     "404": {
-                        "description": "The record was not found.",
+                        "description": "The record or the address was not found.",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -2114,7 +2192,7 @@
                         }
                     },
                     "503": {
-                        "description": "The catalog or the meter is temporarily unavailable.",
+                        "description": "The catalog or the request counter is temporarily unavailable.",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -2133,15 +2211,11 @@
                 "x-codeSamples": [
                     {
                         "lang": "curl",
-                        "source": "curl https://geoapi.ge/api/v1/models/10/generations?limit=1 \\\n  -H \"Authorization: Bearer geoapi_sk_…\""
-                    },
-                    {
-                        "lang": "JavaScript",
-                        "source": "// Server-side only: a geoapi_sk_ key must never reach the browser. In a web page use the widget (geoapi_pk_).\nconst response = await fetch(\"https://geoapi.ge/api/v1/models/10/generations?limit=1\", {\n  headers: { Authorization: 'Bearer geoapi_sk_…' },\n});\nconst data = await response.json();"
+                        "source": "curl \"https://geoapi.ge/api/v1/models/10/generations?limit=1\" \\\n  -H \"Authorization: Bearer geoapi_sk_…\""
                     },
                     {
                         "lang": "Node.js",
-                        "source": "const response = await fetch(\"https://geoapi.ge/api/v1/models/10/generations?limit=1\", {\n  headers: { Authorization: 'Bearer geoapi_sk_…' },\n});\nconsole.log(await response.json());"
+                        "source": "// Server-side only: a geoapi_sk_ key must never reach the browser. In a web page use the widget (geoapi_pk_).\nconst response = await fetch(\"https://geoapi.ge/api/v1/models/10/generations?limit=1\", {\n  headers: { Authorization: 'Bearer geoapi_sk_…' },\n});\nconsole.log(await response.json());"
                     },
                     {
                         "lang": "Python",
@@ -2164,13 +2238,13 @@
                 ],
                 "operationId": "listGenerationModifications",
                 "summary": "Modifications for one public generation id",
-                "description": "Modifications for one public generation id. Filters: year_from, year_to, body, fuel, drive, and transmission.\n\nPagination: page defaults to 1 (maximum 1000000). limit defaults to 100 and cannot exceed 1000. per_page is used only when limit is absent. direction defaults to asc and applies when sort is set. Omitting sort keeps this resource's default order. REST year lists are ascending. The widget list is newest-first.\n\nAuthentication: Authorization: Bearer geoapi_sk_… from your server. Query strings, cookies, and a cabinet session are not credentials. geoapi_pk_ is the widget key, not a catalog bearer. Sanctum cars:read or * also requires X-CARAPI-PROJECT naming that user's active project. A secret key ignores X-CARAPI-PROJECT.\n\nErrors, JSON error.code and error.message only, no request id: 401 unauthorized, 403 forbidden, 404 not_found, 405 method_not_allowed, 422 invalid_parameter, 429 RATE_LIMIT_EXCEEDED or DAILY_QUOTA_EXCEEDED or MONTHLY_QUOTA_EXCEEDED, 503 unavailable. Authentication runs before the method check. A non-GET request without an accepted key is 401, not 405. 405 is returned only after the key is accepted. Use GET.\n\nLimits: one project shares 60 requests each UTC minute and 10 000 successful requests each UTC month with the widget. Those caps are active. A project that has not chosen a commercial plan keeps 10 000 successful requests each UTC month. Choosing the free plan sets that project to 100 successful requests each UTC month. An unlimited plan sends X-Quota-Limit: unlimited. The 2 000 successful requests per UTC day limit is not enforced in production today, because the daily check runs only when platform.project_limits.per_day exists. A missing limits row or a failed meter is 503, not an unmetered success. 401, 403, 404, 405, 422, 429, and 503 do not spend the month. Failures still use the minute window. On 429, wait Retry-After seconds. Do not retry 401, 403, 404, or 422. Success sends X-RateLimit-* for the minute and X-Quota-* for the month. 429 sends X-RateLimit-* for the window that was hit.\n\nCoverage: JSON ids are strings. null means the stored value is missing. dimensions and performance are null. Colors include unverified rows with verified false. Photo files and VIN are not on these routes. Photo rights are cleared; photo files are served by /api/models/{id}/photo, not by these routes.\n\nVersion 1.2.0 at https://geoapi.ge. The TypeScript SDK is packages/sdk-js 0.1.0 in this repository and is not on the public npm registry. The MCP server is packages/mcp-server 0.1.0 in this repository, speaks stdio, and is not on the public npm registry. The CLI is packages/cli 0.1.0 in this repository and is not published on the public npm registry. The widget is the browser embed and uses geoapi_pk_.",
+                "description": "Modifications for one public generation id. Filters: year_from, year_to, body, fuel, drive, and transmission.\n\nPagination: page defaults to 1 (maximum 1000000). limit defaults to 100 and cannot exceed 1000. per_page is used only when limit is absent. direction defaults to asc and applies when sort is set. Without sort, this resource keeps its default order. REST year lists are ascending. The widget list starts with the newest year.\n\nAuthentication: send Authorization: Bearer geoapi_sk_… from your server. A key in the URL query, a cookie, or a cabinet session is not accepted. geoapi_pk_ is the widget key and does not work here. A cabinet personal access token with cars:read or * also needs X-CARAPI-PROJECT with the id of one of your active projects. A secret key ignores X-CARAPI-PROJECT. Before using a key, confirm your email and turn on the Cars API at /account/products, or the key gets 403.\n\nErrors are JSON with only error.code and error.message, and no request id: 401 unauthorized, 403 forbidden, 404 not_found, 405 method_not_allowed, 422 invalid_parameter, 429 RATE_LIMIT_EXCEEDED, DAILY_QUOTA_EXCEEDED, or MONTHLY_QUOTA_EXCEEDED, 503 unavailable. The key is checked before the method, so a non-GET request without a valid key returns 401, not 405. 405 is returned only after the key is accepted. Use GET. One IP address may send 300 requests a minute. That limit is checked before the key, so it can return 429 before 401.\n\nLimits: a project shares 60 requests per UTC minute and its monthly quota with the widget. A project that has not chosen a paid plan has 10 000 successful requests per UTC month. Choosing the free plan sets that to 100. An unlimited plan sends X-Quota-Limit: unlimited. The daily limit of 2 000 successful requests is not enforced in production today. If the request cannot be counted, the API returns 503, never an unmetered success. Errors are not counted against the monthly quota. 404 and 422 still count toward the minute limit. On 429, wait Retry-After seconds. Do not retry 401, 403, 404, or 422. A success sends X-RateLimit-* for the minute and X-Quota-* for the month. 429 sends X-RateLimit-* for the limit that was hit.\n\nData: ids are strings. null means the value is unknown. dimensions and performance are always null. Colors include unchecked rows with verified false, and a color id is the model id. Photo rights are cleared, but the v1 API does not return photos yet. VIN lookup is not available.\n\nVersion 1.2.0 at https://geoapi.ge. The TypeScript SDK, the MCP server (stdio), and the CLI (all 0.1.0) are not published yet. The widget is the browser embed and uses geoapi_pk_.",
                 "parameters": [
                     {
                         "name": "id",
                         "in": "path",
                         "required": true,
-                        "description": "Positive public generation id. A sibling restyling id is 404.",
+                        "description": "Positive public generation id. Another id from the same chassis group returns 404.",
                         "schema": {
                             "type": "integer",
                             "minimum": 1
@@ -2248,13 +2322,35 @@
                                 }
                             },
                             "X-Quota-Limit": {
+                                "description": "An integer, or the word unlimited on an unlimited plan.",
                                 "schema": {
-                                    "type": "integer"
+                                    "oneOf": [
+                                        {
+                                            "type": "integer"
+                                        },
+                                        {
+                                            "type": "string",
+                                            "enum": [
+                                                "unlimited"
+                                            ]
+                                        }
+                                    ]
                                 }
                             },
                             "X-Quota-Remaining": {
+                                "description": "An integer, or the word unlimited on an unlimited plan.",
                                 "schema": {
-                                    "type": "integer"
+                                    "oneOf": [
+                                        {
+                                            "type": "integer"
+                                        },
+                                        {
+                                            "type": "string",
+                                            "enum": [
+                                                "unlimited"
+                                            ]
+                                        }
+                                    ]
                                 }
                             },
                             "X-Quota-Reset": {
@@ -2310,7 +2406,7 @@
                         }
                     },
                     "403": {
-                        "description": "The key is valid, but the project, owner, or email does not allow the call.",
+                        "description": "The key is valid, but the project is disabled, the account is suspended, the email is not confirmed, or the Cars API is not turned on.",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -2326,7 +2422,7 @@
                         }
                     },
                     "404": {
-                        "description": "The record was not found.",
+                        "description": "The record or the address was not found.",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -2419,7 +2515,7 @@
                         }
                     },
                     "503": {
-                        "description": "The catalog or the meter is temporarily unavailable.",
+                        "description": "The catalog or the request counter is temporarily unavailable.",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -2438,15 +2534,11 @@
                 "x-codeSamples": [
                     {
                         "lang": "curl",
-                        "source": "curl https://geoapi.ge/api/v1/generations/100/modifications?limit=1 \\\n  -H \"Authorization: Bearer geoapi_sk_…\""
-                    },
-                    {
-                        "lang": "JavaScript",
-                        "source": "// Server-side only: a geoapi_sk_ key must never reach the browser. In a web page use the widget (geoapi_pk_).\nconst response = await fetch(\"https://geoapi.ge/api/v1/generations/100/modifications?limit=1\", {\n  headers: { Authorization: 'Bearer geoapi_sk_…' },\n});\nconst data = await response.json();"
+                        "source": "curl \"https://geoapi.ge/api/v1/generations/100/modifications?limit=1\" \\\n  -H \"Authorization: Bearer geoapi_sk_…\""
                     },
                     {
                         "lang": "Node.js",
-                        "source": "const response = await fetch(\"https://geoapi.ge/api/v1/generations/100/modifications?limit=1\", {\n  headers: { Authorization: 'Bearer geoapi_sk_…' },\n});\nconsole.log(await response.json());"
+                        "source": "// Server-side only: a geoapi_sk_ key must never reach the browser. In a web page use the widget (geoapi_pk_).\nconst response = await fetch(\"https://geoapi.ge/api/v1/generations/100/modifications?limit=1\", {\n  headers: { Authorization: 'Bearer geoapi_sk_…' },\n});\nconsole.log(await response.json());"
                     },
                     {
                         "lang": "Python",
@@ -2468,14 +2560,14 @@
                     "Catalog"
                 ],
                 "operationId": "getModificationSpecs",
-                "summary": "Stored engine, transmission, and consumption fields for one modification. Unknown specification keys are omitted.",
-                "description": "Stored engine, transmission, and L/100km consumption for one modification. Missing values are null. dimensions and performance are null. Unknown specification keys are omitted.\n\nThis route returns one object in data. It has no pagination. Extra query parameters are ignored.\n\nAuthentication: Authorization: Bearer geoapi_sk_… from your server. Query strings, cookies, and a cabinet session are not credentials. geoapi_pk_ is the widget key, not a catalog bearer. Sanctum cars:read or * also requires X-CARAPI-PROJECT naming that user's active project. A secret key ignores X-CARAPI-PROJECT.\n\nErrors, JSON error.code and error.message only, no request id: 401 unauthorized, 403 forbidden, 404 not_found, 405 method_not_allowed, 422 invalid_parameter, 429 RATE_LIMIT_EXCEEDED or DAILY_QUOTA_EXCEEDED or MONTHLY_QUOTA_EXCEEDED, 503 unavailable. Authentication runs before the method check. A non-GET request without an accepted key is 401, not 405. 405 is returned only after the key is accepted. Use GET.\n\nLimits: one project shares 60 requests each UTC minute and 10 000 successful requests each UTC month with the widget. Those caps are active. A project that has not chosen a commercial plan keeps 10 000 successful requests each UTC month. Choosing the free plan sets that project to 100 successful requests each UTC month. An unlimited plan sends X-Quota-Limit: unlimited. The 2 000 successful requests per UTC day limit is not enforced in production today, because the daily check runs only when platform.project_limits.per_day exists. A missing limits row or a failed meter is 503, not an unmetered success. 401, 403, 404, 405, 422, 429, and 503 do not spend the month. Failures still use the minute window. On 429, wait Retry-After seconds. Do not retry 401, 403, 404, or 422. Success sends X-RateLimit-* for the minute and X-Quota-* for the month. 429 sends X-RateLimit-* for the window that was hit.\n\nCoverage: JSON ids are strings. null means the stored value is missing. dimensions and performance are null. Colors include unverified rows with verified false. Photo files and VIN are not on these routes. Photo rights are cleared; photo files are served by /api/models/{id}/photo, not by these routes.\n\nVersion 1.2.0 at https://geoapi.ge. The TypeScript SDK is packages/sdk-js 0.1.0 in this repository and is not on the public npm registry. The MCP server is packages/mcp-server 0.1.0 in this repository, speaks stdio, and is not on the public npm registry. The CLI is packages/cli 0.1.0 in this repository and is not published on the public npm registry. The widget is the browser embed and uses geoapi_pk_.",
+                "summary": "Engine, transmission, and fuel consumption for one modification. Unknown specification keys are left out.",
+                "description": "Engine, transmission, and fuel consumption (L/100 km) for one modification. Unknown values are null. dimensions and performance are always null. Unknown specification keys are left out.\n\nThis route returns one object in data. It has no pagination. Extra query parameters are ignored.\n\nAuthentication: send Authorization: Bearer geoapi_sk_… from your server. A key in the URL query, a cookie, or a cabinet session is not accepted. geoapi_pk_ is the widget key and does not work here. A cabinet personal access token with cars:read or * also needs X-CARAPI-PROJECT with the id of one of your active projects. A secret key ignores X-CARAPI-PROJECT. Before using a key, confirm your email and turn on the Cars API at /account/products, or the key gets 403.\n\nErrors are JSON with only error.code and error.message, and no request id: 401 unauthorized, 403 forbidden, 404 not_found, 405 method_not_allowed, 422 invalid_parameter, 429 RATE_LIMIT_EXCEEDED, DAILY_QUOTA_EXCEEDED, or MONTHLY_QUOTA_EXCEEDED, 503 unavailable. The key is checked before the method, so a non-GET request without a valid key returns 401, not 405. 405 is returned only after the key is accepted. Use GET. One IP address may send 300 requests a minute. That limit is checked before the key, so it can return 429 before 401.\n\nLimits: a project shares 60 requests per UTC minute and its monthly quota with the widget. A project that has not chosen a paid plan has 10 000 successful requests per UTC month. Choosing the free plan sets that to 100. An unlimited plan sends X-Quota-Limit: unlimited. The daily limit of 2 000 successful requests is not enforced in production today. If the request cannot be counted, the API returns 503, never an unmetered success. Errors are not counted against the monthly quota. 404 and 422 still count toward the minute limit. On 429, wait Retry-After seconds. Do not retry 401, 403, 404, or 422. A success sends X-RateLimit-* for the minute and X-Quota-* for the month. 429 sends X-RateLimit-* for the limit that was hit.\n\nData: ids are strings. null means the value is unknown. dimensions and performance are always null. Colors include unchecked rows with verified false, and a color id is the model id. Photo rights are cleared, but the v1 API does not return photos yet. VIN lookup is not available.\n\nVersion 1.2.0 at https://geoapi.ge. The TypeScript SDK, the MCP server (stdio), and the CLI (all 0.1.0) are not published yet. The widget is the browser embed and uses geoapi_pk_.",
                 "parameters": [
                     {
                         "name": "id",
                         "in": "path",
                         "required": true,
-                        "description": "Positive modification id. Zero or a non-numeric id is 422. An unknown id is 404.",
+                        "description": "Positive modification id. Zero or a non-numeric id returns 422. An unknown id returns 404.",
                         "schema": {
                             "type": "integer",
                             "minimum": 1
@@ -2502,13 +2594,35 @@
                                 }
                             },
                             "X-Quota-Limit": {
+                                "description": "An integer, or the word unlimited on an unlimited plan.",
                                 "schema": {
-                                    "type": "integer"
+                                    "oneOf": [
+                                        {
+                                            "type": "integer"
+                                        },
+                                        {
+                                            "type": "string",
+                                            "enum": [
+                                                "unlimited"
+                                            ]
+                                        }
+                                    ]
                                 }
                             },
                             "X-Quota-Remaining": {
+                                "description": "An integer, or the word unlimited on an unlimited plan.",
                                 "schema": {
-                                    "type": "integer"
+                                    "oneOf": [
+                                        {
+                                            "type": "integer"
+                                        },
+                                        {
+                                            "type": "string",
+                                            "enum": [
+                                                "unlimited"
+                                            ]
+                                        }
+                                    ]
                                 }
                             },
                             "X-Quota-Reset": {
@@ -2558,7 +2672,7 @@
                         }
                     },
                     "403": {
-                        "description": "The key is valid, but the project, owner, or email does not allow the call.",
+                        "description": "The key is valid, but the project is disabled, the account is suspended, the email is not confirmed, or the Cars API is not turned on.",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -2574,7 +2688,7 @@
                         }
                     },
                     "404": {
-                        "description": "The record was not found.",
+                        "description": "The record or the address was not found.",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -2667,7 +2781,7 @@
                         }
                     },
                     "503": {
-                        "description": "The catalog or the meter is temporarily unavailable.",
+                        "description": "The catalog or the request counter is temporarily unavailable.",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -2686,15 +2800,11 @@
                 "x-codeSamples": [
                     {
                         "lang": "curl",
-                        "source": "curl https://geoapi.ge/api/v1/modifications/1000/specs \\\n  -H \"Authorization: Bearer geoapi_sk_…\""
-                    },
-                    {
-                        "lang": "JavaScript",
-                        "source": "// Server-side only: a geoapi_sk_ key must never reach the browser. In a web page use the widget (geoapi_pk_).\nconst response = await fetch(\"https://geoapi.ge/api/v1/modifications/1000/specs\", {\n  headers: { Authorization: 'Bearer geoapi_sk_…' },\n});\nconst data = await response.json();"
+                        "source": "curl \"https://geoapi.ge/api/v1/modifications/1000/specs\" \\\n  -H \"Authorization: Bearer geoapi_sk_…\""
                     },
                     {
                         "lang": "Node.js",
-                        "source": "const response = await fetch(\"https://geoapi.ge/api/v1/modifications/1000/specs\", {\n  headers: { Authorization: 'Bearer geoapi_sk_…' },\n});\nconsole.log(await response.json());"
+                        "source": "// Server-side only: a geoapi_sk_ key must never reach the browser. In a web page use the widget (geoapi_pk_).\nconst response = await fetch(\"https://geoapi.ge/api/v1/modifications/1000/specs\", {\n  headers: { Authorization: 'Bearer geoapi_sk_…' },\n});\nconsole.log(await response.json());"
                     },
                     {
                         "lang": "Python",
@@ -2717,13 +2827,13 @@
                 ],
                 "operationId": "getModificationEquipment",
                 "summary": "Equipment grouped as standard, optional, not_available, and unknown.",
-                "description": "Equipment for one modification. included becomes standard, option becomes optional, not_available stays not_available, and any other status becomes unknown. Duplicate category, name, and status rows collapse.\n\nThis route returns one object in data. It has no pagination. Extra query parameters are ignored.\n\nAuthentication: Authorization: Bearer geoapi_sk_… from your server. Query strings, cookies, and a cabinet session are not credentials. geoapi_pk_ is the widget key, not a catalog bearer. Sanctum cars:read or * also requires X-CARAPI-PROJECT naming that user's active project. A secret key ignores X-CARAPI-PROJECT.\n\nErrors, JSON error.code and error.message only, no request id: 401 unauthorized, 403 forbidden, 404 not_found, 405 method_not_allowed, 422 invalid_parameter, 429 RATE_LIMIT_EXCEEDED or DAILY_QUOTA_EXCEEDED or MONTHLY_QUOTA_EXCEEDED, 503 unavailable. Authentication runs before the method check. A non-GET request without an accepted key is 401, not 405. 405 is returned only after the key is accepted. Use GET.\n\nLimits: one project shares 60 requests each UTC minute and 10 000 successful requests each UTC month with the widget. Those caps are active. A project that has not chosen a commercial plan keeps 10 000 successful requests each UTC month. Choosing the free plan sets that project to 100 successful requests each UTC month. An unlimited plan sends X-Quota-Limit: unlimited. The 2 000 successful requests per UTC day limit is not enforced in production today, because the daily check runs only when platform.project_limits.per_day exists. A missing limits row or a failed meter is 503, not an unmetered success. 401, 403, 404, 405, 422, 429, and 503 do not spend the month. Failures still use the minute window. On 429, wait Retry-After seconds. Do not retry 401, 403, 404, or 422. Success sends X-RateLimit-* for the minute and X-Quota-* for the month. 429 sends X-RateLimit-* for the window that was hit.\n\nCoverage: JSON ids are strings. null means the stored value is missing. dimensions and performance are null. Colors include unverified rows with verified false. Photo files and VIN are not on these routes. Photo rights are cleared; photo files are served by /api/models/{id}/photo, not by these routes.\n\nVersion 1.2.0 at https://geoapi.ge. The TypeScript SDK is packages/sdk-js 0.1.0 in this repository and is not on the public npm registry. The MCP server is packages/mcp-server 0.1.0 in this repository, speaks stdio, and is not on the public npm registry. The CLI is packages/cli 0.1.0 in this repository and is not published on the public npm registry. The widget is the browser embed and uses geoapi_pk_.",
+                "description": "Equipment for one modification in four groups: standard, optional, not_available, and unknown. Rows with the same category, name, and group are merged.\n\nThis route returns one object in data. It has no pagination. Extra query parameters are ignored.\n\nAuthentication: send Authorization: Bearer geoapi_sk_… from your server. A key in the URL query, a cookie, or a cabinet session is not accepted. geoapi_pk_ is the widget key and does not work here. A cabinet personal access token with cars:read or * also needs X-CARAPI-PROJECT with the id of one of your active projects. A secret key ignores X-CARAPI-PROJECT. Before using a key, confirm your email and turn on the Cars API at /account/products, or the key gets 403.\n\nErrors are JSON with only error.code and error.message, and no request id: 401 unauthorized, 403 forbidden, 404 not_found, 405 method_not_allowed, 422 invalid_parameter, 429 RATE_LIMIT_EXCEEDED, DAILY_QUOTA_EXCEEDED, or MONTHLY_QUOTA_EXCEEDED, 503 unavailable. The key is checked before the method, so a non-GET request without a valid key returns 401, not 405. 405 is returned only after the key is accepted. Use GET. One IP address may send 300 requests a minute. That limit is checked before the key, so it can return 429 before 401.\n\nLimits: a project shares 60 requests per UTC minute and its monthly quota with the widget. A project that has not chosen a paid plan has 10 000 successful requests per UTC month. Choosing the free plan sets that to 100. An unlimited plan sends X-Quota-Limit: unlimited. The daily limit of 2 000 successful requests is not enforced in production today. If the request cannot be counted, the API returns 503, never an unmetered success. Errors are not counted against the monthly quota. 404 and 422 still count toward the minute limit. On 429, wait Retry-After seconds. Do not retry 401, 403, 404, or 422. A success sends X-RateLimit-* for the minute and X-Quota-* for the month. 429 sends X-RateLimit-* for the limit that was hit.\n\nData: ids are strings. null means the value is unknown. dimensions and performance are always null. Colors include unchecked rows with verified false, and a color id is the model id. Photo rights are cleared, but the v1 API does not return photos yet. VIN lookup is not available.\n\nVersion 1.2.0 at https://geoapi.ge. The TypeScript SDK, the MCP server (stdio), and the CLI (all 0.1.0) are not published yet. The widget is the browser embed and uses geoapi_pk_.",
                 "parameters": [
                     {
                         "name": "id",
                         "in": "path",
                         "required": true,
-                        "description": "Positive modification id. Zero or a non-numeric id is 422. An unknown id is 404.",
+                        "description": "Positive modification id. Zero or a non-numeric id returns 422. An unknown id returns 404.",
                         "schema": {
                             "type": "integer",
                             "minimum": 1
@@ -2750,13 +2860,35 @@
                                 }
                             },
                             "X-Quota-Limit": {
+                                "description": "An integer, or the word unlimited on an unlimited plan.",
                                 "schema": {
-                                    "type": "integer"
+                                    "oneOf": [
+                                        {
+                                            "type": "integer"
+                                        },
+                                        {
+                                            "type": "string",
+                                            "enum": [
+                                                "unlimited"
+                                            ]
+                                        }
+                                    ]
                                 }
                             },
                             "X-Quota-Remaining": {
+                                "description": "An integer, or the word unlimited on an unlimited plan.",
                                 "schema": {
-                                    "type": "integer"
+                                    "oneOf": [
+                                        {
+                                            "type": "integer"
+                                        },
+                                        {
+                                            "type": "string",
+                                            "enum": [
+                                                "unlimited"
+                                            ]
+                                        }
+                                    ]
                                 }
                             },
                             "X-Quota-Reset": {
@@ -2806,7 +2938,7 @@
                         }
                     },
                     "403": {
-                        "description": "The key is valid, but the project, owner, or email does not allow the call.",
+                        "description": "The key is valid, but the project is disabled, the account is suspended, the email is not confirmed, or the Cars API is not turned on.",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -2822,7 +2954,7 @@
                         }
                     },
                     "404": {
-                        "description": "The record was not found.",
+                        "description": "The record or the address was not found.",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -2915,7 +3047,7 @@
                         }
                     },
                     "503": {
-                        "description": "The catalog or the meter is temporarily unavailable.",
+                        "description": "The catalog or the request counter is temporarily unavailable.",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -2934,15 +3066,11 @@
                 "x-codeSamples": [
                     {
                         "lang": "curl",
-                        "source": "curl https://geoapi.ge/api/v1/modifications/1000/equipment \\\n  -H \"Authorization: Bearer geoapi_sk_…\""
-                    },
-                    {
-                        "lang": "JavaScript",
-                        "source": "// Server-side only: a geoapi_sk_ key must never reach the browser. In a web page use the widget (geoapi_pk_).\nconst response = await fetch(\"https://geoapi.ge/api/v1/modifications/1000/equipment\", {\n  headers: { Authorization: 'Bearer geoapi_sk_…' },\n});\nconst data = await response.json();"
+                        "source": "curl \"https://geoapi.ge/api/v1/modifications/1000/equipment\" \\\n  -H \"Authorization: Bearer geoapi_sk_…\""
                     },
                     {
                         "lang": "Node.js",
-                        "source": "const response = await fetch(\"https://geoapi.ge/api/v1/modifications/1000/equipment\", {\n  headers: { Authorization: 'Bearer geoapi_sk_…' },\n});\nconsole.log(await response.json());"
+                        "source": "// Server-side only: a geoapi_sk_ key must never reach the browser. In a web page use the widget (geoapi_pk_).\nconst response = await fetch(\"https://geoapi.ge/api/v1/modifications/1000/equipment\", {\n  headers: { Authorization: 'Bearer geoapi_sk_…' },\n});\nconsole.log(await response.json());"
                     },
                     {
                         "lang": "Python",
@@ -2965,13 +3093,13 @@
                 ],
                 "operationId": "getModification",
                 "summary": "One modification",
-                "description": "One modification, including brand, model, and generation. modified is the UTC updated_at value. source_url is not returned.\n\nThis route returns one object in data. It has no pagination. Extra query parameters are ignored.\n\nAuthentication: Authorization: Bearer geoapi_sk_… from your server. Query strings, cookies, and a cabinet session are not credentials. geoapi_pk_ is the widget key, not a catalog bearer. Sanctum cars:read or * also requires X-CARAPI-PROJECT naming that user's active project. A secret key ignores X-CARAPI-PROJECT.\n\nErrors, JSON error.code and error.message only, no request id: 401 unauthorized, 403 forbidden, 404 not_found, 405 method_not_allowed, 422 invalid_parameter, 429 RATE_LIMIT_EXCEEDED or DAILY_QUOTA_EXCEEDED or MONTHLY_QUOTA_EXCEEDED, 503 unavailable. Authentication runs before the method check. A non-GET request without an accepted key is 401, not 405. 405 is returned only after the key is accepted. Use GET.\n\nLimits: one project shares 60 requests each UTC minute and 10 000 successful requests each UTC month with the widget. Those caps are active. A project that has not chosen a commercial plan keeps 10 000 successful requests each UTC month. Choosing the free plan sets that project to 100 successful requests each UTC month. An unlimited plan sends X-Quota-Limit: unlimited. The 2 000 successful requests per UTC day limit is not enforced in production today, because the daily check runs only when platform.project_limits.per_day exists. A missing limits row or a failed meter is 503, not an unmetered success. 401, 403, 404, 405, 422, 429, and 503 do not spend the month. Failures still use the minute window. On 429, wait Retry-After seconds. Do not retry 401, 403, 404, or 422. Success sends X-RateLimit-* for the minute and X-Quota-* for the month. 429 sends X-RateLimit-* for the window that was hit.\n\nCoverage: JSON ids are strings. null means the stored value is missing. dimensions and performance are null. Colors include unverified rows with verified false. Photo files and VIN are not on these routes. Photo rights are cleared; photo files are served by /api/models/{id}/photo, not by these routes.\n\nVersion 1.2.0 at https://geoapi.ge. The TypeScript SDK is packages/sdk-js 0.1.0 in this repository and is not on the public npm registry. The MCP server is packages/mcp-server 0.1.0 in this repository, speaks stdio, and is not on the public npm registry. The CLI is packages/cli 0.1.0 in this repository and is not published on the public npm registry. The widget is the browser embed and uses geoapi_pk_.",
+                "description": "One modification with its brand, model, and generation. modified is the time of the last change, in UTC.\n\nThis route returns one object in data. It has no pagination. Extra query parameters are ignored.\n\nAuthentication: send Authorization: Bearer geoapi_sk_… from your server. A key in the URL query, a cookie, or a cabinet session is not accepted. geoapi_pk_ is the widget key and does not work here. A cabinet personal access token with cars:read or * also needs X-CARAPI-PROJECT with the id of one of your active projects. A secret key ignores X-CARAPI-PROJECT. Before using a key, confirm your email and turn on the Cars API at /account/products, or the key gets 403.\n\nErrors are JSON with only error.code and error.message, and no request id: 401 unauthorized, 403 forbidden, 404 not_found, 405 method_not_allowed, 422 invalid_parameter, 429 RATE_LIMIT_EXCEEDED, DAILY_QUOTA_EXCEEDED, or MONTHLY_QUOTA_EXCEEDED, 503 unavailable. The key is checked before the method, so a non-GET request without a valid key returns 401, not 405. 405 is returned only after the key is accepted. Use GET. One IP address may send 300 requests a minute. That limit is checked before the key, so it can return 429 before 401.\n\nLimits: a project shares 60 requests per UTC minute and its monthly quota with the widget. A project that has not chosen a paid plan has 10 000 successful requests per UTC month. Choosing the free plan sets that to 100. An unlimited plan sends X-Quota-Limit: unlimited. The daily limit of 2 000 successful requests is not enforced in production today. If the request cannot be counted, the API returns 503, never an unmetered success. Errors are not counted against the monthly quota. 404 and 422 still count toward the minute limit. On 429, wait Retry-After seconds. Do not retry 401, 403, 404, or 422. A success sends X-RateLimit-* for the minute and X-Quota-* for the month. 429 sends X-RateLimit-* for the limit that was hit.\n\nData: ids are strings. null means the value is unknown. dimensions and performance are always null. Colors include unchecked rows with verified false, and a color id is the model id. Photo rights are cleared, but the v1 API does not return photos yet. VIN lookup is not available.\n\nVersion 1.2.0 at https://geoapi.ge. The TypeScript SDK, the MCP server (stdio), and the CLI (all 0.1.0) are not published yet. The widget is the browser embed and uses geoapi_pk_.",
                 "parameters": [
                     {
                         "name": "id",
                         "in": "path",
                         "required": true,
-                        "description": "Positive modification id. Zero or a non-numeric id is 422. An unknown id is 404.",
+                        "description": "Positive modification id. Zero or a non-numeric id returns 422. An unknown id returns 404.",
                         "schema": {
                             "type": "integer",
                             "minimum": 1
@@ -2998,13 +3126,35 @@
                                 }
                             },
                             "X-Quota-Limit": {
+                                "description": "An integer, or the word unlimited on an unlimited plan.",
                                 "schema": {
-                                    "type": "integer"
+                                    "oneOf": [
+                                        {
+                                            "type": "integer"
+                                        },
+                                        {
+                                            "type": "string",
+                                            "enum": [
+                                                "unlimited"
+                                            ]
+                                        }
+                                    ]
                                 }
                             },
                             "X-Quota-Remaining": {
+                                "description": "An integer, or the word unlimited on an unlimited plan.",
                                 "schema": {
-                                    "type": "integer"
+                                    "oneOf": [
+                                        {
+                                            "type": "integer"
+                                        },
+                                        {
+                                            "type": "string",
+                                            "enum": [
+                                                "unlimited"
+                                            ]
+                                        }
+                                    ]
                                 }
                             },
                             "X-Quota-Reset": {
@@ -3054,7 +3204,7 @@
                         }
                     },
                     "403": {
-                        "description": "The key is valid, but the project, owner, or email does not allow the call.",
+                        "description": "The key is valid, but the project is disabled, the account is suspended, the email is not confirmed, or the Cars API is not turned on.",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -3070,7 +3220,7 @@
                         }
                     },
                     "404": {
-                        "description": "The record was not found.",
+                        "description": "The record or the address was not found.",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -3163,7 +3313,7 @@
                         }
                     },
                     "503": {
-                        "description": "The catalog or the meter is temporarily unavailable.",
+                        "description": "The catalog or the request counter is temporarily unavailable.",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -3182,15 +3332,11 @@
                 "x-codeSamples": [
                     {
                         "lang": "curl",
-                        "source": "curl https://geoapi.ge/api/v1/modifications/1000 \\\n  -H \"Authorization: Bearer geoapi_sk_…\""
-                    },
-                    {
-                        "lang": "JavaScript",
-                        "source": "// Server-side only: a geoapi_sk_ key must never reach the browser. In a web page use the widget (geoapi_pk_).\nconst response = await fetch(\"https://geoapi.ge/api/v1/modifications/1000\", {\n  headers: { Authorization: 'Bearer geoapi_sk_…' },\n});\nconst data = await response.json();"
+                        "source": "curl \"https://geoapi.ge/api/v1/modifications/1000\" \\\n  -H \"Authorization: Bearer geoapi_sk_…\""
                     },
                     {
                         "lang": "Node.js",
-                        "source": "const response = await fetch(\"https://geoapi.ge/api/v1/modifications/1000\", {\n  headers: { Authorization: 'Bearer geoapi_sk_…' },\n});\nconsole.log(await response.json());"
+                        "source": "// Server-side only: a geoapi_sk_ key must never reach the browser. In a web page use the widget (geoapi_pk_).\nconst response = await fetch(\"https://geoapi.ge/api/v1/modifications/1000\", {\n  headers: { Authorization: 'Bearer geoapi_sk_…' },\n});\nconsole.log(await response.json());"
                     },
                     {
                         "lang": "Python",
@@ -3213,7 +3359,7 @@
                 ],
                 "operationId": "listModifications",
                 "summary": "Modifications across brands, models, and generations",
-                "description": "Search modifications across brands, models, and generations. Filters: year_from, year_to, body, fuel, drive, transmission, brand_id, model_id, and q.\n\nPagination: page defaults to 1 (maximum 1000000). limit defaults to 100 and cannot exceed 1000. per_page is used only when limit is absent. direction defaults to asc and applies when sort is set. Omitting sort keeps this resource's default order. REST year lists are ascending. The widget list is newest-first.\n\nAuthentication: Authorization: Bearer geoapi_sk_… from your server. Query strings, cookies, and a cabinet session are not credentials. geoapi_pk_ is the widget key, not a catalog bearer. Sanctum cars:read or * also requires X-CARAPI-PROJECT naming that user's active project. A secret key ignores X-CARAPI-PROJECT.\n\nErrors, JSON error.code and error.message only, no request id: 401 unauthorized, 403 forbidden, 404 not_found, 405 method_not_allowed, 422 invalid_parameter, 429 RATE_LIMIT_EXCEEDED or DAILY_QUOTA_EXCEEDED or MONTHLY_QUOTA_EXCEEDED, 503 unavailable. Authentication runs before the method check. A non-GET request without an accepted key is 401, not 405. 405 is returned only after the key is accepted. Use GET.\n\nLimits: one project shares 60 requests each UTC minute and 10 000 successful requests each UTC month with the widget. Those caps are active. A project that has not chosen a commercial plan keeps 10 000 successful requests each UTC month. Choosing the free plan sets that project to 100 successful requests each UTC month. An unlimited plan sends X-Quota-Limit: unlimited. The 2 000 successful requests per UTC day limit is not enforced in production today, because the daily check runs only when platform.project_limits.per_day exists. A missing limits row or a failed meter is 503, not an unmetered success. 401, 403, 404, 405, 422, 429, and 503 do not spend the month. Failures still use the minute window. On 429, wait Retry-After seconds. Do not retry 401, 403, 404, or 422. Success sends X-RateLimit-* for the minute and X-Quota-* for the month. 429 sends X-RateLimit-* for the window that was hit.\n\nCoverage: JSON ids are strings. null means the stored value is missing. dimensions and performance are null. Colors include unverified rows with verified false. Photo files and VIN are not on these routes. Photo rights are cleared; photo files are served by /api/models/{id}/photo, not by these routes.\n\nVersion 1.2.0 at https://geoapi.ge. The TypeScript SDK is packages/sdk-js 0.1.0 in this repository and is not on the public npm registry. The MCP server is packages/mcp-server 0.1.0 in this repository, speaks stdio, and is not on the public npm registry. The CLI is packages/cli 0.1.0 in this repository and is not published on the public npm registry. The widget is the browser embed and uses geoapi_pk_.",
+                "description": "Search modifications across brands, models, and generations. Filters: year_from, year_to, body, fuel, drive, transmission, brand_id, model_id, and q.\n\nPagination: page defaults to 1 (maximum 1000000). limit defaults to 100 and cannot exceed 1000. per_page is used only when limit is absent. direction defaults to asc and applies when sort is set. Without sort, this resource keeps its default order. REST year lists are ascending. The widget list starts with the newest year.\n\nAuthentication: send Authorization: Bearer geoapi_sk_… from your server. A key in the URL query, a cookie, or a cabinet session is not accepted. geoapi_pk_ is the widget key and does not work here. A cabinet personal access token with cars:read or * also needs X-CARAPI-PROJECT with the id of one of your active projects. A secret key ignores X-CARAPI-PROJECT. Before using a key, confirm your email and turn on the Cars API at /account/products, or the key gets 403.\n\nErrors are JSON with only error.code and error.message, and no request id: 401 unauthorized, 403 forbidden, 404 not_found, 405 method_not_allowed, 422 invalid_parameter, 429 RATE_LIMIT_EXCEEDED, DAILY_QUOTA_EXCEEDED, or MONTHLY_QUOTA_EXCEEDED, 503 unavailable. The key is checked before the method, so a non-GET request without a valid key returns 401, not 405. 405 is returned only after the key is accepted. Use GET. One IP address may send 300 requests a minute. That limit is checked before the key, so it can return 429 before 401.\n\nLimits: a project shares 60 requests per UTC minute and its monthly quota with the widget. A project that has not chosen a paid plan has 10 000 successful requests per UTC month. Choosing the free plan sets that to 100. An unlimited plan sends X-Quota-Limit: unlimited. The daily limit of 2 000 successful requests is not enforced in production today. If the request cannot be counted, the API returns 503, never an unmetered success. Errors are not counted against the monthly quota. 404 and 422 still count toward the minute limit. On 429, wait Retry-After seconds. Do not retry 401, 403, 404, or 422. A success sends X-RateLimit-* for the minute and X-Quota-* for the month. 429 sends X-RateLimit-* for the limit that was hit.\n\nData: ids are strings. null means the value is unknown. dimensions and performance are always null. Colors include unchecked rows with verified false, and a color id is the model id. Photo rights are cleared, but the v1 API does not return photos yet. VIN lookup is not available.\n\nVersion 1.2.0 at https://geoapi.ge. The TypeScript SDK, the MCP server (stdio), and the CLI (all 0.1.0) are not published yet. The widget is the browser embed and uses geoapi_pk_.",
                 "parameters": [
                     {
                         "$ref": "#/components/parameters/page"
@@ -3293,13 +3439,35 @@
                                 }
                             },
                             "X-Quota-Limit": {
+                                "description": "An integer, or the word unlimited on an unlimited plan.",
                                 "schema": {
-                                    "type": "integer"
+                                    "oneOf": [
+                                        {
+                                            "type": "integer"
+                                        },
+                                        {
+                                            "type": "string",
+                                            "enum": [
+                                                "unlimited"
+                                            ]
+                                        }
+                                    ]
                                 }
                             },
                             "X-Quota-Remaining": {
+                                "description": "An integer, or the word unlimited on an unlimited plan.",
                                 "schema": {
-                                    "type": "integer"
+                                    "oneOf": [
+                                        {
+                                            "type": "integer"
+                                        },
+                                        {
+                                            "type": "string",
+                                            "enum": [
+                                                "unlimited"
+                                            ]
+                                        }
+                                    ]
                                 }
                             },
                             "X-Quota-Reset": {
@@ -3355,7 +3523,7 @@
                         }
                     },
                     "403": {
-                        "description": "The key is valid, but the project, owner, or email does not allow the call.",
+                        "description": "The key is valid, but the project is disabled, the account is suspended, the email is not confirmed, or the Cars API is not turned on.",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -3371,7 +3539,7 @@
                         }
                     },
                     "404": {
-                        "description": "The record was not found.",
+                        "description": "The record or the address was not found.",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -3464,7 +3632,7 @@
                         }
                     },
                     "503": {
-                        "description": "The catalog or the meter is temporarily unavailable.",
+                        "description": "The catalog or the request counter is temporarily unavailable.",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -3483,15 +3651,11 @@
                 "x-codeSamples": [
                     {
                         "lang": "curl",
-                        "source": "curl https://geoapi.ge/api/v1/modifications?limit=1 \\\n  -H \"Authorization: Bearer geoapi_sk_…\""
-                    },
-                    {
-                        "lang": "JavaScript",
-                        "source": "// Server-side only: a geoapi_sk_ key must never reach the browser. In a web page use the widget (geoapi_pk_).\nconst response = await fetch(\"https://geoapi.ge/api/v1/modifications?limit=1\", {\n  headers: { Authorization: 'Bearer geoapi_sk_…' },\n});\nconst data = await response.json();"
+                        "source": "curl \"https://geoapi.ge/api/v1/modifications?limit=1\" \\\n  -H \"Authorization: Bearer geoapi_sk_…\""
                     },
                     {
                         "lang": "Node.js",
-                        "source": "const response = await fetch(\"https://geoapi.ge/api/v1/modifications?limit=1\", {\n  headers: { Authorization: 'Bearer geoapi_sk_…' },\n});\nconsole.log(await response.json());"
+                        "source": "// Server-side only: a geoapi_sk_ key must never reach the browser. In a web page use the widget (geoapi_pk_).\nconst response = await fetch(\"https://geoapi.ge/api/v1/modifications?limit=1\", {\n  headers: { Authorization: 'Bearer geoapi_sk_…' },\n});\nconsole.log(await response.json());"
                     },
                     {
                         "lang": "Python",
@@ -3513,8 +3677,8 @@
                     "Catalog"
                 ],
                 "operationId": "listEngines",
-                "summary": "Engine volume, fuel, and power stored on modifications",
-                "description": "Engine volume, fuel, and power stored on a modification. Filter with fuel, brand_id, model_id, volume_from, and volume_to. There is no engines table.\n\nPagination: page defaults to 1 (maximum 1000000). limit defaults to 100 and cannot exceed 1000. per_page is used only when limit is absent. direction defaults to asc and applies when sort is set. Omitting sort keeps this resource's default order. REST year lists are ascending. The widget list is newest-first.\n\nAuthentication: Authorization: Bearer geoapi_sk_… from your server. Query strings, cookies, and a cabinet session are not credentials. geoapi_pk_ is the widget key, not a catalog bearer. Sanctum cars:read or * also requires X-CARAPI-PROJECT naming that user's active project. A secret key ignores X-CARAPI-PROJECT.\n\nErrors, JSON error.code and error.message only, no request id: 401 unauthorized, 403 forbidden, 404 not_found, 405 method_not_allowed, 422 invalid_parameter, 429 RATE_LIMIT_EXCEEDED or DAILY_QUOTA_EXCEEDED or MONTHLY_QUOTA_EXCEEDED, 503 unavailable. Authentication runs before the method check. A non-GET request without an accepted key is 401, not 405. 405 is returned only after the key is accepted. Use GET.\n\nLimits: one project shares 60 requests each UTC minute and 10 000 successful requests each UTC month with the widget. Those caps are active. A project that has not chosen a commercial plan keeps 10 000 successful requests each UTC month. Choosing the free plan sets that project to 100 successful requests each UTC month. An unlimited plan sends X-Quota-Limit: unlimited. The 2 000 successful requests per UTC day limit is not enforced in production today, because the daily check runs only when platform.project_limits.per_day exists. A missing limits row or a failed meter is 503, not an unmetered success. 401, 403, 404, 405, 422, 429, and 503 do not spend the month. Failures still use the minute window. On 429, wait Retry-After seconds. Do not retry 401, 403, 404, or 422. Success sends X-RateLimit-* for the minute and X-Quota-* for the month. 429 sends X-RateLimit-* for the window that was hit.\n\nCoverage: JSON ids are strings. null means the stored value is missing. dimensions and performance are null. Colors include unverified rows with verified false. Photo files and VIN are not on these routes. Photo rights are cleared; photo files are served by /api/models/{id}/photo, not by these routes.\n\nVersion 1.2.0 at https://geoapi.ge. The TypeScript SDK is packages/sdk-js 0.1.0 in this repository and is not on the public npm registry. The MCP server is packages/mcp-server 0.1.0 in this repository, speaks stdio, and is not on the public npm registry. The CLI is packages/cli 0.1.0 in this repository and is not published on the public npm registry. The widget is the browser embed and uses geoapi_pk_.",
+                "summary": "Engine volume, fuel, and power of each modification",
+                "description": "Engine volume, fuel, and power of each modification. Filter with fuel, brand_id, model_id, volume_from, and volume_to.\n\nPagination: page defaults to 1 (maximum 1000000). limit defaults to 100 and cannot exceed 1000. per_page is used only when limit is absent. direction defaults to asc and applies when sort is set. Without sort, this resource keeps its default order. REST year lists are ascending. The widget list starts with the newest year.\n\nAuthentication: send Authorization: Bearer geoapi_sk_… from your server. A key in the URL query, a cookie, or a cabinet session is not accepted. geoapi_pk_ is the widget key and does not work here. A cabinet personal access token with cars:read or * also needs X-CARAPI-PROJECT with the id of one of your active projects. A secret key ignores X-CARAPI-PROJECT. Before using a key, confirm your email and turn on the Cars API at /account/products, or the key gets 403.\n\nErrors are JSON with only error.code and error.message, and no request id: 401 unauthorized, 403 forbidden, 404 not_found, 405 method_not_allowed, 422 invalid_parameter, 429 RATE_LIMIT_EXCEEDED, DAILY_QUOTA_EXCEEDED, or MONTHLY_QUOTA_EXCEEDED, 503 unavailable. The key is checked before the method, so a non-GET request without a valid key returns 401, not 405. 405 is returned only after the key is accepted. Use GET. One IP address may send 300 requests a minute. That limit is checked before the key, so it can return 429 before 401.\n\nLimits: a project shares 60 requests per UTC minute and its monthly quota with the widget. A project that has not chosen a paid plan has 10 000 successful requests per UTC month. Choosing the free plan sets that to 100. An unlimited plan sends X-Quota-Limit: unlimited. The daily limit of 2 000 successful requests is not enforced in production today. If the request cannot be counted, the API returns 503, never an unmetered success. Errors are not counted against the monthly quota. 404 and 422 still count toward the minute limit. On 429, wait Retry-After seconds. Do not retry 401, 403, 404, or 422. A success sends X-RateLimit-* for the minute and X-Quota-* for the month. 429 sends X-RateLimit-* for the limit that was hit.\n\nData: ids are strings. null means the value is unknown. dimensions and performance are always null. Colors include unchecked rows with verified false, and a color id is the model id. Photo rights are cleared, but the v1 API does not return photos yet. VIN lookup is not available.\n\nVersion 1.2.0 at https://geoapi.ge. The TypeScript SDK, the MCP server (stdio), and the CLI (all 0.1.0) are not published yet. The widget is the browser embed and uses geoapi_pk_.",
                 "parameters": [
                     {
                         "$ref": "#/components/parameters/page"
@@ -3584,13 +3748,35 @@
                                 }
                             },
                             "X-Quota-Limit": {
+                                "description": "An integer, or the word unlimited on an unlimited plan.",
                                 "schema": {
-                                    "type": "integer"
+                                    "oneOf": [
+                                        {
+                                            "type": "integer"
+                                        },
+                                        {
+                                            "type": "string",
+                                            "enum": [
+                                                "unlimited"
+                                            ]
+                                        }
+                                    ]
                                 }
                             },
                             "X-Quota-Remaining": {
+                                "description": "An integer, or the word unlimited on an unlimited plan.",
                                 "schema": {
-                                    "type": "integer"
+                                    "oneOf": [
+                                        {
+                                            "type": "integer"
+                                        },
+                                        {
+                                            "type": "string",
+                                            "enum": [
+                                                "unlimited"
+                                            ]
+                                        }
+                                    ]
                                 }
                             },
                             "X-Quota-Reset": {
@@ -3646,7 +3832,7 @@
                         }
                     },
                     "403": {
-                        "description": "The key is valid, but the project, owner, or email does not allow the call.",
+                        "description": "The key is valid, but the project is disabled, the account is suspended, the email is not confirmed, or the Cars API is not turned on.",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -3662,7 +3848,7 @@
                         }
                     },
                     "404": {
-                        "description": "The record was not found.",
+                        "description": "The record or the address was not found.",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -3755,7 +3941,7 @@
                         }
                     },
                     "503": {
-                        "description": "The catalog or the meter is temporarily unavailable.",
+                        "description": "The catalog or the request counter is temporarily unavailable.",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -3774,15 +3960,11 @@
                 "x-codeSamples": [
                     {
                         "lang": "curl",
-                        "source": "curl https://geoapi.ge/api/v1/engines?limit=1 \\\n  -H \"Authorization: Bearer geoapi_sk_…\""
-                    },
-                    {
-                        "lang": "JavaScript",
-                        "source": "// Server-side only: a geoapi_sk_ key must never reach the browser. In a web page use the widget (geoapi_pk_).\nconst response = await fetch(\"https://geoapi.ge/api/v1/engines?limit=1\", {\n  headers: { Authorization: 'Bearer geoapi_sk_…' },\n});\nconst data = await response.json();"
+                        "source": "curl \"https://geoapi.ge/api/v1/engines?limit=1\" \\\n  -H \"Authorization: Bearer geoapi_sk_…\""
                     },
                     {
                         "lang": "Node.js",
-                        "source": "const response = await fetch(\"https://geoapi.ge/api/v1/engines?limit=1\", {\n  headers: { Authorization: 'Bearer geoapi_sk_…' },\n});\nconsole.log(await response.json());"
+                        "source": "// Server-side only: a geoapi_sk_ key must never reach the browser. In a web page use the widget (geoapi_pk_).\nconst response = await fetch(\"https://geoapi.ge/api/v1/engines?limit=1\", {\n  headers: { Authorization: 'Bearer geoapi_sk_…' },\n});\nconsole.log(await response.json());"
                     },
                     {
                         "lang": "Python",
@@ -3804,8 +3986,8 @@
                     "Catalog"
                 ],
                 "operationId": "listBodies",
-                "summary": "Distinct body types stored on models, generations, and modifications",
-                "description": "Distinct body types that are stored. q searches the name. modified_after is rejected. There is no bodies table.\n\nPagination: page defaults to 1 (maximum 1000000). limit defaults to 100 and cannot exceed 1000. per_page is used only when limit is absent. direction defaults to asc and applies when sort is set. Omitting sort keeps this resource's default order. REST year lists are ascending. The widget list is newest-first.\n\nAuthentication: Authorization: Bearer geoapi_sk_… from your server. Query strings, cookies, and a cabinet session are not credentials. geoapi_pk_ is the widget key, not a catalog bearer. Sanctum cars:read or * also requires X-CARAPI-PROJECT naming that user's active project. A secret key ignores X-CARAPI-PROJECT.\n\nErrors, JSON error.code and error.message only, no request id: 401 unauthorized, 403 forbidden, 404 not_found, 405 method_not_allowed, 422 invalid_parameter, 429 RATE_LIMIT_EXCEEDED or DAILY_QUOTA_EXCEEDED or MONTHLY_QUOTA_EXCEEDED, 503 unavailable. Authentication runs before the method check. A non-GET request without an accepted key is 401, not 405. 405 is returned only after the key is accepted. Use GET.\n\nLimits: one project shares 60 requests each UTC minute and 10 000 successful requests each UTC month with the widget. Those caps are active. A project that has not chosen a commercial plan keeps 10 000 successful requests each UTC month. Choosing the free plan sets that project to 100 successful requests each UTC month. An unlimited plan sends X-Quota-Limit: unlimited. The 2 000 successful requests per UTC day limit is not enforced in production today, because the daily check runs only when platform.project_limits.per_day exists. A missing limits row or a failed meter is 503, not an unmetered success. 401, 403, 404, 405, 422, 429, and 503 do not spend the month. Failures still use the minute window. On 429, wait Retry-After seconds. Do not retry 401, 403, 404, or 422. Success sends X-RateLimit-* for the minute and X-Quota-* for the month. 429 sends X-RateLimit-* for the window that was hit.\n\nCoverage: JSON ids are strings. null means the stored value is missing. dimensions and performance are null. Colors include unverified rows with verified false. Photo files and VIN are not on these routes. Photo rights are cleared; photo files are served by /api/models/{id}/photo, not by these routes.\n\nVersion 1.2.0 at https://geoapi.ge. The TypeScript SDK is packages/sdk-js 0.1.0 in this repository and is not on the public npm registry. The MCP server is packages/mcp-server 0.1.0 in this repository, speaks stdio, and is not on the public npm registry. The CLI is packages/cli 0.1.0 in this repository and is not published on the public npm registry. The widget is the browser embed and uses geoapi_pk_.",
+                "summary": "Distinct body types used by models, generations, and modifications",
+                "description": "Distinct body types and how many records use each. q searches the name. modified_after returns 422.\n\nPagination: page defaults to 1 (maximum 1000000). limit defaults to 100 and cannot exceed 1000. per_page is used only when limit is absent. direction defaults to asc and applies when sort is set. Without sort, this resource keeps its default order. REST year lists are ascending. The widget list starts with the newest year.\n\nAuthentication: send Authorization: Bearer geoapi_sk_… from your server. A key in the URL query, a cookie, or a cabinet session is not accepted. geoapi_pk_ is the widget key and does not work here. A cabinet personal access token with cars:read or * also needs X-CARAPI-PROJECT with the id of one of your active projects. A secret key ignores X-CARAPI-PROJECT. Before using a key, confirm your email and turn on the Cars API at /account/products, or the key gets 403.\n\nErrors are JSON with only error.code and error.message, and no request id: 401 unauthorized, 403 forbidden, 404 not_found, 405 method_not_allowed, 422 invalid_parameter, 429 RATE_LIMIT_EXCEEDED, DAILY_QUOTA_EXCEEDED, or MONTHLY_QUOTA_EXCEEDED, 503 unavailable. The key is checked before the method, so a non-GET request without a valid key returns 401, not 405. 405 is returned only after the key is accepted. Use GET. One IP address may send 300 requests a minute. That limit is checked before the key, so it can return 429 before 401.\n\nLimits: a project shares 60 requests per UTC minute and its monthly quota with the widget. A project that has not chosen a paid plan has 10 000 successful requests per UTC month. Choosing the free plan sets that to 100. An unlimited plan sends X-Quota-Limit: unlimited. The daily limit of 2 000 successful requests is not enforced in production today. If the request cannot be counted, the API returns 503, never an unmetered success. Errors are not counted against the monthly quota. 404 and 422 still count toward the minute limit. On 429, wait Retry-After seconds. Do not retry 401, 403, 404, or 422. A success sends X-RateLimit-* for the minute and X-Quota-* for the month. 429 sends X-RateLimit-* for the limit that was hit.\n\nData: ids are strings. null means the value is unknown. dimensions and performance are always null. Colors include unchecked rows with verified false, and a color id is the model id. Photo rights are cleared, but the v1 API does not return photos yet. VIN lookup is not available.\n\nVersion 1.2.0 at https://geoapi.ge. The TypeScript SDK, the MCP server (stdio), and the CLI (all 0.1.0) are not published yet. The widget is the browser embed and uses geoapi_pk_.",
                 "parameters": [
                     {
                         "$ref": "#/components/parameters/page"
@@ -3856,13 +4038,35 @@
                                 }
                             },
                             "X-Quota-Limit": {
+                                "description": "An integer, or the word unlimited on an unlimited plan.",
                                 "schema": {
-                                    "type": "integer"
+                                    "oneOf": [
+                                        {
+                                            "type": "integer"
+                                        },
+                                        {
+                                            "type": "string",
+                                            "enum": [
+                                                "unlimited"
+                                            ]
+                                        }
+                                    ]
                                 }
                             },
                             "X-Quota-Remaining": {
+                                "description": "An integer, or the word unlimited on an unlimited plan.",
                                 "schema": {
-                                    "type": "integer"
+                                    "oneOf": [
+                                        {
+                                            "type": "integer"
+                                        },
+                                        {
+                                            "type": "string",
+                                            "enum": [
+                                                "unlimited"
+                                            ]
+                                        }
+                                    ]
                                 }
                             },
                             "X-Quota-Reset": {
@@ -3918,7 +4122,7 @@
                         }
                     },
                     "403": {
-                        "description": "The key is valid, but the project, owner, or email does not allow the call.",
+                        "description": "The key is valid, but the project is disabled, the account is suspended, the email is not confirmed, or the Cars API is not turned on.",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -3934,7 +4138,7 @@
                         }
                     },
                     "404": {
-                        "description": "The record was not found.",
+                        "description": "The record or the address was not found.",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -4027,7 +4231,7 @@
                         }
                     },
                     "503": {
-                        "description": "The catalog or the meter is temporarily unavailable.",
+                        "description": "The catalog or the request counter is temporarily unavailable.",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -4046,15 +4250,11 @@
                 "x-codeSamples": [
                     {
                         "lang": "curl",
-                        "source": "curl https://geoapi.ge/api/v1/bodies?limit=1 \\\n  -H \"Authorization: Bearer geoapi_sk_…\""
-                    },
-                    {
-                        "lang": "JavaScript",
-                        "source": "// Server-side only: a geoapi_sk_ key must never reach the browser. In a web page use the widget (geoapi_pk_).\nconst response = await fetch(\"https://geoapi.ge/api/v1/bodies?limit=1\", {\n  headers: { Authorization: 'Bearer geoapi_sk_…' },\n});\nconst data = await response.json();"
+                        "source": "curl \"https://geoapi.ge/api/v1/bodies?limit=1\" \\\n  -H \"Authorization: Bearer geoapi_sk_…\""
                     },
                     {
                         "lang": "Node.js",
-                        "source": "const response = await fetch(\"https://geoapi.ge/api/v1/bodies?limit=1\", {\n  headers: { Authorization: 'Bearer geoapi_sk_…' },\n});\nconsole.log(await response.json());"
+                        "source": "// Server-side only: a geoapi_sk_ key must never reach the browser. In a web page use the widget (geoapi_pk_).\nconst response = await fetch(\"https://geoapi.ge/api/v1/bodies?limit=1\", {\n  headers: { Authorization: 'Bearer geoapi_sk_…' },\n});\nconsole.log(await response.json());"
                     },
                     {
                         "lang": "Python",
@@ -4076,8 +4276,8 @@
                     "Catalog"
                 ],
                 "operationId": "listFuel",
-                "summary": "Fuel consumption stored on modification specs",
-                "description": "City, highway, and combined consumption stored on modification specs, in litres per 100 km. The same filters as modification search are accepted, including body, drive, and transmission.\n\nPagination: page defaults to 1 (maximum 1000000). limit defaults to 100 and cannot exceed 1000. per_page is used only when limit is absent. direction defaults to asc and applies when sort is set. Omitting sort keeps this resource's default order. REST year lists are ascending. The widget list is newest-first.\n\nAuthentication: Authorization: Bearer geoapi_sk_… from your server. Query strings, cookies, and a cabinet session are not credentials. geoapi_pk_ is the widget key, not a catalog bearer. Sanctum cars:read or * also requires X-CARAPI-PROJECT naming that user's active project. A secret key ignores X-CARAPI-PROJECT.\n\nErrors, JSON error.code and error.message only, no request id: 401 unauthorized, 403 forbidden, 404 not_found, 405 method_not_allowed, 422 invalid_parameter, 429 RATE_LIMIT_EXCEEDED or DAILY_QUOTA_EXCEEDED or MONTHLY_QUOTA_EXCEEDED, 503 unavailable. Authentication runs before the method check. A non-GET request without an accepted key is 401, not 405. 405 is returned only after the key is accepted. Use GET.\n\nLimits: one project shares 60 requests each UTC minute and 10 000 successful requests each UTC month with the widget. Those caps are active. A project that has not chosen a commercial plan keeps 10 000 successful requests each UTC month. Choosing the free plan sets that project to 100 successful requests each UTC month. An unlimited plan sends X-Quota-Limit: unlimited. The 2 000 successful requests per UTC day limit is not enforced in production today, because the daily check runs only when platform.project_limits.per_day exists. A missing limits row or a failed meter is 503, not an unmetered success. 401, 403, 404, 405, 422, 429, and 503 do not spend the month. Failures still use the minute window. On 429, wait Retry-After seconds. Do not retry 401, 403, 404, or 422. Success sends X-RateLimit-* for the minute and X-Quota-* for the month. 429 sends X-RateLimit-* for the window that was hit.\n\nCoverage: JSON ids are strings. null means the stored value is missing. dimensions and performance are null. Colors include unverified rows with verified false. Photo files and VIN are not on these routes. Photo rights are cleared; photo files are served by /api/models/{id}/photo, not by these routes.\n\nVersion 1.2.0 at https://geoapi.ge. The TypeScript SDK is packages/sdk-js 0.1.0 in this repository and is not on the public npm registry. The MCP server is packages/mcp-server 0.1.0 in this repository, speaks stdio, and is not on the public npm registry. The CLI is packages/cli 0.1.0 in this repository and is not published on the public npm registry. The widget is the browser embed and uses geoapi_pk_.",
+                "summary": "Fuel consumption of each modification",
+                "description": "City, highway, and combined fuel consumption of each modification, in litres per 100 km. The modification search filters are accepted, including body, drive, and transmission.\n\nPagination: page defaults to 1 (maximum 1000000). limit defaults to 100 and cannot exceed 1000. per_page is used only when limit is absent. direction defaults to asc and applies when sort is set. Without sort, this resource keeps its default order. REST year lists are ascending. The widget list starts with the newest year.\n\nAuthentication: send Authorization: Bearer geoapi_sk_… from your server. A key in the URL query, a cookie, or a cabinet session is not accepted. geoapi_pk_ is the widget key and does not work here. A cabinet personal access token with cars:read or * also needs X-CARAPI-PROJECT with the id of one of your active projects. A secret key ignores X-CARAPI-PROJECT. Before using a key, confirm your email and turn on the Cars API at /account/products, or the key gets 403.\n\nErrors are JSON with only error.code and error.message, and no request id: 401 unauthorized, 403 forbidden, 404 not_found, 405 method_not_allowed, 422 invalid_parameter, 429 RATE_LIMIT_EXCEEDED, DAILY_QUOTA_EXCEEDED, or MONTHLY_QUOTA_EXCEEDED, 503 unavailable. The key is checked before the method, so a non-GET request without a valid key returns 401, not 405. 405 is returned only after the key is accepted. Use GET. One IP address may send 300 requests a minute. That limit is checked before the key, so it can return 429 before 401.\n\nLimits: a project shares 60 requests per UTC minute and its monthly quota with the widget. A project that has not chosen a paid plan has 10 000 successful requests per UTC month. Choosing the free plan sets that to 100. An unlimited plan sends X-Quota-Limit: unlimited. The daily limit of 2 000 successful requests is not enforced in production today. If the request cannot be counted, the API returns 503, never an unmetered success. Errors are not counted against the monthly quota. 404 and 422 still count toward the minute limit. On 429, wait Retry-After seconds. Do not retry 401, 403, 404, or 422. A success sends X-RateLimit-* for the minute and X-Quota-* for the month. 429 sends X-RateLimit-* for the limit that was hit.\n\nData: ids are strings. null means the value is unknown. dimensions and performance are always null. Colors include unchecked rows with verified false, and a color id is the model id. Photo rights are cleared, but the v1 API does not return photos yet. VIN lookup is not available.\n\nVersion 1.2.0 at https://geoapi.ge. The TypeScript SDK, the MCP server (stdio), and the CLI (all 0.1.0) are not published yet. The widget is the browser embed and uses geoapi_pk_.",
                 "parameters": [
                     {
                         "$ref": "#/components/parameters/page"
@@ -4155,13 +4355,35 @@
                                 }
                             },
                             "X-Quota-Limit": {
+                                "description": "An integer, or the word unlimited on an unlimited plan.",
                                 "schema": {
-                                    "type": "integer"
+                                    "oneOf": [
+                                        {
+                                            "type": "integer"
+                                        },
+                                        {
+                                            "type": "string",
+                                            "enum": [
+                                                "unlimited"
+                                            ]
+                                        }
+                                    ]
                                 }
                             },
                             "X-Quota-Remaining": {
+                                "description": "An integer, or the word unlimited on an unlimited plan.",
                                 "schema": {
-                                    "type": "integer"
+                                    "oneOf": [
+                                        {
+                                            "type": "integer"
+                                        },
+                                        {
+                                            "type": "string",
+                                            "enum": [
+                                                "unlimited"
+                                            ]
+                                        }
+                                    ]
                                 }
                             },
                             "X-Quota-Reset": {
@@ -4217,7 +4439,7 @@
                         }
                     },
                     "403": {
-                        "description": "The key is valid, but the project, owner, or email does not allow the call.",
+                        "description": "The key is valid, but the project is disabled, the account is suspended, the email is not confirmed, or the Cars API is not turned on.",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -4233,7 +4455,7 @@
                         }
                     },
                     "404": {
-                        "description": "The record was not found.",
+                        "description": "The record or the address was not found.",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -4326,7 +4548,7 @@
                         }
                     },
                     "503": {
-                        "description": "The catalog or the meter is temporarily unavailable.",
+                        "description": "The catalog or the request counter is temporarily unavailable.",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -4345,15 +4567,11 @@
                 "x-codeSamples": [
                     {
                         "lang": "curl",
-                        "source": "curl https://geoapi.ge/api/v1/fuel?limit=1 \\\n  -H \"Authorization: Bearer geoapi_sk_…\""
-                    },
-                    {
-                        "lang": "JavaScript",
-                        "source": "// Server-side only: a geoapi_sk_ key must never reach the browser. In a web page use the widget (geoapi_pk_).\nconst response = await fetch(\"https://geoapi.ge/api/v1/fuel?limit=1\", {\n  headers: { Authorization: 'Bearer geoapi_sk_…' },\n});\nconst data = await response.json();"
+                        "source": "curl \"https://geoapi.ge/api/v1/fuel?limit=1\" \\\n  -H \"Authorization: Bearer geoapi_sk_…\""
                     },
                     {
                         "lang": "Node.js",
-                        "source": "const response = await fetch(\"https://geoapi.ge/api/v1/fuel?limit=1\", {\n  headers: { Authorization: 'Bearer geoapi_sk_…' },\n});\nconsole.log(await response.json());"
+                        "source": "// Server-side only: a geoapi_sk_ key must never reach the browser. In a web page use the widget (geoapi_pk_).\nconst response = await fetch(\"https://geoapi.ge/api/v1/fuel?limit=1\", {\n  headers: { Authorization: 'Bearer geoapi_sk_…' },\n});\nconsole.log(await response.json());"
                     },
                     {
                         "lang": "Python",
@@ -4375,8 +4593,8 @@
                     "Catalog"
                 ],
                 "operationId": "listColors",
-                "summary": "Colors stored on model photos",
-                "description": "Every color stored on a model photo. verified is false when the photo was not confirmed. Unverified rows stay in the list. The image is not included.\n\nPagination: page defaults to 1 (maximum 1000000). limit defaults to 100 and cannot exceed 1000. per_page is used only when limit is absent. direction defaults to asc and applies when sort is set. Omitting sort keeps this resource's default order. REST year lists are ascending. The widget list is newest-first.\n\nAuthentication: Authorization: Bearer geoapi_sk_… from your server. Query strings, cookies, and a cabinet session are not credentials. geoapi_pk_ is the widget key, not a catalog bearer. Sanctum cars:read or * also requires X-CARAPI-PROJECT naming that user's active project. A secret key ignores X-CARAPI-PROJECT.\n\nErrors, JSON error.code and error.message only, no request id: 401 unauthorized, 403 forbidden, 404 not_found, 405 method_not_allowed, 422 invalid_parameter, 429 RATE_LIMIT_EXCEEDED or DAILY_QUOTA_EXCEEDED or MONTHLY_QUOTA_EXCEEDED, 503 unavailable. Authentication runs before the method check. A non-GET request without an accepted key is 401, not 405. 405 is returned only after the key is accepted. Use GET.\n\nLimits: one project shares 60 requests each UTC minute and 10 000 successful requests each UTC month with the widget. Those caps are active. A project that has not chosen a commercial plan keeps 10 000 successful requests each UTC month. Choosing the free plan sets that project to 100 successful requests each UTC month. An unlimited plan sends X-Quota-Limit: unlimited. The 2 000 successful requests per UTC day limit is not enforced in production today, because the daily check runs only when platform.project_limits.per_day exists. A missing limits row or a failed meter is 503, not an unmetered success. 401, 403, 404, 405, 422, 429, and 503 do not spend the month. Failures still use the minute window. On 429, wait Retry-After seconds. Do not retry 401, 403, 404, or 422. Success sends X-RateLimit-* for the minute and X-Quota-* for the month. 429 sends X-RateLimit-* for the window that was hit.\n\nCoverage: JSON ids are strings. null means the stored value is missing. dimensions and performance are null. Colors include unverified rows with verified false. Photo files and VIN are not on these routes. Photo rights are cleared; photo files are served by /api/models/{id}/photo, not by these routes.\n\nVersion 1.2.0 at https://geoapi.ge. The TypeScript SDK is packages/sdk-js 0.1.0 in this repository and is not on the public npm registry. The MCP server is packages/mcp-server 0.1.0 in this repository, speaks stdio, and is not on the public npm registry. The CLI is packages/cli 0.1.0 in this repository and is not published on the public npm registry. The widget is the browser embed and uses geoapi_pk_.",
+                "summary": "Colors of model photos",
+                "description": "Every color stored for a model photo. id is the model id, so it is not unique. verified is false when the photo was not checked, and those rows stay in the list. The image is not included.\n\nPagination: page defaults to 1 (maximum 1000000). limit defaults to 100 and cannot exceed 1000. per_page is used only when limit is absent. direction defaults to asc and applies when sort is set. Without sort, this resource keeps its default order. REST year lists are ascending. The widget list starts with the newest year.\n\nAuthentication: send Authorization: Bearer geoapi_sk_… from your server. A key in the URL query, a cookie, or a cabinet session is not accepted. geoapi_pk_ is the widget key and does not work here. A cabinet personal access token with cars:read or * also needs X-CARAPI-PROJECT with the id of one of your active projects. A secret key ignores X-CARAPI-PROJECT. Before using a key, confirm your email and turn on the Cars API at /account/products, or the key gets 403.\n\nErrors are JSON with only error.code and error.message, and no request id: 401 unauthorized, 403 forbidden, 404 not_found, 405 method_not_allowed, 422 invalid_parameter, 429 RATE_LIMIT_EXCEEDED, DAILY_QUOTA_EXCEEDED, or MONTHLY_QUOTA_EXCEEDED, 503 unavailable. The key is checked before the method, so a non-GET request without a valid key returns 401, not 405. 405 is returned only after the key is accepted. Use GET. One IP address may send 300 requests a minute. That limit is checked before the key, so it can return 429 before 401.\n\nLimits: a project shares 60 requests per UTC minute and its monthly quota with the widget. A project that has not chosen a paid plan has 10 000 successful requests per UTC month. Choosing the free plan sets that to 100. An unlimited plan sends X-Quota-Limit: unlimited. The daily limit of 2 000 successful requests is not enforced in production today. If the request cannot be counted, the API returns 503, never an unmetered success. Errors are not counted against the monthly quota. 404 and 422 still count toward the minute limit. On 429, wait Retry-After seconds. Do not retry 401, 403, 404, or 422. A success sends X-RateLimit-* for the minute and X-Quota-* for the month. 429 sends X-RateLimit-* for the limit that was hit.\n\nData: ids are strings. null means the value is unknown. dimensions and performance are always null. Colors include unchecked rows with verified false, and a color id is the model id. Photo rights are cleared, but the v1 API does not return photos yet. VIN lookup is not available.\n\nVersion 1.2.0 at https://geoapi.ge. The TypeScript SDK, the MCP server (stdio), and the CLI (all 0.1.0) are not published yet. The widget is the browser embed and uses geoapi_pk_.",
                 "parameters": [
                     {
                         "$ref": "#/components/parameters/page"
@@ -4436,13 +4654,35 @@
                                 }
                             },
                             "X-Quota-Limit": {
+                                "description": "An integer, or the word unlimited on an unlimited plan.",
                                 "schema": {
-                                    "type": "integer"
+                                    "oneOf": [
+                                        {
+                                            "type": "integer"
+                                        },
+                                        {
+                                            "type": "string",
+                                            "enum": [
+                                                "unlimited"
+                                            ]
+                                        }
+                                    ]
                                 }
                             },
                             "X-Quota-Remaining": {
+                                "description": "An integer, or the word unlimited on an unlimited plan.",
                                 "schema": {
-                                    "type": "integer"
+                                    "oneOf": [
+                                        {
+                                            "type": "integer"
+                                        },
+                                        {
+                                            "type": "string",
+                                            "enum": [
+                                                "unlimited"
+                                            ]
+                                        }
+                                    ]
                                 }
                             },
                             "X-Quota-Reset": {
@@ -4498,7 +4738,7 @@
                         }
                     },
                     "403": {
-                        "description": "The key is valid, but the project, owner, or email does not allow the call.",
+                        "description": "The key is valid, but the project is disabled, the account is suspended, the email is not confirmed, or the Cars API is not turned on.",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -4514,7 +4754,7 @@
                         }
                     },
                     "404": {
-                        "description": "The record was not found.",
+                        "description": "The record or the address was not found.",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -4607,7 +4847,7 @@
                         }
                     },
                     "503": {
-                        "description": "The catalog or the meter is temporarily unavailable.",
+                        "description": "The catalog or the request counter is temporarily unavailable.",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -4626,26 +4866,22 @@
                 "x-codeSamples": [
                     {
                         "lang": "curl",
-                        "source": "curl https://geoapi.ge/api/v1/colors?limit=1 \\\n  -H \"Authorization: Bearer geoapi_sk_…\""
-                    },
-                    {
-                        "lang": "JavaScript",
-                        "source": "// Server-side only: a geoapi_sk_ key must never reach the browser. In a web page use the widget (geoapi_pk_).\nconst response = await fetch(\"https://geoapi.ge/api/v1/colors?limit=1\", {\n  headers: { Authorization: 'Bearer geoapi_sk_…' },\n});\nconst data = await response.json();"
+                        "source": "curl \"https://geoapi.ge/api/v1/colors?limit=2\" \\\n  -H \"Authorization: Bearer geoapi_sk_…\""
                     },
                     {
                         "lang": "Node.js",
-                        "source": "const response = await fetch(\"https://geoapi.ge/api/v1/colors?limit=1\", {\n  headers: { Authorization: 'Bearer geoapi_sk_…' },\n});\nconsole.log(await response.json());"
+                        "source": "// Server-side only: a geoapi_sk_ key must never reach the browser. In a web page use the widget (geoapi_pk_).\nconst response = await fetch(\"https://geoapi.ge/api/v1/colors?limit=2\", {\n  headers: { Authorization: 'Bearer geoapi_sk_…' },\n});\nconsole.log(await response.json());"
                     },
                     {
                         "lang": "Python",
-                        "source": "import urllib.request\nrequest = urllib.request.Request(\"https://geoapi.ge/api/v1/colors?limit=1\", headers={'Authorization': 'Bearer geoapi_sk_…'})\nprint(urllib.request.urlopen(request).read().decode())"
+                        "source": "import urllib.request\nrequest = urllib.request.Request(\"https://geoapi.ge/api/v1/colors?limit=2\", headers={'Authorization': 'Bearer geoapi_sk_…'})\nprint(urllib.request.urlopen(request).read().decode())"
                     },
                     {
                         "lang": "PHP",
-                        "source": "$ch = curl_init(\"https://geoapi.ge/api/v1/colors?limit=1\");\ncurl_setopt_array($ch, [\n    CURLOPT_HTTPHEADER => ['Authorization: Bearer geoapi_sk_…'],\n    CURLOPT_RETURNTRANSFER => true,\n]);\necho curl_exec($ch);"
+                        "source": "$ch = curl_init(\"https://geoapi.ge/api/v1/colors?limit=2\");\ncurl_setopt_array($ch, [\n    CURLOPT_HTTPHEADER => ['Authorization: Bearer geoapi_sk_…'],\n    CURLOPT_RETURNTRANSFER => true,\n]);\necho curl_exec($ch);"
                     }
                 ],
-                "x-geoapi-example": "/api/v1/colors?limit=1",
+                "x-geoapi-example": "/api/v1/colors?limit=2",
                 "x-geoapi-kind": "colors",
                 "x-geoapi-mode": "list"
             }
@@ -4657,7 +4893,7 @@
                 ],
                 "operationId": "getCoverage",
                 "summary": "Catalog counts.",
-                "description": "Catalog counts measured when the request runs. These are not a quota.\n\nThis route returns counts, not a list. year_from, q, sort, and modified_after return 422.\n\nAuthentication: Authorization: Bearer geoapi_sk_… from your server. Query strings, cookies, and a cabinet session are not credentials. geoapi_pk_ is the widget key, not a catalog bearer. Sanctum cars:read or * also requires X-CARAPI-PROJECT naming that user's active project. A secret key ignores X-CARAPI-PROJECT.\n\nErrors, JSON error.code and error.message only, no request id: 401 unauthorized, 403 forbidden, 404 not_found, 405 method_not_allowed, 422 invalid_parameter, 429 RATE_LIMIT_EXCEEDED or DAILY_QUOTA_EXCEEDED or MONTHLY_QUOTA_EXCEEDED, 503 unavailable. Authentication runs before the method check. A non-GET request without an accepted key is 401, not 405. 405 is returned only after the key is accepted. Use GET.\n\nLimits: one project shares 60 requests each UTC minute and 10 000 successful requests each UTC month with the widget. Those caps are active. A project that has not chosen a commercial plan keeps 10 000 successful requests each UTC month. Choosing the free plan sets that project to 100 successful requests each UTC month. An unlimited plan sends X-Quota-Limit: unlimited. The 2 000 successful requests per UTC day limit is not enforced in production today, because the daily check runs only when platform.project_limits.per_day exists. A missing limits row or a failed meter is 503, not an unmetered success. 401, 403, 404, 405, 422, 429, and 503 do not spend the month. Failures still use the minute window. On 429, wait Retry-After seconds. Do not retry 401, 403, 404, or 422. Success sends X-RateLimit-* for the minute and X-Quota-* for the month. 429 sends X-RateLimit-* for the window that was hit.\n\nCoverage: JSON ids are strings. null means the stored value is missing. dimensions and performance are null. Colors include unverified rows with verified false. Photo files and VIN are not on these routes. Photo rights are cleared; photo files are served by /api/models/{id}/photo, not by these routes.\n\nVersion 1.2.0 at https://geoapi.ge. The TypeScript SDK is packages/sdk-js 0.1.0 in this repository and is not on the public npm registry. The MCP server is packages/mcp-server 0.1.0 in this repository, speaks stdio, and is not on the public npm registry. The CLI is packages/cli 0.1.0 in this repository and is not published on the public npm registry. The widget is the browser embed and uses geoapi_pk_.",
+                "description": "Catalog counts measured when the request runs. They are not your quota.\n\nThis route returns counts, not a list. Filters, q, sort, and modified_after return 422.\n\nAuthentication: send Authorization: Bearer geoapi_sk_… from your server. A key in the URL query, a cookie, or a cabinet session is not accepted. geoapi_pk_ is the widget key and does not work here. A cabinet personal access token with cars:read or * also needs X-CARAPI-PROJECT with the id of one of your active projects. A secret key ignores X-CARAPI-PROJECT. Before using a key, confirm your email and turn on the Cars API at /account/products, or the key gets 403.\n\nErrors are JSON with only error.code and error.message, and no request id: 401 unauthorized, 403 forbidden, 404 not_found, 405 method_not_allowed, 422 invalid_parameter, 429 RATE_LIMIT_EXCEEDED, DAILY_QUOTA_EXCEEDED, or MONTHLY_QUOTA_EXCEEDED, 503 unavailable. The key is checked before the method, so a non-GET request without a valid key returns 401, not 405. 405 is returned only after the key is accepted. Use GET. One IP address may send 300 requests a minute. That limit is checked before the key, so it can return 429 before 401.\n\nLimits: a project shares 60 requests per UTC minute and its monthly quota with the widget. A project that has not chosen a paid plan has 10 000 successful requests per UTC month. Choosing the free plan sets that to 100. An unlimited plan sends X-Quota-Limit: unlimited. The daily limit of 2 000 successful requests is not enforced in production today. If the request cannot be counted, the API returns 503, never an unmetered success. Errors are not counted against the monthly quota. 404 and 422 still count toward the minute limit. On 429, wait Retry-After seconds. Do not retry 401, 403, 404, or 422. A success sends X-RateLimit-* for the minute and X-Quota-* for the month. 429 sends X-RateLimit-* for the limit that was hit.\n\nData: ids are strings. null means the value is unknown. dimensions and performance are always null. Colors include unchecked rows with verified false, and a color id is the model id. Photo rights are cleared, but the v1 API does not return photos yet. VIN lookup is not available.\n\nVersion 1.2.0 at https://geoapi.ge. The TypeScript SDK, the MCP server (stdio), and the CLI (all 0.1.0) are not published yet. The widget is the browser embed and uses geoapi_pk_.",
                 "parameters": [],
                 "responses": {
                     "200": {
@@ -4679,13 +4915,35 @@
                                 }
                             },
                             "X-Quota-Limit": {
+                                "description": "An integer, or the word unlimited on an unlimited plan.",
                                 "schema": {
-                                    "type": "integer"
+                                    "oneOf": [
+                                        {
+                                            "type": "integer"
+                                        },
+                                        {
+                                            "type": "string",
+                                            "enum": [
+                                                "unlimited"
+                                            ]
+                                        }
+                                    ]
                                 }
                             },
                             "X-Quota-Remaining": {
+                                "description": "An integer, or the word unlimited on an unlimited plan.",
                                 "schema": {
-                                    "type": "integer"
+                                    "oneOf": [
+                                        {
+                                            "type": "integer"
+                                        },
+                                        {
+                                            "type": "string",
+                                            "enum": [
+                                                "unlimited"
+                                            ]
+                                        }
+                                    ]
                                 }
                             },
                             "X-Quota-Reset": {
@@ -4726,7 +4984,7 @@
                         }
                     },
                     "403": {
-                        "description": "The key is valid, but the project, owner, or email does not allow the call.",
+                        "description": "The key is valid, but the project is disabled, the account is suspended, the email is not confirmed, or the Cars API is not turned on.",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -4742,7 +5000,7 @@
                         }
                     },
                     "404": {
-                        "description": "The record was not found.",
+                        "description": "The record or the address was not found.",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -4835,7 +5093,7 @@
                         }
                     },
                     "503": {
-                        "description": "The catalog or the meter is temporarily unavailable.",
+                        "description": "The catalog or the request counter is temporarily unavailable.",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -4854,15 +5112,11 @@
                 "x-codeSamples": [
                     {
                         "lang": "curl",
-                        "source": "curl https://geoapi.ge/api/v1/coverage \\\n  -H \"Authorization: Bearer geoapi_sk_…\""
-                    },
-                    {
-                        "lang": "JavaScript",
-                        "source": "// Server-side only: a geoapi_sk_ key must never reach the browser. In a web page use the widget (geoapi_pk_).\nconst response = await fetch(\"https://geoapi.ge/api/v1/coverage\", {\n  headers: { Authorization: 'Bearer geoapi_sk_…' },\n});\nconst data = await response.json();"
+                        "source": "curl \"https://geoapi.ge/api/v1/coverage\" \\\n  -H \"Authorization: Bearer geoapi_sk_…\""
                     },
                     {
                         "lang": "Node.js",
-                        "source": "const response = await fetch(\"https://geoapi.ge/api/v1/coverage\", {\n  headers: { Authorization: 'Bearer geoapi_sk_…' },\n});\nconsole.log(await response.json());"
+                        "source": "// Server-side only: a geoapi_sk_ key must never reach the browser. In a web page use the widget (geoapi_pk_).\nconst response = await fetch(\"https://geoapi.ge/api/v1/coverage\", {\n  headers: { Authorization: 'Bearer geoapi_sk_…' },\n});\nconsole.log(await response.json());"
                     },
                     {
                         "lang": "Python",

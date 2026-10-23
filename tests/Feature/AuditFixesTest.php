@@ -88,11 +88,11 @@ final class AuditFixesTest extends TestCase
             ->assertDontSee('vendor/', false);
     }
 
-    public function test_widget_embed_uses_the_demo_key(): void
+    public function test_widget_embed_uses_a_public_key_placeholder(): void
     {
         $this->get('/guide')
             ->assertOk()
-            ->assertSee('public-key=&quot;demo&quot;', false)
+            ->assertSee('public-key=&quot;geoapi_pk_…&quot;', false)
             ->assertDontSee('geoapi_pk_example', false);
 
         $script = (string) file_get_contents(public_path('widget/v1/geoapi-filter.js'));
