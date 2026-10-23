@@ -24,6 +24,7 @@ use Illuminate\Support\Facades\URL;
 use InvalidArgumentException;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Title;
+use Livewire\Attributes\Url as QueryParam;
 use Livewire\Component;
 
 #[Layout('components.layouts.cabinet')]
@@ -32,8 +33,15 @@ final class Billing extends Component
 {
     public ?int $projectId = null;
 
+    /** The plan picked on /pricing (?plan=starter), marked on the plan cards. */
+    #[QueryParam(as: 'plan', history: false, keep: false)]
+    public ?string $chosen = null;
+
     public function mount(): void
     {
+        if (! in_array($this->chosen, ['starter', 'growth', 'business'], true)) {
+            $this->chosen = null;
+        }
         $first = $this->projects()[0]['id'] ?? null;
         $this->projectId = is_numeric($first) ? (int) $first : null;
     }

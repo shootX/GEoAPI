@@ -31,8 +31,9 @@
             $higher = $shared && \App\Billing\V2\Catalog::rank($code) > \App\Billing\V2\Catalog::rank($planNow === 'legacy-grandfathered' ? 'free' : $planNow);
             $lower = $shared && \App\Billing\V2\Catalog::rank($code) < \App\Billing\V2\Catalog::rank($planNow);
         @endphp
-        <article class="plan {{ $isCurrent ? 'now' : '' }}">
-            <div class="s-a562f4 row"><h2>{{ $label }}</h2>@if ($isCurrent)<span class="bd bd-ok">{{ $en ? 'Current' : 'მიმდინარე' }}</span>@endif</div>
+        @php $picked = ! $isCurrent && $chosen === $code; @endphp
+        <article id="plan-{{ $code }}" class="plan {{ $isCurrent ? 'now' : '' }} {{ $picked ? 'picked' : '' }}">
+            <div class="s-a562f4 row"><h2>{{ $label }}</h2>@if ($isCurrent)<span class="bd bd-ok">{{ $en ? 'Current' : 'მიმდინარე' }}</span>@elseif ($picked)<span class="bd" data-code="picked">{{ $en ? 'Your choice' : 'თქვენი არჩევანი' }}</span>@endif</div>
             <p class="price">{{ $lari($monthCents) }} <span class="muted">/ {{ $en ? 'month' : 'თვე' }}</span></p>
             <p class="muted">{{ $fmt(\App\Billing\V2\Catalog::plans()[$code]['quota']) }} {{ $en ? 'successful requests a month.' : 'წარმატებული მოთხოვნა თვეში.' }}</p>
             <p class="xs mut">{{ $en ? 'Year' : 'წელი' }}: {{ $lari($yearCents) }} · −15%</p>

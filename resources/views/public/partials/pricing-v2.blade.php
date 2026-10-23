@@ -24,7 +24,7 @@
                 ? ['3 active projects', '60 requests / minute', 'PDF invoice']
                 : ['3 აქტიური პროექტი', '60 მოთხოვნა / წუთი', 'ინვოისი PDF'],
             'cta' => $en ? 'Pay' : 'გადახდა',
-            'href' => url('/account/billing'),
+            'href' => url('/account/billing?plan=starter'),
             'buy' => true,
         ],
         'growth' => [
@@ -36,7 +36,7 @@
                 ? ['10 active projects', '120 requests / minute', 'Prepaid request packs']
                 : ['10 აქტიური პროექტი', '120 მოთხოვნა / წუთი', 'წინასწარ შეძენილი პაკეტები'],
             'cta' => $en ? 'Pay' : 'გადახდა',
-            'href' => url('/account/billing'),
+            'href' => url('/account/billing?plan=growth'),
             'buy' => true,
             'hi' => true,
         ],
@@ -51,7 +51,7 @@
                 ? ['25 active projects', '240 requests / minute', 'PDF invoice']
                 : ['25 აქტიური პროექტი', '240 მოთხოვნა / წუთი', 'ინვოისი PDF'],
             'cta' => $en ? 'Pay' : 'გადახდა',
-            'href' => url('/account/billing'),
+            'href' => url('/account/billing?plan=business'),
             'buy' => true,
         ];
     }
@@ -75,7 +75,7 @@
                 @php $hi = ! empty($plan['hi']); @endphp
                 <div class="fc plan-card {{ $hi ? 'plan-card-hi' : '' }}">
                     @if ($hi)<span class="s-aa8940 bd">{{ $en ? 'Recommended' : 'რეკომენდებული' }}</span>@endif
-                    <h3>{{ $plan['name'] }}</h3>
+                    <h2 class="h3">{{ $plan['name'] }}</h2>
                     <div data-show="month">
                         <div class="s-47a3c2"><span class="s-3d01a4 tabular">{{ $lari($plan['month']) }}</span><span class="mut">{{ $perMonth }}</span></div>
                     </div>
@@ -99,7 +99,7 @@
             {{ $en ? 'Prices are in GEL and include VAT. The quota resets every month, including on a yearly payment.' : 'ფასები ლარშია და დღგ-ს მოიცავს. კვოტა ყოველ თვე ნულდება, წლიურ გადახდაზეც.' }}
             {{ $en ? 'Payment: Bank of Georgia. There is no automatic charge.' : 'გადახდა: Bank of Georgia. ავტომატური ჩამოჭრა არ არის.' }}
         </p>
-        <p class="s-ed74eb xs mut">{{ $en ? 'One subscription per workspace: all projects share the monthly quota. Prepaid packs: Starter +10 000 for '.$lari(900).', Growth +50 000 for '.$lari(2000).'; they expire after 90 days and are spent after the monthly quota. Extra active project: '.$lari(500).' / month. No overage bill.' : 'ერთი გამოწერა სამუშაო სივრცეზე: ყველა პროექტი თვიურ კვოტას იზიარებს. წინასწარი პაკეტები: Starter +10 000 — '.$lari(900).', Growth +50 000 — '.$lari(2000).'; 90 დღეში იწურება და თვიური კვოტის შემდეგ იხარჯება. დამატებითი აქტიური პროექტი: '.$lari(500).' / თვე. ზედმეტ მოხმარებაზე ანგარიში არ იწერება.' }}</p>
+        <p class="s-ed74eb xs mut">{{ $en ? 'One subscription per workspace: all projects share the monthly quota. Prepaid packs: Starter +10 000 for '.$lari(\App\Billing\V2\Catalog::packs()['starter']['tetri']).', Growth +50 000 for '.$lari(\App\Billing\V2\Catalog::packs()['growth']['tetri']).'; they expire after 90 days and are spent after the monthly quota. Extra active project: '.$lari(\App\Billing\V2\Catalog::EXTRA_PROJECT_TETRI).' / month. No overage bill.' : 'ერთი გამოწერა სამუშაო სივრცეზე: ყველა პროექტი თვიურ კვოტას იზიარებს. წინასწარი პაკეტები: Starter +10 000 — '.$lari(\App\Billing\V2\Catalog::packs()['starter']['tetri']).', Growth +50 000 — '.$lari(\App\Billing\V2\Catalog::packs()['growth']['tetri']).'; 90 დღეში იწურება და თვიური კვოტის შემდეგ იხარჯება. დამატებითი აქტიური პროექტი: '.$lari(\App\Billing\V2\Catalog::EXTRA_PROJECT_TETRI).' / თვე. ზედმეტ მოხმარებაზე ანგარიში არ იწერება.' }}</p>
         <p class="s-ed74eb xs mut">{{ $en ? 'Enterprise: custom limits and terms —' : 'Enterprise: ინდივიდუალური ლიმიტები და პირობები —' }} <a href="mailto:hello@geoapi.ge">hello@geoapi.ge</a></p>
     </div>
 </section>

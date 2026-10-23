@@ -60,6 +60,7 @@
 .cab.ga .plan h2 { font-size: 18px; font-weight: 600; }
 .cab.ga .plan .price { font-size: 30px; font-weight: 700; letter-spacing: -.02em; }
 .cab.ga .plan.now { border: 2px solid var(--ac); background: #fff; box-shadow: var(--sh2); }
+.cab.ga .plan.picked { border: 2px dashed var(--ac); }
 .cab.ga .plan ul { margin: 0; padding-left: 18px; color: var(--ink2); display: grid; gap: 4px; }
 .cab.ga .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
 .cab.ga .card { overflow: hidden; cursor: pointer; padding: 0; text-align: left; width: 100%; }

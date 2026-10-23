@@ -5,13 +5,13 @@
     <form wire:submit="resetPassword" class="s-f6ce4d col">
         <div class="fld">
             <label for="rp-email">{{ __('Email') }}</label>
-            <input id="rp-email" class="inp @error('email') err @enderror" wire:model="email" type="email" autocomplete="username" required>
-            @error('email')<span class="emsg"><x-ga.icon name="err" :size="14" />{{ $message }}</span>@enderror
+            <input id="rp-email" class="inp @error('email') err @enderror" @error('email') aria-invalid="true" aria-describedby="rp-email-error" @enderror wire:model="email" type="email" autocomplete="username" required>
+            @error('email')<span class="emsg" id="rp-email-error" role="alert"><x-ga.icon name="err" :size="14" />{{ $message }}</span>@enderror
         </div>
         <div class="fld">
             <label for="rp-password">{{ __('New password') }}</label>
-            <input id="rp-password" class="inp @error('password') err @enderror" wire:model="password" type="password" autocomplete="new-password" required>
-            @error('password')<span class="emsg"><x-ga.icon name="err" :size="14" />{{ $message }}</span>@else<span class="hint">{{ \Carapi\Platform\Passwords::rule(app()->getLocale()) }}</span>@enderror
+            <input id="rp-password" class="inp @error('password') err @enderror" @error('password') aria-invalid="true" aria-describedby="rp-password-error" @enderror wire:model="password" type="password" autocomplete="new-password" required>
+            @error('password')<span class="emsg" id="rp-password-error" role="alert"><x-ga.icon name="err" :size="14" />{{ $message }}</span>@else<span class="hint">{{ \Carapi\Platform\Passwords::rule(app()->getLocale()) }}</span>@enderror
         </div>
         <div class="fld">
             <label for="rp-password2">{{ __('Confirm password') }}</label>
