@@ -30,6 +30,15 @@ final class MediaController extends CrudController
         ];
     }
 
+    private const TYPES = [
+        'image/jpeg' => 'jpg',
+        'image/png' => 'png',
+        'image/webp' => 'webp',
+        'image/gif' => 'gif',
+        'image/avif' => 'avif',
+        'application/pdf' => 'pdf',
+    ];
+
     public function store(Request $request): JsonResponse
     {
         $data = $request->validate([
@@ -62,8 +71,18 @@ final class MediaController extends CrudController
             ], 422);
         }
 
-        $safe = preg_replace('/[^A-Za-z0-9._-]+/', '-', $name) ?: 'file';
-        $path = 'media/'.bin2hex(random_bytes(16)).'-'.$safe;
+        // Files are served from the site's own origin, so only inert formats are accepted. The type comes
+        // from the bytes, not from the client: an .html or .svg upload would run as same-origin script.
+        $mime = (string) (new \finfo(FILEINFO_MIME_TYPE))->buffer($binary);
+        $extension = self::TYPES[$mime] ?? null;
+        if ($extension === null) {
+            return response()->json([
+                'error' => ['code' => 'invalid', 'message' => 'დაშვებულია მხოლოდ JPEG, PNG, WebP, GIF, AVIF და PDF.'],
+            ], 422);
+        }
+
+        $base = preg_replace('/[^A-Za-z0-9_-]+/', '-', pathinfo($name, PATHINFO_FILENAME)) ?: 'file';
+        $path = 'media/'.bin2hex(random_bytes(16)).'-'.$base.'.'.$extension;
         Storage::disk('public')->put($path, $binary);
 
         $row = MediaItem::query()->create([
@@ -109,8 +128,10 @@ final class MediaController extends CrudController
             ], 404));
         }
 
-        return Storage::disk('public')->response($row->path, $row->original_name, [
+        // The stored name is already sanitized and carries the detected extension; the client's name may hold "/".
+        return Storage::disk('public')->response($row->path, basename($row->path), [
             'Content-Type' => $row->mime,
+            'X-Content-Type-Options' => 'nosniff',
         ]);
     }
 

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers;
 
+use App\Access\AdminAccess;
 use App\Models\User;
 use Carapi\Catalog\Connection;
 use Carapi\Catalog\UnavailableException;
@@ -67,11 +68,7 @@ final class PhotoReportController
     private function admins(): Collection
     {
         $user = new User();
-        $ids = DB::table('model_has_roles')
-            ->join('roles', 'roles.id', '=', 'model_has_roles.role_id')
-            ->where('model_has_roles.model_type', $user->getMorphClass())
-            ->where('roles.name', 'admin')
-            ->pluck('model_has_roles.model_id');
+        $ids = AdminAccess::adminRoleHolders()->pluck('model_has_roles.model_id');
 
         return User::query()->whereIn($user->getKeyName(), $ids)->get();
     }

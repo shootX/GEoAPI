@@ -37,6 +37,10 @@ final class Checkout
             if ($currentPlan !== null && Catalog::rank($product) < Catalog::rank($currentPlan)) {
                 throw new InvalidArgumentException('plan');
             }
+            if ($currentPlan !== null && $currentPlan !== 'free' && Catalog::rank($product) > Catalog::rank($currentPlan) && self::termOutlasts($legacyUserId, $interval)) {
+                // The higher plan would inherit a term paid for at the lower plan's price.
+                throw new InvalidArgumentException('term');
+            }
         }
         $code = Catalog::code($product, $interval);
         $tetri = Catalog::tetri($product, $interval);
@@ -187,13 +191,10 @@ final class Checkout
         $spec = Catalog::plans()[$plan];
         $now = Workspace::stamp();
         if ($sub !== null && Flag::is($sub->shared_quota) && ! Flag::is($sub->legacy_preserved) && Catalog::rank($plan) > Catalog::rank((string) $sub->plan_code)) {
-            // A paid upgrade always buys a full month (or year) from now; it never inherits a shorter
-            // remaining term, e.g. 5 days left on Free (QA GEO-QA-004). Usage in the current period is kept.
-            $term = (string) $sub->term_end;
-            $extended = $interval === 'year' ? Workspace::plusYear($now) : Workspace::plusMonth($now);
-            if ($extended > $term) {
-                $term = $extended;
-            }
+            // A paid upgrade buys exactly a month (or year) from now. It never inherits a shorter remaining
+            // term (5 days left on Free, QA GEO-QA-004) nor a longer one paid at the lower plan's price
+            // (Checkout::open refuses those; an order opened earlier still gets only what it paid for).
+            $term = $interval === 'year' ? Workspace::plusYear($now) : Workspace::plusMonth($now);
             DB::table('billing_workspace_subscriptions')->where('id', $sub->id)->update([
                 'plan_code' => $plan,
                 'interval' => $interval,
@@ -284,6 +285,20 @@ final class Checkout
         $plan = self::sharedPlan($legacyUserId);
 
         return $plan !== null && isset(Catalog::packs()[$plan]) ? $plan : null;
+    }
+
+    /** True when the shared subscription's paid term ends after the period this purchase would cover. */
+    private static function termOutlasts(int $legacyUserId, string $interval): bool
+    {
+        $workspace = Workspace::find($legacyUserId);
+        $sub = $workspace === null ? null : Workspace::subscription((int) $workspace->id);
+        if ($sub === null || $sub->term_end === null) {
+            return false;
+        }
+        $now = Workspace::stamp();
+        $covers = $interval === 'year' ? Workspace::plusYear($now) : Workspace::plusMonth($now);
+
+        return (string) $sub->term_end > $covers;
     }
 
     private static function sharedPlan(int $legacyUserId): ?string

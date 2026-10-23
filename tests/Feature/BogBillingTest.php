@@ -187,6 +187,33 @@ final class BogBillingTest extends TestCase
         }
     }
 
+    public function test_mock_mode_is_admin_only_in_any_environment_but_local_and_testing(): void
+    {
+        $user = $this->owner();
+        $this->app['env'] = 'staging';
+
+        try {
+            $this->assertTrue(MockPay::enabled());
+            $this->assertFalse(MockPay::allowedFor($user));
+            config(['electrik.operators.emails' => [$user->email]]);
+            $this->assertTrue(MockPay::allowedFor($user->fresh()));
+        } finally {
+            $this->app['env'] = 'testing';
+        }
+    }
+
+    public function test_billing_does_not_reveal_the_plan_of_someone_elses_project(): void
+    {
+        $user = $this->owner();
+        DB::table('platform.users')->insert(['id' => 4, 'email' => 'other@example.com', 'status' => 'active']);
+        DB::table('platform.projects')->insert(['id' => 8, 'user_id' => 4, 'name' => 'Other', 'status' => 'active']);
+        $this->limits(8, 100000, 'growth', false, now()->addMonth()->toDateTimeString());
+
+        Livewire::actingAs($user)->test(Billing::class)
+            ->set('projectId', 8)
+            ->assertViewHas('currentPlan', null);
+    }
+
     public function test_new_project_limits_insert_a_boolean_literal_for_unlimited_month(): void
     {
         $repo = new ProjectRepository($this->platform);

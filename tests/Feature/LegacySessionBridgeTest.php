@@ -121,4 +121,25 @@ final class LegacySessionBridgeTest extends TestCase
         $this->withUnencryptedCookie('geoapi_platform', $sid)->get('/');
         $this->assertGuest();
     }
+
+    public function test_a_bridge_sign_in_rotates_the_legacy_session_so_logout_revokes_every_copy(): void
+    {
+        $copied = $this->legacySession(60, 60);
+        $response = $this->withUnencryptedCookie('geoapi_platform', $copied)->get('/');
+        $this->assertAuthenticated();
+        $rotated = $response->getCookie('geoapi_platform', false)?->getValue();
+        $this->assertIsString($rotated);
+        $this->assertNotSame($copied, $rotated);
+        $this->assertFileDoesNotExist($this->dir.'/sess_'.$copied, 'the sid the bridge used must not stay valid');
+
+        $this->withUnencryptedCookie('geoapi_platform', $rotated)->post('/logout');
+        $this->assertFileDoesNotExist($this->dir.'/sess_'.$rotated);
+
+        foreach ([$copied, $rotated] as $sid) {
+            $this->flushSession();
+            auth()->forgetGuards();
+            $this->withUnencryptedCookie('geoapi_platform', $sid)->get('/');
+            $this->assertGuest();
+        }
+    }
 }

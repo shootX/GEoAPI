@@ -241,6 +241,42 @@ final class BillingV2Test extends TestCase
         $this->assertSame('growth', Workspace::subscription($workspaceId)->plan_code, 'the paid plan outlives the old 5-day term');
     }
 
+    public function test_a_one_month_upgrade_cannot_inherit_a_longer_paid_term(): void
+    {
+        config(['billing.v2' => true]);
+        $user = $this->owner();
+        $this->projects();
+        $workspaceId = $this->shared($user, 'free');
+        $this->pay($user, 'starter', 'year');
+        $this->assertSame('starter', Workspace::subscription($workspaceId)->plan_code);
+
+        try {
+            Checkout::open((int) $user->id, 3, 7, 'growth', 'month', $this->buyer());
+            $this->fail('A month of growth must not buy the rest of the starter year.');
+        } catch (InvalidArgumentException $e) {
+            $this->assertSame('term', $e->getMessage());
+        }
+
+        $this->pay($user, 'growth', 'year');
+        $this->assertSame('growth', Workspace::subscription($workspaceId)->plan_code);
+    }
+
+    public function test_an_upgrade_opened_earlier_still_grants_only_the_paid_month(): void
+    {
+        config(['billing.v2' => true]);
+        $user = $this->owner();
+        $this->projects();
+        $workspaceId = $this->shared($user, 'free');
+        $publicId = Checkout::open((int) $user->id, 3, 7, 'growth', 'month', $this->buyer());
+        $this->pay($user, 'starter', 'year');
+
+        Entitlements::grant($publicId);
+
+        $growth = Workspace::subscription($workspaceId);
+        $this->assertSame('growth', $growth->plan_code);
+        $this->assertSame(Workspace::plusMonth(Workspace::stamp()), (string) $growth->term_end);
+    }
+
     public function test_an_extra_project_lasts_a_month_from_payment(): void
     {
         config(['billing.v2' => true]);

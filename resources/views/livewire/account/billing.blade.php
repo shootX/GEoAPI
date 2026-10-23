@@ -40,7 +40,7 @@
                 <div class="al al-wa" data-code="payments not configured"><x-ga.icon name="warn" :size="18" /><div>{{ $en ? 'The payment provider is not connected yet. Card payment is temporarily unavailable.' : 'გადახდის პროვაიდერი ჯერ არ არის მიერთებული. ბარათით გადახდა დროებით მიუწვდომელია.' }}</div></div>
             @endunless
             @error('checkout')
-                <div class="al al-er" data-code="{{ $message }}"><x-ga.icon name="err" :size="18" /><div>{{ $message === 'payments not configured' ? ($en ? 'The payment provider is not connected.' : 'გადახდის პროვაიდერი არ არის მიერთებული.') : ($message === 'no project' ? ($en ? 'Create a project first: the subscription is attached to your workspace through a project.' : 'ჯერ შექმენით პროექტი: გამოწერა სამუშაო სივრცეს პროექტის მეშვეობით ებმება.') : $message) }}</div></div>
+                <div class="al al-er" data-code="{{ $message }}"><x-ga.icon name="err" :size="18" /><div>{{ $message === 'payments not configured' ? ($en ? 'The payment provider is not connected.' : 'გადახდის პროვაიდერი არ არის მიერთებული.') : ($message === 'no project' ? ($en ? 'Create a project first: the subscription is attached to your workspace through a project.' : 'ჯერ შექმენით პროექტი: გამოწერა სამუშაო სივრცეს პროექტის მეშვეობით ებმება.') : ($message === 'term' ? ($en ? 'Your current plan is paid for longer than this period. Upgrade for a year instead.' : 'მიმდინარე გეგმა ამ პერიოდზე დიდხანს არის გადახდილი. გაზარდეთ წლიური გადახდით.') : $message)) }}</div></div>
             @enderror
 
             @if (! empty($v2))
