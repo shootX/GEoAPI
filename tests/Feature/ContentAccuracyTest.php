@@ -41,7 +41,7 @@ final class ContentAccuracyTest extends TestCase
     {
         $samples = PublicSpec::codeSamples('/api/v1/brands');
 
-        $this->assertStringContainsString('Server-side only', $samples['JavaScript']);
+        $this->assertStringContainsString('Server-side only', $samples['Node.js']);
     }
 
     public function test_guide_code_tabs_are_real_aria_tabs_and_code_is_keyboard_scrollable(): void

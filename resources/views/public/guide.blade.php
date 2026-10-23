@@ -14,17 +14,17 @@
 @component('components.layouts.public', [
     'title' => __('Documentation').' — GeoAPI',
     'description' => $en
-        ? 'GeoAPI authorization, endpoints, widget, and error codes.'
-        : 'GeoAPI-ის ავტორიზაცია, მისამართები, ვიჯეტი და შეცდომის კოდები.',
+        ? 'GeoAPI authentication, endpoints, widget, and error codes.'
+        : 'GeoAPI-ის ავთენტიფიკაცია, მისამართები, ვიჯეტი და შეცდომის კოდები.',
     'active' => 'docs',
     'bleed' => true,
 ])
 <div class="s-ce92a4 wrap docs-l">
     <aside class="toc" aria-label="{{ __('On this page') }}">
-        <div class="gr">{{ $en ? 'ON THIS PAGE' : 'გვერდზე' }}</div>
+        <div class="gr">{{ $en ? 'ON THIS PAGE' : 'ამ გვერდზე' }}</div>
         @include('public.partials.guide-toc-links')
-        <div class="gr">{{ $en ? 'REFERENCE' : 'სპეციფიკაცია' }}</div>
-        <a href="{{ url('/api/v1/docs') }}">API reference</a>
+        <div class="gr">{{ $en ? 'REFERENCE' : 'ცნობარი' }}</div>
+        <a href="{{ url('/api/v1/docs') }}">{{ $en ? 'API reference' : 'API ცნობარი' }}</a>
         <a href="{{ url('/api/v1/openapi.json') }}">openapi.json</a>
         <a href="{{ url('/api/v1/postman.json') }}">postman.json</a>
     </aside>
@@ -35,8 +35,8 @@
     <main class="s-3922d3">
         <div class="sm mut">{{ $en ? 'Documentation / REST API v1' : 'დოკუმენტაცია / REST API v1' }}</div>
         <h1 class="s-fe74f3">{{ __('Documentation') }}</h1>
-        <p class="s-9ca068 lead">{{ $en ? 'Every endpoint with a request in cURL, JavaScript, Node.js, Python and PHP, and an example response.' : 'ყველა endpoint — მოთხოვნა cURL, JavaScript, Node.js, Python და PHP-ზე და პასუხის მაგალითი.' }}</p>
-        <div class="s-329c66 al al-in"><x-ga.icon name="lock" :size="18" /><div><b>{{ $en ? 'Authorization' : 'ავტორიზაცია' }}</b>{{ $en ? 'The secret key stays on your server. Send it as Authorization: Bearer geoapi_sk_…' : 'საიდუმლო გასაღები geoapi_sk_ მხოლოდ სერვერზე რჩება. სათაური: Authorization: Bearer.' }} {{ __('The example is illustrative.') }}</div></div>
+        <p class="s-9ca068 lead">{{ $en ? 'Every endpoint with a request in cURL, Node.js, Python, and PHP, and an example response.' : 'ყველა მისამართი (endpoint): მოთხოვნა cURL-ზე, Node.js-ზე, Python-სა და PHP-ზე და პასუხის მაგალითი.' }}</p>
+        <div class="s-329c66 al al-in"><x-ga.icon name="lock" :size="18" /><div><b>{{ $en ? 'Authentication' : 'ავთენტიფიკაცია' }}</b>{{ $en ? 'Use the secret key only on your server. Send it as Authorization: Bearer geoapi_sk_…' : 'საიდუმლო გასაღები (geoapi_sk_…) მხოლოდ სერვერზე გამოიყენეთ და გაგზავნეთ სათაურით Authorization: Bearer geoapi_sk_….' }} {{ __('The example is illustrative.') }}</div></div>
         <div class="s-8ca97c row sm"><a class="s-f0abc1 row" href="{{ url('/api/v1/docs') }}"><x-ga.icon name="ext" :size="14" />{{ $en ? 'OpenAPI reference' : 'OpenAPI ცნობარი' }}</a><a class="s-f0abc1 row" href="{{ url('/api/v1/openapi.json') }}"><x-ga.icon name="ext" :size="14" />openapi.json</a><a class="s-f0abc1 row" href="{{ url('/api/v1/postman.json') }}"><x-ga.icon name="ext" :size="14" />Postman</a></div>
     @foreach ($before as $id)
         @include('public.partials.prose', ['page' => $pageById[$id]])
@@ -55,7 +55,7 @@
         <div class="code">
             <div class="ch"><span class="on">HTML</span><button type="button" class="s-0bc09c row" data-copy-target="guide-embed" data-copied="{{ __('Copied') }}">{{ __('Copy') }}</button></div>
             <pre id="guide-embed" class="s-3f3a6c">{{ '<script src="'.rtrim((string) config('app.url'), '/').'/widget/v1/geoapi-filter.js"></script>' }}
-{{ '<geoapi-filter public-key="demo"></geoapi-filter>' }}</pre>
+{{ '<geoapi-filter public-key="geoapi_pk_…"></geoapi-filter>' }}</pre>
         </div>
     </section>
     @foreach ($after as $id)

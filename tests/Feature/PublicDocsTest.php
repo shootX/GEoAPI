@@ -67,15 +67,14 @@ final class PublicDocsTest extends TestCase
                 'https://geoapi.ge',
                 '401, not 405',
                 'not enforced in production today',
-                'packages/sdk-js',
-                'packages/mcp-server',
-                'packages/cli',
-                'not published on the public npm registry',
+                'not published yet',
+                'confirm your email',
+                '/account/products',
             ] as $needle) {
                 $this->assertStringContainsString($needle, $description, $row['path'].' '.$needle);
             }
             $this->assertSame($row['example'], $operation['x-geoapi-example']);
-            $this->assertCount(5, $operation['x-codeSamples']);
+            $this->assertCount(4, $operation['x-codeSamples']);
 
             if ($row['mode'] !== 'list') {
                 continue;
@@ -138,7 +137,7 @@ final class PublicDocsTest extends TestCase
         try {
             foreach ($this->endpointRows() as $row) {
                 $samples = PublicSpec::codeSamples($row['example']);
-                $this->assertStringContainsString(PublicSpec::ORIGIN.$row['example'], $samples['curl']);
+                $this->assertStringContainsString(PublicSpec::ORIGIN.$row['example'], $samples['cURL']);
                 $this->assertDoesNotMatchRegularExpression('/geoapi_sk_[A-Za-z0-9]{8,}_/', implode("\n", $samples));
                 $this->lint($directory, $samples);
             }
@@ -157,19 +156,19 @@ final class PublicDocsTest extends TestCase
             $this->assertStringNotContainsString('Unverified rows are omitted', $html);
             $this->assertStringNotContainsString('დაუდასტურებელი სტრიქონი არ ბრუნდება', $html);
             if ($locale === 'en') {
-                $this->assertStringContainsString('Unverified rows stay in the list.', $html);
+                $this->assertStringContainsString('those rows stay in the list.', $html);
             } else {
-                $this->assertStringContainsString('დაუდასტურებელი სტრიქონი სიაში რჩება', $html);
+                $this->assertStringContainsString('ასეთი ჩანაწერი სიაში რჩება', $html);
             }
             $this->assertStringNotContainsString('/api/admin', $html);
             $this->assertStringNotContainsString('$59', $html);
             $this->assertStringNotContainsString('npm install', $html);
             $this->assertStringContainsString($locale === 'en' ? 'not published' : 'გამოქვეყნებული არ არის', $html);
-            $this->assertStringContainsString('packages/mcp-server', $html);
-            $this->assertStringContainsString('packages/cli', $html);
+            $this->assertStringContainsString($locale === 'en' ? 'MCP server 0.1.0' : 'MCP სერვერი 0.1.0', $html);
+            $this->assertStringContainsString('CLI 0.1.0', $html);
             $this->assertStringContainsString('geoapi_list_brands', $html);
             $this->assertStringContainsString('geoapi brands list --limit 20 --json', $html);
-            $this->assertStringContainsString('public-key=&quot;demo&quot;', $html);
+            $this->assertStringContainsString('public-key=&quot;geoapi_pk_…&quot;', $html);
             preg_match_all('#https://geoapi\.ge(/api/v1/[^\\\\\s"<&]+)#', $html, $matches);
             $paths = array_values(array_unique($matches[1]));
             sort($paths);
@@ -257,7 +256,7 @@ final class PublicDocsTest extends TestCase
         $english = (string) $this->withSession(['locale' => 'en'])->get('/guide')->assertOk()->getContent();
         $this->assertStringContainsString('401, not 405', $english);
         $this->assertStringContainsString('not enforced in production today', $english);
-        $this->assertStringContainsString('packages/sdk-js', $english);
+        $this->assertStringContainsString('not published yet', $english);
         $this->assertStringContainsString('requestId is null', $english);
         $this->assertStringContainsString('<details class="toc-m">', $english);
         $this->assertStringContainsString('<summary>On this page</summary>', $english);
@@ -265,7 +264,7 @@ final class PublicDocsTest extends TestCase
 
         $georgian = (string) $this->withSession(['locale' => 'ka'])->get('/guide')->assertOk()->getContent();
         $this->assertStringContainsString('არა 405', $georgian);
-        $this->assertStringContainsString('პროდაქშენში დღეს არ მოქმედებს', $georgian);
+        $this->assertStringContainsString('მოქმედ სერვისზე დღეს არ მოქმედებს', $georgian);
         $this->assertStringContainsString('<summary>ამ გვერდზე</summary>', $georgian);
 
         $css = (string) file_get_contents(public_path('assets/public-design.css'));
@@ -280,9 +279,7 @@ final class PublicDocsTest extends TestCase
     /** @param array<string, string> $samples */
     private function lint(string $directory, array $samples): void
     {
-        file_put_contents($directory.'/sample.mjs', $samples['JavaScript']);
-        $this->command(['node', '--check', $directory.'/sample.mjs']);
-        file_put_contents($directory.'/node.mjs', $samples['Node']);
+        file_put_contents($directory.'/node.mjs', $samples['Node.js']);
         $this->command(['node', '--check', $directory.'/node.mjs']);
         file_put_contents($directory.'/sample.py', $samples['Python']);
         $this->command(['python3', '-c', 'import ast, pathlib, sys; ast.parse(pathlib.Path(sys.argv[1]).read_text());', $directory.'/sample.py']);
