@@ -4,21 +4,19 @@ declare(strict_types=1);
 
 namespace Tests\Unit;
 
+use Illuminate\Config\Repository;
+use Illuminate\Container\Container;
+use Illuminate\Foundation\Application;
 use Tests\TestCase;
 
 /** artisan with a cached config does not load .env; legacy settings then come from config('geoapi.env'). */
 final class GeoapiEnvTest extends TestCase
 {
-    private ?string $cacheFile = null;
-
     protected function tearDown(): void
     {
-        unset($_ENV['GEOAPI_ENV_PROBE'], $_SERVER['GEOAPI_ENV_PROBE'], $_ENV['APP_CONFIG_CACHE'], $_SERVER['APP_CONFIG_CACHE']);
+        unset($_ENV['GEOAPI_ENV_PROBE'], $_SERVER['GEOAPI_ENV_PROBE']);
         putenv('GEOAPI_ENV_PROBE');
-        putenv('APP_CONFIG_CACHE');
-        if ($this->cacheFile !== null) {
-            @unlink($this->cacheFile);
-        }
+        Container::setInstance($this->app);
         parent::tearDown();
     }
 
@@ -27,7 +25,7 @@ final class GeoapiEnvTest extends TestCase
         config(['geoapi.env' => ['GEOAPI_ENV_PROBE' => 'cached']]);
         $this->assertFalse(geoapi_env('GEOAPI_ENV_PROBE'), 'without a cached config the snapshot is not used');
 
-        $this->pretendConfigIsCached();
+        $this->useAppWithCachedConfig(['GEOAPI_ENV_PROBE' => 'cached']);
         $this->assertSame('cached', geoapi_env('GEOAPI_ENV_PROBE'));
 
         $_SERVER['GEOAPI_ENV_PROBE'] = 'live';
@@ -45,10 +43,17 @@ final class GeoapiEnvTest extends TestCase
         }
     }
 
-    private function pretendConfigIsCached(): void
+    /** @param array<string, string> $env */
+    private function useAppWithCachedConfig(array $env): void
     {
-        $this->cacheFile = tempnam(sys_get_temp_dir(), 'geoapi-config-');
-        $_ENV['APP_CONFIG_CACHE'] = $_SERVER['APP_CONFIG_CACHE'] = $this->cacheFile;
-        $this->assertTrue($this->app->configurationIsCached());
+        $app = new class(base_path()) extends Application
+        {
+            public function configurationIsCached(): bool
+            {
+                return true;
+            }
+        };
+        $app->instance('config', new Repository(['geoapi' => ['env' => $env]]));
+        Container::setInstance($app);
     }
 }
