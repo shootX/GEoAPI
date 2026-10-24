@@ -3,14 +3,14 @@
 declare(strict_types=1);
 
 /**
- * Reads GEOAPI_* settings. Until the server's env files are renamed, a missing GEOAPI_X falls back to
- * the old CARAPI_X name (the project was called carapi before 2026-10-23).
+ * Reads a GEOAPI_* setting. On the web, PHP-FPM passes it in the environment. In artisan with a cached
+ * config, Laravel does not load .env, so the value config:cache captured in config('geoapi.env') is used.
  */
 function geoapi_env(string $name): mixed
 {
     $value = geoapi_env_raw($name);
-    if (($value === false || $value === '') && str_starts_with($name, 'GEOAPI_')) {
-        $value = geoapi_env_raw('CARAPI_'.substr($name, 7));
+    if ($value === false || $value === '') {
+        return geoapi_env_cached($name) ?? $value;
     }
 
     return $value;
@@ -31,29 +31,36 @@ function geoapi_env_raw(string $name): mixed
     return getenv($name);
 }
 
-/** Copies every old CARAPI_X into GEOAPI_X when GEOAPI_X is not set, so Laravel's env() sees the new names too. */
-function geoapi_env_compat(): void
+function geoapi_env_cached(string $name): ?string
+{
+    if (PHP_SAPI !== 'cli' || ! class_exists(\Illuminate\Foundation\Application::class)) {
+        return null;
+    }
+    $app = \Illuminate\Container\Container::getInstance();
+    if (! $app instanceof \Illuminate\Foundation\Application || ! $app->bound('config') || ! $app->configurationIsCached()) {
+        return null;
+    }
+    $value = ((array) $app['config']->get('geoapi.env', []))[$name] ?? null;
+
+    return is_string($value) && $value !== '' ? $value : null;
+}
+
+/** @return array<string, string> every GEOAPI_* value visible now, for config/geoapi.php */
+function geoapi_env_snapshot(): array
 {
     $sources = [$_ENV, $_SERVER];
     if (function_exists('getenv')) {
         $sources[] = getenv();
     }
+    $values = [];
     foreach ($sources as $source) {
-        foreach ($source as $old => $value) {
-            if (! is_string($old) || ! str_starts_with($old, 'CARAPI_') || ! is_string($value)) {
-                continue;
-            }
-            $new = 'GEOAPI_'.substr($old, 7);
-            if (geoapi_env_raw($new) !== false && geoapi_env_raw($new) !== '') {
-                continue;
-            }
-            $_ENV[$new] = $value;
-            $_SERVER[$new] = $value;
-            if (function_exists('putenv')) {
-                putenv($new.'='.$value);
+        foreach ($source as $name => $value) {
+            if (is_string($name) && str_starts_with($name, 'GEOAPI_') && is_string($value) && $value !== '' && ! isset($values[$name])) {
+                $values[$name] = $value;
             }
         }
     }
-}
+    ksort($values);
 
-geoapi_env_compat();
+    return $values;
+}

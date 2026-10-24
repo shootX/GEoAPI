@@ -63,25 +63,25 @@
       this.names = { brand: null, model: null, year: null, body: null, generation: null, modification: null };
       this.seq = 0;
       this.shadowRoot.innerHTML = '<style>' +
-        ':host{display:block;font:var(--geoapi-font,var(--carapi-font,16px/1.4 sans-serif);color:var(--geoapi-ink,var(--carapi-ink,#141719)}' +
+        ':host{display:block;font:var(--geoapi-font,16px/1.4 sans-serif);color:var(--geoapi-ink,#141719)}' +
         '.field{position:relative;margin:0 0 12px}' +
         'label{display:block;font-weight:600}' +
         '.box{position:relative;margin-top:6px}' +
-        'input{display:block;box-sizing:border-box;width:100%;margin:0;padding:10px 40px 10px 10px;min-height:var(--geoapi-control,var(--carapi-control,auto);border:1px solid var(--geoapi-line,var(--carapi-line,#e1e4e5);border-radius:var(--geoapi-radius,var(--carapi-radius,8px);font:inherit;color:inherit;background:#fff}' +
-        'input:focus{outline:2px solid var(--geoapi-accent,var(--carapi-accent,#193f68);outline-offset:1px}' +
-        'input:disabled{background:#f4f5f6;color:var(--geoapi-muted,var(--carapi-muted,#5c6163);cursor:not-allowed}' +
-        'input::placeholder{color:var(--geoapi-muted,var(--carapi-muted,#5c6163);opacity:1}' +
-        '.toggle{position:absolute;top:50%;right:4px;display:grid;place-items:center;width:32px;height:32px;margin-top:-16px;padding:0;border:0;border-radius:6px;background:none;color:var(--geoapi-muted,var(--carapi-muted,#5c6163);cursor:pointer}' +
+        'input{display:block;box-sizing:border-box;width:100%;margin:0;padding:10px 40px 10px 10px;min-height:var(--geoapi-control,auto);border:1px solid var(--geoapi-line,#e1e4e5);border-radius:var(--geoapi-radius,8px);font:inherit;color:inherit;background:#fff}' +
+        'input:focus{outline:2px solid var(--geoapi-accent,#193f68);outline-offset:1px}' +
+        'input:disabled{background:#f4f5f6;color:var(--geoapi-muted,#5c6163);cursor:not-allowed}' +
+        'input::placeholder{color:var(--geoapi-muted,#5c6163);opacity:1}' +
+        '.toggle{position:absolute;top:50%;right:4px;display:grid;place-items:center;width:32px;height:32px;margin-top:-16px;padding:0;border:0;border-radius:6px;background:none;color:var(--geoapi-muted,#5c6163);cursor:pointer}' +
         'input:disabled+.toggle{cursor:not-allowed;opacity:.5}' +
         'input[aria-expanded="true"]+.toggle svg{transform:rotate(180deg)}' +
-        'ul{position:absolute;z-index:10;top:100%;left:0;right:0;box-sizing:border-box;max-height:264px;margin:4px 0 0;padding:4px;overflow:auto;list-style:none;background:#fff;border:1px solid var(--geoapi-line,var(--carapi-line,#e1e4e5);border-radius:var(--geoapi-radius,var(--carapi-radius,8px);box-shadow:0 14px 32px rgba(0,0,0,.14)}' +
+        'ul{position:absolute;z-index:10;top:100%;left:0;right:0;box-sizing:border-box;max-height:264px;margin:4px 0 0;padding:4px;overflow:auto;list-style:none;background:#fff;border:1px solid var(--geoapi-line,#e1e4e5);border-radius:var(--geoapi-radius,8px);box-shadow:0 14px 32px rgba(0,0,0,.14)}' +
         'li{padding:8px 10px;border-radius:6px;cursor:pointer;overflow-wrap:anywhere}' +
-        'li.active{background:#eef0f3;background:color-mix(in srgb,var(--geoapi-accent,var(--carapi-accent,#193f68) 12%,#fff)}' +
+        'li.active{background:#eef0f3;background:color-mix(in srgb,var(--geoapi-accent,#193f68) 12%,#fff)}' +
         'li[aria-selected="true"]{font-weight:600}' +
-        'li.note{color:var(--geoapi-muted,var(--carapi-muted,#5c6163);font-size:.9em;cursor:default}' +
-        'mark{background:none;color:var(--geoapi-accent,var(--carapi-accent,#193f68);font-weight:700}' +
+        'li.note{color:var(--geoapi-muted,#5c6163);font-size:.9em;cursor:default}' +
+        'mark{background:none;color:var(--geoapi-accent,#193f68);font-weight:700}' +
         'select{position:absolute;left:0;bottom:0;width:1px;height:1px;margin:0;padding:0;border:0;opacity:0;pointer-events:none}' +
-        'p{margin:8px 0;color:var(--geoapi-muted,var(--carapi-muted,#5c6163)}' +
+        'p{margin:8px 0;color:var(--geoapi-muted,#5c6163)}' +
         '.err{color:#9b2c2c}' +
         '</style>' +
         LEVELS.map((level) => field(level, this.uid)).join('') +
@@ -418,10 +418,7 @@
         generation_name: this.names.generation,
         modification_name: this.names.modification
       };
-      var self = this;
-      ['geoapi:change', 'carapi:change'].forEach(function (name) {
-        self.dispatchEvent(new CustomEvent(name, { bubbles: true, composed: true, detail: detail }));
-      });
+      this.dispatchEvent(new CustomEvent('geoapi:change', { bubbles: true, composed: true, detail: detail }));
     }
 
     combo(level) {
@@ -662,8 +659,5 @@
 
   if (!customElements.get('geoapi-filter')) {
     customElements.define('geoapi-filter', GeoapiFilter);
-  }
-  if (!customElements.get('carapi-filter')) {
-    customElements.define('carapi-filter', GeoapiFilter);
   }
 })();

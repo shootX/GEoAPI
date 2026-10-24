@@ -24,7 +24,7 @@ final class ApiKeys
     /** @return array{selector:string,secret:string}|null */
     public static function parse(string $token): ?array
     {
-        if (preg_match('/^(?:geoapi_sk_|carapi_sk_)([0-9a-f]{32})_([A-Za-z0-9_-]{43})$/', $token) !== 1) {
+        if (preg_match('/^geoapi_sk_([0-9a-f]{32})_([A-Za-z0-9_-]{43})$/', $token) !== 1) {
             return null;
         }
 

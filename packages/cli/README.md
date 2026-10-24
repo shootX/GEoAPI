@@ -19,4 +19,4 @@ Use the absolute path. A host does not start in this repository. `--json` writes
 
 Exit codes: 0 success, 2 invalid input (including 400, 404, 405, and 422), 3 auth (401 and 403), 4 rate limited (429), 5 network or service (including 503). 429 and 503 retry through the SDK at most twice. `Retry-After` of 0 does not wait. A missing `Retry-After` waits 250 ms times the attempt.
 
-`geoapi_sk_` and `carapi_sk_` text is replaced with `[redacted]` on stdout and stderr. `npm test` uses a mock `fetch`. It does not call production.
+`geoapi_sk_` text is replaced with `[redacted]` on stdout and stderr. `npm test` uses a mock `fetch`. It does not call production.

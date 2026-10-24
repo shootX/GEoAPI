@@ -202,18 +202,18 @@ final class ProjectAccessQuotaTest extends TestCase
             ->assertUnauthorized();
     }
 
-    public function test_the_pre_rename_project_header_still_selects_the_project(): void
+    public function test_the_project_header_selects_the_project(): void
     {
         $this->useIssuedKeys();
         $owner = $this->user(3);
         $token = $owner->createToken('cars', ['cars:read'])->plainTextToken;
 
         $this->withHeader('Authorization', 'Bearer '.$token)
-            ->withHeader('X-CARAPI-PROJECT', '8')
+            ->withHeader('X-GEOAPI-PROJECT', '8')
             ->getJson('/api/v1/brands')
             ->assertForbidden();
         $this->withHeader('Authorization', 'Bearer '.$token)
-            ->withHeader('X-CARAPI-PROJECT', '7')
+            ->withHeader('X-GEOAPI-PROJECT', '7')
             ->getJson('/api/v1/brands?limit=1')
             ->assertOk();
     }

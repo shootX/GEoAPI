@@ -101,32 +101,32 @@ final class Http
     private static function route(string $path): ?array
     {
         $path = rawurldecode($path);
-        if (preg_match('#^/widget/v1/((?:geoapi_pk_|carapi_pk_)[0-9a-f]{32})/brands$#', $path, $m) === 1) {
+        if (preg_match('#^/widget/v1/(geoapi_pk_[0-9a-f]{32})/brands$#', $path, $m) === 1) {
             return ['key' => $m[1], 'kind' => 'widget:brands'];
         }
-        if (preg_match('#^/widget/v1/((?:geoapi_pk_|carapi_pk_)[0-9a-f]{32})/brands/([^/]+)/models$#u', $path, $m) === 1) {
+        if (preg_match('#^/widget/v1/(geoapi_pk_[0-9a-f]{32})/brands/([^/]+)/models$#u', $path, $m) === 1) {
             return ['key' => $m[1], 'kind' => 'widget:models', 'slug' => $m[2]];
         }
-        if (preg_match('#^/widget/v1/((?:geoapi_pk_|carapi_pk_)[0-9a-f]{32})/models/([1-9][0-9]{0,18})/years$#', $path, $m) === 1) {
+        if (preg_match('#^/widget/v1/(geoapi_pk_[0-9a-f]{32})/models/([1-9][0-9]{0,18})/years$#', $path, $m) === 1) {
             return ['key' => $m[1], 'kind' => 'widget:years', 'id' => $m[2]];
         }
-        if (preg_match('#^/widget/v1/((?:geoapi_pk_|carapi_pk_)[0-9a-f]{32})/models/([^/]+)/years$#', $path, $m) === 1) {
+        if (preg_match('#^/widget/v1/(geoapi_pk_[0-9a-f]{32})/models/([^/]+)/years$#', $path, $m) === 1) {
             CatalogHttp::json(422, ['error' => ['code' => 'invalid_parameter', 'message' => 'მოდელის id არასწორია. გამოიყენეთ დადებითი მთელი რიცხვი, რომელიც API-ის პასუხშია.']]);
 
             return ['key' => $m[1], 'kind' => 'invalid'];
         }
-        if (preg_match('#^/widget/v1/((?:geoapi_pk_|carapi_pk_)[0-9a-f]{32})/models/([1-9][0-9]{0,18})/generations$#', $path, $m) === 1) {
+        if (preg_match('#^/widget/v1/(geoapi_pk_[0-9a-f]{32})/models/([1-9][0-9]{0,18})/generations$#', $path, $m) === 1) {
             return ['key' => $m[1], 'kind' => 'widget:generations', 'id' => $m[2]];
         }
-        if (preg_match('#^/widget/v1/((?:geoapi_pk_|carapi_pk_)[0-9a-f]{32})/generations/([1-9][0-9]{0,18})/modifications$#', $path, $m) === 1) {
+        if (preg_match('#^/widget/v1/(geoapi_pk_[0-9a-f]{32})/generations/([1-9][0-9]{0,18})/modifications$#', $path, $m) === 1) {
             return ['key' => $m[1], 'kind' => 'widget:modifications', 'id' => $m[2]];
         }
-        if (preg_match('#^/widget/v1/((?:geoapi_pk_|carapi_pk_)[0-9a-f]{32})/generations/([^/]+)/modifications$#', $path, $m) === 1) {
+        if (preg_match('#^/widget/v1/(geoapi_pk_[0-9a-f]{32})/generations/([^/]+)/modifications$#', $path, $m) === 1) {
             CatalogHttp::json(422, ['error' => ['code' => 'invalid_parameter', 'message' => 'თაობის id არასწორია. გამოიყენეთ დადებითი მთელი რიცხვი, რომელიც API-ის პასუხშია.']]);
 
             return ['key' => $m[1], 'kind' => 'invalid'];
         }
-        if (preg_match('#^/widget/v1/((?:geoapi_pk_|carapi_pk_)[0-9a-f]{32})/models/([^/]+)/generations$#', $path, $m) === 1) {
+        if (preg_match('#^/widget/v1/(geoapi_pk_[0-9a-f]{32})/models/([^/]+)/generations$#', $path, $m) === 1) {
             CatalogHttp::json(422, ['error' => ['code' => 'invalid_parameter', 'message' => 'მოდელის id არასწორია. გამოიყენეთ დადებითი მთელი რიცხვი, რომელიც API-ის პასუხშია.']]);
 
             return ['key' => $m[1], 'kind' => 'invalid'];
