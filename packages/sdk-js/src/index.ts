@@ -317,8 +317,7 @@ export class GeoAPI {
     const scope = globalThis as { window?: unknown; document?: unknown; importScripts?: unknown };
     // Pages and web workers both run untrusted-visible code; a secret key must not be shipped to either.
     const browser = scope.window !== undefined || scope.document !== undefined || typeof scope.importScripts === "function";
-    // carapi_sk_ is the legacy prefix of the same secret key.
-    if (browser && /^(geoapi|carapi)_sk_/.test(options.apiKey)) {
+    if (browser && /^geoapi_sk_/.test(options.apiKey)) {
       throw new GeoAPIError(0, null, "A secret key cannot be used in the browser.");
     }
     const baseUrl = (options.baseUrl ?? "https://geoapi.ge").replace(/\/+$/, "");

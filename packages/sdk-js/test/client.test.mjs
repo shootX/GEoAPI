@@ -174,7 +174,6 @@ test("refuses a secret key in the browser before any request", () => {
         return true;
       },
     );
-    assert.throws(() => new GeoAPI({ apiKey: "carapi_sk_legacy_secret", fetch: async () => jsonResponse(200, {}) }), GeoAPIError);
     const publishable = new GeoAPI({ apiKey: "geoapi_pk_demo", fetch: async () => jsonResponse(200, {}) });
     assert.ok(publishable);
     assert.equal(calls, 0);

@@ -39,7 +39,7 @@ final class AuditLog
                 continue;
             }
             if (is_string($value)) {
-                $value = preg_replace('/(?:geoapi|carapi)_sk_[A-Za-z0-9_-]+/', '[redacted]', $value) ?? $value;
+                $value = preg_replace('/geoapi_sk_[A-Za-z0-9_-]+/', '[redacted]', $value) ?? $value;
             }
             $clean[$key] = $value;
         }

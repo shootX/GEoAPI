@@ -148,7 +148,7 @@ const COMMANDS: Command[] = [
 ];
 
 function scrub(text: string, apiKey: string): string {
-  let out = text.replace(/(?:geoapi|carapi)_sk_[A-Za-z0-9_-]+/g, "[redacted]");
+  let out = text.replace(/geoapi_sk_[A-Za-z0-9_-]+/g, "[redacted]");
   if (apiKey.length >= 8 && out.includes(apiKey)) {
     out = out.split(apiKey).join("[redacted]");
   }

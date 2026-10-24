@@ -4,42 +4,51 @@ declare(strict_types=1);
 
 namespace Tests\Unit;
 
-use PHPUnit\Framework\TestCase;
+use Tests\TestCase;
 
-/** The project was renamed from carapi; old CARAPI_* server settings keep working until they are renamed. */
+/** artisan with a cached config does not load .env; legacy settings then come from config('geoapi.env'). */
 final class GeoapiEnvTest extends TestCase
 {
+    private ?string $cacheFile = null;
+
     protected function tearDown(): void
     {
-        foreach (['GEOAPI_RENAME_PROBE', 'CARAPI_RENAME_PROBE'] as $name) {
-            unset($_ENV[$name], $_SERVER[$name]);
-            putenv($name);
+        unset($_ENV['GEOAPI_ENV_PROBE'], $_SERVER['GEOAPI_ENV_PROBE'], $_ENV['APP_CONFIG_CACHE'], $_SERVER['APP_CONFIG_CACHE']);
+        putenv('GEOAPI_ENV_PROBE');
+        putenv('APP_CONFIG_CACHE');
+        if ($this->cacheFile !== null) {
+            @unlink($this->cacheFile);
         }
         parent::tearDown();
     }
 
-    public function test_the_new_name_wins_and_the_old_name_is_a_fallback(): void
+    public function test_the_environment_wins_and_the_cached_value_is_only_a_fallback(): void
     {
-        $this->assertFalse(geoapi_env('GEOAPI_RENAME_PROBE'));
+        config(['geoapi.env' => ['GEOAPI_ENV_PROBE' => 'cached']]);
+        $this->assertFalse(geoapi_env('GEOAPI_ENV_PROBE'), 'without a cached config the snapshot is not used');
 
-        putenv('CARAPI_RENAME_PROBE=old');
-        $this->assertSame('old', geoapi_env('GEOAPI_RENAME_PROBE'));
+        $this->pretendConfigIsCached();
+        $this->assertSame('cached', geoapi_env('GEOAPI_ENV_PROBE'));
 
-        $_SERVER['GEOAPI_RENAME_PROBE'] = 'new';
-        $this->assertSame('new', geoapi_env('GEOAPI_RENAME_PROBE'));
+        $_SERVER['GEOAPI_ENV_PROBE'] = 'live';
+        $this->assertSame('live', geoapi_env('GEOAPI_ENV_PROBE'));
     }
 
-    public function test_compat_copies_old_names_without_overwriting_new_ones(): void
+    public function test_the_snapshot_keeps_only_geoapi_settings(): void
     {
-        $_ENV['CARAPI_RENAME_PROBE'] = 'old';
-        geoapi_env_compat();
-        $this->assertSame('old', $_SERVER['GEOAPI_RENAME_PROBE']);
-        $this->assertSame('old', getenv('GEOAPI_RENAME_PROBE'));
+        $_ENV['GEOAPI_ENV_PROBE'] = 'x';
+        $snapshot = geoapi_env_snapshot();
 
-        $_ENV['GEOAPI_RENAME_PROBE'] = 'new';
-        $_SERVER['GEOAPI_RENAME_PROBE'] = 'new';
-        putenv('GEOAPI_RENAME_PROBE=new');
-        geoapi_env_compat();
-        $this->assertSame('new', getenv('GEOAPI_RENAME_PROBE'));
+        $this->assertSame('x', $snapshot['GEOAPI_ENV_PROBE']);
+        foreach (array_keys($snapshot) as $name) {
+            $this->assertStringStartsWith('GEOAPI_', $name);
+        }
+    }
+
+    private function pretendConfigIsCached(): void
+    {
+        $this->cacheFile = tempnam(sys_get_temp_dir(), 'geoapi-config-');
+        $_ENV['APP_CONFIG_CACHE'] = $_SERVER['APP_CONFIG_CACHE'] = $this->cacheFile;
+        $this->assertTrue($this->app->configurationIsCached());
     }
 }

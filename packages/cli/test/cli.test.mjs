@@ -123,19 +123,19 @@ test("invalid input exits 2 before a request", async () => {
   assert.match(out.stderr, /GEOAPI_API_KEY, not on the command line/);
 });
 
-test("a wrong token exits 3 and redacts geoapi_sk_ and carapi_sk_", async () => {
+test("a wrong token exits 3 and redacts every geoapi_sk_ key", async () => {
   let calls = 0;
-  const legacy = "carapi_sk_legacy_secret";
+  const other = "geoapi_sk_other_secret";
   const { out, io } = capture(async () => {
     calls += 1;
-    return jsonResponse(401, { error: { code: "unauthorized", message: `denied ${KEY} ${legacy}` } });
+    return jsonResponse(401, { error: { code: "unauthorized", message: `denied ${KEY} ${other}` } });
   });
   assert.equal(await main(["brands", "list"], io), 3);
   assert.equal(calls, 1);
   assert.equal(out.stdout, "");
   assert.match(out.stderr, /^unauthorized: denied \[redacted\] \[redacted\]\n/);
   assert.equal(out.stderr.includes(KEY), false);
-  assert.equal(out.stderr.includes(legacy), false);
+  assert.equal(out.stderr.includes(other), false);
 });
 
 test("429 retries twice and then exits 4", async () => {
@@ -178,7 +178,7 @@ test("503 exits 5 and a network error does not print the key", async () => {
   assert.match(limited.out.stderr, /^unavailable: down retryAfter=0\n/);
 
   const { out, io } = capture(async () => {
-    throw new Error(`socket ${KEY} carapi_sk_legacy_secret`);
+    throw new Error(`socket ${KEY} geoapi_sk_other_secret`);
   });
   assert.equal(await main(["coverage"], io), 5);
   assert.equal(out.stdout, "");
@@ -187,11 +187,11 @@ test("503 exits 5 and a network error does not print the key", async () => {
 });
 
 test("stdout redacts a secret that the payload echoed", async () => {
-  const { out, io } = capture(async () => jsonResponse(200, { data: [{ name: `${KEY} carapi_sk_legacy_secret` }] }));
+  const { out, io } = capture(async () => jsonResponse(200, { data: [{ name: `${KEY} geoapi_sk_other_secret` }] }));
   assert.equal(await main(["brands", "list", "--json"], io), 0);
   assert.match(out.stdout, /\[redacted\] \[redacted\]/);
   assert.equal(out.stdout.includes(KEY), false);
-  assert.equal(out.stdout.includes("carapi_sk_"), false);
+  assert.equal(out.stdout.includes("geoapi_sk_"), false);
 });
 
 test("the executable help and a missing key do not call the network", () => {
