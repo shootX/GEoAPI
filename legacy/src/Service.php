@@ -31,8 +31,7 @@ final class Service
         $key = self::key($make, $model, $year);
 
         $meta = $this->cache->getMeta($key);
-        // 'carapi' marks photo cache entries written before the project was renamed.
-        if (is_array($meta) && in_array(($meta['source'] ?? ''), ['geoapi', 'carapi'], true) && empty($meta['catalog_url'])) {
+        if (is_array($meta) && ($meta['source'] ?? '') === 'geoapi' && empty($meta['catalog_url'])) {
             $status = (int)($meta['status'] ?? -1);
             if ($status === 1 && !empty($meta['file']) && $this->cache->hasImage((string) $meta['file'])
                 && ImagePolicy::mayRedistribute((string) ($meta['license'] ?? ''))) {
